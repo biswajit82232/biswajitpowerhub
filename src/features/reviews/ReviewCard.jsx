@@ -43,10 +43,10 @@ export function ReviewCard({ review, className }) {
             {initials(review.name)}
           </span>
         )}
-        <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-heading">{review.name}</p>
+        <div className="min-w-0 flex-1">
+          <p className="break-words text-sm font-bold text-heading">{review.name}</p>
           {review.scooter && (
-            <p className="truncate text-xs text-muted">Owns the {review.scooter}</p>
+            <p className="break-words text-xs text-muted">Owns the {review.scooter}</p>
           )}
         </div>
       </figcaption>

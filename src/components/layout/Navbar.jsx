@@ -27,11 +27,12 @@ export function Navbar() {
       className={cn(
         'fixed inset-x-0 top-0 z-50 w-full border-b transition-shadow duration-300 ease-premium',
         'bg-surface/95 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/90',
+        'pt-[env(safe-area-inset-top,0px)]',
         scrolled ? 'border-line/80 shadow-soft' : 'border-line/60',
       )}
     >
-      <nav className="container-px flex h-[var(--header-height)] items-center justify-between">
-        <Logo compact />
+      <nav className="container-px flex h-[var(--header-height)] min-w-0 items-center justify-between gap-2">
+        <Logo compact className="min-w-0 shrink" />
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 lg:flex">
@@ -92,7 +93,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 top-[var(--header-height)] z-40 bg-heading/30 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 top-[var(--header-offset)] z-40 bg-heading/30 backdrop-blur-sm lg:hidden"
               onClick={() => setOpen(false)}
             />
             <motion.div
@@ -100,7 +101,7 @@ export function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute inset-x-0 top-[var(--header-height)] z-50 border-b border-line bg-surface px-5 pb-6 pt-3 shadow-card lg:hidden"
+              className="absolute inset-x-0 top-[var(--header-height)] z-50 max-h-[calc(100dvh-var(--header-offset))] overflow-y-auto border-b border-line bg-surface px-4 pb-6 pt-3 shadow-card sm:px-5 lg:hidden"
             >
               <div className="flex flex-col gap-1">
                 {NAV_LINKS.map((link) => (

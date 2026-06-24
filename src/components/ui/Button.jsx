@@ -54,7 +54,7 @@ const Button = forwardRef(function Button(
     'disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97]',
     VARIANTS[variant],
     SIZES[size],
-    fullWidth && 'w-full',
+    fullWidth && 'w-full whitespace-normal text-center leading-snug',
     className
   );
 

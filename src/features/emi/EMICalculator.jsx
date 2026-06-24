@@ -37,15 +37,15 @@ export function EMICalculator({ price, settings, scooterId }) {
   };
 
   return (
-    <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
+    <div className="min-w-0 rounded-2xl bg-surface p-4 ring-1 ring-line shadow-soft sm:p-6">
       <h3 className="font-display text-lg font-bold text-heading">EMI Calculator</h3>
       <p className="mt-1 text-sm text-muted">Estimate your monthly payment.</p>
 
       <div className="mt-6 space-y-6" onPointerDown={track}>
         <div>
-          <div className="mb-2 flex items-center justify-between text-sm font-semibold text-heading">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm font-semibold text-heading">
             <span>Vehicle price</span>
-            <span className="text-brand-600">{formatINR(price)}</span>
+            <span className="break-words text-brand-600">{formatINR(price)}</span>
           </div>
           <div className="h-2 rounded-full bg-line">
             <div className="h-full rounded-full bg-brand-gradient" style={{ width: '100%' }} />
@@ -53,9 +53,9 @@ export function EMICalculator({ price, settings, scooterId }) {
         </div>
 
         <div>
-          <div className="mb-2 flex items-center justify-between text-sm font-semibold text-heading">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm font-semibold text-heading">
             <span>Down payment ({downPct}%)</span>
-            <span className="text-brand-600">{formatINR(downPayment)}</span>
+            <span className="break-words text-brand-600">{formatINR(downPayment)}</span>
           </div>
           <RangeSlider
             value={downPct}
@@ -101,9 +101,9 @@ export function EMICalculator({ price, settings, scooterId }) {
 
       {/* Result */}
       <motion.div layout className="mt-6 rounded-2xl bg-surface-alt p-5">
-        <div className="flex items-end justify-between">
+        <div className="flex flex-wrap items-end justify-between gap-2">
           <span className="text-sm font-medium text-body">Monthly EMI</span>
-          <Amount value={result.emi} className="font-display text-3xl font-extrabold text-brand-700" />
+          <Amount value={result.emi} className="break-words font-display text-2xl font-extrabold text-brand-700 sm:text-3xl" />
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm">
           <div>

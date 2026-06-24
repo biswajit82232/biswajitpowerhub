@@ -28,21 +28,22 @@ export function ScooterGallery({ scooter }) {
               hue={scooter.hue}
               name={scooter.name}
               loading="eager"
-              className="aspect-[4/3] w-full"
+              fit="contain"
+              className="aspect-[4/3] w-full bg-surface-alt"
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
       {images.length > 1 && (
-        <div className="mt-4 flex gap-3">
+        <div className="no-scrollbar mt-4 flex gap-3 overflow-x-auto pb-1">
           {images.map((img, i) => (
             <button
               key={i}
               onClick={() => setActive(i)}
               aria-label={`View image ${i + 1}`}
               className={cn(
-                'overflow-hidden rounded-xl ring-2 transition',
+                'shrink-0 overflow-hidden rounded-xl ring-2 transition',
                 active === i ? 'ring-brand-500' : 'ring-line hover:ring-brand-200'
               )}
             >

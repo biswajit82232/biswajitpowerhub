@@ -5,21 +5,38 @@
 @layer base {
   :root {
     --header-height: 68px;
+    --header-offset: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
+  #root {
+    min-width: 0;
+    width: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    @apply bg-bg text-body font-sans antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+    overflow-wrap: anywhere;
+  }
+
+  h1, h2, h3, h4, h5, h6, p, li, td, th, blockquote {
+    overflow-wrap: anywhere;
   }
 
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
-  html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  body {
-    @apply bg-bg text-body font-sans antialiased;
-    text-rendering: optimizeLegibility;
-    overflow-x: hidden;
+  .grid > * {
+    min-width: 0;
   }
 
   ::selection {
@@ -64,7 +81,7 @@
 
 @layer components {
   .container-px {
-    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8;
   }
 
   .text-gradient {

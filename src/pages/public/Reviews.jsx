@@ -80,7 +80,7 @@ export default function Reviews() {
 
           {/* Submit form */}
           <div>
-            <div className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
+            <div className="lg:sticky lg:top-[calc(var(--header-offset)+1.5rem)] lg:self-start">
               <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
                 <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
                   <PenLine className="h-5 w-5 text-brand-500" /> Write a review

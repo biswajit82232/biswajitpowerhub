@@ -16,7 +16,7 @@ const HUES = {
   cyan: 'from-cyan-100 via-cyan-50 to-white text-cyan-500',
 };
 
-export function ScooterImage({ src, alt, hue = 'blue', className, name, loading = 'lazy' }) {
+export function ScooterImage({ src, alt, hue = 'blue', className, name, loading = 'lazy', fit = 'cover' }) {
   const [errored, setErrored] = useState(false);
   const showImage = src && !errored;
 
@@ -29,7 +29,10 @@ export function ScooterImage({ src, alt, hue = 'blue', className, name, loading 
           loading={loading}
           decoding="async"
           onError={() => setErrored(true)}
-          className="h-full w-full object-cover"
+          className={cn(
+            'h-full w-full',
+            fit === 'contain' ? 'object-contain object-center' : 'object-cover',
+          )}
         />
       ) : (
         <div

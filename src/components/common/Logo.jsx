@@ -9,7 +9,7 @@ const LOGO_SRC = '/logo-192.png';
  */
 export function Logo({ to = '/', className, compact = false, light = false }) {
   return (
-    <Link to={to} className={cn('group flex items-center gap-2.5', className)} aria-label={SITE.name}>
+    <Link to={to} className={cn('group flex min-w-0 items-center gap-2 sm:gap-2.5', className)} aria-label={SITE.name}>
       <img
         src={LOGO_SRC}
         alt=""
@@ -20,10 +20,11 @@ export function Logo({ to = '/', className, compact = false, light = false }) {
           light && 'bg-white p-1 shadow-sm ring-1 ring-white/20',
         )}
       />
-      <span className="flex flex-col leading-none">
+      <span className={cn('hidden min-w-0 flex-col leading-none sm:flex', !compact && 'flex')}>
         <span
           className={cn(
-            'font-display text-[0.95rem] font-extrabold tracking-tight sm:text-base',
+            'break-words font-display font-extrabold tracking-tight',
+            compact ? 'text-[0.85rem] sm:text-base' : 'text-[0.95rem] sm:text-base',
             light ? 'text-white' : 'text-heading'
           )}
         >

@@ -28,9 +28,9 @@ function Spec({ icon: Icon, label, value }) {
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
         <Icon className="h-4.5 w-4.5" strokeWidth={2.2} />
       </span>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-muted">{label}</p>
-        <p className="truncate text-sm font-bold text-heading">{value}</p>
+        <p className="break-words text-sm font-bold leading-snug text-heading">{value}</p>
       </div>
     </div>
   );
@@ -83,33 +83,33 @@ export default function ScooterDetails() {
     <>
       <SEO title={scooter.name} description={scooter.description} path={`/scooters/${scooter.id}`} jsonLd={productSchema} />
 
-      <div className="container-px py-6 sm:py-10">
+      <div className="container-px min-w-0 pb-10 pt-6 sm:pb-14 sm:pt-10">
         <Link to="/scooters" className="inline-flex items-center gap-1 text-sm font-semibold text-muted transition hover:text-brand-700">
-          <ChevronLeft className="h-4 w-4" /> All scooters
+          <ChevronLeft className="h-4 w-4 shrink-0" /> All scooters
         </Link>
 
-        <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="mt-6 grid min-w-0 gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Gallery */}
-          <Reveal>
+          <Reveal className="min-w-0">
             <ScooterGallery scooter={scooter} />
           </Reveal>
 
           {/* Summary */}
-          <Reveal delay={0.05}>
+          <Reveal delay={0.05} className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone={stock.tone}>{stock.label}</Badge>
               {scooter.noLicence && <Badge tone="brand">No Licence*</Badge>}
               {scooter.noRegistration && <Badge tone="accent">No Registration*</Badge>}
             </div>
-            <h1 className="mt-4 font-display text-display-md font-extrabold text-heading">{scooter.name}</h1>
-            <p className="mt-1 text-base text-muted">{scooter.tagline}</p>
+            <h1 className="mt-4 break-words font-display text-display-md font-extrabold text-heading">{scooter.name}</h1>
+            <p className="mt-1 break-words text-base text-muted">{scooter.tagline}</p>
 
-            <div className="mt-5 flex items-end gap-3">
-              <span className="font-display text-4xl font-extrabold text-heading">{formatINR(scooter.price)}</span>
+            <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
+              <span className="break-words font-display text-3xl font-extrabold text-heading sm:text-4xl">{formatINR(scooter.price)}</span>
               <span className="pb-1 text-sm text-muted">on-road price</span>
             </div>
 
-            <p className="mt-5 leading-relaxed text-body">{scooter.description}</p>
+            <p className="mt-5 break-words leading-relaxed text-body">{scooter.description}</p>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button
@@ -128,7 +128,7 @@ export default function ScooterDetails() {
             </div>
 
             {/* Quick specs */}
-            <div className="mt-7 grid grid-cols-2 gap-3">
+            <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Spec icon={BatteryCharging} label="Range" value={`${scooter.range} km`} />
               <Spec icon={Gauge} label="Top speed" value={`${scooter.topSpeed} km/h`} />
               <Spec icon={Timer} label="Charging time" value={scooter.chargingTime} />
@@ -137,11 +137,11 @@ export default function ScooterDetails() {
           </Reveal>
         </div>
 
-        {/* Full specs + EMI */}
-        <div className="mt-14 grid gap-8 lg:grid-cols-5 lg:gap-12">
-          <div className="lg:col-span-3">
-            <h2 className="font-display text-display-md font-bold text-heading">Specifications</h2>
-            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {/* Full specs + EMI — EMI first on mobile for visibility */}
+        <div className="mt-14 grid min-w-0 gap-8 lg:grid-cols-5 lg:gap-12">
+          <div className="order-2 min-w-0 lg:order-1 lg:col-span-3">
+            <h2 className="break-words font-display text-display-md font-bold text-heading">Specifications</h2>
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <Spec icon={BatteryCharging} label="Battery type" value={scooter.batteryType} />
               <Spec icon={Cpu} label="Battery capacity" value={scooter.batteryCapacity} />
               <Spec icon={Gauge} label="Range" value={`${scooter.range} km`} />
@@ -161,7 +161,7 @@ export default function ScooterDetails() {
                 </h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {scooter.colors.map((c) => (
-                    <span key={c} className="rounded-full bg-surface px-4 py-2 text-sm font-medium text-body ring-1 ring-line">
+                    <span key={c} className="break-words rounded-full bg-surface px-3 py-2 text-sm font-medium text-body ring-1 ring-line sm:px-4">
                       {c}
                     </span>
                   ))}
@@ -174,10 +174,10 @@ export default function ScooterDetails() {
               <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
                 <Sparkles className="h-5 w-5 text-accent-500" /> Features
               </h3>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-4 grid grid-cols-1 gap-3">
                 {scooter.features?.map((f) => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm text-body">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-50 text-accent-600">
+                  <li key={f} className="flex items-start gap-2.5 break-words text-sm text-body">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-50 text-accent-600">
                       <Check className="h-3.5 w-3.5" strokeWidth={3} />
                     </span>
                     {f}
@@ -190,10 +190,10 @@ export default function ScooterDetails() {
             {scooter.benefits?.length > 0 && (
               <div className="mt-8 rounded-2xl bg-surface-alt p-6">
                 <h3 className="font-display text-lg font-bold text-heading">Why riders love it</h3>
-                <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {scooter.benefits.map((b) => (
-                    <li key={b} className="flex items-center gap-2.5 text-sm font-medium text-body">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white">
+                    <li key={b} className="flex items-start gap-2.5 break-words text-sm font-medium text-body">
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white">
                         <Check className="h-3.5 w-3.5" strokeWidth={3} />
                       </span>
                       {b}
@@ -204,9 +204,9 @@ export default function ScooterDetails() {
             )}
           </div>
 
-          {/* EMI sticky */}
-          <div className="lg:col-span-2">
-            <div className="lg:sticky lg:top-[calc(var(--header-height)+1.5rem)]">
+          {/* EMI — shown before full specs on mobile */}
+          <div className="order-1 min-w-0 lg:order-2 lg:col-span-2">
+            <div className="lg:sticky lg:top-[calc(var(--header-offset)+1.5rem)] lg:self-start">
               <EMICalculator price={scooter.price} settings={settings} scooterId={scooter.id} />
             </div>
           </div>

@@ -110,8 +110,8 @@ function DetailKpi({ icon, label, value, decimals = 0, prefix = '', suffix = '',
       <span className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-md', t.icon)}>
         {icon}
       </span>
-      <div className="min-w-0">
-        <p className="truncate text-[10px] font-semibold text-muted">{label}</p>
+      <div className="min-w-0 flex-1">
+        <p className="break-words text-[10px] font-semibold leading-tight text-muted">{label}</p>
         <p className="font-display text-sm font-bold leading-tight text-heading">
           <CountValue value={value} decimals={decimals} prefix={prefix} suffix={suffix} />
         </p>

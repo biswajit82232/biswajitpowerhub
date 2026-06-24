@@ -37,7 +37,7 @@ export function ScooterCard({ scooter, index = 0 }) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <h3 className="font-display text-lg font-bold text-heading">{scooter.name}</h3>
-            <p className="text-sm text-muted">{scooter.tagline}</p>
+            <p className="break-words text-sm text-muted">{scooter.tagline}</p>
           </div>
         </div>
 

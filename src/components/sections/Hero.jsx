@@ -22,9 +22,9 @@ const d = (ms) => ({ animationDelay: `${ms}ms` });
 
 export function Hero({ heroImageUrl }) {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-x-clip">
       {/* Background — static, no animated blur on mobile */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_20%_-10%,#DBEAFE,transparent_60%),radial-gradient(ellipse_80%_60%_at_80%_10%,#CCFBF1,transparent_55%)] bg-bg" />
         <div className="absolute -left-32 -top-32 h-72 w-72 rounded-full bg-blue-200/25 blur-2xl lg:h-96 lg:w-96" />
         <div className="absolute -right-20 top-10 h-64 w-64 rounded-full bg-teal-200/20 blur-2xl lg:h-80 lg:w-80" />
@@ -34,7 +34,7 @@ export function Hero({ heroImageUrl }) {
         {/* Left — CSS stagger (opacity + transform only) */}
         <div className="text-center lg:text-left">
           <div className="animate-hero-rise" style={d(0)}>
-            <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-50 to-accent-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-700 ring-1 ring-brand-200 shadow-sm">
+            <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-50 to-accent-50 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-brand-700 ring-1 ring-brand-200 shadow-sm sm:px-4 sm:text-xs">
               <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-gradient">
                 <Zap className="h-2.5 w-2.5 text-white" fill="white" />
               </span>
@@ -101,7 +101,7 @@ export function Hero({ heroImageUrl }) {
 
         {/* Right — card */}
         <div
-          className="relative mx-auto w-full max-w-md animate-hero-scale lg:max-w-none"
+          className="relative mx-auto w-full max-w-md animate-hero-scale pb-10 sm:pb-12 lg:max-w-none lg:pb-0"
           style={d(180)}
         >
           <div className="absolute -inset-3 rounded-[2.5rem] bg-gradient-to-br from-brand-300/10 to-teal-300/10 blur-xl" />
@@ -116,7 +116,7 @@ export function Hero({ heroImageUrl }) {
               loading="eager"
             />
 
-            <div className="absolute -bottom-5 -left-4 animate-hero-pop" style={d(520)}>
+            <div className="absolute -bottom-4 left-0 animate-hero-pop sm:-bottom-5 sm:-left-4" style={d(520)}>
               <div className="glass flex items-center gap-3 rounded-2xl px-4 py-3 shadow-card animate-float-slow">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500">
                   <BatteryCharging className="h-5 w-5 text-white" />
@@ -128,7 +128,7 @@ export function Hero({ heroImageUrl }) {
               </div>
             </div>
 
-            <div className="absolute -right-4 top-8 animate-hero-pop" style={d(600)}>
+            <div className="absolute -right-2 top-6 animate-hero-pop sm:-right-4 sm:top-8" style={d(600)}>
               <div className="glass flex items-center gap-2.5 rounded-2xl px-4 py-3 shadow-card animate-float-med [animation-delay:1s]">
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500">
                   <Zap className="h-4 w-4 text-white" fill="white" />
@@ -150,11 +150,11 @@ export function Hero({ heroImageUrl }) {
             {STATS.map(({ value, label }, i) => (
               <div
                 key={label}
-                className="flex animate-hero-rise flex-col items-center gap-0.5 px-4 py-4 sm:py-5"
+                className="flex animate-hero-rise flex-col items-center gap-0.5 px-2 py-4 text-center sm:px-4 sm:py-5"
                 style={d(420 + i * 50)}
               >
-                <span className="font-display text-xl font-extrabold text-gradient-bt sm:text-2xl">{value}</span>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted">{label}</span>
+                <span className="break-words font-display text-lg font-extrabold text-gradient-bt sm:text-2xl">{value}</span>
+                <span className="break-words text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-[11px] sm:tracking-wider">{label}</span>
               </div>
             ))}
           </div>

@@ -18,7 +18,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-auto overflow-hidden bg-heading text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white/60">
+    <footer className="relative mt-auto overflow-x-hidden bg-heading text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white/60">
       {/* Brand gradient accent line */}
       <div className="h-1 bg-brand-gradient" />
 

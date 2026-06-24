@@ -24,7 +24,7 @@ function FadeOutlet() {
   }, [location.pathname]);
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className="min-w-0">
       <Outlet />
     </div>
   );
@@ -34,10 +34,10 @@ export function PublicLayout() {
   usePageTracking();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen min-w-0 w-full flex-col overflow-x-clip">
       <ScrollToTop />
       <Navbar />
-      <main className="flex-1 pt-[var(--header-height)]">
+      <main className="min-w-0 flex-1 overflow-x-clip pt-[var(--header-offset)] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         <Suspense fallback={<PageLoader />}>
           <FadeOutlet />
         </Suspense>

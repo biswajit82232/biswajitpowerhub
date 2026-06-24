@@ -91,7 +91,7 @@ export default function Compare() {
                           <X className="h-4 w-4" />
                         </button>
                         <ScooterImage src={s.images?.[0]} hue={s.hue} name={s.name} alt={s.name} className="aspect-[4/3] w-full rounded-xl" />
-                        <p className="mt-3 font-display text-base font-bold text-heading">{s.name}</p>
+                        <p className="mt-3 break-words font-display text-base font-bold text-heading">{s.name}</p>
                         <Button to={`/scooters/${s.id}`} variant="secondary" size="sm" className="mt-2 w-full">
                           View
                         </Button>
@@ -120,11 +120,11 @@ export default function Compare() {
               <tbody>
                 {ROWS.map((row, ri) => (
                   <tr key={row.label} className={ri % 2 ? 'bg-surface-alt/40' : ''}>
-                    <td className="sticky left-0 z-10 whitespace-nowrap bg-inherit px-3 py-3.5 text-sm font-semibold text-heading">
+                    <td className="sticky left-0 z-10 min-w-[7rem] bg-inherit px-3 py-3.5 text-sm font-semibold text-heading sm:min-w-[8.5rem]">
                       {row.label}
                     </td>
                     {chosen.map((s) => (
-                      <td key={s.id} className="px-4 py-3.5 text-center text-sm text-body">
+                      <td key={s.id} className="min-w-[8.5rem] break-words px-4 py-3.5 text-left text-sm text-body sm:text-center">
                         {row.get(s)}
                       </td>
                     ))}

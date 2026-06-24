@@ -62,7 +62,7 @@ export default function Scooters() {
       </section>
 
       {/* Toolbar */}
-      <div className="sticky top-[var(--header-height)] z-30 border-b border-line bg-bg/85 backdrop-blur-xl">
+      <div className="sticky top-[var(--header-offset)] z-30 border-b border-line bg-bg/85 backdrop-blur-xl">
         <div className="container-px flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted" />
