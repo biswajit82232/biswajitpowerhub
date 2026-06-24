@@ -2,7 +2,8 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { ACCESSORIES } from '@/data/accessories';
 
-const CACHE_TTL = 5 * 60;
+const CACHE_KEY = 'accessories_v2';
+const CACHE_TTL = 60;
 
 function fromRow(row) {
   return {
@@ -11,11 +12,11 @@ function fromRow(row) {
     category: row.category,
     price: Number(row.price),
     hue: row.hue || 'teal',
-    images: row.images || [],
-    description: row.description,
-    compatibility: row.compatibility,
+    images: Array.isArray(row.images) ? row.images : [],
+    description: row.description || '',
+    compatibility: row.compatibility || '',
     stock: row.stock_status,
-    featured: row.featured,
+    featured: Boolean(row.featured),
   };
 }
 
@@ -27,28 +28,51 @@ export function toRow(a) {
     price: a.price,
     hue: a.hue,
     images: a.images || [],
-    description: a.description,
-    compatibility: a.compatibility,
+    description: a.description || '',
+    compatibility: a.compatibility || '',
     stock_status: a.stock,
-    featured: a.featured,
+    featured: Boolean(a.featured),
   };
 }
 
 export async function getAccessories() {
-  return fetchWithCache('accessories', async () => {
+  return fetchWithCache(CACHE_KEY, async () => {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('accessories')
         .select('*')
         .order('category', { ascending: true })
         .order('price', { ascending: true });
-      if (!error && data) return data.map(fromRow);
+
+      if (!error) {
+        return (data || []).map(fromRow);
+      }
+
+      // Table missing — demo seed for pre-migration installs
+      if (error?.code === '42P01') {
+        return ACCESSORIES;
+      }
+
+      console.warn('[Accessories] Supabase fetch failed:', error.message);
+      return [];
     }
+
     return ACCESSORIES;
   }, CACHE_TTL);
 }
 
 export async function getAccessoryById(id) {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from('accessories')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (!error && data) return fromRow(data);
+    if (!error) return null;
+  }
+
   const all = await getAccessories();
   return all.find((a) => a.id === id) || null;
 }
@@ -62,6 +86,7 @@ export async function upsertAccessory(accessory) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { data, error } = await supabase.from('accessories').upsert(toRow(accessory)).select().single();
   if (error) throw error;
+  clearCache(CACHE_KEY);
   clearCache('accessories');
   return fromRow(data);
 }
@@ -70,6 +95,7 @@ export async function deleteAccessory(id) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('accessories').delete().eq('id', id);
   if (error) throw error;
+  clearCache(CACHE_KEY);
   clearCache('accessories');
 }
 
@@ -77,6 +103,7 @@ export async function updateAccessoryStock(id, stock_status) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('accessories').update({ stock_status }).eq('id', id);
   if (error) throw error;
+  clearCache(CACHE_KEY);
   clearCache('accessories');
 }
 

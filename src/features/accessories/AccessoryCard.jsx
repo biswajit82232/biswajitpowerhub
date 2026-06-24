@@ -33,6 +33,9 @@ export function AccessoryCard({ accessory, index = 0 }) {
 
       <div className="flex flex-1 flex-col p-5">
         <h3 className="font-display text-lg font-bold text-heading">{accessory.name}</h3>
+        {accessory.description && (
+          <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-body">{accessory.description}</p>
+        )}
         {accessory.compatibility && (
           <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
             <Wrench className="h-3.5 w-3.5 shrink-0" />
