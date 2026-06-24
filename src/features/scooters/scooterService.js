@@ -2,7 +2,8 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { SCOOTERS } from '@/data/scooters';
 
-const CACHE_TTL = 5 * 60; // 5 minutes
+const CACHE_KEY = 'scooters_v2';
+const CACHE_TTL = 60;
 
 /**
  * Normalize a Supabase row (snake_case) to the app's camelCase scooter shape.
@@ -15,7 +16,7 @@ function fromRow(row) {
     tagline: row.tagline,
     price: Number(row.price),
     hue: row.hue || 'blue',
-    images: row.images || [],
+    images: Array.isArray(row.images) ? row.images : [],
     batteryType: row.battery_type,
     batteryCapacity: row.battery_capacity,
     range: Number(row.range_km),
@@ -31,7 +32,7 @@ function fromRow(row) {
     noRegistration: row.no_registration,
     stock: row.stock_status,
     featured: row.featured,
-    description: row.description,
+    description: row.description || '',
     features: row.features || [],
     benefits: row.benefits || [],
   };
@@ -62,26 +63,53 @@ export function toRow(s) {
     no_registration: s.noRegistration,
     stock_status: s.stock,
     featured: s.featured,
-    description: s.description,
+    description: s.description || '',
     features: s.features || [],
     benefits: s.benefits || [],
   };
 }
 
+function bustScooterCache() {
+  clearCache(CACHE_KEY);
+  clearCache('scooters');
+}
+
 export async function getScooters() {
-  return fetchWithCache('scooters', async () => {
+  return fetchWithCache(CACHE_KEY, async () => {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('scooters')
         .select('*')
         .order('price', { ascending: true });
-      if (!error && data) return data.map(fromRow);
+
+      if (!error) {
+        return (data || []).map(fromRow);
+      }
+
+      if (error?.code === '42P01') {
+        return SCOOTERS;
+      }
+
+      console.warn('[Scooters] Supabase fetch failed:', error.message);
+      return [];
     }
+
     return SCOOTERS;
   }, CACHE_TTL);
 }
 
 export async function getScooterById(id) {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from('scooters')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (!error && data) return fromRow(data);
+    if (!error) return null;
+  }
+
   const all = await getScooters();
   return all.find((s) => s.id === id) || null;
 }
@@ -97,7 +125,7 @@ export async function upsertScooter(scooter) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { data, error } = await supabase.from('scooters').upsert(toRow(scooter)).select().single();
   if (error) throw error;
-  clearCache('scooters');
+  bustScooterCache();
   return fromRow(data);
 }
 
@@ -105,14 +133,14 @@ export async function deleteScooter(id) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('scooters').delete().eq('id', id);
   if (error) throw error;
-  clearCache('scooters');
+  bustScooterCache();
 }
 
 export async function updateStock(id, stock_status) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('scooters').update({ stock_status }).eq('id', id);
   if (error) throw error;
-  clearCache('scooters');
+  bustScooterCache();
 }
 
 /**
@@ -120,10 +148,6 @@ export async function updateStock(id, stock_status) {
  * - If Supabase is configured: uploads to the `scooter-images` public bucket
  *   and returns the public URL.
  * - Otherwise: converts to a base64 data URL (demo mode).
- *
- * Requires the `scooter-images` bucket to exist in Supabase Storage with
- * public read access. Create it once via Supabase Dashboard → Storage → New bucket
- * (name: scooter-images, Public: ON).
  */
 export async function uploadScooterImage(file, scooterId) {
   if (isSupabaseConfigured && supabase) {
@@ -137,13 +161,11 @@ export async function uploadScooterImage(file, scooterId) {
         const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
         return data.publicUrl;
       }
-      // Bucket missing or policy error — fall through to base64
       console.warn('[Storage] Upload failed, falling back to base64:', error.message);
     } catch (e) {
       console.warn('[Storage] Upload exception, falling back to base64:', e);
     }
   }
-  // Base64 fallback (works always; not persisted on page reload in demo mode)
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target.result);

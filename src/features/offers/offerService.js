@@ -2,8 +2,16 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { getFinanceSettings } from '@/features/finance/financeService';
 
-const CACHE_KEY = 'promotional_offers';
+const CACHE_KEY = 'promotional_offers_v2';
+const LEGACY_CACHE_KEY = 'promotional_offers';
 const LOCAL_KEY = 'bph_promotional_offers';
+
+function bustOfferCache() {
+  clearCache(CACHE_KEY);
+  clearCache(`${CACHE_KEY}_active`);
+  clearCache(LEGACY_CACHE_KEY);
+  clearCache(`${LEGACY_CACHE_KEY}_active`);
+}
 
 function mapRow(row) {
   return {
@@ -94,10 +102,12 @@ export async function getActiveOffers() {
           .sort((a, b) => a.sortOrder - b.sortOrder);
       }
 
-      // Table missing — fall back to old finance_settings promo (pre-migration installs)
       if (error?.code === '42P01') {
         return legacyOffersFromFinance();
       }
+
+      console.warn('[Offers] Supabase fetch failed:', error.message);
+      return [];
     }
 
     const local = readLocal();
@@ -125,6 +135,9 @@ export async function getAllOffers() {
     if (error?.code === '42P01') {
       return legacyOffersFromFinance();
     }
+
+    console.warn('[Offers] Supabase fetch failed:', error.message);
+    return [];
   }
 
   return readLocal();
@@ -134,8 +147,7 @@ export async function saveOffer(offer) {
   const payload = toRow(offer);
 
   if (isSupabaseConfigured && supabase) {
-    clearCache(CACHE_KEY);
-    clearCache(`${CACHE_KEY}_active`);
+    bustOfferCache();
 
     if (offer.id && !String(offer.id).startsWith('legacy')) {
       const { data, error } = await supabase
@@ -161,7 +173,7 @@ export async function saveOffer(offer) {
   if (offer.id) {
     const next = list.map((o) => (o.id === offer.id ? { ...o, ...offer, ...payload, discountText: payload.discount_text, promoCode: payload.promo_code, sortOrder: payload.sort_order } : o));
     writeLocal(next);
-    clearCache(`${CACHE_KEY}_active`);
+    bustOfferCache();
     return next.find((o) => o.id === offer.id);
   }
 
@@ -175,7 +187,7 @@ export async function saveOffer(offer) {
     createdAt: new Date().toISOString(),
   };
   writeLocal([...list, created]);
-  clearCache(`${CACHE_KEY}_active`);
+  bustOfferCache();
   return created;
 }
 
@@ -183,8 +195,7 @@ export async function deleteOffer(id) {
   if (!id || String(id).startsWith('legacy')) return;
 
   if (isSupabaseConfigured && supabase) {
-    clearCache(CACHE_KEY);
-    clearCache(`${CACHE_KEY}_active`);
+    bustOfferCache();
     const { data, error } = await supabase
       .from('promotional_offers')
       .delete()
@@ -199,10 +210,10 @@ export async function deleteOffer(id) {
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: false });
     writeLocal((remaining || []).map(mapRow));
-    clearCache(`${CACHE_KEY}_active`);
+    bustOfferCache();
     return;
   }
 
   writeLocal(readLocal().filter((o) => o.id !== id));
-  clearCache(`${CACHE_KEY}_active`);
+  bustOfferCache();
 }

@@ -10,7 +10,7 @@ export function SiteSettingsProvider({ children }) {
 
   const refresh = useCallback(async () => {
     try {
-      const data = await getSiteSettings();
+      const data = await getSiteSettings({ bypassCache: true });
       setSite(data);
     } catch {
       setSite(mergeSiteSettings({}));

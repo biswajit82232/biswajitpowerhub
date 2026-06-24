@@ -2,6 +2,9 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { REVIEWS } from '@/data/reviews';
 
+const CACHE_KEY = 'reviews_approved_v2';
+const CACHE_TTL = 60;
+
 function fromRow(row) {
   return {
     id: row.id,
@@ -14,6 +17,11 @@ function fromRow(row) {
     featured: row.featured,
     created_at: row.created_at,
   };
+}
+
+function bustReviewCache() {
+  clearCache(CACHE_KEY);
+  clearCache('reviews_approved');
 }
 
 /** Upload a customer review photo to Supabase Storage. Falls back to base64 in demo mode. */
@@ -42,9 +50,9 @@ export async function uploadReviewPhoto(file) {
   });
 }
 
-/** Public: only approved reviews — cached 5 min. */
+/** Public: only approved reviews — cached 60s. */
 export async function getApprovedReviews() {
-  return fetchWithCache('reviews_approved', async () => {
+  return fetchWithCache(CACHE_KEY, async () => {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('reviews')
@@ -52,10 +60,17 @@ export async function getApprovedReviews() {
         .eq('status', 'approved')
         .order('featured', { ascending: false })
         .order('created_at', { ascending: false });
-      if (!error && data) return data.map(fromRow);
+
+      if (!error) {
+        return (data || []).map(fromRow);
+      }
+
+      console.warn('[Reviews] Supabase fetch failed:', error.message);
+      return [];
     }
+
     return REVIEWS.filter((r) => r.status === 'approved');
-  }, 5 * 60);
+  }, CACHE_TTL);
 }
 
 export async function getFeaturedReviews(limit = 6) {
@@ -84,7 +99,6 @@ export async function submitReview({ name, rating, review, scooter, photo, photo
     if (error) throw error;
     return { ok: true };
   }
-  // Demo mode
   await new Promise((r) => setTimeout(r, 600));
   return { ok: true, demo: true };
 }
@@ -98,7 +112,7 @@ export async function getAllReviews() {
       .select('*')
       .order('created_at', { ascending: false });
     if (error) throw error;
-    return data.map(fromRow);
+    return (data || []).map(fromRow);
   }
   return REVIEWS;
 }
@@ -107,13 +121,14 @@ export async function setReviewStatus(id, status) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('reviews').update({ status }).eq('id', id);
   if (error) throw error;
-  clearCache('reviews_approved');
+  bustReviewCache();
 }
 
 export async function setReviewFeatured(id, featured) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('reviews').update({ featured }).eq('id', id);
   if (error) throw error;
+  bustReviewCache();
 }
 
 export async function setReviewPhoto(id, photoFile) {
@@ -121,7 +136,7 @@ export async function setReviewPhoto(id, photoFile) {
   const photoUrl = await uploadReviewPhoto(photoFile);
   const { error } = await supabase.from('reviews').update({ photo_url: photoUrl }).eq('id', id);
   if (error) throw error;
-  clearCache('reviews_approved');
+  bustReviewCache();
   return photoUrl;
 }
 
@@ -129,5 +144,5 @@ export async function clearReviewPhoto(id) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('reviews').update({ photo_url: null }).eq('id', id);
   if (error) throw error;
-  clearCache('reviews_approved');
+  bustReviewCache();
 }

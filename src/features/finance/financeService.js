@@ -28,21 +28,26 @@ export async function uploadHeroImage(file) {
   });
 }
 
-const ROW_ID = 1; // single-row settings table
+const ROW_ID = 1;
+const CACHE_KEY = 'finance_settings_v2';
+const CACHE_TTL = 60;
+
+function bustFinanceCache() {
+  clearCache(CACHE_KEY);
+  clearCache('finance_settings');
+}
 
 export async function getFinanceSettings({ bypassCache = false } = {}) {
-  if (bypassCache) clearCache('finance_settings');
+  if (bypassCache) bustFinanceCache();
 
-  return fetchWithCache('finance_settings', async () => {
+  return fetchWithCache(CACHE_KEY, async () => {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('finance_settings')
         .select('*')
         .eq('id', ROW_ID)
-        .single();
-      if (error) {
-        console.warn('[finance] Failed to load settings:', error.message);
-      }
+        .maybeSingle();
+
       if (!error && data) {
         return {
           interestRate: Number(data.interest_rate ?? FINANCE_DEFAULTS.interestRate),
@@ -58,9 +63,15 @@ export async function getFinanceSettings({ bypassCache = false } = {}) {
           heroImageUrl: data.hero_image_url || null,
         };
       }
+
+      if (!error) {
+        return { ...FINANCE_DEFAULTS, heroImageUrl: null };
+      }
+
+      console.warn('[finance] Failed to load settings:', error.message);
     }
     return { ...FINANCE_DEFAULTS, heroImageUrl: null };
-  }, 60); // 1 min — admin changes should show on site quickly
+  }, CACHE_TTL);
 }
 
 export async function saveFinanceSettings(settings) {
@@ -81,7 +92,7 @@ export async function saveFinanceSettings(settings) {
   if (settings.promo !== undefined) row.promo = settings.promo;
   const { error } = await supabase.from('finance_settings').upsert(row);
   if (error) throw error;
-  clearCache('finance_settings');
+  bustFinanceCache();
 }
 
 /** Save homepage hero image only (stored in finance_settings.hero_image_url). */
@@ -95,5 +106,5 @@ export async function saveHeroImage(heroImageUrl) {
     })
     .eq('id', ROW_ID);
   if (error) throw error;
-  clearCache('finance_settings');
+  bustFinanceCache();
 }

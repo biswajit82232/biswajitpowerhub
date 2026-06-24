@@ -9,9 +9,11 @@ import {
   DAY_KEYS,
 } from '@/config/site';
 
-const CACHE_KEY = 'site_settings';
+const CACHE_KEY = 'site_settings_v2';
+const LEGACY_CACHE_KEY = 'site_settings';
 const LOCAL_KEY = 'bph_site_settings';
 const ROW_ID = 1;
+const CACHE_TTL = 60;
 
 export { DAY_KEYS, DEFAULT_DAY_HOURS, INITIAL_HOURS };
 
@@ -87,6 +89,11 @@ function writeLocal(settings) {
   } catch (_) { /* ignore */ }
 }
 
+function bustSiteCache() {
+  clearCache(CACHE_KEY);
+  clearCache(LEGACY_CACHE_KEY);
+}
+
 export function getDefaultSiteSettings() {
   return mergeSiteSettings({
     ...CONTACT_DEFAULTS,
@@ -94,18 +101,31 @@ export function getDefaultSiteSettings() {
   });
 }
 
-export async function getSiteSettings() {
+export async function getSiteSettings({ bypassCache = false } = {}) {
+  if (bypassCache) bustSiteCache();
+
   return fetchWithCache(CACHE_KEY, async () => {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
         .eq('id', ROW_ID)
-        .single();
+        .maybeSingle();
+
       if (!error && data) return mapRow(data);
+
+      if (!error) return getDefaultSiteSettings();
+
+      if (error?.code === '42P01') {
+        return getDefaultSiteSettings();
+      }
+
+      console.warn('[Site settings] Supabase fetch failed:', error.message);
+      return getDefaultSiteSettings();
     }
+
     return readLocal() || getDefaultSiteSettings();
-  }, 10 * 60);
+  }, CACHE_TTL);
 }
 
 export async function saveSiteSettings(settings) {
@@ -126,7 +146,7 @@ export async function saveSiteSettings(settings) {
   });
 
   if (isSupabaseConfigured && supabase) {
-    clearCache(CACHE_KEY);
+    bustSiteCache();
     const row = {
       id: ROW_ID,
       phones: merged.phones,
@@ -145,7 +165,7 @@ export async function saveSiteSettings(settings) {
     if (error) throw error;
   } else {
     writeLocal(merged);
-    clearCache(CACHE_KEY);
+    bustSiteCache();
   }
 
   return merged;
