@@ -56,7 +56,7 @@ export function Hero({ heroImageUrl }) {
                 </defs>
               </svg>
             </span>
-            <span className="block animate-hero-rise text-gradient-bt" style={d(180)}>Power Every Journey.</span>
+            <span className="block animate-hero-rise text-gradient-bt" style={d(180)}>Power Every Ride.</span>
           </h1>
 
           <p
