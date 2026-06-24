@@ -17,7 +17,7 @@ export function Logo({ to = '/', className, compact = false, light = false }) {
         height={40}
         className={cn(
           'h-10 w-10 shrink-0 rounded-xl object-contain transition-transform duration-300 group-hover:scale-105',
-          light && 'brightness-0 invert',
+          light && 'bg-white p-1 shadow-sm ring-1 ring-white/20',
         )}
       />
       <span className="flex flex-col leading-none">
