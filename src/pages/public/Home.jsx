@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, PhoneCall, Sparkles, TrendingDown } from 'lucide-react';
+import { ArrowRight, PhoneCall, Sparkles } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
@@ -121,29 +121,19 @@ export default function Home() {
       <GradientDivider flip />
 
       {/* ── EV Simulator ── */}
-      <Section id="simulator" className="relative overflow-hidden">
-        {/* Gradient bg treatment */}
+      <Section id="simulator" tight className="relative overflow-hidden bg-gradient-to-b from-slate-50/80 via-white to-slate-50/50">
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-50/60 via-cyan-50/30 to-teal-50/50" />
-          <div className="absolute -right-20 top-10 h-72 w-72 rounded-full bg-teal-200/20 blur-3xl" />
-          <div className="absolute -left-10 bottom-10 h-56 w-56 rounded-full bg-blue-200/20 blur-3xl" />
+          <div className="absolute left-1/2 top-0 h-[480px] w-[min(100%,720px)] -translate-x-1/2 rounded-full bg-emerald-100/30 blur-3xl" />
         </div>
 
         <SectionHeading
-          eyebrow="EV Usage Simulator"
-          title="See your real-world numbers"
-          subtitle="Range, charging cost and savings — calculated for how you actually ride."
+          eyebrow="Petrol costs more — every single km"
+          title="See What You'd Save by Going Electric"
+          subtitle="Pick your scooter, set your daily travel — your yearly savings show up instantly."
+          className="[&_h2]:text-2xl [&_h2]:leading-tight [&_h2]:sm:text-[2.25rem] [&_p]:mt-3 [&_p]:max-w-lg [&_p]:text-sm [&_p]:leading-relaxed [&_p]:text-slate-600 [&_p]:sm:mx-auto [&_p]:sm:text-base [&_span]:border-emerald-200/60 [&_span]:bg-emerald-50/80 [&_span]:text-emerald-800 [&_span]:shadow-sm"
         />
 
-        {/* Savings teaser pill */}
-        <Reveal className="mt-5 flex justify-center">
-          <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-1.5 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-200 shadow-sm">
-            <TrendingDown className="h-4 w-4" />
-            Most riders save ₹20,000 – ₹35,000 per year switching to EV
-          </span>
-        </Reveal>
-
-        <Reveal className="mt-8" y={20}>
+        <Reveal className="mt-6 sm:mt-10" y={20}>
           <EVSimulator scooters={allScooters || []} settings={financeSettings} />
         </Reveal>
       </Section>

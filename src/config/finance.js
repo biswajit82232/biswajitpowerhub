@@ -17,6 +17,7 @@ export const FINANCE_DEFAULTS = {
   // EV Usage Simulator — petrol comparison defaults
   petrolPricePerLitre: 110, // ₹/L
   petrolMileageKmPerLitre: 40, // km/L for a typical petrol scooter
+  electricityRatePerUnit: 7, // ₹/kWh — used by homepage savings simulator
 };
 
 export const EMI_DISCLAIMER =
