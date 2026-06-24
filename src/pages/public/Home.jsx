@@ -21,8 +21,9 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters, getFeaturedScooters } from '@/features/scooters/scooterService';
 import { getFinanceSettings } from '@/features/finance/financeService';
 import { getScooterInsights } from '@/features/analytics/popularityService';
-import { SITE } from '@/config/site';
+import { SITE, SITE_URL } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { openingHoursSchema } from '@/lib/schemaHelpers';
 
 /** Decorative gradient divider between sections */
 function GradientDivider({ flip = false }) {
@@ -36,7 +37,10 @@ export default function Home() {
   const localBusinessSchema = useMemo(() => ({
     '@context': 'https://schema.org',
     '@type': 'AutoDealer',
+    '@id': `${SITE_URL}/#dealership`,
     name: SITE.name,
+    url: SITE_URL,
+    image: `${SITE_URL}/logo-512.png`,
     description: SITE.description,
     telephone: site.phones.map((p) => `+91${p}`),
     address: {
@@ -47,8 +51,10 @@ export default function Home() {
       postalCode: site.address.pincode,
       addressCountry: 'IN',
     },
+    openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
     slogan: SITE.tagline,
     areaServed: `${site.address.city}, ${site.address.state}`,
+    priceRange: '₹₹',
   }), [site]);
   const { data: featured, loading } = useAsync(() => getFeaturedScooters(3), []);
   const { data: allScooters } = useAsync(() => getScooters(), []);
@@ -64,7 +70,11 @@ export default function Home() {
 
   return (
     <>
-      <SEO jsonLd={localBusinessSchema} />
+      <SEO
+        path="/"
+        description={`${SITE.description} Visit our ${site.address.city} showroom or book a test ride.`}
+        jsonLd={localBusinessSchema}
+      />
 
       <Hero heroImageUrl={financeSettings?.heroImageUrl} />
 

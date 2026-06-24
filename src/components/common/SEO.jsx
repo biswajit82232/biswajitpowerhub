@@ -17,7 +17,11 @@ export function SEO({ title, description, path = '', image, jsonLd, noindex = fa
       <title>{fullTitle}</title>
       <meta name="description" content={desc} />
       <link rel="canonical" href={url} />
+      {!noindex && <meta name="robots" content="index, follow, max-image-preview:large" />}
       {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+      <meta property="og:site_name" content={SITE.name} />
+      <meta property="og:locale" content="en_IN" />
 
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={desc} />

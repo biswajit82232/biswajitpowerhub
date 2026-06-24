@@ -22,7 +22,7 @@ import { getAllValueBadges } from '@/lib/valueBadges';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
 import { STOCK_LABELS } from '@/data/scooters';
-import { whatsappUrl } from '@/config/site';
+import { whatsappUrl, SITE_URL } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
@@ -79,10 +79,14 @@ export default function ScooterDetails() {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: scooter.name,
+    sku: scooter.id,
+    url: `${SITE_URL}/scooters/${scooter.id}`,
+    image: scooter.images?.[0] || `${SITE_URL}/logo-512.png`,
     brand: { '@type': 'Brand', name: scooter.brand },
     description: scooter.description,
     offers: {
       '@type': 'Offer',
+      url: `${SITE_URL}/scooters/${scooter.id}`,
       price: scooter.price,
       priceCurrency: 'INR',
       availability:

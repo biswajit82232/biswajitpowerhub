@@ -126,7 +126,27 @@ public/             logos, sitemap.xml, robots.txt, admin PWA
 
 ---
 
-## Performance & SEO
+## Google indexing
+
+The site is configured for search indexing:
+
+- `robots.txt` — allows public pages, blocks `/admin`
+- `sitemap.xml` — auto-generated at build (static pages + every scooter URL)
+- Per-page **title**, **description**, **canonical**, Open Graph, Twitter cards
+- **JSON-LD**: `AutoDealer` (homepage), `Product` (scooter pages), `AggregateRating` (reviews)
+- Admin pages use `noindex, nofollow`
+
+### After deploy — Google Search Console
+
+1. Go to [Google Search Console](https://search.google.com/search-console)
+2. Add your property (`https://your-domain.com`)
+3. Verify ownership (HTML tag or DNS)
+4. Submit sitemap: `https://your-domain.com/sitemap.xml`
+5. Use **URL Inspection** on homepage and a scooter page to request indexing
+
+Set `VITE_SITE_URL` in Vercel **before** build so canonical URLs and sitemap match your live domain.
+
+---
 
 - Route-level code splitting, vendor chunks
 - Per-page meta + Open Graph + JSON-LD (`AutoDealer`, `Product`)
