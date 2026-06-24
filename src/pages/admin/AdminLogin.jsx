@@ -7,6 +7,8 @@ import { Field, Input } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
+import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
 
 export default function AdminLogin() {
   const { signIn, session } = useAuth();
@@ -39,8 +41,10 @@ export default function AdminLogin() {
   return (
     <>
       <SEO title="Admin Login" noindex />
-      <div className="flex min-h-screen items-center justify-center bg-sky-fade px-4 py-12">
+      <AdminPwaSetup />
+      <div className="flex min-h-screen items-center justify-center bg-sky-fade px-4 py-12 pt-[max(3rem,env(safe-area-inset-top))]">
         <div className="w-full max-w-md">
+          <AdminInstallBanner />
           <div className="mb-6 flex justify-center">
             <Logo />
           </div>

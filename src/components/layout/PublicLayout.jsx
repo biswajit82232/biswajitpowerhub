@@ -1,34 +1,45 @@
-import { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
+import { Suspense, useEffect, useRef } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { PageLoader } from '@/components/ui/Loading';
 import { usePageTracking } from '@/hooks/usePageTracking';
 
-export function PublicLayout() {
+function FadeOutlet() {
   const location = useLocation();
+  const isFirst = useRef(true);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (isFirst.current) {
+      isFirst.current = false;
+      return;
+    }
+    const el = ref.current;
+    if (!el) return;
+    el.classList.remove('animate-page-fade-in');
+    void el.offsetHeight;
+    el.classList.add('animate-page-fade-in');
+  }, [location.pathname]);
+
+  return (
+    <div ref={ref}>
+      <Outlet />
+    </div>
+  );
+}
+
+export function PublicLayout() {
   usePageTracking();
 
   return (
-    <div className="flex min-h-screen flex-col bg-sky-fade">
+    <div className="flex min-h-screen flex-col">
       <ScrollToTop />
       <Navbar />
       <main className="flex-1 pt-[var(--header-height)]">
         <Suspense fallback={<PageLoader />}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+          <FadeOutlet />
         </Suspense>
       </main>
       <Footer />

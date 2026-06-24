@@ -27,14 +27,14 @@ export function ReviewsCarousel({ reviews = [] }) {
     let raf = 0;
 
     const tick = () => {
-      if (halfRef.current <= 0) measure();
-      const half = halfRef.current;
-      if (half > 0) {
-        offsetRef.current -= SCROLL_SPEED;
-        if (Math.abs(offsetRef.current) >= half) {
-          offsetRef.current = 0;
+      if (!document.hidden) {
+        if (halfRef.current <= 0) measure();
+        const half = halfRef.current;
+        if (half > 0) {
+          offsetRef.current -= SCROLL_SPEED;
+          if (Math.abs(offsetRef.current) >= half) offsetRef.current = 0;
+          track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
         }
-        track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
       }
       raf = requestAnimationFrame(tick);
     };

@@ -1,5 +1,8 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { fetchWithCache, clearCache } from '@/lib/cache';
 import { SCOOTERS } from '@/data/scooters';
+
+const CACHE_TTL = 5 * 60; // 5 minutes
 
 /**
  * Normalize a Supabase row (snake_case) to the app's camelCase scooter shape.
@@ -66,26 +69,21 @@ export function toRow(s) {
 }
 
 export async function getScooters() {
-  if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('scooters')
-      .select('*')
-      .order('price', { ascending: true });
-    if (!error && data) return data.map(fromRow);
-  }
-  return SCOOTERS;
+  return fetchWithCache('scooters', async () => {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('scooters')
+        .select('*')
+        .order('price', { ascending: true });
+      if (!error && data) return data.map(fromRow);
+    }
+    return SCOOTERS;
+  }, CACHE_TTL);
 }
 
 export async function getScooterById(id) {
-  if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('scooters')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if (!error && data) return fromRow(data);
-  }
-  return SCOOTERS.find((s) => s.id === id) || null;
+  const all = await getScooters();
+  return all.find((s) => s.id === id) || null;
 }
 
 export async function getFeaturedScooters(limit = 4) {
@@ -96,35 +94,25 @@ export async function getFeaturedScooters(limit = 4) {
 /* ---------- Admin mutations (require Supabase + auth) ---------- */
 
 export async function upsertScooter(scooter) {
-  if (!isSupabaseConfigured || !supabase) {
-    throw new Error('Supabase not configured.');
-  }
-  const { data, error } = await supabase
-    .from('scooters')
-    .upsert(toRow(scooter))
-    .select()
-    .single();
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { data, error } = await supabase.from('scooters').upsert(toRow(scooter)).select().single();
   if (error) throw error;
+  clearCache('scooters');
   return fromRow(data);
 }
 
 export async function deleteScooter(id) {
-  if (!isSupabaseConfigured || !supabase) {
-    throw new Error('Supabase not configured.');
-  }
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('scooters').delete().eq('id', id);
   if (error) throw error;
+  clearCache('scooters');
 }
 
 export async function updateStock(id, stock_status) {
-  if (!isSupabaseConfigured || !supabase) {
-    throw new Error('Supabase not configured.');
-  }
-  const { error } = await supabase
-    .from('scooters')
-    .update({ stock_status })
-    .eq('id', id);
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { error } = await supabase.from('scooters').update({ stock_status }).eq('id', id);
   if (error) throw error;
+  clearCache('scooters');
 }
 
 /**

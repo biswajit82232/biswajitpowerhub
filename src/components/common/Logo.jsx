@@ -1,17 +1,25 @@
 import { Link } from 'react-router-dom';
-import { Zap } from 'lucide-react';
 import { SITE } from '@/config/site';
 import { cn } from '@/lib/utils';
 
+const LOGO_SRC = '/logo-192.png';
+
 /**
- * Brand wordmark: gradient bolt badge + name + tagline.
+ * Brand wordmark: BPH logo image + name + tagline.
  */
 export function Logo({ to = '/', className, compact = false, light = false }) {
   return (
     <Link to={to} className={cn('group flex items-center gap-2.5', className)} aria-label={SITE.name}>
-      <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-brand-gradient shadow-glow transition-transform duration-300 group-hover:scale-105">
-        <Zap className="h-5 w-5 text-white" fill="currentColor" strokeWidth={1.5} />
-      </span>
+      <img
+        src={LOGO_SRC}
+        alt=""
+        width={40}
+        height={40}
+        className={cn(
+          'h-10 w-10 shrink-0 rounded-xl object-contain transition-transform duration-300 group-hover:scale-105',
+          light && 'brightness-0 invert',
+        )}
+      />
       <span className="flex flex-col leading-none">
         <span
           className={cn(

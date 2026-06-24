@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { fetchWithCache, clearCache } from '@/lib/cache';
 import { REVIEWS } from '@/data/reviews';
 
 function fromRow(row) {
@@ -15,18 +16,20 @@ function fromRow(row) {
   };
 }
 
-/** Public: only approved reviews. */
+/** Public: only approved reviews — cached 5 min. */
 export async function getApprovedReviews() {
-  if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('*')
-      .eq('status', 'approved')
-      .order('featured', { ascending: false })
-      .order('created_at', { ascending: false });
-    if (!error && data) return data.map(fromRow);
-  }
-  return REVIEWS.filter((r) => r.status === 'approved');
+  return fetchWithCache('reviews_approved', async () => {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('status', 'approved')
+        .order('featured', { ascending: false })
+        .order('created_at', { ascending: false });
+      if (!error && data) return data.map(fromRow);
+    }
+    return REVIEWS.filter((r) => r.status === 'approved');
+  }, 5 * 60);
 }
 
 export async function getFeaturedReviews(limit = 6) {
@@ -35,7 +38,7 @@ export async function getFeaturedReviews(limit = 6) {
   return (featured.length ? featured : all).slice(0, limit);
 }
 
-/** Public submission — defaults to pending status for moderation. */
+/** Public submission — clears review cache so new count shows after approval. */
 export async function submitReview({ name, rating, review, scooter, photo }) {
   if (isSupabaseConfigured && supabase) {
     const { error } = await supabase.from('reviews').insert({
@@ -73,6 +76,7 @@ export async function setReviewStatus(id, status) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('reviews').update({ status }).eq('id', id);
   if (error) throw error;
+  clearCache('reviews_approved');
 }
 
 export async function setReviewFeatured(id, featured) {

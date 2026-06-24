@@ -25,10 +25,9 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-all duration-300 ease-premium',
-        scrolled
-          ? 'border-b border-line/80 bg-surface/85 backdrop-blur-xl shadow-soft'
-          : 'border-b border-transparent bg-transparent'
+        'fixed inset-x-0 top-0 z-50 w-full border-b transition-shadow duration-300 ease-premium',
+        'bg-surface/95 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/90',
+        scrolled ? 'border-line/80 shadow-soft' : 'border-line/60',
       )}
     >
       <nav className="container-px flex h-[var(--header-height)] items-center justify-between">

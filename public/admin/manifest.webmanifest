@@ -1,0 +1,46 @@
+{
+  "name": "BPH Admin Panel",
+  "short_name": "BPH Admin",
+  "description": "BISWAJIT POWER HUB — dealership admin dashboard",
+  "id": "/admin/?source=pwa",
+  "start_url": "/admin/?source=pwa",
+  "scope": "/admin",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "theme_color": "#2563EB",
+  "background_color": "#FFFFFF",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/admin/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/admin/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/admin/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/admin/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/admin/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

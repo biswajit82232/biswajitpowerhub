@@ -56,7 +56,7 @@ export default function Home() {
     <>
       <SEO jsonLd={localBusinessSchema} />
 
-      <Hero />
+      <Hero heroImageUrl={financeSettings?.heroImageUrl} />
 
       <GradientDivider />
       <WhyChooseUs />

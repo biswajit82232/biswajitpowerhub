@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
+import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
+import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
 import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -57,7 +59,8 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg pt-[env(safe-area-inset-top)]">
+      <AdminPwaSetup />
       {/* Sidebar (desktop) */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-surface p-5 lg:flex">
         <Logo compact />
@@ -124,6 +127,7 @@ export default function AdminLayout() {
             </p>
           </div>
           <Suspense fallback={<PageLoader />}>
+            <AdminInstallBanner />
             <Outlet />
           </Suspense>
         </div>
