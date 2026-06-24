@@ -1,10 +1,10 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { RangeSlider } from '@/components/ui/RangeSlider';
 import { useCountUp } from '@/hooks/useCountUp';
 import { calculateEMI } from '@/lib/finance';
 import { formatINR } from '@/lib/utils';
-import { EMI_DISCLAIMER } from '@/config/finance';
+import { EMI_DISCLAIMER, EMI_DISCLAIMER_NOTE } from '@/config/finance';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 function Amount({ value, className }) {
@@ -22,11 +22,24 @@ export function EMICalculator({ price, settings, scooterId }) {
   const [tenure, setTenure] = useState(settings?.defaultTenure ?? 12);
   const tracked = useRef(false);
 
+  useEffect(() => {
+    if (!settings) return;
+    setDownPct(settings.downPaymentPct ?? 20);
+    setRate(settings.interestRate ?? 12);
+    setTenure(settings.defaultTenure ?? 12);
+  }, [settings]);
+
   const downPayment = Math.round((price * downPct) / 100);
 
   const result = useMemo(
-    () => calculateEMI({ price, downPayment, annualRate: rate, tenureMonths: tenure }),
-    [price, downPayment, rate, tenure]
+    () => calculateEMI({
+      price,
+      downPayment,
+      annualRate: rate,
+      tenureMonths: tenure,
+      fileCharges: settings?.fileCharges ?? 0,
+    }),
+    [price, downPayment, rate, tenure, settings?.fileCharges]
   );
 
   const track = () => {
@@ -111,13 +124,21 @@ export function EMICalculator({ price, settings, scooterId }) {
             <Amount value={result.totalInterest} className="font-bold text-heading" />
           </div>
           <div className="text-right">
-            <p className="text-muted">Total payable</p>
+            <p className="text-muted">Balance via EMI</p>
+            <Amount value={result.balanceViaEmi} className="font-bold text-heading" />
+          </div>
+          <div className="col-span-2 flex items-center justify-between border-t border-line pt-3">
+            <div>
+              <p className="text-muted">Total payable</p>
+              <p className="mt-0.5 text-[10px] text-muted">+ file charges · On full vehicle price</p>
+            </div>
             <Amount value={result.totalPayable} className="font-bold text-heading" />
           </div>
         </div>
       </motion.div>
 
       <p className="mt-4 text-xs text-muted">{EMI_DISCLAIMER}</p>
+      <p className="mt-1 text-[11px] text-muted">{EMI_DISCLAIMER_NOTE}</p>
     </div>
   );
 }

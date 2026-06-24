@@ -5,11 +5,13 @@ import { ScooterImage } from '@/components/common/ScooterImage';
 import { Badge } from '@/components/ui/Badge';
 import { formatINR } from '@/lib/utils';
 import { emiFrom } from '@/lib/finance';
+import { useFinance } from '@/context/FinanceSettingsContext';
 import { STOCK_LABELS } from '@/data/scooters';
 
 export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [] }) {
+  const { settings } = useFinance();
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
-  const emi = emiFrom({ price: scooter.price });
+  const emi = emiFrom({ price: scooter.price, settings });
   const extraBadges = [...popularityTags, ...valueBadges.map((b) => ({
     label: `${b.emoji} ${b.label}`,
     tone: b.tone,

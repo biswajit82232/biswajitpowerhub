@@ -10,6 +10,7 @@ import {
   isMobileDevice,
   isSecureForPwa,
   promptAdminInstall,
+  shouldRegisterAdminServiceWorker,
 } from '@/lib/adminPwa';
 
 export function AdminInstallBanner() {
@@ -58,6 +59,8 @@ export function AdminInstallBanner() {
     hint = 'Tap Share, then "Add to Home Screen".';
   } else if (android && !secure) {
     hint = 'Use https:// (not http://) on your phone. Run npm run dev, then open the https:// address shown in terminal.';
+  } else if (android && import.meta.env.DEV && !shouldRegisterAdminServiceWorker()) {
+    hint = 'Admin works over https:// on your phone. PWA install needs a trusted certificate — use localhost on PC, or deploy to test install.';
   } else if (android && canInstall) {
     hint = 'Tap Install below, or Chrome menu ⋮ → "Install app".';
   } else if (android) {
@@ -65,14 +68,14 @@ export function AdminInstallBanner() {
   }
 
   return (
-    <div className="mb-5 flex flex-col gap-3 rounded-2xl bg-gradient-to-r from-brand-600 to-teal-600 p-4 text-white shadow-card sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
-          <Smartphone className="h-5 w-5" />
+    <div className="mb-4 flex flex-col gap-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 p-3 text-white shadow-card sm:mb-5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:rounded-2xl sm:p-4">
+      <div className="flex items-start gap-2.5 sm:gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/20 sm:h-10 sm:w-10 sm:rounded-xl">
+          <Smartphone className="h-4 w-4 sm:h-5 sm:w-5" />
         </span>
-        <div>
-          <p className="font-display text-sm font-bold">Install Admin App</p>
-          <p className="mt-0.5 text-xs leading-relaxed text-white/85">{hint}</p>
+        <div className="min-w-0">
+          <p className="font-display text-xs font-bold sm:text-sm">Install Admin App</p>
+          <p className="mt-0.5 text-[11px] leading-snug text-white/85 sm:text-xs sm:leading-relaxed">{hint}</p>
         </div>
       </div>
       <div className="flex shrink-0 gap-2">

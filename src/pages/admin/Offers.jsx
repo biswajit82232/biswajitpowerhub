@@ -5,6 +5,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { Modal } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
@@ -27,6 +28,7 @@ export default function Offers() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
     if (editing === 'new') setForm(EMPTY);
@@ -54,12 +56,13 @@ export default function Offers() {
     }
   };
 
-  const onDelete = async (id) => {
-    if (!window.confirm('Delete this offer?')) return;
+  const onDelete = async () => {
+    const id = confirmDelete;
     try {
       await deleteOffer(id);
       toast('Offer deleted.', 'success');
       if (editing?.id === id) setEditing(null);
+      setConfirmDelete(null);
       refetch();
     } catch (err) {
       toast(err.message || 'Delete failed.', 'error');
@@ -73,26 +76,20 @@ export default function Offers() {
         title="Promotional Offers"
         subtitle="Create offers shown prominently on the website homepage."
         action={
-          <Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>
+          <Button variant="primary" icon={Plus} onClick={() => setEditing('new')} className="w-full sm:w-auto">
             New Offer
           </Button>
         }
       />
 
       {!isSupabaseConfigured && (
-        <div className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+        <div className="mb-4 rounded-xl bg-amber-50 px-3 py-2.5 text-xs text-amber-700 sm:mb-5 sm:px-4 sm:py-3 sm:text-sm">
           Demo mode — offers save to this browser only. Connect Supabase and run{' '}
           <code className="font-mono text-xs">add_promotional_offers.sql</code> for production.
         </div>
       )}
 
-      {isSupabaseConfigured && (
-        <div className="mb-5 rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">
-          Run <code className="font-mono text-xs">supabase/migrations/add_promotional_offers.sql</code> in Supabase if the offers table is missing.
-        </div>
-      )}
-
-      <div className="grid gap-6 lg:grid-cols-5">
+      <div className="grid gap-4 lg:grid-cols-5 lg:gap-6">
         <div className="lg:col-span-2">
           {loading ? (
             <Skeleton className="h-64" />
@@ -108,7 +105,7 @@ export default function Offers() {
               {data.map((offer) => (
                 <li
                   key={offer.id}
-                  className="rounded-2xl bg-surface p-4 ring-1 ring-line shadow-soft"
+                  className="rounded-xl bg-surface p-3 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -135,7 +132,7 @@ export default function Offers() {
                       {!String(offer.id).startsWith('legacy') && (
                         <button
                           type="button"
-                          onClick={() => onDelete(offer.id)}
+                          onClick={() => setConfirmDelete(offer.id)}
                           className="rounded-lg p-2 text-muted transition hover:bg-red-50 hover:text-red-600"
                           aria-label="Delete"
                         >
@@ -152,7 +149,7 @@ export default function Offers() {
 
         <div className="lg:col-span-3">
           {editing ? (
-            <form onSubmit={onSave} className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
+            <form onSubmit={onSave} className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6 lg:p-8">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="font-display text-lg font-bold text-heading">
                   {editing === 'new' ? 'New offer' : 'Edit offer'}
@@ -219,22 +216,35 @@ export default function Offers() {
                 Active — show on website
               </label>
 
-              <div className="mt-6 flex gap-3">
-                <Button type="submit" variant="primary" icon={Save} loading={saving}>
+              <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:gap-3">
+                <Button type="submit" variant="primary" icon={Save} loading={saving} className="w-full sm:w-auto">
                   Save Offer
                 </Button>
-                <Button type="button" variant="secondary" onClick={() => setEditing(null)}>
+                <Button type="button" variant="secondary" onClick={() => setEditing(null)} className="w-full sm:w-auto">
                   Cancel
                 </Button>
               </div>
             </form>
           ) : (
-            <div className="flex h-full min-h-[12rem] items-center justify-center rounded-2xl border border-dashed border-line bg-surface-alt/50 p-8 text-center text-sm text-muted">
+            <div className="hidden min-h-[12rem] items-center justify-center rounded-xl border border-dashed border-line bg-surface-alt/50 p-6 text-center text-sm text-muted lg:flex">
               Select an offer to edit, or create a new one.
             </div>
           )}
         </div>
       </div>
+
+      <Modal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} title="Delete offer?" size="sm">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+            <Tag className="h-7 w-7" />
+          </span>
+          <p className="text-sm text-body">Delete this offer? This cannot be undone.</p>
+          <div className="mt-2 flex w-full gap-3">
+            <Button variant="secondary" fullWidth onClick={() => setConfirmDelete(null)}>Cancel</Button>
+            <Button variant="danger" fullWidth onClick={onDelete}>Delete</Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

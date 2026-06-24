@@ -7,16 +7,16 @@ import Button from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useToast } from '@/components/ui/Toast';
 import { useAsync } from '@/hooks/useAsync';
-import { getFinanceSettings, saveFinanceSettings, uploadHeroImage } from '@/features/finance/financeService';
+import { getFinanceSettings, saveFinanceSettings } from '@/features/finance/financeService';
+import { useFinance } from '@/context/FinanceSettingsContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 export default function Finance() {
   const { toast } = useToast();
-  const { data, loading } = useAsync(() => getFinanceSettings(), []);
+  const { refresh: refreshFinanceSettings } = useFinance();
+  const { data, loading, refetch } = useAsync(() => getFinanceSettings(), []);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [heroUploading, setHeroUploading] = useState(false);
-  const heroInputRef = useRef(null);
 
   useEffect(() => {
     if (data) setForm({ ...data, tenureText: data.tenureOptions.join(', ') });
@@ -42,30 +42,15 @@ export default function Finance() {
         tenureOptions: form.tenureText.split(',').map((t) => Number(t.trim())).filter(Boolean),
         petrolPricePerLitre: Number(form.petrolPricePerLitre),
         petrolMileageKmPerLitre: Number(form.petrolMileageKmPerLitre),
+        fileCharges: Number(form.fileCharges),
       });
+      await refreshFinanceSettings();
+      refetch();
       toast('Finance settings saved.', 'success');
     } catch (err) {
       toast(err.message || 'Save failed.', 'error');
     } finally {
       setSaving(false);
-    }
-  };
-
-  const onHeroFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { toast('Please select an image file.', 'error'); return; }
-    if (file.size > 10 * 1024 * 1024) { toast('Max 10 MB per image.', 'error'); return; }
-    setHeroUploading(true);
-    try {
-      const url = await uploadHeroImage(file);
-      set('heroImageUrl', url);
-      toast('Hero image uploaded — save settings to apply.', 'success');
-    } catch {
-      toast('Upload failed.', 'error');
-    } finally {
-      setHeroUploading(false);
-      if (heroInputRef.current) heroInputRef.current.value = '';
     }
   };
 
@@ -89,8 +74,8 @@ export default function Finance() {
         </div>
       )}
 
-      <form onSubmit={onSave} className="max-w-2xl rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
-        <div className="grid gap-5 sm:grid-cols-2">
+      <form onSubmit={onSave} className="max-w-2xl rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6 lg:p-8">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
           <Field label="Default interest rate (% p.a.)">
             <Input type="number" step="0.5" value={form.interestRate} onChange={(e) => set('interestRate', e.target.value)} />
           </Field>
@@ -109,9 +94,12 @@ export default function Finance() {
           <Field label="Tenure options" hint="Comma-separated, in months">
             <Input value={form.tenureText} onChange={(e) => set('tenureText', e.target.value)} />
           </Field>
+          <Field label="File / processing charges (₹)" hint="Included in total payable (CD finance)" className="sm:col-span-2 sm:max-w-xs">
+            <Input type="number" step="100" min="0" value={form.fileCharges} onChange={(e) => set('fileCharges', e.target.value)} />
+          </Field>
         </div>
 
-        <div className="mt-6 rounded-xl bg-surface-alt p-5">
+        <div className="mt-5 rounded-xl bg-surface-alt p-4 sm:mt-6 sm:p-5">
           <h3 className="text-sm font-bold text-heading">EV Simulator — petrol comparison</h3>
           <p className="mt-1 text-xs text-muted">Used to calculate savings vs petrol on the homepage simulator.</p>
           <div className="mt-4 grid gap-5 sm:grid-cols-2">
@@ -124,60 +112,7 @@ export default function Finance() {
           </div>
         </div>
 
-        {/* Hero image */}
-        <div className="mt-6 rounded-xl bg-surface-alt p-5">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-heading">
-            <ImagePlus className="h-4 w-4 text-brand-500" /> Homepage Hero Image
-          </h3>
-          <p className="mt-1 text-xs text-muted">
-            Replaces the placeholder scooter illustration on the homepage. JPG / PNG / WebP, max 10 MB.
-          </p>
-          <div className="mt-4 flex flex-wrap items-start gap-4">
-            {form.heroImageUrl ? (
-              <div className="relative">
-                <img
-                  src={form.heroImageUrl}
-                  alt="Hero preview"
-                  className="h-28 w-44 rounded-xl object-cover ring-2 ring-brand-200 shadow-soft"
-                />
-                <button
-                  type="button"
-                  onClick={() => set('heroImageUrl', null)}
-                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow transition hover:bg-red-600"
-                  title="Remove hero image"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex h-28 w-44 items-center justify-center rounded-xl border-2 border-dashed border-line bg-surface text-xs text-muted">
-                No image set
-              </div>
-            )}
-            <div className="flex flex-col gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                icon={heroUploading ? Loader2 : ImagePlus}
-                onClick={() => heroInputRef.current?.click()}
-                disabled={heroUploading}
-              >
-                {heroUploading ? 'Uploading…' : form.heroImageUrl ? 'Change Image' : 'Upload Image'}
-              </Button>
-              <input
-                ref={heroInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={onHeroFile}
-              />
-              <p className="text-[11px] text-muted">Click Save Settings below to apply.</p>
-            </div>
-          </div>
-        </div>
-
-        <Button type="submit" variant="primary" size="lg" icon={Save} loading={saving} className="mt-6">
+        <Button type="submit" variant="primary" size="lg" icon={Save} loading={saving} className="mt-5 w-full sm:mt-6 sm:w-auto">
           Save Settings
         </Button>
       </form>

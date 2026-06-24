@@ -39,11 +39,20 @@ export function setupAdminPwa() {
   upsertMeta('apple-mobile-web-app-status-bar-style', 'default');
   upsertMeta('theme-color', '#2563EB');
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register(SW_URL, { scope: SW_SCOPE }).then((reg) => {
-      reg.update();
+  if (!('serviceWorker' in navigator)) return;
+
+  if (!shouldRegisterAdminServiceWorker()) {
+    navigator.serviceWorker.getRegistrations().then((regs) => {
+      regs.forEach((reg) => {
+        if (reg.scope.includes('/admin')) reg.unregister();
+      });
     }).catch(() => {});
+    return;
   }
+
+  navigator.serviceWorker.register(SW_URL, { scope: SW_SCOPE }).then((reg) => {
+    reg.update();
+  }).catch(() => {});
 }
 
 export function teardownAdminPwa() {
@@ -107,4 +116,11 @@ export function hasInstallPrompt() {
 
 export function isSecureForPwa() {
   return window.isSecureContext === true;
+}
+
+/** Self-signed dev HTTPS on LAN IPs fails service worker registration. */
+export function shouldRegisterAdminServiceWorker() {
+  if (import.meta.env.PROD) return true;
+  const host = window.location.hostname;
+  return host === 'localhost' || host === '127.0.0.1';
 }

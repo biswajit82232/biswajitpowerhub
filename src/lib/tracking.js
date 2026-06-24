@@ -152,3 +152,12 @@ export function getLocalLeadSummary() {
   const events = readLocalEvents();
   return { events, ...classifyLead(events) };
 }
+
+/** Clear locally stored interaction events (demo / offline analytics). */
+export function resetLocalTrackingEvents() {
+  try {
+    localStorage.removeItem(EVENTS_KEY);
+  } catch {
+    /* ignore */
+  }
+}

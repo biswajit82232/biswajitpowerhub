@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { EVENT } from '@/lib/tracking';
+import { EVENT, resetLocalTrackingEvents } from '@/lib/tracking';
+import { clearCache } from '@/lib/cache';
 
 /** Read all local events (demo-mode source of truth). */
 function localEvents() {
@@ -93,4 +94,30 @@ export async function getEventAggregates() {
       .slice(0, 5),
     total: events.length,
   };
+}
+
+const RESET_TABLES = ['lead_events', 'leads', 'callbacks', 'test_rides', 'contact_messages'];
+
+/**
+ * Reset dashboard / analytics counts — clears tracking events and lead capture rows.
+ * Does not affect inventory, reviews, offers, or settings.
+ */
+export async function resetAllCounts() {
+  resetLocalTrackingEvents();
+  clearCache('popularity_engine');
+
+  if (!isSupabaseConfigured || !supabase) {
+    return { mode: 'local' };
+  }
+
+  const results = await Promise.all(
+    RESET_TABLES.map((table) =>
+      supabase.from(table).delete().gte('created_at', '1970-01-01T00:00:00Z'),
+    ),
+  );
+
+  const failed = results.find((r) => r.error);
+  if (failed?.error) throw new Error(failed.error.message || 'Reset failed.');
+
+  return { mode: 'supabase' };
 }

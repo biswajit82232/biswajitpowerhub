@@ -119,6 +119,7 @@ export const PREMIUM_PERKS = [
 export const NAV_LINKS = [
   { label: 'Home', to: '/' },
   { label: 'Scooters', to: '/scooters' },
+  { label: 'Parts', to: '/accessories' },
   { label: 'Reviews', to: '/reviews' },
   { label: 'Contact', to: '/contact' },
 ];
@@ -129,6 +130,17 @@ export function whatsappUrl(
   site = SITE,
 ) {
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
+}
+
+/** WhatsApp link to a customer/lead phone (10-digit Indian mobile or full intl number) */
+export function whatsappCustomerUrl(
+  phone,
+  message = "Hi, this is BISWAJIT POWER HUB. We'd like to follow up on your inquiry.",
+) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  if (!digits) return whatsappUrl(message);
+  const num = digits.length === 10 ? `91${digits}` : digits;
+  return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
 }
 
 export function telUrl(phone, site = SITE) {

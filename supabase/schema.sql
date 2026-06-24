@@ -38,6 +38,23 @@ create table if not exists public.scooters (
 );
 
 -- ---------------------------------------------------------------------------
+-- ACCESSORIES (parts & add-ons catalog)
+-- ---------------------------------------------------------------------------
+create table if not exists public.accessories (
+  id              text primary key,
+  name            text not null,
+  category        text not null default 'Other',
+  price           numeric not null default 0,
+  hue             text default 'teal',
+  images          jsonb default '[]'::jsonb,
+  description     text,
+  compatibility   text,
+  stock_status    text default 'in_stock',
+  featured        boolean default false,
+  created_at      timestamptz default now()
+);
+
+-- ---------------------------------------------------------------------------
 -- REVIEWS
 -- ---------------------------------------------------------------------------
 create table if not exists public.reviews (
@@ -135,6 +152,7 @@ create table if not exists public.finance_settings (
   default_tenure        int default 12,
   min_down_payment_pct  numeric default 10,
   max_down_payment_pct  numeric default 60,
+  file_charges          numeric default 2500,
   petrol_price_per_litre numeric default 110,
   petrol_mileage_km_per_litre numeric default 40,
   promo                 jsonb default '{"active":false,"label":""}'::jsonb,
@@ -146,6 +164,7 @@ insert into public.finance_settings (id) values (1) on conflict (id) do nothing;
 -- ROW LEVEL SECURITY
 -- ============================================================================
 alter table public.scooters         enable row level security;
+alter table public.accessories      enable row level security;
 alter table public.reviews          enable row level security;
 alter table public.callbacks        enable row level security;
 alter table public.test_rides       enable row level security;
@@ -156,6 +175,9 @@ alter table public.finance_settings enable row level security;
 
 -- Public READ: scooters, finance settings, and approved reviews
 create policy "public read scooters" on public.scooters
+  for select using (true);
+
+create policy "public read accessories" on public.accessories
   for select using (true);
 
 create policy "public read finance" on public.finance_settings
@@ -175,6 +197,7 @@ create policy "anon upsert leads upd" on public.leads           for update using
 
 -- Authenticated (admin) FULL ACCESS to everything
 create policy "auth all scooters"  on public.scooters          for all to authenticated using (true) with check (true);
+create policy "auth all accessories" on public.accessories     for all to authenticated using (true) with check (true);
 create policy "auth all reviews"   on public.reviews           for all to authenticated using (true) with check (true);
 create policy "auth all callbacks" on public.callbacks         for all to authenticated using (true) with check (true);
 create policy "auth all testrides" on public.test_rides        for all to authenticated using (true) with check (true);

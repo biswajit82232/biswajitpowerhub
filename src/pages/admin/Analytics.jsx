@@ -7,9 +7,10 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAsync } from '@/hooks/useAsync';
 import { getEventAggregates } from '@/features/analytics/analyticsService';
+import { ResetAllCountsButton } from '@/components/admin/ResetAllCountsButton';
 
 export default function Analytics() {
-  const { data: agg, loading } = useAsync(() => getEventAggregates(), []);
+  const { data: agg, loading, refetch } = useAsync(() => getEventAggregates(), []);
 
   const sourceData = [
     { label: 'WhatsApp', value: agg?.whatsappClicks || 0, color: '#25D366' },
@@ -21,27 +22,30 @@ export default function Analytics() {
   return (
     <>
       <SEO title="Analytics" noindex />
-      <AdminHeader title="Analytics" subtitle="Engagement, popular models & conversion signals." />
+      <AdminHeader
+        title="Analytics"
+        subtitle="Engagement, popular models & conversion signals."
+      />
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-32" />
+            <Skeleton key={i} className="h-16 sm:h-32" />
           ))}
         </div>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
             <StatCard icon={Eye} label="Total events" value={agg?.total || 0} tone="slate" />
             <StatCard icon={MessageCircle} label="WhatsApp clicks" value={agg?.whatsappClicks || 0} tone="accent" />
             <StatCard icon={Calculator} label="EMI calculator" value={agg?.emiUsage || 0} tone="brand" />
             <StatCard icon={Gauge} label="EV simulator" value={agg?.simulatorUsage || 0} tone="amber" />
           </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
-              <h2 className="font-display text-lg font-bold text-heading">Most viewed scooters</h2>
-              <div className="mt-6">
+          <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-2">
+            <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
+              <h2 className="font-display text-base font-bold text-heading sm:text-lg">Most viewed scooters</h2>
+              <div className="mt-4 sm:mt-6">
                 {agg?.mostViewed?.length ? (
                   <BarChart data={agg.mostViewed} />
                 ) : (
@@ -50,9 +54,9 @@ export default function Analytics() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
-              <h2 className="font-display text-lg font-bold text-heading">Lead sources</h2>
-              <div className="mt-6">
+            <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
+              <h2 className="font-display text-base font-bold text-heading sm:text-lg">Lead sources</h2>
+              <div className="mt-4 sm:mt-6">
                 {sourceData.length ? (
                   <DonutChart data={sourceData} />
                 ) : (
@@ -67,6 +71,10 @@ export default function Analytics() {
           </p>
         </>
       )}
+
+      <div className="mt-8 flex justify-center border-t border-line pt-6 sm:mt-10">
+        <ResetAllCountsButton onReset={refetch} className="w-full sm:w-auto" />
+      </div>
     </>
   );
 }

@@ -11,7 +11,7 @@ import { useAsync } from '@/hooks/useAsync';
 import { getLeads, updateLead } from '@/features/leads/leadService';
 import { FOLLOW_UP } from '@/lib/purchaseReadiness';
 import { timeAgo } from '@/lib/utils';
-import { telUrl, whatsappUrl } from '@/config/site';
+import { telUrl, whatsappCustomerUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 
 const STATUSES = ['new', 'contacted', 'follow_up', 'converted', 'lost'];
@@ -57,14 +57,14 @@ export default function Leads() {
         title="Lead Management"
         subtitle="Purchase readiness scores and smart follow-up prioritization."
         action={
-          <div className="flex flex-wrap gap-2">
-            <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="w-44">
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+            <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-44 sm:flex-none">
               <option value="all">All priorities</option>
               <option value={FOLLOW_UP.IMMEDIATE}>Call immediately</option>
               <option value={FOLLOW_UP.TODAY}>Call today</option>
               <option value={FOLLOW_UP.LATER}>Follow up later</option>
             </Select>
-            <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="w-36">
+            <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-36 sm:flex-none">
               <option value="all">All leads</option>
               <option value="hot">Hot</option>
               <option value="warm">Warm</option>
@@ -85,7 +85,7 @@ export default function Leads() {
       ) : (
         <div className="space-y-3">
           {list.map((l) => (
-            <div key={l.id} className="flex flex-col gap-3 rounded-2xl bg-surface p-4 ring-1 ring-line shadow-soft lg:flex-row lg:items-center">
+            <div key={l.id} className="flex flex-col gap-3 rounded-xl bg-surface p-3 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-4 lg:flex-row lg:items-center">
               <div className="flex items-start gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-gradient font-bold text-white">
                   {l.readinessPercent >= 70 ? <Flame className="h-5 w-5" /> : (l.name?.[0] || '?').toUpperCase()}
@@ -120,13 +120,13 @@ export default function Leads() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3 sm:border-0 sm:pt-0 lg:ml-auto">
                 {l.phone && (
                   <>
                     <a href={telUrl(l.phone, site)} className="rounded-xl bg-brand-50 p-2.5 text-brand-600" aria-label="Call">
                       <Phone className="h-4.5 w-4.5" />
                     </a>
-                    <a href={whatsappUrl(undefined, site)} target="_blank" rel="noreferrer" className="rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp">
+                    <a href={whatsappCustomerUrl(l.phone, `Hi ${l.name || 'there'}, this is BISWAJIT POWER HUB regarding your inquiry.`)} target="_blank" rel="noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer">
                       <MessageCircle className="h-4.5 w-4.5" />
                     </a>
                   </>
@@ -134,7 +134,7 @@ export default function Leads() {
                 <Select
                   value={l.status || 'new'}
                   onChange={(e) => onStatus(l.id, e.target.value)}
-                  className="h-10 w-36 text-sm"
+                  className="h-10 min-w-0 flex-1 text-sm sm:w-36 sm:flex-none"
                   disabled={String(l.id).startsWith('cb-') || String(l.id).startsWith('tr-')}
                 >
                   {STATUSES.map((s) => (

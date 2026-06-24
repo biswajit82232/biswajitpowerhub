@@ -80,7 +80,9 @@ async function legacyOffersFromFinance() {
 export async function getActiveOffers() {
   return fetchWithCache(`${CACHE_KEY}_active`, async () => {
     const all = await getAllOffers();
-    return all.filter((o) => o.active).sort((a, b) => a.sortOrder - b.sortOrder);
+    const active = all.filter((o) => o.active).sort((a, b) => a.sortOrder - b.sortOrder);
+    if (active.length) return active;
+    return legacyOffersFromFinance();
   }, 5 * 60);
 }
 
@@ -94,11 +96,8 @@ export async function getAllOffers() {
 
     if (!error) {
       const mapped = (data || []).map(mapRow);
-      if (mapped.length) {
-        writeLocal(mapped);
-        return mapped;
-      }
-      return legacyOffersFromFinance();
+      writeLocal(mapped);
+      return mapped;
     }
 
     if (error?.code === '42P01') {
@@ -106,10 +105,7 @@ export async function getAllOffers() {
     }
   }
 
-  const local = readLocal();
-  if (local.length) return local;
-
-  return legacyOffersFromFinance();
+  return readLocal();
 }
 
 export async function saveOffer(offer) {
@@ -167,8 +163,14 @@ export async function deleteOffer(id) {
   if (isSupabaseConfigured && supabase) {
     clearCache(CACHE_KEY);
     clearCache(`${CACHE_KEY}_active`);
-    const { error } = await supabase.from('promotional_offers').delete().eq('id', id);
+    const { data, error } = await supabase
+      .from('promotional_offers')
+      .delete()
+      .eq('id', id)
+      .select('id');
     if (error) throw error;
+    if (!data?.length) throw new Error('Offer could not be deleted.');
+    writeLocal(readLocal().filter((o) => o.id !== id));
     return;
   }
 

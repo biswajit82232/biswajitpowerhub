@@ -42,14 +42,14 @@ export default function AdminLogin() {
     <>
       <SEO title="Admin Login" noindex />
       <AdminPwaSetup />
-      <div className="flex min-h-screen items-center justify-center bg-sky-fade px-4 py-12 pt-[max(3rem,env(safe-area-inset-top))]">
+      <div className="flex min-h-screen items-center justify-center bg-sky-fade px-3 py-8 pt-[max(2rem,env(safe-area-inset-top))] sm:px-4 sm:py-12 sm:pt-[max(3rem,env(safe-area-inset-top))]">
         <div className="w-full max-w-md">
           <AdminInstallBanner />
-          <div className="mb-6 flex justify-center">
+          <div className="mb-5 flex justify-center sm:mb-6">
             <Logo />
           </div>
-          <div className="rounded-3xl bg-surface p-8 shadow-card ring-1 ring-line">
-            <h1 className="font-display text-2xl font-extrabold text-heading">Admin Login</h1>
+          <div className="rounded-2xl bg-surface p-5 shadow-card ring-1 ring-line sm:rounded-3xl sm:p-8">
+            <h1 className="font-display text-xl font-extrabold text-heading sm:text-2xl">Admin Login</h1>
             <p className="mt-1 text-sm text-muted">Sign in to manage your dealership.</p>
 
             {!isSupabaseConfigured && (

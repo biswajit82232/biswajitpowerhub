@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { ResetAllCountsButton } from '@/components/admin/ResetAllCountsButton';
 import { useAsync } from '@/hooks/useAsync';
 import { getOverview, getEventAggregates } from '@/features/analytics/analyticsService';
 import { getPopularityEngine } from '@/features/analytics/popularityService';
@@ -23,11 +24,18 @@ const PRIORITY_TONE = {
 };
 
 export default function Dashboard() {
-  const { data: overview, loading } = useAsync(() => getOverview(), []);
-  const { data: agg } = useAsync(() => getEventAggregates(), []);
+  const { data: overview, loading, refetch: refetchOverview } = useAsync(() => getOverview(), []);
+  const { data: agg, refetch: refetchAgg } = useAsync(() => getEventAggregates(), []);
   const { data: scooters } = useAsync(() => getScooters(), []);
-  const { data: popularity } = useAsync(() => getPopularityEngine(), []);
-  const { data: leads } = useAsync(() => getLeads(), []);
+  const { data: popularity, refetch: refetchPopularity } = useAsync(() => getPopularityEngine(), []);
+  const { data: leads, refetch: refetchLeads } = useAsync(() => getLeads(), []);
+
+  const refetchAll = () => {
+    refetchOverview();
+    refetchAgg();
+    refetchPopularity();
+    refetchLeads();
+  };
 
   const o = overview || {};
   const badgeMap = computeValueBadges(scooters || []);
@@ -39,7 +47,10 @@ export default function Dashboard() {
   return (
     <>
       <SEO title="Dashboard" noindex />
-      <AdminHeader title="Dashboard" subtitle="Smart insights — who to call, what's trending, best value picks." />
+      <AdminHeader
+        title="Dashboard"
+        subtitle="Smart insights — who to call, what's trending, best value picks."
+      />
 
       {loading ? (
         <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
@@ -61,17 +72,17 @@ export default function Dashboard() {
       )}
 
       {/* Follow-up queue */}
-      <div className="mt-8 rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="font-display text-lg font-bold text-heading">Who to call first</h2>
-            <p className="mt-1 text-sm text-muted">Ranked by purchase readiness and behaviour signals.</p>
+      <div className="mt-6 rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:mt-8 sm:rounded-2xl sm:p-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+          <div className="min-w-0">
+            <h2 className="font-display text-base font-bold text-heading sm:text-lg">Who to call first</h2>
+            <p className="mt-0.5 text-xs text-muted sm:mt-1 sm:text-sm">Ranked by purchase readiness and behaviour signals.</p>
           </div>
-          <Button to="/admin/leads" variant="secondary" size="sm">All leads</Button>
+          <Button to="/admin/leads" variant="secondary" size="sm" className="w-full sm:w-auto">All leads</Button>
         </div>
-        <div className="mt-5 space-y-3">
+        <div className="mt-4 space-y-2 sm:mt-5 sm:space-y-3">
           {callQueue.length ? callQueue.map((l) => (
-            <div key={l.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-alt px-4 py-3">
+            <div key={l.id} className="flex flex-col gap-2 rounded-xl bg-surface-alt px-3 py-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3 sm:px-4 sm:py-3">
               <div className="min-w-0">
                 <p className="font-semibold text-heading">{l.name || 'Anonymous'} · {l.phone || 'No phone'}</p>
                 <p className="text-xs text-muted">{l.interested_scooter || l.last_source || 'Website visitor'}</p>
@@ -90,9 +101,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-2">
         {/* Popularity engine */}
-        <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
+        <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
           <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
             <TrendingUp className="h-5 w-5 text-orange-500" /> Popularity engine
           </h2>
@@ -131,17 +142,17 @@ export default function Dashboard() {
         </div>
 
         {/* Best value badges */}
-        <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
-          <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
+        <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
+          <h2 className="flex items-center gap-2 font-display text-base font-bold text-heading sm:text-lg">
             <Star className="h-5 w-5 text-amber-500" /> Best value badges
           </h2>
-          <p className="mt-1 text-sm text-muted">Auto-assigned from specs — shown on scooter cards.</p>
-          <ul className="mt-5 space-y-3">
+          <p className="mt-1 text-xs text-muted sm:text-sm">Auto-assigned from specs — shown on scooter cards.</p>
+          <ul className="mt-4 space-y-2 sm:mt-5 sm:space-y-3">
             {Object.values(VALUE_BADGE_DEFS).map((def) => {
               const winnerId = [...badgeMap.entries()].find(([, badges]) =>
                 badges.some((b) => b.id === def.id))?.[0];
               return (
-                <li key={def.id} className="flex items-center justify-between rounded-xl bg-surface-alt px-4 py-3 text-sm">
+                <li key={def.id} className="flex flex-col gap-0.5 rounded-xl bg-surface-alt px-3 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
                   <span>{def.emoji} {def.label}</span>
                   <span className="font-semibold text-heading">
                     {winnerId ? resolveName(winnerId) : '—'}
@@ -154,10 +165,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
-          <h2 className="font-display text-lg font-bold text-heading">Most viewed scooters (all time)</h2>
-          <div className="mt-6">
+      <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-2">
+        <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
+          <h2 className="font-display text-base font-bold text-heading sm:text-lg">Most viewed scooters (all time)</h2>
+          <div className="mt-4 sm:mt-6">
             {agg?.mostViewed?.length ? (
               <BarChart data={agg.mostViewed} />
             ) : (
@@ -166,17 +177,17 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
-          <h2 className="font-display text-lg font-bold text-heading">Engagement</h2>
-          <div className="mt-5 space-y-3">
+        <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
+          <h2 className="font-display text-base font-bold text-heading sm:text-lg">Engagement</h2>
+          <div className="mt-4 space-y-2 sm:mt-5 sm:space-y-3">
             {[
               { label: 'WhatsApp clicks', value: agg?.whatsappClicks || 0 },
               { label: 'Call clicks', value: agg?.callClicks || 0 },
               { label: 'EMI calculator used', value: agg?.emiUsage || 0 },
               { label: 'EV simulator used', value: agg?.simulatorUsage || 0 },
             ].map((row) => (
-              <div key={row.label} className="flex items-center justify-between rounded-xl bg-surface-alt px-4 py-3">
-                <span className="text-sm font-medium text-body">{row.label}</span>
+              <div key={row.label} className="flex items-center justify-between rounded-xl bg-surface-alt px-3 py-2.5 sm:px-4 sm:py-3">
+                <span className="text-xs font-medium text-body sm:text-sm">{row.label}</span>
                 <span className="font-display text-lg font-extrabold text-heading">{row.value}</span>
               </div>
             ))}
@@ -185,6 +196,10 @@ export default function Dashboard() {
             View full analytics
           </Button>
         </div>
+      </div>
+
+      <div className="mt-8 flex justify-center border-t border-line pt-6 sm:mt-10">
+        <ResetAllCountsButton onReset={refetchAll} className="w-full sm:w-auto" />
       </div>
     </>
   );

@@ -8,7 +8,6 @@ import { Hero } from '@/components/sections/Hero';
 import { WhyChooseUs } from '@/components/sections/WhyChooseUs';
 import { PremiumPerks } from '@/components/sections/PremiumPerks';
 import { PromotionalOffers } from '@/components/sections/PromotionalOffers';
-import { PopularitySection } from '@/components/sections/PopularitySection';
 import { ScooterCardWithInsights } from '@/features/scooters/ScooterCardWithInsights';
 import { ScooterCardSkeleton, ReviewCardSkeleton } from '@/components/ui/Skeleton';
 import { EVSimulator } from '@/features/simulator/EVSimulator';
@@ -19,8 +18,8 @@ import { CallbackForm } from '@/features/leads/CallbackForm';
 import Button from '@/components/ui/Button';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters, getFeaturedScooters } from '@/features/scooters/scooterService';
-import { getFinanceSettings } from '@/features/finance/financeService';
 import { getScooterInsights } from '@/features/analytics/popularityService';
+import { useFinance } from '@/context/FinanceSettingsContext';
 import { SITE, SITE_URL } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { openingHoursSchema } from '@/lib/schemaHelpers';
@@ -58,7 +57,7 @@ export default function Home() {
   }), [site]);
   const { data: featured, loading } = useAsync(() => getFeaturedScooters(3), []);
   const { data: allScooters } = useAsync(() => getScooters(), []);
-  const { data: financeSettings } = useAsync(() => getFinanceSettings(), []);
+  const { settings: financeSettings } = useFinance();
   const { data: reviews, loading: reviewsLoading } = useAsync(() => getApprovedReviews(), []);
   const { data: insights } = useAsync(
     () => (allScooters?.length ? getScooterInsights(allScooters) : Promise.resolve(null)),
@@ -120,10 +119,8 @@ export default function Home() {
       </Section>
 
       <GradientDivider flip />
-      <PopularitySection />
 
       {/* ── EV Simulator ── */}
-      <GradientDivider />
       <Section id="simulator" className="relative overflow-hidden">
         {/* Gradient bg treatment */}
         <div className="pointer-events-none absolute inset-0 -z-10">

@@ -124,9 +124,9 @@ export default function Settings() {
         </div>
       )}
 
-      <form onSubmit={onSave} className="max-w-2xl space-y-6">
+      <form onSubmit={onSave} className="max-w-2xl space-y-4 sm:space-y-6">
         {/* Contact */}
-        <section className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
+        <section className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6 lg:p-8">
           <h3 className="flex items-center gap-2 text-sm font-bold text-heading">
             <Phone className="h-4 w-4 text-brand-500" /> Contact numbers
           </h3>
@@ -167,7 +167,7 @@ export default function Settings() {
         </section>
 
         {/* Address */}
-        <section className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
+        <section className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6 lg:p-8">
           <h3 className="flex items-center gap-2 text-sm font-bold text-heading">
             <MapPin className="h-4 w-4 text-brand-500" /> Address
           </h3>
@@ -201,9 +201,9 @@ export default function Settings() {
         </section>
 
         {/* Hours */}
-        <section className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
+        <section className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6 lg:p-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
               <h3 className="flex items-center gap-2 text-sm font-bold text-heading">
                 <Clock className="h-4 w-4 text-brand-500" /> Opening hours
               </h3>
@@ -211,7 +211,7 @@ export default function Settings() {
                 Default for new days: 9:00 AM – 8:30 PM. Current showroom: Mon–Sat 10–8, Sun 11–6.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               <Button
                 type="button"
                 variant="secondary"
@@ -232,15 +232,15 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="mt-5 space-y-3">
+          <div className="mt-4 space-y-2 sm:mt-5 sm:space-y-3">
             {DAY_KEYS.map((day) => {
               const d = form.hours[day] || DEFAULT_DAY_HOURS;
               return (
                 <div
                   key={day}
-                  className="flex flex-wrap items-center gap-3 rounded-xl bg-surface-alt px-4 py-3"
+                  className="flex flex-col gap-2 rounded-xl bg-surface-alt px-3 py-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:px-4 sm:py-3"
                 >
-                  <span className="w-24 text-sm font-semibold text-heading">{DAY_LABELS[day]}</span>
+                  <span className="text-sm font-semibold text-heading sm:w-20">{DAY_LABELS[day]}</span>
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -251,21 +251,21 @@ export default function Settings() {
                     Closed
                   </label>
                   {!d.closed && (
-                    <>
+                    <div className="flex flex-wrap items-center gap-2">
                       <Input
                         type="time"
                         value={d.open}
                         onChange={(e) => setDayHours(day, 'open', e.target.value)}
-                        className="w-32"
+                        className="w-28 sm:w-32"
                       />
                       <span className="text-muted">to</span>
                       <Input
                         type="time"
                         value={d.close}
                         onChange={(e) => setDayHours(day, 'close', e.target.value)}
-                        className="w-32"
+                        className="w-28 sm:w-32"
                       />
-                    </>
+                    </div>
                   )}
                 </div>
               );
@@ -278,7 +278,7 @@ export default function Settings() {
           </div>
         </section>
 
-        <Button type="submit" variant="primary" size="lg" icon={Save} loading={saving}>
+        <Button type="submit" variant="primary" size="lg" icon={Save} loading={saving} className="w-full sm:w-auto">
           Save Settings
         </Button>
       </form>

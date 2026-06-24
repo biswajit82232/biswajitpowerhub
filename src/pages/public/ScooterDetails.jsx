@@ -16,8 +16,8 @@ import { PremiumPerksStrip } from '@/components/sections/PremiumPerks';
 import { EMICalculator } from '@/features/emi/EMICalculator';
 import { TestRideForm } from '@/features/leads/TestRideForm';
 import { getScooterById, getScooters } from '@/features/scooters/scooterService';
-import { getFinanceSettings } from '@/features/finance/financeService';
 import { getScooterInsights } from '@/features/analytics/popularityService';
+import { useFinance } from '@/context/FinanceSettingsContext';
 import { getAllValueBadges } from '@/lib/valueBadges';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
@@ -44,7 +44,7 @@ export default function ScooterDetails() {
   const { id } = useParams();
   const { site } = useSite();
   const { data: scooter, loading } = useAsync(() => getScooterById(id), [id]);
-  const { data: settings } = useAsync(() => getFinanceSettings(), []);
+  const { settings } = useFinance();
   const { data: insights } = useAsync(async () => {
     const all = await getScooters();
     return getScooterInsights(all);

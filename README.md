@@ -48,14 +48,12 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX   # optional — Google Analytics 4
 ## Supabase setup
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. SQL editor: run `supabase/schema.sql`, then `supabase/seed.sql`.
-3. Run migrations in order — see `supabase/migrations/README.md`:
-   - `add_petrol_settings.sql`
-   - `add_hero_image.sql`
-   - `create_storage_bucket.sql`
-   - `add_promotional_offers.sql`
-   - `add_site_settings.sql`
-4. **Authentication → Users → Add user** for admin login at `/admin/login`.
+2. Copy `.env.example` → `.env` and set `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` (Project Settings → API).
+3. SQL editor: run `supabase/schema.sql`, then `supabase/seed.sql`.
+4. Apply migrations — either:
+   - **CLI (recommended):** add `SUPABASE_DB_PASSWORD` to `.env`, then `npm run db:check` and `npm run db:migrate`
+   - **Manual:** run files in order — see `supabase/migrations/README.md`
+5. **Authentication → Users → Add user** for admin login at `/admin/login`.
 
 ---
 
@@ -88,7 +86,7 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX   # optional — Google Analytics 4
 Before go-live, confirm:
 
 - [ ] **Vercel env vars** — `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SITE_URL` on Production
-- [ ] **Supabase migrations** — all five migration files applied
+- [ ] **Supabase migrations** — `npm run db:check` shows no pending items
 - [ ] **Admin user** — created in Supabase Auth
 - [ ] **Admin → Settings** — phones, address, hours saved
 - [ ] **Admin → Offers** — at least one active offer (optional)

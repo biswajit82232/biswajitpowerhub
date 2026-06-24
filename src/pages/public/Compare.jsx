@@ -10,24 +10,29 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { formatINR } from '@/lib/utils';
 import { emiFrom } from '@/lib/finance';
+import { useFinance } from '@/context/FinanceSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
-const ROWS = [
-  { label: 'Price', get: (s) => formatINR(s.price) },
-  { label: 'EMI from', get: (s) => `${formatINR(emiFrom({ price: s.price }))}/mo` },
-  { label: 'Range', get: (s) => `${s.range} km` },
-  { label: 'Top speed', get: (s) => `${s.topSpeed} km/h` },
-  { label: 'Battery', get: (s) => s.batteryCapacity },
-  { label: 'Battery type', get: (s) => s.batteryType },
-  { label: 'Charging time', get: (s) => s.chargingTime },
-  { label: 'Motor', get: (s) => s.motor },
-  { label: 'Weight', get: (s) => s.weight },
-  { label: 'Load capacity', get: (s) => s.loadCapacity },
-  { label: 'Warranty', get: (s) => s.warranty },
-];
+function compareRows(settings) {
+  return [
+    { label: 'Price', get: (s) => formatINR(s.price) },
+    { label: 'EMI from', get: (s) => `${formatINR(emiFrom({ price: s.price, settings }))}/mo*` },
+    { label: 'Range', get: (s) => `${s.range} km` },
+    { label: 'Top speed', get: (s) => `${s.topSpeed} km/h` },
+    { label: 'Battery', get: (s) => s.batteryCapacity },
+    { label: 'Battery type', get: (s) => s.batteryType },
+    { label: 'Charging time', get: (s) => s.chargingTime },
+    { label: 'Motor', get: (s) => s.motor },
+    { label: 'Weight', get: (s) => s.weight },
+    { label: 'Load capacity', get: (s) => s.loadCapacity },
+    { label: 'Warranty', get: (s) => s.warranty },
+  ];
+}
 
 export default function Compare() {
   const { data: scooters } = useAsync(() => getScooters(), []);
+  const { settings } = useFinance();
+  const rows = useMemo(() => compareRows(settings), [settings]);
   const [selected, setSelected] = useState([]);
   const tracked = useRef(false);
 
@@ -118,7 +123,7 @@ export default function Compare() {
                 </tr>
               </thead>
               <tbody>
-                {ROWS.map((row, ri) => (
+                {rows.map((row, ri) => (
                   <tr key={row.label} className={ri % 2 ? 'bg-surface-alt/40' : ''}>
                     <td className="sticky left-0 z-10 min-w-[7rem] bg-inherit px-3 py-3.5 text-sm font-semibold text-heading sm:min-w-[8.5rem]">
                       {row.label}
