@@ -32,7 +32,7 @@ export function Navbar() {
       )}
     >
       <nav className="container-px flex h-[var(--header-height)] min-w-0 items-center justify-between gap-2">
-        <Logo compact className="min-w-0 shrink" />
+        <Logo compact className="min-w-0 max-w-[calc(100%-3rem)] shrink" />
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 lg:flex">

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
   Phone, MapPin, Clock, MessageCircle, ChevronRight,
-  Zap, ShieldCheck, BatteryCharging, ArrowUpRight,
+  Zap, ShieldCheck, BatteryCharging, ArrowUpRight, Wrench,
 } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import Button from '@/components/ui/Button';
@@ -9,7 +9,8 @@ import { NAV_LINKS, SITE, whatsappUrl, telUrl } from '@/config/site';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 const TRUST = [
-  { icon: ShieldCheck, label: 'No licence models*' },
+  { icon: Wrench, label: '3 free servicing' },
+  { icon: ShieldCheck, label: '1 yr motor & controller warranty' },
   { icon: BatteryCharging, label: 'Home charging' },
   { icon: Zap, label: 'Low running cost' },
 ];
@@ -193,7 +194,12 @@ export function Footer() {
             </div>
             <p className="max-w-xl text-[0.7rem] leading-relaxed text-white/40">
               *No licence or registration applies to eligible low-speed models only. Specifications,
-              prices, and EMI figures are indicative and subject to change.
+              prices, EMI figures, and promotional offers are indicative and subject to change.
+              Showroom benefits and promo codes are governed by our{' '}
+              <Link to="/terms" className="underline hover:text-white/60">
+                Terms of Service
+              </Link>
+              .
             </p>
           </div>
         </div>

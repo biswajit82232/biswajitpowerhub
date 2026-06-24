@@ -34,7 +34,7 @@ export default function Privacy() {
               Your privacy matters to us. This policy explains what information we collect and how
               we use it when you interact with {SITE.name}.
             </p>
-            <p className="mt-2 text-sm text-muted">Last updated: June 2026</p>
+            <p className="mt-2 text-sm text-muted">Last updated: 24 June 2026</p>
           </Reveal>
         </div>
       </section>
@@ -44,8 +44,8 @@ export default function Privacy() {
           <LegalSection title="1. Who we are">
             <p>
               {SITE.name} (&quot;we&quot;, &quot;us&quot;) operates an electric scooter dealership
-              at {SITE.address.full}. This policy applies to our website, showroom interactions,
-              and customer communications.
+              at {SITE.address.full}. This policy applies to our website, admin systems, showroom
+              interactions, and customer communications.
             </p>
           </LegalSection>
 
@@ -54,8 +54,10 @@ export default function Privacy() {
             <ul className="list-disc space-y-1 pl-5">
               <li>Name, phone number, and email (contact forms, callbacks, test ride bookings)</li>
               <li>Messages you send via WhatsApp, phone, or our website forms</li>
-              <li>Scooter preferences and purchase-related details you share with us</li>
+              <li>Scooter preferences, review content, and photos you choose to submit</li>
+              <li>Promo codes or offer details when you enquire about a promotion</li>
               <li>Anonymous website usage data (pages visited, calculator usage) to improve our service</li>
+              <li>Admin account email if you log in to our dealership admin panel</li>
             </ul>
           </LegalSection>
 
@@ -63,7 +65,9 @@ export default function Privacy() {
             <p>We use your information to:</p>
             <ul className="list-disc space-y-1 pl-5">
               <li>Respond to enquiries, callback requests, and test ride bookings</li>
-              <li>Provide quotes, finance guidance, and after-sales support</li>
+              <li>Process and validate promotional offer claims</li>
+              <li>Provide quotes, EMI guidance, warranty support, and after-sales service</li>
+              <li>Moderate and publish customer reviews you submit</li>
               <li>Follow up on leads and improve customer experience</li>
               <li>Understand website performance and popular products</li>
             </ul>
@@ -72,33 +76,37 @@ export default function Privacy() {
 
           <LegalSection title="4. Cookies & local storage">
             <p>
-              Our website may store a anonymous visitor identifier in your browser to track
+              Our website may store an anonymous visitor identifier in your browser to track
               interactions (such as calculator usage) for lead scoring. This helps us serve you
               better. You can clear site data through your browser settings.
+            </p>
+            <p>
+              If you install our admin web app, your browser may also store session and preference
+              data required for login and offline functionality.
             </p>
           </LegalSection>
 
           <LegalSection title="5. Third-party services">
             <p>
-              We use trusted services such as Supabase (data storage), Google Maps (location), and
-              WhatsApp (messaging). When you click WhatsApp or Maps links, their respective
-              privacy policies apply.
+              We use trusted services such as Supabase (database and file storage), Vercel (website
+              hosting), Google Maps (location), and WhatsApp (messaging). When you use those
+              services via links on our site, their respective privacy policies apply.
             </p>
           </LegalSection>
 
           <LegalSection title="6. Data retention">
             <p>
-              We retain enquiry and customer records for as long as needed to fulfil the purposes
-              above, comply with law, or resolve disputes. You may request deletion of non-essential
-              data by contacting us.
+              We retain enquiry, customer, and review records for as long as needed to fulfil the
+              purposes above, comply with law, or resolve disputes. You may request deletion of
+              non-essential data by contacting us.
             </p>
           </LegalSection>
 
           <LegalSection title="7. Security">
             <p>
-              We implement reasonable technical measures to protect data. No online transmission is
-              100% secure; please avoid sharing sensitive financial passwords through unsecured
-              channels.
+              We implement reasonable technical measures to protect data, including secure hosting
+              and access controls on our admin panel. No online transmission is 100% secure; please
+              avoid sharing sensitive financial passwords through unsecured channels.
             </p>
           </LegalSection>
 
@@ -106,7 +114,7 @@ export default function Privacy() {
             <p>
               You may request access, correction, or deletion of your personal information by
               contacting us. We will respond within a reasonable timeframe as required by applicable
-              law.
+              Indian law.
             </p>
           </LegalSection>
 
@@ -121,9 +129,14 @@ export default function Privacy() {
           <LegalSection title="10. Contact">
             <p>
               For privacy-related questions, contact {SITE.name} at{' '}
-              <a href={`tel:+91${SITE.phones[0]}`} className="font-semibold text-brand-600 hover:underline">
-                +91 {SITE.phones[0]}
-              </a>{' '}
+              {SITE.phones.map((p, i) => (
+                <span key={p}>
+                  {i > 0 && ' or '}
+                  <a href={`tel:+91${p}`} className="font-semibold text-brand-600 hover:underline">
+                    +91 {p}
+                  </a>
+                </span>
+              ))}{' '}
               or{' '}
               <Link to="/contact" className="font-semibold text-brand-600 hover:underline">
                 visit our showroom

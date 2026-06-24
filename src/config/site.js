@@ -9,7 +9,7 @@ export const SITE = {
   tagline: 'Powering Every Ride',
   type: 'EV Dealership & Showroom',
   description:
-    'Premium low-speed electric scooters in Berhampore, West Bengal. Ride electric, save more, power every journey.',
+    'Premium low-speed electric scooters in Berhampore, West Bengal. Ride electric, save more, power every ride.',
 
   phones: ['9635505436', '9775441797'],
 
@@ -45,6 +45,22 @@ export const SITE = {
 
   url: 'https://biswajitpowerhub.example',
 };
+
+/** Premium showroom perks — shown on homepage, footer, and product pages */
+export const PREMIUM_PERKS = [
+  {
+    id: 'servicing',
+    title: '3 Free Servicing',
+    desc: 'Complimentary service visits at our showroom.',
+    highlight: '3×',
+  },
+  {
+    id: 'warranty',
+    title: '1 Year Motor & Controller Warranty',
+    desc: 'Full-year motor & controller coverage.',
+    highlight: '1 Yr',
+  },
+];
 
 export const NAV_LINKS = [
   { label: 'Home', to: '/' },

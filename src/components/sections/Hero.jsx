@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle, Zap, ShieldCheck, BatteryCharging, Wallet } from 'lucide-react';
+import { ArrowRight, MessageCircle, Zap, ShieldCheck, BatteryCharging, Wallet, Wrench } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { ScooterImage } from '@/components/common/ScooterImage';
 import { SITE, whatsappUrl } from '@/config/site';
@@ -12,7 +12,8 @@ const STATS = [
 ];
 
 const CHIPS = [
-  { icon: ShieldCheck, label: 'No Licence Required*', color: 'text-accent-600' },
+  { icon: Wrench, label: '3 Free Servicing', color: 'text-rose-600' },
+  { icon: ShieldCheck, label: '1 Yr Motor Warranty', color: 'text-indigo-600' },
   { icon: BatteryCharging, label: 'Charge at Home', color: 'text-brand-600' },
   { icon: Wallet, label: 'Low Running Cost', color: 'text-cyan-600' },
 ];

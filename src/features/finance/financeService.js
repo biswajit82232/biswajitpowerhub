@@ -60,7 +60,7 @@ export async function getFinanceSettings() {
 export async function saveFinanceSettings(settings) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   clearCache('finance_settings');
-  const { error } = await supabase.from('finance_settings').upsert({
+  const row = {
     id: ROW_ID,
     interest_rate: settings.interestRate,
     down_payment_pct: settings.downPaymentPct,
@@ -68,11 +68,12 @@ export async function saveFinanceSettings(settings) {
     default_tenure: settings.defaultTenure,
     min_down_payment_pct: settings.minDownPaymentPct,
     max_down_payment_pct: settings.maxDownPaymentPct,
-    promo: settings.promo,
     petrol_price_per_litre: settings.petrolPricePerLitre,
     petrol_mileage_km_per_litre: settings.petrolMileageKmPerLitre,
     hero_image_url: settings.heroImageUrl ?? null,
     updated_at: new Date().toISOString(),
-  });
+  };
+  if (settings.promo !== undefined) row.promo = settings.promo;
+  const { error } = await supabase.from('finance_settings').upsert(row);
   if (error) throw error;
 }

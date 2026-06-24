@@ -12,6 +12,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PageLoader } from '@/components/ui/Loading';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ScooterGallery } from '@/features/scooters/ScooterGallery';
+import { PremiumPerksStrip } from '@/components/sections/PremiumPerks';
 import { EMICalculator } from '@/features/emi/EMICalculator';
 import { TestRideForm } from '@/features/leads/TestRideForm';
 import { getScooterById } from '@/features/scooters/scooterService';
@@ -110,6 +111,8 @@ export default function ScooterDetails() {
             </div>
 
             <p className="mt-5 break-words leading-relaxed text-body">{scooter.description}</p>
+
+            <PremiumPerksStrip />
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Save, Tag, ImagePlus, X, Loader2 } from 'lucide-react';
+import { Save, ImagePlus, X, Loader2 } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Field, Input } from '@/components/ui/Input';
@@ -121,19 +121,6 @@ export default function Finance() {
             <Field label="Petrol mileage (km per litre)" hint="Typical petrol scooter efficiency">
               <Input type="number" step="1" value={form.petrolMileageKmPerLitre} onChange={(e) => set('petrolMileageKmPerLitre', e.target.value)} />
             </Field>
-          </div>
-        </div>
-
-        <div className="mt-6 rounded-xl bg-surface-alt p-5">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-heading">
-            <Tag className="h-4 w-4 text-brand-500" /> Promotional offer
-          </h3>
-          <div className="mt-3 grid gap-4 sm:grid-cols-[auto,1fr] sm:items-center">
-            <label className="flex items-center gap-2 text-sm font-medium text-body">
-              <input type="checkbox" checked={form.promo?.active || false} onChange={(e) => set('promo', { ...form.promo, active: e.target.checked })} className="h-5 w-5 rounded accent-brand-500" />
-              Active
-            </label>
-            <Input placeholder="e.g. Festive offer: ₹5,000 off!" value={form.promo?.label || ''} onChange={(e) => set('promo', { ...form.promo, label: e.target.value })} />
           </div>
         </div>
 

@@ -5,6 +5,8 @@ import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
 import { Hero } from '@/components/sections/Hero';
 import { WhyChooseUs } from '@/components/sections/WhyChooseUs';
+import { PremiumPerks } from '@/components/sections/PremiumPerks';
+import { PromotionalOffers } from '@/components/sections/PromotionalOffers';
 import { ScooterCard } from '@/features/scooters/ScooterCard';
 import { ScooterCardSkeleton, ReviewCardSkeleton } from '@/components/ui/Skeleton';
 import { EVSimulator } from '@/features/simulator/EVSimulator';
@@ -58,11 +60,16 @@ export default function Home() {
 
       <Hero heroImageUrl={financeSettings?.heroImageUrl} />
 
+      <PromotionalOffers />
+
       <GradientDivider />
       <WhyChooseUs />
 
-      {/* ── Featured Scooters ── */}
       <GradientDivider flip />
+      <PremiumPerks />
+
+      {/* ── Featured Scooters ── */}
+      <GradientDivider />
       <Section id="featured" className="relative overflow-hidden">
         {/* subtle bg */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-blue-50/30 via-transparent to-transparent" />

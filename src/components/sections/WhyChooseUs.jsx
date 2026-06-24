@@ -1,8 +1,28 @@
 import { useEffect, useRef } from 'react';
-import { Zap, FileX2, Wallet, BatteryCharging } from 'lucide-react';
+import { Zap, FileX2, Wallet, BatteryCharging, Wrench, ShieldCheck } from 'lucide-react';
 import { Section, SectionHeading } from '@/components/common/Section';
 
 const ITEMS = [
+  {
+    icon: Wrench,
+    title: '3 Free Servicing',
+    desc: 'Complimentary scheduled service visits at our Berhampore showroom.',
+    gradient: 'from-rose-500 to-pink-500',
+    glow: 'rgba(244,63,94,0.18)',
+    bg: 'from-rose-50/80 to-pink-50/40',
+    ring: 'ring-rose-100',
+    bar: 'from-rose-400 to-pink-400',
+  },
+  {
+    icon: ShieldCheck,
+    title: '1 Yr Motor & Controller Warranty',
+    desc: 'Full-year coverage on motor and controller — ride with confidence.',
+    gradient: 'from-indigo-500 to-blue-500',
+    glow: 'rgba(99,102,241,0.18)',
+    bg: 'from-indigo-50/80 to-blue-50/40',
+    ring: 'ring-indigo-100',
+    bar: 'from-indigo-400 to-blue-400',
+  },
   {
     icon: Zap,
     title: 'No Licence Required*',
@@ -44,6 +64,26 @@ const ITEMS = [
     bar: 'from-violet-400 to-purple-400',
   },
   // duplicate set for seamless loop
+  {
+    icon: Wrench,
+    title: '3 Free Servicing',
+    desc: 'Complimentary scheduled service visits at our Berhampore showroom.',
+    gradient: 'from-rose-500 to-pink-500',
+    glow: 'rgba(244,63,94,0.18)',
+    bg: 'from-rose-50/80 to-pink-50/40',
+    ring: 'ring-rose-100',
+    bar: 'from-rose-400 to-pink-400',
+  },
+  {
+    icon: ShieldCheck,
+    title: '1 Yr Motor & Controller Warranty',
+    desc: 'Full-year coverage on motor and controller — ride with confidence.',
+    gradient: 'from-indigo-500 to-blue-500',
+    glow: 'rgba(99,102,241,0.18)',
+    bg: 'from-indigo-50/80 to-blue-50/40',
+    ring: 'ring-indigo-100',
+    bar: 'from-indigo-400 to-blue-400',
+  },
   {
     icon: Zap,
     title: 'No Licence Required*',
