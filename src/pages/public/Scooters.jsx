@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import Button from '@/components/ui/Button';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
+import { BATTERY_UPGRADE_TAGLINE } from '@/config/site';
 
 const SORTS = {
   'price-asc': (a, b) => a.price - b.price,
@@ -69,6 +70,9 @@ export default function Scooters() {
             </h1>
             <p className="mt-2 max-w-xl text-sm text-body sm:text-base">
               Premium electric scooters for every budget. Compare specs, calculate EMI, and book a test ride.
+            </p>
+            <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted sm:text-sm">
+              {BATTERY_UPGRADE_TAGLINE}
             </p>
           </Reveal>
         </div>

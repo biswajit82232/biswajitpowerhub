@@ -213,6 +213,7 @@ export default function Home() {
                 {[
                   'Personalised model recommendations',
                   'EMI & finance guidance',
+                  'Custom battery upgrade options',
                   'Test ride scheduling',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2">

@@ -114,7 +114,21 @@ export const PREMIUM_PERKS = [
     desc: 'Full-year motor & controller coverage.',
     highlight: '1 Yr',
   },
+  {
+    id: 'batteryUpgrade',
+    title: 'Custom Battery Upgrades',
+    desc: 'Need more range? Higher AH batteries & custom mods — ask us.',
+    highlight: '+ Range',
+  },
 ];
+
+/** Short copy for battery upgrade mentions across the site */
+export const BATTERY_UPGRADE_TAGLINE =
+  'Need more mileage? We offer custom higher-AH battery upgrades on eligible models — contact us to know more.';
+
+export function batteryUpgradeWhatsappMessage(scooterName) {
+  return `Hi BISWAJIT POWER HUB, I'm interested in a custom battery upgrade${scooterName ? ` for the ${scooterName}` : ''} to increase mileage. Please share options and pricing.`;
+}
 
 export const NAV_LINKS = [
   { label: 'Home', to: '/' },

@@ -22,7 +22,7 @@ import { getAllValueBadges } from '@/lib/valueBadges';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
 import { STOCK_LABELS } from '@/data/scooters';
-import { whatsappUrl, SITE_URL } from '@/config/site';
+import { whatsappUrl, SITE_URL, batteryUpgradeWhatsappMessage } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
@@ -74,6 +74,7 @@ export default function ScooterDetails() {
   if (insights?.popularWeekIds?.has?.(scooter.id)) popularityTags.push({ label: '🔥 Trending this week', tone: 'hot' });
   if (insights?.topIntentMonthIds?.has?.(scooter.id)) popularityTags.push({ label: '⭐ Top pick this month', tone: 'warm' });
   const waMessage = `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${formatINR(scooter.price)}). Please share more details.`;
+  const batteryUpgradeWaMessage = batteryUpgradeWhatsappMessage(scooter.name);
 
   const productSchema = {
     '@context': 'https://schema.org',
@@ -174,6 +175,44 @@ export default function ScooterDetails() {
               <Spec icon={Weight} label="Weight" value={scooter.weight} />
               <Spec icon={Users} label="Load capacity" value={scooter.loadCapacity} />
               <Spec icon={ShieldCheck} label="Warranty" value={scooter.warranty} />
+            </div>
+
+            {/* Battery upgrade */}
+            <div className="mt-8 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-50 via-white to-accent-50 p-6 ring-1 ring-brand-100 sm:p-7">
+              <div className="flex items-start gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-card">
+                  <BatteryCharging className="h-6 w-6" strokeWidth={2.2} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display text-lg font-bold text-heading">Want more range?</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-body">
+                    You can increase the mileage on this scooter with a more powerful AH battery. We offer custom battery modifications tailored to your daily riding needs — so you go farther on every charge.
+                  </p>
+                  <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {[
+                      'Higher AH battery options',
+                      'Custom modification available',
+                      'Extended range on the same model',
+                      'Expert fitting at our showroom',
+                    ].map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-sm text-body">
+                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" strokeWidth={2.5} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    href={whatsappUrl(batteryUpgradeWaMessage, site)}
+                    variant="whatsapp"
+                    size="md"
+                    icon={MessageCircle}
+                    className="mt-5"
+                    onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'battery-upgrade', scooterId: scooter.id })}
+                  >
+                    Contact us to know more
+                  </Button>
+                </div>
+              </div>
             </div>
 
             {/* Colors */}

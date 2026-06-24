@@ -1,4 +1,4 @@
-import { Wrench, ShieldCheck } from 'lucide-react';
+import { Wrench, ShieldCheck, BatteryCharging } from 'lucide-react';
 import { Section } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
 import { PREMIUM_PERKS } from '@/config/site';
@@ -6,6 +6,7 @@ import { PREMIUM_PERKS } from '@/config/site';
 const ICONS = {
   servicing: Wrench,
   warranty: ShieldCheck,
+  batteryUpgrade: BatteryCharging,
 };
 
 const CARD_STYLE = {
@@ -18,6 +19,11 @@ const CARD_STYLE = {
     gradient: 'from-blue-500 to-cyan-500',
     bg: 'bg-blue-50/60',
     ring: 'ring-blue-100',
+  },
+  batteryUpgrade: {
+    gradient: 'from-emerald-500 to-teal-500',
+    bg: 'bg-emerald-50/60',
+    ring: 'ring-emerald-100',
   },
 };
 
@@ -52,13 +58,13 @@ export function PremiumPerks() {
           More than just a scooter
         </h2>
         <p className="mx-auto mt-1.5 max-w-lg text-xs leading-relaxed text-body sm:text-sm">
-          Free servicing and warranty coverage — all at our showroom.
+          Free servicing, warranty coverage, and custom battery upgrades at our showroom.
         </p>
       </Reveal>
 
       <Reveal delay={0.05} className="mt-5">
         <div className="rounded-2xl bg-surface p-3 ring-1 ring-line shadow-soft sm:p-4">
-          <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {PREMIUM_PERKS.map((perk) => (
               <PerkTile key={perk.id} perk={perk} />
             ))}

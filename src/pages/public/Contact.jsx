@@ -96,7 +96,9 @@ export default function Contact() {
             </span>
             <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">{SITE.name}</h1>
             <p className="mt-2 text-base font-semibold text-gradient">{SITE.tagline}</p>
-            <p className="mt-3 max-w-xl text-body">We'd love to help you find the perfect electric ride. Reach out any way you like.</p>
+            <p className="mt-3 max-w-xl text-body">
+              We&apos;d love to help you find the perfect electric ride. Questions about custom battery upgrades? Reach out any way you like.
+            </p>
           </Reveal>
         </div>
       </section>

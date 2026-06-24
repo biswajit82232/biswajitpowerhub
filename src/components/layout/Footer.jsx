@@ -12,7 +12,7 @@ import { trackEvent, EVENT } from '@/lib/tracking';
 const TRUST = [
   { icon: Wrench, label: '3 free servicing' },
   { icon: ShieldCheck, label: '1 yr motor & controller warranty' },
-  { icon: BatteryCharging, label: 'Home charging' },
+  { icon: BatteryCharging, label: 'Custom battery upgrades' },
   { icon: Zap, label: 'Low running cost' },
 ];
 
@@ -68,7 +68,7 @@ export function Footer() {
             <Logo light />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/70">
               Premium low-speed electric scooters in Berhampore. No licence, no registration* for
-              eligible models — low running cost, home charging, expert local support.
+              eligible models — low running cost, home charging, and custom battery upgrades for extra range.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {TRUST.map(({ icon: Icon, label }) => (

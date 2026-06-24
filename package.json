@@ -6,6 +6,7 @@
   "description": "BISWAJIT POWER HUB — Premium EV dealership website & business management platform.",
   "scripts": {
     "dev": "vite",
+    "dev:http": "vite --mode http",
     "build": "node scripts/generate-sitemap.mjs && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
