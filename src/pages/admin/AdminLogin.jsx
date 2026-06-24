@@ -54,7 +54,22 @@ export default function AdminLogin() {
 
             {!isSupabaseConfigured && (
               <div className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                Supabase isn't connected yet. Add your credentials to <code className="font-mono">.env</code> and create an admin user to enable login.
+                Supabase isn&apos;t connected yet.
+                {import.meta.env.DEV ? (
+                  <>
+                    {' '}Add <code className="font-mono">VITE_SUPABASE_URL</code> and{' '}
+                    <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> to your local{' '}
+                    <code className="font-mono">.env</code>, then restart the dev server.
+                  </>
+                ) : (
+                  <>
+                    {' '}In Vercel → Project → Settings → Environment Variables, add{' '}
+                    <code className="font-mono">VITE_SUPABASE_URL</code> and{' '}
+                    <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> (same values as your{' '}
+                    <code className="font-mono">.env</code>), then redeploy.
+                  </>
+                )}
+                {' '}Create an admin user in Supabase → Authentication → Users.
               </div>
             )}
 
