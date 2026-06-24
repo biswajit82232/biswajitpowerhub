@@ -24,6 +24,7 @@ const ORDER = [
   'add_file_charges.sql',
   'add_accessories.sql',
   'create_accessory_images_bucket.sql',
+  'update_reviews_product_names.sql',
 ];
 
 function loadEnv() {

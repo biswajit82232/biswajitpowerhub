@@ -52,8 +52,10 @@ values
 on conflict (id) do nothing;
 
 insert into public.reviews (name, rating, review, scooter, status, featured) values
-  ('Subhankar Das',5,'Bought the Urban Pro for my daily commute to Berhampore market. Smooth ride, brilliant range, and zero paperwork. The team explained everything patiently.','Urban Pro','approved',true),
-  ('Riya Saha',5,'My first electric scooter — the Breeze X. Love the storage and the colour. Charging at home is so convenient and cheap. Highly recommend this showroom.','Breeze X','approved',true),
-  ('Amit Pramanik',4,'Great value with the Spark Lite. Running cost is almost nothing compared to my old petrol scooter. Service support has been prompt.','Spark Lite','approved',false),
-  ('Moumita Ghosh',5,'The Thunder GT is a beast for a no-licence scooter. The twin battery means I never worry about range. Worth every rupee.','Thunder GT','approved',true),
-  ('Sayan Mondal',5,'Test rode three models and the staff were never pushy. Ended up with the Metro Eco for my daughter. Excellent first-time buyer experience.','Metro Eco','approved',false);
+  ('Subhankar Das',5,'Needed good range for Berhampore to Kandi trips. Went with the Activa — easily 80 km on one charge if you don''t throttle hard. Team explained EMI clearly, no surprise fees at delivery.','Activa','approved',true),
+  ('Riya Saha',5,'My first electric scooter. Single Light fit our budget at ₹42,999 and 50 km is more than enough for school drop and market — maybe 18 km daily. Plug in at night, done.','Single Light','approved',true),
+  ('Amit Pramanik',4,'Dubble Light replaced my old petrol scooter. Getting 55–60 km regularly, running cost is peanuts. Minus one star only because I wanted a longer charging cable — otherwise showroom was very helpful.','Dubble Light','approved',false),
+  ('Moumita Ghosh',5,'Ceeon BMW range is serious — they claim 120 km and I got close on a long run towards Murshidabad and back. Feels planted on highway stretches. Worth the ₹75,000 if you travel far often.','Ceeon BMW','approved',true),
+  ('Sayan Mondal',5,'Test rode Activa, OLA and Zoom before deciding. Zoom felt best for my daily Lalbagh office run — 70 km range, smooth pickup. Staff never rushed us, answered every silly question.','Zoom','approved',false),
+  ('Priya Banerjee',5,'Took the OLA — looks premium and rides quiet. We worked out fuel vs electric: husband''s bike was ₹70–80/day, this is maybe ₹15–20 charging at home. Very happy with the purchase.','OLA','approved',true),
+  ('Arindam Roy',5,'Bought Dubble Light for shop errands around town. Light, easy in narrow lanes, 60 km is plenty for the whole day. Honest pricing at Biswajit Power Hub — already sent two neighbours here.','Dubble Light','approved',false);
