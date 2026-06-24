@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --header-height: 68px;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-bg text-body font-sans antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-heading;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-heading;
+  }
+
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Premium focus ring */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-bg;
+  }
+
+  /* Custom scrollbar (desktop) */
+  @media (pointer: fine) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      @apply bg-line rounded-full;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      @apply bg-muted/40;
+    }
+  }
+}
+
+@layer components {
+  .container-px {
+    @apply mx-auto w-full max-w-content px-5 sm:px-6 lg:px-8;
+  }
+
+  .text-gradient {
+    @apply bg-brand-gradient bg-clip-text text-transparent;
+  }
+
+  /* Range slider — premium thumb */
+  .bph-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    border-radius: 9999px;
+    outline: none;
+  }
+  .bph-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 26px;
+    width: 26px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 3px solid #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .bph-range::-webkit-slider-thumb:active {
+    transform: scale(1.15);
+  }
+  .bph-range::-moz-range-thumb {
+    height: 26px;
+    width: 26px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 3px solid #3b82f6;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    cursor: pointer;
+  }
+
+  /* Continuous review marquee */
+  .reviews-marquee-wrap {
+    overflow: hidden;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reviews-marquee-wrap {
+      overflow-x: auto;
+    }
+  }
+
+  /* Hide scrollbar utility for horizontal carousels */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Glassmorphism card */
+  .glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+  }
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Gradient text — blue to teal */
+  .text-gradient-bt {
+    background: linear-gradient(135deg, #2563EB 0%, #06B6D4 50%, #0D9488 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Animated gradient border */
+  .gradient-border {
+    position: relative;
+    z-index: 0;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -1.5px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #3B82F6, #06B6D4, #14B8A6, #3B82F6);
+    background-size: 300% 300%;
+    animation: gradient-shift 4s ease infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .gradient-border:hover::before {
+    opacity: 1;
+  }
+
+  /* Glow shadow utilities */
+  .shadow-glow-blue {
+    box-shadow: 0 0 24px rgba(59, 130, 246, 0.35), 0 4px 16px rgba(59, 130, 246, 0.2);
+  }
+  .shadow-glow-teal {
+    box-shadow: 0 0 24px rgba(20, 184, 166, 0.35), 0 4px 16px rgba(20, 184, 166, 0.2);
+  }
+  .shadow-glow-brand {
+    box-shadow: 0 0 32px rgba(59, 130, 246, 0.25), 0 0 80px rgba(20, 184, 166, 0.15);
+  }
+}
