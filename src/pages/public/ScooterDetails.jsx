@@ -15,12 +15,15 @@ import { ScooterGallery } from '@/features/scooters/ScooterGallery';
 import { PremiumPerksStrip } from '@/components/sections/PremiumPerks';
 import { EMICalculator } from '@/features/emi/EMICalculator';
 import { TestRideForm } from '@/features/leads/TestRideForm';
-import { getScooterById } from '@/features/scooters/scooterService';
+import { getScooterById, getScooters } from '@/features/scooters/scooterService';
 import { getFinanceSettings } from '@/features/finance/financeService';
+import { getScooterInsights } from '@/features/analytics/popularityService';
+import { getAllValueBadges } from '@/lib/valueBadges';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
 import { STOCK_LABELS } from '@/data/scooters';
-import { SITE, whatsappUrl } from '@/config/site';
+import { whatsappUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 function Spec({ icon: Icon, label, value }) {
@@ -39,8 +42,13 @@ function Spec({ icon: Icon, label, value }) {
 
 export default function ScooterDetails() {
   const { id } = useParams();
+  const { site } = useSite();
   const { data: scooter, loading } = useAsync(() => getScooterById(id), [id]);
   const { data: settings } = useAsync(() => getFinanceSettings(), []);
+  const { data: insights } = useAsync(async () => {
+    const all = await getScooters();
+    return getScooterInsights(all);
+  }, []);
   const [testRideOpen, setTestRideOpen] = useState(false);
 
   useEffect(() => {
@@ -61,6 +69,10 @@ export default function ScooterDetails() {
   }
 
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
+  const valueBadges = getAllValueBadges(scooter.id, insights?.valueBadges);
+  const popularityTags = [];
+  if (insights?.popularWeekIds?.has?.(scooter.id)) popularityTags.push({ label: '🔥 Trending this week', tone: 'hot' });
+  if (insights?.topIntentMonthIds?.has?.(scooter.id)) popularityTags.push({ label: '⭐ Top pick this month', tone: 'warm' });
   const waMessage = `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${formatINR(scooter.price)}). Please share more details.`;
 
   const productSchema = {
@@ -101,6 +113,10 @@ export default function ScooterDetails() {
               <Badge tone={stock.tone}>{stock.label}</Badge>
               {scooter.noLicence && <Badge tone="brand">No Licence*</Badge>}
               {scooter.noRegistration && <Badge tone="accent">No Registration*</Badge>}
+              {popularityTags.map((b) => <Badge key={b.label} tone={b.tone}>{b.label}</Badge>)}
+              {valueBadges.map((b) => (
+                <Badge key={b.id} tone={b.tone}>{b.emoji} {b.label}</Badge>
+              ))}
             </div>
             <h1 className="mt-4 break-words font-display text-display-md font-extrabold text-heading">{scooter.name}</h1>
             <p className="mt-1 break-words text-base text-muted">{scooter.tagline}</p>
@@ -116,7 +132,7 @@ export default function ScooterDetails() {
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button
-                href={whatsappUrl(waMessage)}
+                href={whatsappUrl(waMessage, site)}
                 variant="whatsapp"
                 size="lg"
                 icon={MessageCircle}
@@ -218,7 +234,7 @@ export default function ScooterDetails() {
 
       <Modal open={testRideOpen} onClose={() => setTestRideOpen(false)} title={`Book a test ride`}>
         <p className="mb-4 text-sm text-muted">
-          Ride the <span className="font-semibold text-heading">{scooter.name}</span> at our {SITE.address.city} showroom.
+          Ride the <span className="font-semibold text-heading">{scooter.name}</span> at our {site.address.city} showroom.
         </p>
         <TestRideForm scooter={scooter} onSuccess={() => setTimeout(() => setTestRideOpen(false), 2500)} />
       </Modal>

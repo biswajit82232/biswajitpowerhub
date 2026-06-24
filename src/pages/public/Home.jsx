@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, PhoneCall, Sparkles, TrendingDown } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
@@ -7,36 +8,21 @@ import { Hero } from '@/components/sections/Hero';
 import { WhyChooseUs } from '@/components/sections/WhyChooseUs';
 import { PremiumPerks } from '@/components/sections/PremiumPerks';
 import { PromotionalOffers } from '@/components/sections/PromotionalOffers';
-import { ScooterCard } from '@/features/scooters/ScooterCard';
+import { PopularitySection } from '@/components/sections/PopularitySection';
+import { ScooterCardWithInsights } from '@/features/scooters/ScooterCardWithInsights';
 import { ScooterCardSkeleton, ReviewCardSkeleton } from '@/components/ui/Skeleton';
 import { EVSimulator } from '@/features/simulator/EVSimulator';
 import { ReviewsCarousel } from '@/features/reviews/ReviewsCarousel';
+import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { Stars } from '@/components/ui/StarRating';
 import { CallbackForm } from '@/features/leads/CallbackForm';
 import Button from '@/components/ui/Button';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters, getFeaturedScooters } from '@/features/scooters/scooterService';
 import { getFinanceSettings } from '@/features/finance/financeService';
-import { getApprovedReviews } from '@/features/reviews/reviewService';
+import { getScooterInsights } from '@/features/analytics/popularityService';
 import { SITE } from '@/config/site';
-
-const localBusinessSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'AutoDealer',
-  name: SITE.name,
-  description: SITE.description,
-  telephone: SITE.phones.map((p) => `+91${p}`),
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: SITE.address.line,
-    addressLocality: SITE.address.city,
-    addressRegion: SITE.address.state,
-    postalCode: SITE.address.pincode,
-    addressCountry: 'IN',
-  },
-  slogan: SITE.tagline,
-  areaServed: 'Berhampore, West Bengal',
-};
+import { useSite } from '@/context/SiteSettingsContext';
 
 /** Decorative gradient divider between sections */
 function GradientDivider({ flip = false }) {
@@ -46,10 +32,32 @@ function GradientDivider({ flip = false }) {
 }
 
 export default function Home() {
+  const { site } = useSite();
+  const localBusinessSchema = useMemo(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'AutoDealer',
+    name: SITE.name,
+    description: SITE.description,
+    telephone: site.phones.map((p) => `+91${p}`),
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: site.address.line,
+      addressLocality: site.address.city,
+      addressRegion: site.address.state,
+      postalCode: site.address.pincode,
+      addressCountry: 'IN',
+    },
+    slogan: SITE.tagline,
+    areaServed: `${site.address.city}, ${site.address.state}`,
+  }), [site]);
   const { data: featured, loading } = useAsync(() => getFeaturedScooters(3), []);
   const { data: allScooters } = useAsync(() => getScooters(), []);
   const { data: financeSettings } = useAsync(() => getFinanceSettings(), []);
   const { data: reviews, loading: reviewsLoading } = useAsync(() => getApprovedReviews(), []);
+  const { data: insights } = useAsync(
+    () => (allScooters?.length ? getScooterInsights(allScooters) : Promise.resolve(null)),
+    [allScooters?.length],
+  );
   const reviewAvg = reviews?.length
     ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)
     : null;
@@ -91,7 +99,7 @@ export default function Home() {
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
           {loading
             ? Array.from({ length: 3 }).map((_, i) => <ScooterCardSkeleton key={i} />)
-            : featured?.map((s, i) => <ScooterCard key={s.id} scooter={s} index={i} />)}
+            : featured?.map((s, i) => <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />)}
         </div>
 
         <div className="mt-8 text-center sm:hidden">
@@ -100,6 +108,9 @@ export default function Home() {
           </Button>
         </div>
       </Section>
+
+      <GradientDivider flip />
+      <PopularitySection />
 
       {/* ── EV Simulator ── */}
       <GradientDivider />

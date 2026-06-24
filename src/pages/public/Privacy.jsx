@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
-import { SITE } from '@/config/site';
+import { SITE, telUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 
 function LegalSection({ title, children }) {
   return (
@@ -13,6 +14,8 @@ function LegalSection({ title, children }) {
 }
 
 export default function Privacy() {
+  const { site } = useSite();
+
   return (
     <>
       <SEO
@@ -44,7 +47,7 @@ export default function Privacy() {
           <LegalSection title="1. Who we are">
             <p>
               {SITE.name} (&quot;we&quot;, &quot;us&quot;) operates an electric scooter dealership
-              at {SITE.address.full}. This policy applies to our website, admin systems, showroom
+              at {site.address.full}. This policy applies to our website, admin systems, showroom
               interactions, and customer communications.
             </p>
           </LegalSection>
@@ -129,10 +132,10 @@ export default function Privacy() {
           <LegalSection title="10. Contact">
             <p>
               For privacy-related questions, contact {SITE.name} at{' '}
-              {SITE.phones.map((p, i) => (
+              {site.phones.map((p, i) => (
                 <span key={p}>
                   {i > 0 && ' or '}
-                  <a href={`tel:+91${p}`} className="font-semibold text-brand-600 hover:underline">
+                  <a href={telUrl(p, site)} className="font-semibold text-brand-600 hover:underline">
                     +91 {p}
                   </a>
                 </span>

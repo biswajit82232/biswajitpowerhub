@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react';
 import { Search, SlidersHorizontal, GitCompare } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
-import { ScooterCard } from '@/features/scooters/ScooterCard';
+import { ScooterCardWithInsights } from '@/features/scooters/ScooterCardWithInsights';
+import { getScooterInsights } from '@/features/analytics/popularityService';
 import { ScooterCardSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input, Select } from '@/components/ui/Input';
@@ -18,6 +19,10 @@ const SORTS = {
 
 export default function Scooters() {
   const { data: scooters, loading } = useAsync(() => getScooters(), []);
+  const { data: insights } = useAsync(
+    () => (scooters?.length ? getScooterInsights(scooters) : Promise.resolve(null)),
+    [scooters?.length],
+  );
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('price-asc');
   const [stockOnly, setStockOnly] = useState(false);
@@ -126,7 +131,7 @@ export default function Scooters() {
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
             {filtered.map((s, i) => (
-              <ScooterCard key={s.id} scooter={s} index={i} />
+              <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />
             ))}
           </div>
         )}

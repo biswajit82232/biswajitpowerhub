@@ -25,6 +25,7 @@ const TestRides = lazy(() => import('@/pages/admin/TestRides'));
 const AdminReviews = lazy(() => import('@/pages/admin/AdminReviews'));
 const Finance = lazy(() => import('@/pages/admin/Finance'));
 const Offers = lazy(() => import('@/pages/admin/Offers'));
+const Settings = lazy(() => import('@/pages/admin/Settings'));
 const Analytics = lazy(() => import('@/pages/admin/Analytics'));
 
 export default function App() {
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="reviews" element={<AdminReviews />} />
         <Route path="offers" element={<Offers />} />
         <Route path="finance" element={<Finance />} />
+        <Route path="settings" element={<Settings />} />
         <Route path="analytics" element={<Analytics />} />
       </Route>
     </Routes>

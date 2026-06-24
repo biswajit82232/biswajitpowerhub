@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
-import { SITE, PREMIUM_PERKS } from '@/config/site';
+import { SITE, PREMIUM_PERKS, telUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 
 function LegalSection({ title, children }) {
   return (
@@ -13,6 +14,9 @@ function LegalSection({ title, children }) {
 }
 
 export default function Terms() {
+  const { site } = useSite();
+  const hourLines = site.hours.groups || [];
+
   return (
     <>
       <SEO
@@ -45,11 +49,17 @@ export default function Terms() {
             <p>
               These Terms of Service (&quot;Terms&quot;) govern your use of the website and services
               offered by <strong>{SITE.name}</strong> ({SITE.tagline}), located at{' '}
-              {SITE.address.full}. By accessing our website, submitting an enquiry, or visiting our
+              {site.address.full}. By accessing our website, submitting an enquiry, or visiting our
               showroom, you agree to these Terms.
             </p>
             <p>
-              Showroom hours: Mon–Sat {SITE.hours.weekdays}, Sunday {SITE.hours.sunday}.
+              Showroom hours:{' '}
+              {hourLines.map((g, i) => (
+                <span key={g.label}>
+                  {i > 0 && '; '}
+                  {g.label} {g.text}
+                </span>
+              ))}.
             </p>
           </LegalSection>
 
@@ -63,7 +73,7 @@ export default function Terms() {
             <p>
               Product images, specifications, range figures, and prices on this website are
               indicative. Final on-road price, colours, and availability are confirmed at our
-              showroom in {SITE.address.city}.
+              showroom in {site.address.city}.
             </p>
           </LegalSection>
 
@@ -156,10 +166,10 @@ export default function Terms() {
           <LegalSection title="11. Contact">
             <p>
               Questions about these Terms? Call{' '}
-              {SITE.phones.map((p, i) => (
+              {site.phones.map((p, i) => (
                 <span key={p}>
                   {i > 0 && ' or '}
-                  <a href={`tel:+91${p}`} className="font-semibold text-brand-600 hover:underline">
+                  <a href={telUrl(p, site)} className="font-semibold text-brand-600 hover:underline">
                     +91 {p}
                   </a>
                 </span>

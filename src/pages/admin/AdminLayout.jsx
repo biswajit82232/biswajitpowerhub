@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Bike, Users, PhoneCall, CalendarCheck, Star,
-  Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag,
+  Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag, Settings,
 } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
@@ -22,6 +22,7 @@ const LINKS = [
   { to: '/admin/reviews', label: 'Reviews', icon: Star },
   { to: '/admin/offers', label: 'Offers', icon: Tag },
   { to: '/admin/finance', label: 'Finance', icon: Banknote },
+  { to: '/admin/settings', label: 'Settings', icon: Settings },
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
 ];
 

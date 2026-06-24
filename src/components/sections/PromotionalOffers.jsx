@@ -6,10 +6,11 @@ import { Reveal } from '@/components/common/Reveal';
 import Button from '@/components/ui/Button';
 import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
-import { SITE, whatsappUrl } from '@/config/site';
+import { whatsappUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
-function OfferCard({ offer }) {
+function OfferCard({ offer, site }) {
   const [copied, setCopied] = useState(false);
 
   const onCopy = async () => {
@@ -22,8 +23,8 @@ function OfferCard({ offer }) {
   };
 
   const waMsg = offer.promoCode
-    ? `Hi ${SITE.name}, I'd like to claim the offer "${offer.title}" (${offer.discountText}). Promo code: ${offer.promoCode}`
-    : `Hi ${SITE.name}, I'd like to know more about the offer "${offer.title}" — ${offer.discountText}.`;
+    ? `Hi ${site.name}, I'd like to claim the offer "${offer.title}" (${offer.discountText}). Promo code: ${offer.promoCode}`
+    : `Hi ${site.name}, I'd like to know more about the offer "${offer.title}" — ${offer.discountText}.`;
 
   return (
     <div className="relative overflow-hidden rounded-3xl bg-heading shadow-card ring-1 ring-white/10">
@@ -70,7 +71,7 @@ function OfferCard({ offer }) {
 
         <div className="flex flex-col gap-2.5 sm:flex-row lg:flex-col lg:min-w-[11rem]">
           <Button
-            href={whatsappUrl(waMsg)}
+            href={whatsappUrl(waMsg, site)}
             variant="whatsapp"
             size="lg"
             fullWidth
@@ -89,6 +90,7 @@ function OfferCard({ offer }) {
 }
 
 export function PromotionalOffers() {
+  const { site } = useSite();
   const { data: offers, loading } = useAsync(() => getActiveOffers(), []);
 
   if (loading || !offers?.length) return null;
@@ -107,7 +109,7 @@ export function PromotionalOffers() {
       <div className="space-y-5">
         {offers.map((offer, i) => (
           <Reveal key={offer.id} delay={i * 0.05}>
-            <OfferCard offer={offer} />
+            <OfferCard offer={offer} site={site} />
           </Reveal>
         ))}
       </div>

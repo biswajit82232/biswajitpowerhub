@@ -31,9 +31,9 @@ export async function getOverview() {
       countRows('test_rides'),
       countRows('reviews', (q) => q.eq('status', 'pending')),
     ]);
-    const { data: visitEvents } = await supabase
+    const { count: visitCount } = await supabase
       .from('lead_events')
-      .select('event_type', { count: 'exact', head: true })
+      .select('*', { count: 'exact', head: true })
       .eq('event_type', EVENT.PAGE_VIEW);
     return {
       totalLeads,
@@ -41,7 +41,7 @@ export async function getOverview() {
       callbacks,
       testRides,
       pendingReviews: reviews,
-      visits: visitEvents?.length || 0,
+      visits: visitCount || 0,
     };
   }
 

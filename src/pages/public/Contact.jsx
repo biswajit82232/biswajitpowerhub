@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/Toast';
 import { submitContact } from '@/features/leads/leadService';
 import { isValidName, isValidPhone, isValidEmail } from '@/features/leads/validation';
 import { SITE, whatsappUrl, telUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 function ContactMessageForm() {
@@ -80,9 +81,12 @@ function InfoRow({ icon: Icon, title, children }) {
 }
 
 export default function Contact() {
+  const { site } = useSite();
+  const hourLines = site.hours.groups || [];
+
   return (
     <>
-      <SEO title="Contact Us" description={`Visit BISWAJIT POWER HUB at ${SITE.address.full}. Call, WhatsApp, or request a callback.`} path="/contact" />
+      <SEO title="Contact Us" description={`Visit BISWAJIT POWER HUB at ${site.address.full}. Call, WhatsApp, or request a callback.`} path="/contact" />
 
       <section className="border-b border-line bg-surface-alt/50">
         <div className="container-px py-12 sm:py-16">
@@ -105,26 +109,29 @@ export default function Contact() {
               <div className="space-y-6 rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
                 <InfoRow icon={Phone} title="Call us">
                   <div className="flex flex-col gap-1">
-                    {SITE.phones.map((p) => (
-                      <a key={p} href={telUrl(p)} onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })} className="font-medium transition hover:text-brand-700">
+                    {site.phones.map((p) => (
+                      <a key={p} href={telUrl(p, site)} onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })} className="font-medium transition hover:text-brand-700">
                         +91 {p}
                       </a>
                     ))}
                   </div>
                 </InfoRow>
                 <InfoRow icon={MapPin} title="Visit our showroom">
-                  {SITE.address.full}
+                  {site.address.full}
                 </InfoRow>
                 <InfoRow icon={Clock} title="Opening hours">
-                  Mon–Sat: {SITE.hours.weekdays}
-                  <br />
-                  Sunday: {SITE.hours.sunday}
+                  {hourLines.map((g, i) => (
+                    <span key={g.label}>
+                      {i > 0 && <br />}
+                      {g.label}: {g.text}
+                    </span>
+                  ))}
                 </InfoRow>
                 <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-                  <Button href={whatsappUrl()} variant="whatsapp" icon={MessageCircle} fullWidth onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}>
+                  <Button href={whatsappUrl(undefined, site)} variant="whatsapp" icon={MessageCircle} fullWidth onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}>
                     WhatsApp Us
                   </Button>
-                  <Button href={SITE.maps.link} variant="secondary" icon={Navigation} fullWidth>
+                  <Button href={site.maps.link} variant="secondary" icon={Navigation} fullWidth>
                     Get Directions
                   </Button>
                 </div>
@@ -135,7 +142,7 @@ export default function Contact() {
               <div className="overflow-hidden rounded-2xl ring-1 ring-line shadow-soft">
                 <iframe
                   title="BISWAJIT POWER HUB location"
-                  src={SITE.maps.embed}
+                  src={site.maps.embed}
                   width="100%"
                   height="320"
                   style={{ border: 0 }}

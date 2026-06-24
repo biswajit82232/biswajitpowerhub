@@ -4,11 +4,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X, Phone, MessageCircle } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import Button from '@/components/ui/Button';
-import { NAV_LINKS, SITE, whatsappUrl, telUrl } from '@/config/site';
+import { NAV_LINKS, whatsappUrl, telUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { cn } from '@/lib/utils';
 
 export function Navbar() {
+  const { site } = useSite();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const location = useLocation();
@@ -56,7 +58,7 @@ export function Navbar() {
           <Button
             variant="secondary"
             size="sm"
-            href={telUrl()}
+            href={telUrl(undefined, site)}
             target="_self"
             icon={Phone}
             onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'navbar' })}
@@ -66,7 +68,7 @@ export function Navbar() {
           <Button
             variant="primary"
             size="sm"
-            href={whatsappUrl()}
+            href={whatsappUrl(undefined, site)}
             icon={MessageCircle}
             onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'navbar' })}
           >
@@ -122,7 +124,7 @@ export function Navbar() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <Button
                   variant="secondary"
-                  href={telUrl()}
+                  href={telUrl(undefined, site)}
                   target="_self"
                   icon={Phone}
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'mobile-menu' })}
@@ -131,7 +133,7 @@ export function Navbar() {
                 </Button>
                 <Button
                   variant="primary"
-                  href={whatsappUrl()}
+                  href={whatsappUrl(undefined, site)}
                   icon={MessageCircle}
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'mobile-menu' })}
                 >
@@ -139,7 +141,7 @@ export function Navbar() {
                 </Button>
               </div>
               <p className="mt-4 text-center text-xs text-muted">
-                {SITE.address.line}, {SITE.address.pincode}
+                {site.address.line}, {site.address.pincode}
               </p>
             </motion.div>
           </>

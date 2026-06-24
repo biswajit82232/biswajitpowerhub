@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://biswajitpowerhub.example/</loc>
+    <loc>https://biswajitpowerhub.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.example/scooters</loc>
+    <loc>https://biswajitpowerhub.vercel.app/scooters</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.example/reviews</loc>
+    <loc>https://biswajitpowerhub.vercel.app/reviews</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.example/compare</loc>
+    <loc>https://biswajitpowerhub.vercel.app/compare</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.example/contact</loc>
+    <loc>https://biswajitpowerhub.vercel.app/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.example/terms</loc>
+    <loc>https://biswajitpowerhub.vercel.app/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.example/privacy</loc>
+    <loc>https://biswajitpowerhub.vercel.app/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

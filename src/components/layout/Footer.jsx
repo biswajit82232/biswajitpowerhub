@@ -6,6 +6,7 @@ import {
 import { Logo } from '@/components/common/Logo';
 import Button from '@/components/ui/Button';
 import { NAV_LINKS, SITE, whatsappUrl, telUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 const TRUST = [
@@ -17,6 +18,8 @@ const TRUST = [
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const { site } = useSite();
+  const hourLines = site.hours.groups || [];
 
   return (
     <footer className="relative mt-auto overflow-x-hidden bg-heading text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white/60">
@@ -46,7 +49,7 @@ export function Footer() {
               View Scooters
             </Button>
             <Button
-              href={whatsappUrl()}
+              href={whatsappUrl(undefined, site)}
               variant="whatsapp"
               size="md"
               icon={MessageCircle}
@@ -115,10 +118,10 @@ export function Footer() {
               Contact
             </h4>
             <ul className="mt-5 space-y-4 text-sm text-white/75">
-              {SITE.phones.map((p) => (
+              {site.phones.map((p) => (
                 <li key={p}>
                   <a
-                    href={telUrl(p)}
+                    href={telUrl(p, site)}
                     onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'footer' })}
                     className="inline-flex items-center gap-2.5 transition hover:text-white"
                   >
@@ -133,16 +136,19 @@ export function Footer() {
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/8 ring-1 ring-white/10">
                   <MapPin className="h-4 w-4 text-brand-300" />
                 </span>
-                <span className="pt-1.5 leading-relaxed">{SITE.address.full}</span>
+                <span className="pt-1.5 leading-relaxed">{site.address.full}</span>
               </li>
               <li className="flex gap-2.5">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/8 ring-1 ring-white/10">
                   <Clock className="h-4 w-4 text-brand-300" />
                 </span>
                 <span className="pt-1.5 leading-relaxed">
-                  Mon–Sat: {SITE.hours.weekdays}
-                  <br />
-                  Sun: {SITE.hours.sunday}
+                  {hourLines.map((g, i) => (
+                    <span key={g.label}>
+                      {i > 0 && <br />}
+                      {g.label}: {g.text}
+                    </span>
+                  ))}
                 </span>
               </li>
             </ul>
@@ -157,7 +163,7 @@ export function Footer() {
               Walk in for a test ride, EMI guidance, and honest advice on the best model for you.
             </p>
             <a
-              href={SITE.maps.link}
+              href={site.maps.link}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-300 transition hover:text-accent-200"

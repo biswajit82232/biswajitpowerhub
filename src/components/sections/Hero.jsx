@@ -2,13 +2,14 @@ import { ArrowRight, MessageCircle, Zap, ShieldCheck, BatteryCharging, Wallet, W
 import Button from '@/components/ui/Button';
 import { ScooterImage } from '@/components/common/ScooterImage';
 import { SITE, whatsappUrl } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 const STATS = [
   { value: '120 km', label: 'Max range' },
   { value: '₹0.18', label: 'Per km cost' },
   { value: '0 RTO', label: 'Paperwork*' },
-  { value: '8 hrs', label: 'Full charge' },
+  { value: '4 hrs', label: 'Full charge' },
 ];
 
 const CHIPS = [
@@ -22,6 +23,8 @@ const CHIPS = [
 const d = (ms) => ({ animationDelay: `${ms}ms` });
 
 export function Hero({ heroImageUrl }) {
+  const { site } = useSite();
+
   return (
     <section className="relative overflow-x-clip">
       {/* Background — static, no animated blur on mobile */}
@@ -74,7 +77,7 @@ export function Hero({ heroImageUrl }) {
           >
             <Button to="/scooters" size="sm" variant="primary" iconRight={ArrowRight}>View Scooters</Button>
             <Button
-              href={whatsappUrl()}
+              href={whatsappUrl(undefined, site)}
               size="sm"
               variant="whatsapp"
               icon={MessageCircle}

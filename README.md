@@ -2,7 +2,7 @@
 
 A premium EV dealership website **and** business-management platform for **BISWAJIT POWER HUB**, a low-speed (non-RTO) electric scooter showroom in Berhampore, West Bengal.
 
-Built to feel like a modern EV technology brand (Apple / Stripe / Rivian) — bright, airy, mobile-first, and conversion-focused — not a generic dealership template.
+Built to feel like a modern EV technology brand — bright, airy, mobile-first, and conversion-focused.
 
 ---
 
@@ -10,16 +10,14 @@ Built to feel like a modern EV technology brand (Apple / Stripe / Rivian) — br
 
 | Layer | Choice |
 |---|---|
-| Framework | **React 18** + **Vite 5** (JavaScript, no TypeScript) |
-| Styling | **Tailwind CSS 3** (custom *Electric Sky Premium* theme) |
+| Framework | **React 18** + **Vite 5** (JavaScript) |
+| Styling | **Tailwind CSS 3** |
 | Animation | **Framer Motion** |
-| Routing | **React Router 6** (lazy-loaded, code-split) |
-| Backend | **Supabase** (Postgres + Auth + RLS) |
-| Icons | **Lucide React** |
-| SEO | **react-helmet-async** + JSON-LD schema |
+| Routing | **React Router 6** (lazy-loaded) |
+| Backend | **Supabase** (Postgres + Auth + RLS + Storage) |
 | Deploy | **Vercel** |
 
-> The app runs **fully in demo mode without Supabase** — it falls back to local seed data and simulates form submissions, so you can preview everything immediately.
+> Runs in **demo mode** without Supabase — local seed data and simulated forms.
 
 ---
 
@@ -27,98 +25,113 @@ Built to feel like a modern EV technology brand (Apple / Stripe / Rivian) — br
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173
+npm run dev          # https://localhost:5173 (HTTPS for admin PWA on phone)
 npm run build        # production build -> dist/
-npm run preview      # preview the production build
+npm run preview      # preview production build
 ```
 
-### Connect Supabase (optional but recommended)
+### Environment variables
+
+Copy `.env.example` to `.env`:
+
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_SITE_URL=https://your-production-domain.com
+```
+
+**Vercel:** set all three for **Production** (not only Development), then redeploy.
+
+---
+
+## Supabase setup
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. In the SQL editor, run `supabase/schema.sql` then `supabase/seed.sql`.
-3. Copy `.env.example` to `.env` and fill in:
-   ```
-   VITE_SUPABASE_URL=...
-   VITE_SUPABASE_ANON_KEY=...
-   ```
-4. Create an admin user: **Supabase → Authentication → Users → Add user** (email + password). Log in at `/admin/login`.
+2. SQL editor: run `supabase/schema.sql`, then `supabase/seed.sql`.
+3. Run migrations in order — see `supabase/migrations/README.md`:
+   - `add_petrol_settings.sql`
+   - `add_hero_image.sql`
+   - `create_storage_bucket.sql`
+   - `add_promotional_offers.sql`
+   - `add_site_settings.sql`
+4. **Authentication → Users → Add user** for admin login at `/admin/login`.
 
 ---
 
-## Design System — "Electric Sky Premium"
+## Admin features
 
-Tokens live in `tailwind.config.js`.
-
-| Token | Value |
+| Route | Purpose |
 |---|---|
-| Background | `#F8FBFF` (`bg`) |
-| Surface | `#FFFFFF` (`surface`) |
-| Alt section | `#F0F9FF` (`surface-alt`) |
-| Brand | `#3B82F6` (`brand`) |
-| Accent | `#14B8A6` (`accent`) |
-| Heading | `#0F172A` (`heading`) |
-| Body | `#475569` (`body`) |
-| Muted | `#64748B` (`muted`) |
-| Border | `#E2E8F0` (`line`) |
-| Gradient | `bg-brand-gradient` (`#3B82F6 → #14B8A6`) |
+| `/admin` | Dashboard — call queue, popularity, best-value badges |
+| `/admin/inventory` | Scooter CRUD + images |
+| `/admin/leads` | Purchase intent % + follow-up priority |
+| `/admin/offers` | Homepage promotional offers |
+| `/admin/settings` | Phone, address, opening hours |
+| `/admin/finance` | EMI defaults, hero image, petrol simulator |
+| `/admin/callbacks` | Callback requests |
+| `/admin/test-rides` | Test ride bookings |
+| `/admin/reviews` | Review moderation |
+| `/admin/analytics` | Event aggregates |
 
-Mobile-first (360 / 390 / 412 px), 44px+ touch targets, thumb-friendly sticky CTAs, no horizontal scroll, reduced-motion aware.
+### Intelligence features
+
+- **Purchase readiness score** — tracks views, EMI, simulator, WhatsApp, callbacks (0–100%).
+- **Follow-up prioritization** — Call immediately / Call today / Follow up later.
+- **Popularity engine** — most viewed this week, top intent this month.
+- **Best value badges** — Best Value, Longest Range, Lowest Running Cost, Best City Scooter.
 
 ---
 
-## Project Structure
+## Production checklist
+
+Before go-live, confirm:
+
+- [ ] **Vercel env vars** — `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SITE_URL` on Production
+- [ ] **Supabase migrations** — all five migration files applied
+- [ ] **Admin user** — created in Supabase Auth
+- [ ] **Admin → Settings** — phones, address, hours saved
+- [ ] **Admin → Offers** — at least one active offer (optional)
+- [ ] **Admin → Finance** — hero image uploaded if desired
+- [ ] **Inventory** — real scooter photos and prices
+- [ ] **Custom domain** — update `VITE_SITE_URL`, `public/sitemap.xml`, and `public/robots.txt` if not using `biswajitpowerhub.vercel.app`
+- [ ] **Smoke test** — homepage, contact form, callback, test ride, admin login, lead appears in dashboard
+
+---
+
+## Project structure
 
 ```
 src/
-  config/        site.js (business config), finance.js (EMI defaults)
-  lib/           supabase, utils, finance (EMI), simulator, tracking (lead scoring)
-  hooks/         useCountUp, useMediaQuery, useAsync, usePageTracking
-  context/       AuthContext
-  components/
-    ui/          Button, Card, Badge, Input, Modal, Skeleton, Toast, RangeSlider, StarRating…
-    common/      SEO, Reveal, Section, AnimatedCounter, Logo, ScooterImage, ScrollToTop
-    layout/      Navbar, Footer, MobileCTABar, PublicLayout
-    sections/    Hero, WhyChooseUs
-    admin/       Charts, StatCard, AdminHeader
-  features/      scooters · reviews · leads · emi · simulator · finance · analytics
-  pages/
-    public/      Home, Scooters, ScooterDetails, Compare, Reviews, Contact, NotFound
-    admin/       AdminLogin, AdminLayout, Dashboard, Inventory, Leads, Callbacks,
-                 TestRides, AdminReviews, Finance, Analytics
-  routes/        ProtectedRoute
-  data/          seed scooters & reviews (Supabase fallback)
-supabase/        schema.sql, seed.sql (tables + RLS policies)
+  config/           site.js, finance.js
+  context/          AuthContext, SiteSettingsContext
+  lib/              supabase, tracking, purchaseReadiness, valueBadges
+  features/         scooters, leads, offers, analytics, site settings
+  pages/public/     Home, Scooters, Contact, Terms, Privacy…
+  pages/admin/      Dashboard, Leads, Settings, Offers…
+supabase/
+  schema.sql        base tables + RLS
+  seed.sql          demo scooters
+  migrations/       incremental SQL (run after schema)
+public/             logos, sitemap.xml, robots.txt, admin PWA
 ```
-
----
-
-## Phase Roadmap (delivered)
-
-- **Phase 1 — Foundation:** design system, layout, responsive nav/footer, reusable UI kit, Supabase setup.
-- **Phase 2 — Homepage:** hero, Why Choose Us, featured scooters, **EV Usage Simulator**, reviews carousel, callback.
-- **Phase 3 — Catalog:** list + filters, product detail with gallery, **EMI calculator**, **compare**, test-ride booking, sticky WhatsApp.
-- **Phase 4 — Reviews:** public submission + moderation.
-- **Phase 5 — Lead intelligence:** event tracking + automatic Hot/Warm/Cold scoring (`src/lib/tracking.js`).
-- **Phase 6 — Admin:** secure login, dashboard, inventory CRUD, leads, callbacks, test rides, review moderation, finance settings, analytics.
-
-### Lead Scoring Model
-High-intent actions (EMI/simulator use, callback, test ride, WhatsApp, or repeat views of the same model) → **Hot**. Multiple visits / scooter views → **Warm**. Single visit → **Cold**.
-
----
-
-## Performance & SEO
-
-- Route-level code splitting + lazy loading, vendor chunk splitting.
-- Lazy images, branded placeholder fallbacks, reduced-motion support.
-- Per-page meta + Open Graph + Twitter cards, `robots.txt`, `sitemap.xml`.
-- JSON-LD: `AutoDealer` (local business), `Product`, `AggregateRating`.
 
 ---
 
 ## Deploying to Vercel
 
-1. Push to GitHub and import the repo in Vercel.
-2. Add env vars `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-3. `vercel.json` already rewrites all routes to `index.html` for SPA routing.
+1. Push to GitHub and import in Vercel.
+2. Add environment variables (see above).
+3. Build: `npm run build`, output: `dist/`.
+4. `vercel.json` handles SPA rewrites and asset caching.
 
-Build command `npm run build`, output `dist/`.
+---
+
+## Performance & SEO
+
+- Route-level code splitting, vendor chunks
+- Per-page meta + Open Graph + JSON-LD (`AutoDealer`, `Product`)
+- `robots.txt` blocks `/admin`, `sitemap.xml` for public pages
+
+---
+
+*BISWAJIT POWER HUB — Nimtala, Chunakhali, Berhampore, West Bengal*

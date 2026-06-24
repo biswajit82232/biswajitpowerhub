@@ -7,9 +7,13 @@ import { formatINR } from '@/lib/utils';
 import { emiFrom } from '@/lib/finance';
 import { STOCK_LABELS } from '@/data/scooters';
 
-export function ScooterCard({ scooter, index = 0 }) {
+export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [] }) {
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
   const emi = emiFrom({ price: scooter.price });
+  const extraBadges = [...popularityTags, ...valueBadges.map((b) => ({
+    label: `${b.emoji} ${b.label}`,
+    tone: b.tone,
+  }))];
 
   return (
     <motion.article
@@ -27,9 +31,12 @@ export function ScooterCard({ scooter, index = 0 }) {
           name={scooter.name}
           className="aspect-[4/3] w-full bg-surface-alt transition-transform duration-500 group-hover:scale-[1.03]"
         />
-        <div className="absolute left-3 top-3 flex gap-2">
+        <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2">
           <Badge tone={stock.tone}>{stock.label}</Badge>
           {scooter.noLicence && <Badge tone="brand">No Licence*</Badge>}
+          {extraBadges.slice(0, 2).map((b) => (
+            <Badge key={b.label} tone={b.tone}>{b.label}</Badge>
+          ))}
         </div>
       </Link>
 
