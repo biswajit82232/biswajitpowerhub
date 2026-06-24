@@ -2,15 +2,6 @@ import { Quote, BadgeCheck } from 'lucide-react';
 import { Stars } from '@/components/ui/StarRating';
 import { cn } from '@/lib/utils';
 
-function initials(name = '') {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-}
-
 export function ReviewCard({ review, className }) {
   return (
     <figure
@@ -40,26 +31,11 @@ export function ReviewCard({ review, className }) {
       <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-body sm:text-[0.95rem]">
         “{review.review}”
       </blockquote>
-      <figcaption className="mt-4 flex items-center gap-3 border-t border-line pt-4">
-        {review.photo ? (
-          <img
-            src={review.photo}
-            alt={review.name}
-            loading="lazy"
-            decoding="async"
-            className="h-11 w-11 rounded-full object-cover ring-2 ring-brand-100"
-          />
-        ) : (
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-gradient text-sm font-bold text-white ring-2 ring-brand-100">
-            {initials(review.name)}
-          </span>
+      <figcaption className="mt-4 border-t border-line pt-4">
+        <p className="break-words text-sm font-bold text-heading">{review.name}</p>
+        {review.scooter && (
+          <p className="break-words text-xs text-muted">Owns the {review.scooter}</p>
         )}
-        <div className="min-w-0 flex-1">
-          <p className="break-words text-sm font-bold text-heading">{review.name}</p>
-          {review.scooter && (
-            <p className="break-words text-xs text-muted">Owns the {review.scooter}</p>
-          )}
-        </div>
       </figcaption>
     </figure>
   );

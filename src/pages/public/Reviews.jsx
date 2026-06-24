@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
-import { Star, PenLine } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Star, PenLine, ChevronDown } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
 import { Stars } from '@/components/ui/StarRating';
+import Button from '@/components/ui/Button';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
 import { ReviewForm } from '@/features/reviews/ReviewForm';
 import { ReviewCardSkeleton } from '@/components/ui/Skeleton';
@@ -11,14 +12,25 @@ import { useAsync } from '@/hooks/useAsync';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { getScooters } from '@/features/scooters/scooterService';
 
+const PAGE_SIZE = 10;
+
 export default function Reviews() {
   const { data: reviews, loading } = useAsync(() => getApprovedReviews(), []);
   const { data: scooters } = useAsync(() => getScooters(), []);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const avg = useMemo(() => {
     if (!reviews?.length) return 0;
     return reviews.reduce((a, r) => a + r.rating, 0) / reviews.length;
   }, [reviews]);
+
+  const visibleReviews = useMemo(
+    () => (reviews || []).slice(0, visibleCount),
+    [reviews, visibleCount]
+  );
+
+  const hasMore = (reviews?.length || 0) > visibleCount;
+  const remaining = Math.max(0, (reviews?.length || 0) - visibleCount);
 
   const reviewSchema = reviews?.length
     ? {
@@ -56,42 +68,52 @@ export default function Reviews() {
       </section>
 
       <div className="container-px py-12">
-        <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">
-          {/* Reviews list */}
-          <div className="lg:col-span-2">
-            {loading ? (
-              <div className="grid gap-6 sm:grid-cols-2">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <ReviewCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : reviews?.length === 0 ? (
-              <EmptyState icon={Star} title="No reviews yet" description="Be the first to share your experience!" />
-            ) : (
-              <RevealGroup className="grid gap-6 sm:grid-cols-2">
-                {reviews.map((r) => (
+        {/* Form first — no sticky sidebar, avoids scroll overlap with long review lists */}
+        <Reveal className="mx-auto max-w-xl">
+          <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-7">
+            <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
+              <PenLine className="h-5 w-5 text-brand-500" /> Write a review
+            </h2>
+            <p className="mt-1 text-sm text-muted">Help others choose with confidence.</p>
+            <div className="mt-5">
+              <ReviewForm scooters={scooters || []} />
+            </div>
+          </div>
+        </Reveal>
+
+        <div className="mt-12 sm:mt-14">
+          {loading ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ReviewCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : reviews?.length === 0 ? (
+            <EmptyState icon={Star} title="No reviews yet" description="Be the first to share your experience above!" />
+          ) : (
+            <>
+              <RevealGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {visibleReviews.map((r) => (
                   <RevealItem key={r.id}>
                     <ReviewCard review={r} className="h-full" />
                   </RevealItem>
                 ))}
               </RevealGroup>
-            )}
-          </div>
 
-          {/* Submit form */}
-          <div>
-            <div className="lg:sticky lg:top-[calc(var(--header-offset)+1.5rem)] lg:self-start">
-              <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft">
-                <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-                  <PenLine className="h-5 w-5 text-brand-500" /> Write a review
-                </h2>
-                <p className="mt-1 text-sm text-muted">Help others choose with confidence.</p>
-                <div className="mt-5">
-                  <ReviewForm scooters={scooters || []} />
+              {hasMore && (
+                <div className="mt-10 flex justify-center">
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    icon={ChevronDown}
+                    onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+                  >
+                    Load more reviews ({remaining} left)
+                  </Button>
                 </div>
-              </div>
-            </div>
-          </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </>
