@@ -26,6 +26,17 @@ export function ReviewCard({ review, className }) {
         </span>
       </div>
       <Stars value={review.rating} className="mt-3" size={15} />
+      {review.photo && (
+        <div className="mt-3 overflow-hidden rounded-xl ring-1 ring-line">
+          <img
+            src={review.photo}
+            alt={`Photo from ${review.name}`}
+            loading="lazy"
+            decoding="async"
+            className="aspect-[4/3] w-full object-cover"
+          />
+        </div>
+      )}
       <blockquote className="mt-3 flex-1 text-sm leading-relaxed text-body sm:text-[0.95rem]">
         “{review.review}”
       </blockquote>

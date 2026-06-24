@@ -16,6 +16,32 @@ function fromRow(row) {
   };
 }
 
+/** Upload a customer review photo to Supabase Storage. Falls back to base64 in demo mode. */
+export async function uploadReviewPhoto(file) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage
+        .from('review-photos')
+        .upload(path, file, { upsert: false, contentType: file.type });
+      if (!error) {
+        const { data } = supabase.storage.from('review-photos').getPublicUrl(path);
+        return data.publicUrl;
+      }
+      console.warn('[Storage] Review photo upload failed, falling back to base64:', error.message);
+    } catch (e) {
+      console.warn('[Storage] Review photo upload exception, falling back to base64:', e);
+    }
+  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 /** Public: only approved reviews — cached 5 min. */
 export async function getApprovedReviews() {
   return fetchWithCache('reviews_approved', async () => {
@@ -39,14 +65,19 @@ export async function getFeaturedReviews(limit = 6) {
 }
 
 /** Public submission — clears review cache so new count shows after approval. */
-export async function submitReview({ name, rating, review, scooter, photo }) {
+export async function submitReview({ name, rating, review, scooter, photo, photoFile }) {
+  let photoUrl = photo || null;
+  if (photoFile) {
+    photoUrl = await uploadReviewPhoto(photoFile);
+  }
+
   if (isSupabaseConfigured && supabase) {
     const { error } = await supabase.from('reviews').insert({
       name,
       rating,
       review,
       scooter,
-      photo_url: photo || null,
+      photo_url: photoUrl,
       status: 'pending',
       featured: false,
     });
@@ -83,4 +114,20 @@ export async function setReviewFeatured(id, featured) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('reviews').update({ featured }).eq('id', id);
   if (error) throw error;
+}
+
+export async function setReviewPhoto(id, photoFile) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const photoUrl = await uploadReviewPhoto(photoFile);
+  const { error } = await supabase.from('reviews').update({ photo_url: photoUrl }).eq('id', id);
+  if (error) throw error;
+  clearCache('reviews_approved');
+  return photoUrl;
+}
+
+export async function clearReviewPhoto(id) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { error } = await supabase.from('reviews').update({ photo_url: null }).eq('id', id);
+  if (error) throw error;
+  clearCache('reviews_approved');
 }
