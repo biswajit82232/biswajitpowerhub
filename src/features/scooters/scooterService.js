@@ -126,3 +126,40 @@ export async function updateStock(id, stock_status) {
     .eq('id', id);
   if (error) throw error;
 }
+
+/**
+ * Upload a scooter image file.
+ * - If Supabase is configured: uploads to the `scooter-images` public bucket
+ *   and returns the public URL.
+ * - Otherwise: converts to a base64 data URL (demo mode).
+ *
+ * Requires the `scooter-images` bucket to exist in Supabase Storage with
+ * public read access. Create it once via Supabase Dashboard → Storage → New bucket
+ * (name: scooter-images, Public: ON).
+ */
+export async function uploadScooterImage(file, scooterId) {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      const path = `${scooterId || 'new'}/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage
+        .from('scooter-images')
+        .upload(path, file, { upsert: false, contentType: file.type });
+      if (!error) {
+        const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
+        return data.publicUrl;
+      }
+      // Bucket missing or policy error — fall through to base64
+      console.warn('[Storage] Upload failed, falling back to base64:', error.message);
+    } catch (e) {
+      console.warn('[Storage] Upload exception, falling back to base64:', e);
+    }
+  }
+  // Base64 fallback (works always; not persisted on page reload in demo mode)
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}

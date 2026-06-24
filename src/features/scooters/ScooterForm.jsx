@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Field, Input, Textarea, Select } from '@/components/ui/Input';
+import { Field, Input, Textarea, Select, Label } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { slugify } from '@/lib/utils';
+import { ScooterImageUpload } from './ScooterImageUpload';
 
 const HUES = ['blue', 'teal', 'sky', 'green', 'indigo', 'cyan'];
 const STOCKS = [
@@ -131,9 +132,16 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
         <Field label="Colours" hint="One per line">
           <Textarea rows={3} value={listToText(form.colors)} onChange={(e) => set('colors', textToList(e.target.value))} />
         </Field>
-        <Field label="Image URLs" hint="One per line">
-          <Textarea rows={3} value={listToText(form.images)} onChange={(e) => set('images', textToList(e.target.value))} />
-        </Field>
+        <div>
+          <Label>Photos</Label>
+          <div className="mt-1.5">
+            <ScooterImageUpload
+              images={form.images}
+              onChange={(urls) => set('images', urls)}
+              scooterId={form.id}
+            />
+          </div>
+        </div>
         <Field label="Features" hint="One per line">
           <Textarea rows={4} value={listToText(form.features)} onChange={(e) => set('features', textToList(e.target.value))} />
         </Field>

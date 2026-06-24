@@ -23,13 +23,13 @@ export default function Dashboard() {
       <AdminHeader title="Dashboard" subtitle="Your dealership at a glance." />
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-32" />
+            <Skeleton key={i} className="h-16 sm:h-32" />
           ))}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           <StatCard icon={Users} label="Total Leads" value={o.totalLeads || 0} tone="brand" />
           <StatCard icon={Flame} label="Hot Leads" value={o.hotLeads || 0} tone="red" />
           <StatCard icon={PhoneCall} label="Callback Requests" value={o.callbacks || 0} tone="accent" />

@@ -11,17 +11,33 @@ const TONES = {
 
 export function StatCard({ icon: Icon, label, value, prefix = '', suffix = '', tone = 'brand', hint }) {
   return (
-    <div className="rounded-2xl bg-surface p-5 ring-1 ring-line shadow-soft">
-      <div className="flex items-center justify-between">
-        <span className={cn('flex h-11 w-11 items-center justify-center rounded-xl', TONES[tone])}>
-          <Icon className="h-5 w-5" strokeWidth={2.2} />
+    <div className="rounded-xl bg-surface ring-1 ring-line shadow-soft sm:rounded-2xl">
+      {/* Mobile: horizontal compact row */}
+      <div className="flex items-center gap-2.5 p-3 sm:hidden">
+        <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', TONES[tone])}>
+          <Icon className="h-4 w-4" strokeWidth={2.2} />
         </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-muted">{label}</p>
+          <p className="font-display text-lg font-extrabold leading-tight text-heading">
+            <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
+          </p>
+        </div>
       </div>
-      <p className="mt-4 font-display text-3xl font-extrabold text-heading">
-        <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
-      </p>
-      <p className="mt-1 text-sm font-medium text-muted">{label}</p>
-      {hint && <p className="mt-1 text-xs text-muted/80">{hint}</p>}
+
+      {/* sm+: original tall card */}
+      <div className="hidden p-5 sm:block">
+        <div className="flex items-center justify-between">
+          <span className={cn('flex h-11 w-11 items-center justify-center rounded-xl', TONES[tone])}>
+            <Icon className="h-5 w-5" strokeWidth={2.2} />
+          </span>
+        </div>
+        <p className="mt-4 font-display text-3xl font-extrabold text-heading">
+          <AnimatedCounter value={value} prefix={prefix} suffix={suffix} />
+        </p>
+        <p className="mt-1 text-sm font-medium text-muted">{label}</p>
+        {hint && <p className="mt-1 text-xs text-muted/80">{hint}</p>}
+      </div>
     </div>
   );
 }
