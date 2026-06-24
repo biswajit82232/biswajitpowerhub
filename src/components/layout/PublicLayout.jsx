@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { PageLoader } from '@/components/ui/Loading';
 import { usePageTracking } from '@/hooks/usePageTracking';
 
@@ -35,6 +36,7 @@ export function PublicLayout() {
 
   return (
     <div className="flex min-h-screen min-w-0 w-full flex-col overflow-x-clip">
+      <GoogleAnalytics />
       <ScrollToTop />
       <Navbar />
       <main className="min-w-0 flex-1 overflow-x-clip pt-[var(--header-offset)] pb-[max(1.5rem,env(safe-area-inset-bottom))]">

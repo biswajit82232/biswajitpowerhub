@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { trackGAEvent } from './googleAnalytics';
 
 /**
  * Lead tracking & scoring engine (Phase 5).
@@ -99,6 +100,8 @@ export async function trackEvent(type, meta = {}) {
       /* fail silently — analytics must never break UX */
     }
   }
+
+  trackGAEvent(type, meta);
 }
 
 /**

@@ -38,6 +38,7 @@ Copy `.env.example` to `.env`:
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
 VITE_SITE_URL=https://your-production-domain.com
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX   # optional — Google Analytics 4
 ```
 
 **Vercel:** set all three for **Production** (not only Development), then redeploy.
@@ -148,9 +149,39 @@ Set `VITE_SITE_URL` in Vercel **before** build so canonical URLs and sitemap mat
 
 ---
 
-- Route-level code splitting, vendor chunks
-- Per-page meta + Open Graph + JSON-LD (`AutoDealer`, `Product`)
-- `robots.txt` blocks `/admin`, `sitemap.xml` for public pages
+## Google Analytics 4
+
+Optional — enable by setting `VITE_GA_MEASUREMENT_ID` in Vercel (Production).
+
+1. [Google Analytics](https://analytics.google.com) → Admin → **Data streams** → Web
+2. Copy **Measurement ID** (format `G-XXXXXXXXXX`)
+3. Add to Vercel env → redeploy
+
+**What is tracked automatically:**
+- Page views (public site only — `/admin` excluded)
+- WhatsApp / call clicks
+- Callback, test ride, contact form (`generate_lead`)
+- Scooter views, EMI calculator, simulator, compare
+
+Internal **Admin → Analytics** still uses Supabase `lead_events` for lead scoring — GA4 is for marketing/traffic reports.
+
+---
+
+## Performance
+
+Production optimisations already in place:
+
+| Area | Implementation |
+|------|----------------|
+| JS bundle | Route lazy-loading, vendor chunks (React, Motion, Supabase, icons) |
+| Caching | 1-year immutable cache on `/assets/*` (Vercel) |
+| Fonts | Non-blocking load with `display=swap` |
+| Hero / UI | CSS animations instead of heavy infinite JS loops |
+| Images | Lazy loading on maps; branded placeholders |
+| GA4 | Script deferred until browser idle (~1–2s after load) |
+| Admin | Separate chunk — not loaded on public pages |
+
+**After deploy:** run [PageSpeed Insights](https://pagespeed.web.dev/) on your live URL. Target 90+ mobile where possible; real images and third-party maps will affect scores.
 
 ---
 
