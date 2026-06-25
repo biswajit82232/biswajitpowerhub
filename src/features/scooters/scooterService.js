@@ -1,9 +1,11 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
+import { withTimeout } from '@/lib/utils';
 import { SCOOTERS } from '@/data/scooters';
 
 const CACHE_KEY = 'scooters_v2';
-const CACHE_TTL = 60;
+const CACHE_TTL = 5 * 60;
+const FETCH_TIMEOUT_MS = 8000;
 
 /**
  * Normalize a Supabase row (snake_case) to the app's camelCase scooter shape.
@@ -77,21 +79,27 @@ function bustScooterCache() {
 export async function getScooters() {
   return fetchWithCache(CACHE_KEY, async () => {
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('scooters')
-        .select('*')
-        .order('price', { ascending: true });
+      try {
+        const { data, error } = await withTimeout(
+          supabase.from('scooters').select('*').order('price', { ascending: true }),
+          FETCH_TIMEOUT_MS,
+          'Scooter catalog fetch timed out',
+        );
 
-      if (!error) {
-        return (data || []).map(fromRow);
+        if (!error && Array.isArray(data)) {
+          return data.map(fromRow);
+        }
+
+        if (error?.code === '42P01') {
+          return SCOOTERS;
+        }
+
+        console.warn('[Scooters] Supabase fetch failed:', error?.message || 'Unknown error');
+      } catch (err) {
+        console.warn('[Scooters] Supabase fetch failed:', err.message);
       }
 
-      if (error?.code === '42P01') {
-        return SCOOTERS;
-      }
-
-      console.warn('[Scooters] Supabase fetch failed:', error.message);
-      return [];
+      return SCOOTERS;
     }
 
     return SCOOTERS;
@@ -100,14 +108,18 @@ export async function getScooters() {
 
 export async function getScooterById(id) {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('scooters')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('scooters').select('*').eq('id', id).maybeSingle(),
+        FETCH_TIMEOUT_MS,
+        'Scooter fetch timed out',
+      );
 
-    if (!error && data) return fromRow(data);
-    if (!error) return null;
+      if (!error && data) return fromRow(data);
+      if (!error) return null;
+    } catch (err) {
+      console.warn('[Scooters] Single fetch failed:', err.message);
+    }
   }
 
   const all = await getScooters();

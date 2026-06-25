@@ -17,7 +17,7 @@ import { Stars } from '@/components/ui/StarRating';
 import { CallbackForm } from '@/features/leads/CallbackForm';
 import Button from '@/components/ui/Button';
 import { useAsync } from '@/hooks/useAsync';
-import { getScooters, getFeaturedScooters } from '@/features/scooters/scooterService';
+import { getScooters } from '@/features/scooters/scooterService';
 import { getScooterInsights } from '@/features/analytics/popularityService';
 import { useFinance } from '@/context/FinanceSettingsContext';
 import { SITE, SITE_URL } from '@/config/site';
@@ -55,8 +55,11 @@ export default function Home() {
     areaServed: `${site.address.city}, ${site.address.state}`,
     priceRange: '₹₹',
   }), [site]);
-  const { data: featured, loading } = useAsync(() => getFeaturedScooters(3), []);
-  const { data: allScooters } = useAsync(() => getScooters(), []);
+  const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
+  const featured = useMemo(
+    () => (allScooters ? allScooters.filter((s) => s.featured).slice(0, 3) : null),
+    [allScooters],
+  );
   const { settings: financeSettings } = useFinance();
   const { data: reviews, loading: reviewsLoading } = useAsync(() => getApprovedReviews(), []);
   const { data: insights } = useAsync(
@@ -106,7 +109,7 @@ export default function Home() {
         </div>
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
-          {loading
+          {scootersLoading
             ? Array.from({ length: 3 }).map((_, i) => <ScooterCardSkeleton key={i} />)
             : featured?.map((s, i) => <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />)}
         </div>
@@ -134,7 +137,7 @@ export default function Home() {
         />
 
         <Reveal className="mt-6 sm:mt-10" y={20}>
-          <EVSimulator scooters={allScooters || []} settings={financeSettings} />
+          <EVSimulator scooters={allScooters || []} settings={financeSettings} loading={scootersLoading} />
         </Reveal>
       </Section>
 

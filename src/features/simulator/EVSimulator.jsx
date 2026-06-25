@@ -144,7 +144,7 @@ const MATCH_STYLES = {
   stretch: 'bg-orange-500/10 text-orange-900 ring-orange-500/20',
 };
 
-export function EVSimulator({ scooters = [], settings }) {
+export function EVSimulator({ scooters = [], settings, loading = false }) {
   const { site } = useSite();
   const petrolPrice = settings?.petrolPricePerLitre ?? FINANCE_DEFAULTS.petrolPricePerLitre;
   const petrolMileage = settings?.petrolMileageKmPerLitre ?? FINANCE_DEFAULTS.petrolMileageKmPerLitre;
@@ -193,10 +193,30 @@ export function EVSimulator({ scooters = [], settings }) {
     ? `Hi, I tried your EV savings calculator — I could save around ${formatINR(result.annualSavings)}/year on the ${scooter.name} (${dailyDistance} km/day). I'd like to know more!`
     : 'Hi, I\'d like to know more about your electric scooters.';
 
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-3xl rounded-3xl bg-white p-10 text-center shadow-xl ring-1 ring-slate-200/60">
+        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        <p className="text-sm text-muted">Loading simulator…</p>
+      </div>
+    );
+  }
+
+  if (!scooters.length) {
+    return (
+      <div className="mx-auto max-w-3xl rounded-3xl bg-white p-10 text-center shadow-xl ring-1 ring-slate-200/60">
+        <p className="text-sm text-muted">
+          Scooter data is unavailable right now. Please refresh the page or try again in a moment.
+        </p>
+      </div>
+    );
+  }
+
   if (!scooter) {
     return (
-      <div className="mx-auto max-w-3xl rounded-3xl bg-white p-10 text-center text-sm text-muted shadow-xl ring-1 ring-slate-200/60">
-        Loading simulator…
+      <div className="mx-auto max-w-3xl rounded-3xl bg-white p-10 text-center shadow-xl ring-1 ring-slate-200/60">
+        <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+        <p className="text-sm text-muted">Preparing simulator…</p>
       </div>
     );
   }
