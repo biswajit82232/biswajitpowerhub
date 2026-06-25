@@ -2,7 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { REVIEWS } from '@/data/reviews';
 
-const CACHE_KEY = 'reviews_approved_v2';
+const CACHE_KEY = 'reviews_approved_v3';
 const CACHE_TTL = 60;
 
 function fromRow(row) {
@@ -37,9 +37,11 @@ export async function uploadReviewPhoto(file) {
         const { data } = supabase.storage.from('review-photos').getPublicUrl(path);
         return data.publicUrl;
       }
-      console.warn('[Storage] Review photo upload failed, falling back to base64:', error.message);
+      console.warn('[Storage] Review photo upload failed:', error.message);
+      throw new Error(error.message || 'Image upload failed');
     } catch (e) {
-      console.warn('[Storage] Review photo upload exception, falling back to base64:', e);
+      console.warn('[Storage] Review photo upload exception:', e);
+      throw e instanceof Error ? e : new Error('Image upload failed');
     }
   }
   return new Promise((resolve, reject) => {
@@ -66,7 +68,7 @@ export async function getApprovedReviews() {
       }
 
       console.warn('[Reviews] Supabase fetch failed:', error.message);
-      return [];
+      return REVIEWS.filter((r) => r.status === 'approved');
     }
 
     return REVIEWS.filter((r) => r.status === 'approved');

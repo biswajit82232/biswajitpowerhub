@@ -7,7 +7,7 @@ export function Spinner({ className, size = 22 }) {
 
 /**
  * Slim gradient progress bar at the very top of the viewport.
- * Used as the Suspense fallback — invisible and non-disruptive.
+ * Pair with RouteLoader when the page body would otherwise collapse.
  */
 export function PageLoader() {
   return (
@@ -18,6 +18,27 @@ export function PageLoader() {
       <div
         className="h-full w-full origin-left animate-[page-progress_1.2s_ease-in-out_infinite] bg-gradient-to-r from-brand-400 via-cyan-400 to-teal-400"
       />
+    </div>
+  );
+}
+
+/** In-flow loading shell — keeps layout height so the page does not jump to the footer. */
+export function RouteLoader({ children, className, label = 'Loading page' }) {
+  return (
+    <div
+      className={cn(
+        'min-h-[calc(100vh-var(--header-offset)-10rem)] w-full',
+        className,
+      )}
+      aria-busy="true"
+      aria-label={label}
+    >
+      <PageLoader />
+      {children ?? (
+        <div className="flex items-center justify-center py-24">
+          <Spinner size={28} />
+        </div>
+      )}
     </div>
   );
 }

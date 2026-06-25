@@ -35,13 +35,31 @@ export default function Reviews() {
   const reviewSchema = reviews?.length
     ? {
         '@context': 'https://schema.org',
-        '@type': 'Product',
-        name: 'BISWAJIT POWER HUB Electric Scooters',
+        '@type': 'LocalBusiness',
+        name: 'BISWAJIT POWER HUB',
+        description: 'Electric scooter dealership in Berhampore, West Bengal',
         aggregateRating: {
           '@type': 'AggregateRating',
           ratingValue: avg.toFixed(1),
+          bestRating: '5',
+          worstRating: '1',
           reviewCount: reviews.length,
         },
+        review: reviews.slice(0, 5).map((r) => ({
+          '@type': 'Review',
+          author: { '@type': 'Person', name: r.name },
+          datePublished: r.created_at || undefined,
+          reviewRating: {
+            '@type': 'Rating',
+            ratingValue: String(r.rating),
+            bestRating: '5',
+            worstRating: '1',
+          },
+          reviewBody: r.review,
+          ...(r.scooter
+            ? { itemReviewed: { '@type': 'Product', name: r.scooter } }
+            : {}),
+        })),
       }
     : null;
 

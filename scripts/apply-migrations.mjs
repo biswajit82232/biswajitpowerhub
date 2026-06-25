@@ -26,6 +26,11 @@ const ORDER = [
   'create_accessory_images_bucket.sql',
   'update_reviews_product_names.sql',
   'create_review_photos_bucket.sql',
+  'add_scooter_variants.sql',
+  'add_battery_warranty.sql',
+  'fix_critical_rls_and_rpc.sql',
+  'update_reviews_catalog.sql',
+  'update_zoom_max_range.sql',
 ];
 
 function loadEnv() {

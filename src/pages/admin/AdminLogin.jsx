@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
+import { adminAccessHint } from '@/lib/adminAccess';
 
 export default function AdminLogin() {
   const { signIn, session } = useAuth();
@@ -70,6 +71,12 @@ export default function AdminLogin() {
                   </>
                 )}
                 {' '}Create an admin user in Supabase → Authentication → Users.
+              </div>
+            )}
+
+            {adminAccessHint() && (
+              <div className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                {adminAccessHint()}
               </div>
             )}
 

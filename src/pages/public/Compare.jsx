@@ -4,23 +4,34 @@ import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
 import { ScooterImage } from '@/components/common/ScooterImage';
 import { Select } from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { ScooterCardSkeleton } from '@/components/ui/Skeleton';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
-import { formatINR } from '@/lib/utils';
+import { cn, formatINR } from '@/lib/utils';
 import { emiFrom } from '@/lib/finance';
 import { useFinance } from '@/context/FinanceSettingsContext';
+import { EMI_DISCLAIMER, EMI_DISCLAIMER_NOTE } from '@/config/finance';
 import { trackEvent, EVENT } from '@/lib/tracking';
+import {
+  formatPriceRange,
+  formatRangeRange,
+  formatVariantSpec,
+  getStartingPrice,
+} from '@/lib/scooterVariants';
+
+const MAX_SLOTS = 3;
+const LABEL_W = '8.75rem';
 
 function compareRows(settings) {
   return [
-    { label: 'Price', get: (s) => formatINR(s.price) },
-    { label: 'EMI from', get: (s) => `${formatINR(emiFrom({ price: s.price, settings }))}/mo*` },
-    { label: 'Range', get: (s) => `${s.range} km` },
+    { label: 'Price', get: (s) => formatPriceRange(s, formatINR) },
+    { label: 'EMI from', get: (s) => `${formatINR(emiFrom({ price: getStartingPrice(s), settings }))}/mo*` },
+    { label: 'Range', get: (s) => formatRangeRange(s) },
     { label: 'Top speed', get: (s) => `${s.topSpeed} km/h` },
-    { label: 'Battery', get: (s) => s.batteryCapacity },
-    { label: 'Battery type', get: (s) => s.batteryType },
+    { label: 'Battery', get: (s) => formatVariantSpec(s, 'batteryCapacity') },
+    { label: 'Battery type', get: (s) => formatVariantSpec(s, 'batteryType') },
+    { label: 'Battery warranty', get: (s) => formatVariantSpec(s, 'batteryWarranty') },
     { label: 'Charging time', get: (s) => s.chargingTime },
     { label: 'Motor', get: (s) => s.motor },
     { label: 'Weight', get: (s) => s.weight },
@@ -29,15 +40,180 @@ function compareRows(settings) {
   ];
 }
 
+function stickyLabelClass(even) {
+  return cn(
+    'sticky left-0 z-20 border-r border-line shadow-[4px_0_8px_-4px_rgba(15,23,42,0.14)]',
+    even ? 'bg-surface-alt' : 'bg-surface',
+  );
+}
+
+function CompactSlot({ scooter, options, onChange, onRemove, canRemove }) {
+  return (
+    <div className="relative flex min-w-[9.5rem] items-center gap-2 p-2 sm:min-w-[10.5rem] sm:p-2.5">
+      <ScooterImage
+        src={scooter.images?.[0]}
+        hue={scooter.hue}
+        name={scooter.name}
+        alt=""
+        className="h-11 w-14 shrink-0 rounded-lg sm:h-12 sm:w-[3.25rem]"
+      />
+      <div className="min-w-0 flex-1">
+        <Select
+          value={scooter.id}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 px-2 text-xs font-semibold"
+          aria-label={`Change ${scooter.name}`}
+        >
+          {options.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </Select>
+        <p className="mt-0.5 truncate text-[11px] font-bold text-heading sm:text-xs">
+          {formatPriceRange(scooter, formatINR)}
+        </p>
+      </div>
+      {canRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="shrink-0 rounded-full p-1 text-muted ring-1 ring-line transition hover:bg-surface-alt hover:text-heading"
+          aria-label={`Remove ${scooter.name}`}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function CompactAddSlot({ options, onAdd }) {
+  return (
+    <div className="flex min-w-[9.5rem] items-center gap-2 border-l border-dashed border-line p-2 sm:min-w-[10.5rem] sm:p-2.5">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-500 ring-1 ring-brand-100">
+        <Plus className="h-4 w-4" />
+      </span>
+      <Select onChange={(e) => onAdd(e.target.value)} value="" className="h-8 min-w-0 flex-1 px-2 text-xs">
+        <option value="" disabled>
+          Add model
+        </option>
+        {options.map((s) => (
+          <option key={s.id} value={s.id}>
+            {s.name}
+          </option>
+        ))}
+      </Select>
+    </div>
+  );
+}
+
+function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, optionsFor }) {
+  const showAdd = chosen.length < MAX_SLOTS && available.length > 0;
+  const colCount = chosen.length + (showAdd ? 1 : 0);
+  const gridCols = `${LABEL_W} repeat(${colCount}, minmax(9.5rem, 1fr))`;
+
+  return (
+    <div className="overflow-hidden rounded-2xl bg-surface ring-1 ring-line shadow-soft">
+      <p className="border-b border-line bg-surface-alt px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-muted sm:hidden">
+        Swipe to compare →
+      </p>
+
+      <div className="isolate overflow-x-auto overscroll-x-contain">
+        <div
+          className="grid min-w-max border-collapse"
+          style={{ gridTemplateColumns: gridCols }}
+        >
+          {/* Header row — scrolls with columns; only spec labels stick below */}
+          <div
+            className={cn(
+              'sticky left-0 z-30 border-b border-r border-line bg-surface-alt px-3 py-2.5',
+              'text-[10px] font-bold uppercase tracking-wide text-muted shadow-[4px_0_8px_-4px_rgba(15,23,42,0.14)]',
+            )}
+          >
+            Models
+          </div>
+
+          {chosen.map((s, i) => (
+            <div
+              key={s.id}
+              className={cn(
+                'border-b border-line bg-surface-alt',
+                i < chosen.length - 1 || showAdd ? 'border-r border-line' : '',
+              )}
+            >
+              <CompactSlot
+                scooter={s}
+                options={optionsFor(s.id)}
+                onChange={(id) => onSwap(s.id, id)}
+                onRemove={() => onRemove(s.id)}
+                canRemove={chosen.length > 1}
+              />
+            </div>
+          ))}
+
+          {showAdd && (
+            <div className="border-b border-line bg-surface-alt">
+              <CompactAddSlot options={available} onAdd={onAdd} />
+            </div>
+          )}
+
+          {/* Spec rows */}
+          {rows.map((row, ri) => {
+            const even = ri % 2 === 1;
+            return (
+              <div key={row.label} className="contents">
+                <div
+                  className={cn(
+                    stickyLabelClass(even),
+                    'border-b border-line px-3 py-3 text-xs font-semibold text-heading sm:text-sm',
+                    ri === rows.length - 1 && 'border-b-0',
+                  )}
+                >
+                  {row.label}
+                </div>
+
+                {chosen.map((s, ci) => (
+                  <div
+                    key={s.id}
+                    className={cn(
+                      'border-b border-line px-3 py-3 text-xs leading-snug text-body sm:text-sm',
+                      even ? 'bg-surface-alt' : 'bg-surface',
+                      ci < chosen.length - 1 || showAdd ? 'border-r border-line' : '',
+                      ri === rows.length - 1 && 'border-b-0',
+                    )}
+                  >
+                    {row.get(s)}
+                  </div>
+                ))}
+
+                {showAdd && (
+                  <div
+                    className={cn(
+                      'border-b border-line px-3 py-3',
+                      even ? 'bg-surface-alt' : 'bg-surface',
+                      ri === rows.length - 1 && 'border-b-0',
+                    )}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Compare() {
-  const { data: scooters } = useAsync(() => getScooters(), []);
+  const { data: scooters, loading } = useAsync(() => getScooters(), []);
   const { settings } = useFinance();
   const rows = useMemo(() => compareRows(settings), [settings]);
   const [selected, setSelected] = useState([]);
   const tracked = useRef(false);
 
   useEffect(() => {
-    if (scooters && scooters.length && selected.length === 0) {
+    if (scooters?.length && selected.length === 0) {
       setSelected(scooters.slice(0, 2).map((s) => s.id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -52,93 +228,94 @@ export default function Compare() {
 
   const chosen = useMemo(
     () => selected.map((id) => scooters?.find((s) => s.id === id)).filter(Boolean),
-    [selected, scooters]
+    [selected, scooters],
   );
 
   const available = scooters?.filter((s) => !selected.includes(s.id)) || [];
 
-  const addSlot = (id) => id && setSelected((s) => [...s, id].slice(0, 3));
+  const addSlot = (id) => {
+    if (!id || selected.includes(id) || selected.length >= MAX_SLOTS) return;
+    setSelected((s) => [...s, id]);
+  };
+
   const remove = (id) => setSelected((s) => s.filter((x) => x !== id));
+
+  const swap = (oldId, newId) => {
+    if (!newId || oldId === newId) return;
+    setSelected((s) => s.map((id) => (id === oldId ? newId : id)));
+  };
+
+  const optionsFor = (currentId) =>
+    scooters?.filter((s) => !selected.includes(s.id) || s.id === currentId) || [];
 
   return (
     <>
       <SEO title="Compare Scooters" description="Compare electric scooter models side by side." path="/compare" />
 
       <section className="border-b border-line bg-surface-alt/50">
-        <div className="container-px py-12">
+        <div className="container-px py-8 sm:py-10">
           <Reveal>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-600">
               <GitCompare className="h-3.5 w-3.5" /> Compare
             </span>
             <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">Compare models</h1>
-            <p className="mt-3 max-w-xl text-body">Put up to three scooters head-to-head and find your match.</p>
+            <p className="mt-2 max-w-xl text-sm text-body sm:mt-3">
+              Pick up to three scooters — compact view below, swipe on mobile to read specs.
+            </p>
           </Reveal>
         </div>
       </section>
 
-      <div className="container-px py-10">
-        {chosen.length === 0 ? (
-          <EmptyState icon={GitCompare} title="Pick scooters to compare" description="Add models below to begin." />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px] border-separate border-spacing-0">
-              <thead>
-                <tr>
-                  <th className="sticky left-0 z-10 bg-bg" />
-                  {chosen.map((s) => (
-                    <th key={s.id} className="p-3 align-top">
-                      <div className="relative rounded-2xl bg-surface p-4 ring-1 ring-line shadow-soft">
-                        <button
-                          onClick={() => remove(s.id)}
-                          className="absolute right-2 top-2 rounded-full bg-slate-100 p-1 text-muted transition hover:bg-slate-200"
-                          aria-label={`Remove ${s.name}`}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                        <ScooterImage src={s.images?.[0]} hue={s.hue} name={s.name} alt={s.name} className="aspect-[4/3] w-full rounded-xl" />
-                        <p className="mt-3 break-words font-display text-base font-bold text-heading">{s.name}</p>
-                        <Button to={`/scooters/${s.id}`} variant="secondary" size="sm" className="mt-2 w-full">
-                          View
-                        </Button>
-                      </div>
-                    </th>
-                  ))}
-                  {chosen.length < 3 && available.length > 0 && (
-                    <th className="p-3 align-top">
-                      <div className="flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-line bg-surface/50 p-4">
-                        <Plus className="h-6 w-6 text-brand-400" />
-                        <Select onChange={(e) => addSlot(e.target.value)} value="" className="w-40">
-                          <option value="" disabled>
-                            Add model
-                          </option>
-                          {available.map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.name}
-                            </option>
-                          ))}
-                        </Select>
-                      </div>
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, ri) => (
-                  <tr key={row.label} className={ri % 2 ? 'bg-surface-alt/40' : ''}>
-                    <td className="sticky left-0 z-10 min-w-[7rem] bg-inherit px-3 py-3.5 text-sm font-semibold text-heading sm:min-w-[8.5rem]">
-                      {row.label}
-                    </td>
-                    {chosen.map((s) => (
-                      <td key={s.id} className="min-w-[8.5rem] break-words px-4 py-3.5 text-left text-sm text-body sm:text-center">
-                        {row.get(s)}
-                      </td>
-                    ))}
-                    {chosen.length < 3 && available.length > 0 && <td />}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className="container-px py-6 sm:py-8">
+        {loading ? (
+          <div className="flex gap-3 overflow-hidden">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="min-w-[9rem] shrink-0">
+                <ScooterCardSkeleton />
+              </div>
+            ))}
           </div>
+        ) : chosen.length === 0 ? (
+          <EmptyState icon={GitCompare} title="Pick scooters to compare" description="Add models below to begin." />
+        ) : chosen.length === 1 ? (
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {chosen.map((s) => (
+                <div key={s.id} className="rounded-xl ring-1 ring-line">
+                  <CompactSlot
+                    scooter={s}
+                    options={optionsFor(s.id)}
+                    onChange={(id) => swap(s.id, id)}
+                    onRemove={() => remove(s.id)}
+                    canRemove={false}
+                  />
+                </div>
+              ))}
+              {available.length > 0 && (
+                <div className="rounded-xl ring-1 ring-dashed ring-line">
+                  <CompactAddSlot options={available} onAdd={addSlot} />
+                </div>
+              )}
+            </div>
+            <p className="rounded-xl bg-brand-50 px-4 py-3 text-center text-sm text-brand-800 ring-1 ring-brand-100">
+              Add one more model to compare specs side by side.
+            </p>
+          </div>
+        ) : (
+          <Reveal>
+            <CompareGrid
+              chosen={chosen}
+              rows={rows}
+              available={available}
+              onSwap={swap}
+              onRemove={remove}
+              onAdd={addSlot}
+              optionsFor={optionsFor}
+            />
+            <p className="mt-4 text-xs text-muted">
+              {EMI_DISCLAIMER} {EMI_DISCLAIMER_NOTE}
+            </p>
+          </Reveal>
         )}
       </div>
     </>

@@ -22,6 +22,7 @@ import { trackEvent, EVENT } from '@/lib/tracking';
 import { FINANCE_DEFAULTS } from '@/config/finance';
 import { whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { getScooterVariants, hasVariants, withVariant } from '@/lib/scooterVariants';
 
 function CountValue({ value, decimals = 0, prefix = '', suffix = '', duration = 700, className }) {
   const display = useCountUp(value, { active: true, decimals, duration });
@@ -151,6 +152,7 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
   const electricityRate = settings?.electricityRatePerUnit ?? FINANCE_DEFAULTS.electricityRatePerUnit;
 
   const [scooterId, setScooterId] = useState('');
+  const [variantId, setVariantId] = useState('');
   const [dailyDistance, setDailyDistance] = useState(45);
   const tracked = useRef(false);
 
@@ -166,16 +168,31 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
     [scooters, scooterId]
   );
 
+  const variants = useMemo(() => getScooterVariants(scooter), [scooter]);
+
+  useEffect(() => {
+    if (!scooter) return;
+    const list = getScooterVariants(scooter);
+    setVariantId((current) =>
+      current && list.some((v) => v.id === current) ? current : list[0]?.id || ''
+    );
+  }, [scooterId, scooter]);
+
+  const simulationScooter = useMemo(
+    () => (scooter && variantId ? withVariant(scooter, variantId) : scooter),
+    [scooter, variantId]
+  );
+
   const result = useMemo(
     () =>
       simulate({
-        scooter,
+        scooter: simulationScooter,
         dailyDistance,
         electricityRate,
         petrolPricePerLitre: petrolPrice,
         petrolMileageKmPerLitre: petrolMileage,
       }),
-    [scooter, dailyDistance, electricityRate, petrolPrice, petrolMileage]
+    [simulationScooter, dailyDistance, electricityRate, petrolPrice, petrolMileage]
   );
 
   const charging = getChargingHabit(result.daysBetweenCharges);
@@ -189,8 +206,8 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
     }
   };
 
-  const waMessage = scooter
-    ? `Hi, I tried your EV savings calculator — I could save around ${formatINR(result.annualSavings)}/year on the ${scooter.name} (${dailyDistance} km/day). I'd like to know more!`
+  const waMessage = simulationScooter
+    ? `Hi, I tried your EV savings calculator — I could save around ${formatINR(result.annualSavings)}/year on the ${simulationScooter.name}${simulationScooter.selectedVariant ? ` (${simulationScooter.selectedVariant.name})` : ''} (${dailyDistance} km/day). I'd like to know more!`
     : 'Hi, I\'d like to know more about your electric scooters.';
 
   if (loading) {
@@ -229,7 +246,7 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
           {/* Inputs */}
           <div className="border-b border-slate-100 bg-slate-50/90 px-4 py-4 sm:px-6 sm:py-5">
             <div className="grid gap-4 sm:grid-cols-2" onPointerDown={onInteract}>
-              <div>
+              <div className={hasVariants(scooter) ? '' : 'sm:col-span-2'}>
                 <label className="mb-1.5 block text-xs font-semibold text-slate-600">
                   Scooter model
                 </label>
@@ -248,7 +265,28 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
                   ))}
                 </Select>
               </div>
-              <div>
+              {hasVariants(scooter) && (
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Battery variant
+                  </label>
+                  <Select
+                    value={variantId}
+                    className="h-11 rounded-xl border-0 bg-white text-sm shadow-sm ring-1 ring-slate-200/80"
+                    onChange={(e) => {
+                      setVariantId(e.target.value);
+                      onInteract();
+                    }}
+                  >
+                    {variants.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name} · {formatINR(v.price)}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              )}
+              <div className={hasVariants(scooter) ? 'sm:col-span-2' : ''}>
                 <div className="mb-1.5 flex items-center justify-between">
                   <label className="text-xs font-semibold text-slate-600">Daily travel</label>
                   <span className="rounded-full bg-white px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-sm ring-1 ring-emerald-200/60">
@@ -288,7 +326,9 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
                 />
               </p>
               <p className="mt-2 text-sm text-slate-500 sm:text-base">
-                vs petrol · {scooter.name} · {dailyDistance} km/day
+                vs petrol · {simulationScooter.name}
+                {simulationScooter.selectedVariant ? ` · ${simulationScooter.selectedVariant.name}` : ''}
+                {' · '}{dailyDistance} km/day
               </p>
             </div>
           </div>

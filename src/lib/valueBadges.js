@@ -1,16 +1,15 @@
 /** Algorithmic value badges from scooter specs */
 
+import { parseBatteryKwh } from '@/lib/battery';
+import { CHARGE_EFFICIENCY } from '@/lib/simulator';
+import { FINANCE_DEFAULTS } from '@/config/finance';
+
 export const VALUE_BADGE_DEFS = {
   best_value: { id: 'best_value', label: 'Best Value', emoji: '⭐', tone: 'warning' },
   longest_range: { id: 'longest_range', label: 'Longest Range', emoji: '⚡', tone: 'brand' },
   lowest_running_cost: { id: 'lowest_running_cost', label: 'Lowest Running Cost', emoji: '💰', tone: 'accent' },
   best_city: { id: 'best_city', label: 'Best City Scooter', emoji: '🏙', tone: 'success' },
 };
-
-function parseKwh(capacity) {
-  const m = String(capacity || '').match(/([\d.]+)/);
-  return m ? Number(m[1]) : 1.5;
-}
 
 function parseWeightKg(weight) {
   const m = String(weight || '').match(/([\d.]+)/);
@@ -21,12 +20,13 @@ function realRange(scooter) {
   return scooter.range * (scooter.realRangeFactor ?? 0.85);
 }
 
-/** Estimated electricity cost per km (₹8/kWh) */
+/** Estimated electricity cost per km */
 function runningCostPerKm(scooter) {
-  const kwh = parseKwh(scooter.batteryCapacity);
+  const kwh = parseBatteryKwh(scooter.batteryCapacity);
   const range = realRange(scooter);
-  if (!range) return Infinity;
-  return (kwh / range) * 8;
+  if (!range || !kwh) return Infinity;
+  const energyPerCharge = kwh / CHARGE_EFFICIENCY;
+  return (energyPerCharge * FINANCE_DEFAULTS.electricityRatePerUnit) / range;
 }
 
 function cityScore(scooter) {

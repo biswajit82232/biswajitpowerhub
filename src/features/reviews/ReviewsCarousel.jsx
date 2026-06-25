@@ -1,19 +1,26 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ReviewCard } from './ReviewCard';
 
-const SCROLL_SPEED = 0.75; // px per frame (~45px/s at 60fps)
+const SCROLL_SPEED = 0.75;
+
+function prefersReducedMotion() {
+  return typeof window !== 'undefined'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
 
 /**
- * Seamless infinite horizontal marquee — continuous scroll, no controls.
+ * Seamless infinite horizontal marquee — pauses on hover; static scroll when reduced motion.
  */
 export function ReviewsCarousel({ reviews = [] }) {
   const trackRef = useRef(null);
   const offsetRef = useRef(0);
   const halfRef = useRef(0);
+  const [paused, setPaused] = useState(false);
+  const reducedMotion = useRef(prefersReducedMotion());
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track || reviews.length === 0) return;
+    if (!track || reviews.length === 0 || reducedMotion.current) return;
 
     const measure = () => {
       halfRef.current = track.scrollWidth / 2;
@@ -27,7 +34,7 @@ export function ReviewsCarousel({ reviews = [] }) {
     let raf = 0;
 
     const tick = () => {
-      if (!document.hidden) {
+      if (!document.hidden && !paused) {
         if (halfRef.current <= 0) measure();
         const half = halfRef.current;
         if (half > 0) {
@@ -44,15 +51,24 @@ export function ReviewsCarousel({ reviews = [] }) {
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      track.style.transform = '';
     };
-  }, [reviews.length]);
+  }, [reviews.length, paused]);
 
   if (!reviews.length) return null;
 
   const track = [...reviews, ...reviews];
 
   return (
-    <div className="reviews-marquee-wrap relative overflow-hidden">
+    <div
+      className="reviews-marquee-wrap relative overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false);
+      }}
+    >
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-surface-alt to-transparent sm:w-16" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-surface-alt to-transparent sm:w-16" />
 

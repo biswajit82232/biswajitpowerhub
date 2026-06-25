@@ -114,7 +114,7 @@ export default function Accessories() {
         <CatalogSelect
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="hidden w-32 sm:block"
+          className="w-full min-w-0 sm:w-32"
           aria-label="Category"
         >
           <option value="all">All categories</option>

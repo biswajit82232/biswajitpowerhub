@@ -23,6 +23,7 @@ create table if not exists public.scooters (
   top_speed         numeric default 25,
   charging_time     text,
   warranty          text,
+  battery_warranty  text,
   motor             text,
   weight            text,
   load_capacity     text,
@@ -34,6 +35,7 @@ create table if not exists public.scooters (
   description       text,
   features          jsonb default '[]'::jsonb,
   benefits          jsonb default '[]'::jsonb,
+  variants          jsonb default '[]'::jsonb,
   created_at        timestamptz default now()
 );
 
@@ -187,13 +189,14 @@ create policy "public read approved reviews" on public.reviews
   for select using (status = 'approved');
 
 -- Public INSERT: lead capture forms + events (anon can submit, not read)
-create policy "anon insert reviews"  on public.reviews          for insert with check (true);
+create policy "anon insert reviews" on public.reviews
+  for insert to anon
+  with check (status = 'pending' and featured = false and rating between 1 and 5);
 create policy "anon insert callbacks" on public.callbacks       for insert with check (true);
 create policy "anon insert testrides" on public.test_rides      for insert with check (true);
 create policy "anon insert contact"   on public.contact_messages for insert with check (true);
 create policy "anon insert events"    on public.lead_events     for insert with check (true);
-create policy "anon upsert leads ins" on public.leads           for insert with check (true);
-create policy "anon upsert leads upd" on public.leads           for update using (true) with check (true);
+-- Leads: anon upsert via upsert_lead() RPC only (see functions below)
 
 -- Authenticated (admin) FULL ACCESS to everything
 create policy "auth all scooters"  on public.scooters          for all to authenticated using (true) with check (true);
@@ -205,3 +208,89 @@ create policy "auth all contact"   on public.contact_messages  for all to authen
 create policy "auth all events"    on public.lead_events       for all to authenticated using (true) with check (true);
 create policy "auth all leads"     on public.leads             for all to authenticated using (true) with check (true);
 create policy "auth all finance"   on public.finance_settings  for all to authenticated using (true) with check (true);
+
+-- ============================================================================
+-- SECURITY DEFINER RPCs (public lead upsert + analytics read)
+-- ============================================================================
+
+create or replace function public.enforce_review_pending()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if tg_op = 'INSERT' then
+    new.status := 'pending';
+    new.featured := false;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists reviews_force_pending on public.reviews;
+create trigger reviews_force_pending
+  before insert on public.reviews
+  for each row execute function public.enforce_review_pending();
+
+create or replace function public.upsert_lead(
+  p_visitor_id text,
+  p_name text,
+  p_phone text,
+  p_last_source text,
+  p_interested_scooter text,
+  p_score int,
+  p_classification text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_visitor_id is null or length(trim(p_visitor_id)) = 0 then
+    raise exception 'visitor_id required';
+  end if;
+
+  insert into public.leads (
+    visitor_id, name, phone, last_source, interested_scooter,
+    score, classification, updated_at
+  )
+  values (
+    p_visitor_id, p_name, p_phone, p_last_source, p_interested_scooter,
+    coalesce(p_score, 0), coalesce(p_classification, 'cold'), now()
+  )
+  on conflict (visitor_id) do update set
+    name = coalesce(excluded.name, leads.name),
+    phone = coalesce(excluded.phone, leads.phone),
+    last_source = excluded.last_source,
+    interested_scooter = coalesce(excluded.interested_scooter, leads.interested_scooter),
+    score = greatest(coalesce(leads.score, 0), coalesce(excluded.score, 0)),
+    classification = excluded.classification,
+    updated_at = now();
+end;
+$$;
+
+revoke all on function public.upsert_lead(text, text, text, text, text, int, text) from public;
+grant execute on function public.upsert_lead(text, text, text, text, text, int, text) to anon, authenticated;
+
+create or replace function public.get_analytics_events(p_limit int default 8000)
+returns table (
+  event_type text,
+  meta jsonb,
+  created_at timestamptz,
+  visitor_id text
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select e.event_type, e.meta, e.created_at, e.visitor_id
+  from public.lead_events e
+  order by e.created_at desc
+  limit least(greatest(coalesce(p_limit, 8000), 1), 10000);
+$$;
+
+revoke all on function public.get_analytics_events(int) from public;
+grant execute on function public.get_analytics_events(int) to anon, authenticated;
+

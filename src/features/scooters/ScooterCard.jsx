@@ -7,11 +7,13 @@ import { formatINR } from '@/lib/utils';
 import { emiFrom } from '@/lib/finance';
 import { useFinance } from '@/context/FinanceSettingsContext';
 import { STOCK_LABELS } from '@/data/scooters';
+import { hasVariants, getStartingPrice } from '@/lib/scooterVariants';
 
 export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [] }) {
   const { settings } = useFinance();
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
-  const emi = emiFrom({ price: scooter.price, settings });
+  const startingPrice = getStartingPrice(scooter);
+  const emi = emiFrom({ price: startingPrice, settings });
   const extraBadges = [...popularityTags, ...valueBadges.map((b) => ({
     label: `${b.emoji} ${b.label}`,
     tone: b.tone,
@@ -66,8 +68,11 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
             <div>
               <p className="text-xs font-medium text-muted">Starting at</p>
               <p className="font-display text-2xl font-extrabold text-heading">
-                {formatINR(scooter.price)}
+                {formatINR(startingPrice)}
               </p>
+              {hasVariants(scooter) && (
+                <p className="mt-0.5 text-xs text-muted">Standard & Lithium Pro</p>
+              )}
               <p className="mt-0.5 text-xs font-semibold text-accent-600">
                 EMI from {formatINR(emi)}/mo
               </p>

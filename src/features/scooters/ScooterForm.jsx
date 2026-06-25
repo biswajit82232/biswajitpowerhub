@@ -16,7 +16,11 @@ const EMPTY = {
   batteryType: '', batteryCapacity: '', range: 0, realRangeFactor: 0.83, topSpeed: 25,
   chargingTime: '', warranty: '', motor: '', weight: '', loadCapacity: '',
   colors: [], noLicence: true, noRegistration: true, stock: 'in_stock', featured: false,
-  description: '', features: [], benefits: [], images: [],
+  description: '', features: [], benefits: [], images: [], variants: [],
+};
+
+const EMPTY_VARIANT = {
+  id: '', name: '', price: 0, batteryType: '', batteryCapacity: '', batteryWarranty: '', range: 0,
 };
 
 function listToText(arr) {
@@ -28,19 +32,58 @@ function textToList(text) {
 
 export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
   const [form, setForm] = useState(() => ({ ...EMPTY, ...initial }));
+  const [formError, setFormError] = useState('');
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setFormError('');
+    const variants = (form.variants || []).map((v, i) => ({
+      ...v,
+      id: v.id || slugify(v.name || `variant-${i + 1}`),
+      price: Number(v.price),
+      range: Number(v.range),
+    }));
+    const variantPrices = variants
+      .map((v) => v.price)
+      .filter((p) => Number.isFinite(p) && p > 0);
+    let price = Number(form.price);
+    if (!Number.isFinite(price) || price <= 0) {
+      price = variantPrices.length ? Math.min(...variantPrices) : NaN;
+    }
+    if (!Number.isFinite(price) || price <= 0) {
+      setFormError('Enter a valid price or add at least one variant with a price.');
+      return;
+    }
     const payload = {
       ...form,
       id: form.id || slugify(form.name),
-      price: Number(form.price),
+      price,
       range: Number(form.range),
       topSpeed: Number(form.topSpeed),
       realRangeFactor: Number(form.realRangeFactor),
+      variants,
     };
     onSubmit(payload);
+  };
+
+  const setVariant = (index, key, value) => {
+    setForm((f) => {
+      const variants = [...(f.variants || [])];
+      variants[index] = { ...variants[index], [key]: value };
+      return { ...f, variants };
+    });
+  };
+
+  const addVariant = () => {
+    setForm((f) => ({ ...f, variants: [...(f.variants || []), { ...EMPTY_VARIANT }] }));
+  };
+
+  const removeVariant = (index) => {
+    setForm((f) => ({
+      ...f,
+      variants: (f.variants || []).filter((_, i) => i !== index),
+    }));
   };
 
   return (
@@ -128,6 +171,51 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
         <Textarea rows={3} value={form.description} onChange={(e) => set('description', e.target.value)} />
       </Field>
 
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <Label>Variants</Label>
+          <Button type="button" variant="secondary" size="sm" onClick={addVariant}>
+            Add variant
+          </Button>
+        </div>
+        {(form.variants || []).length === 0 ? (
+          <p className="text-sm text-muted">No variants — price above is used as the listing price.</p>
+        ) : (
+          <div className="space-y-3">
+            {(form.variants || []).map((variant, index) => (
+              <div key={index} className="rounded-xl bg-surface-alt p-4 ring-1 ring-line">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-heading">Variant {index + 1}</p>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeVariant(index)}>
+                    Remove
+                  </Button>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field label="Name">
+                    <Input value={variant.name} onChange={(e) => setVariant(index, 'name', e.target.value)} placeholder="Standard" />
+                  </Field>
+                  <Field label="Price (₹)">
+                    <Input type="number" value={variant.price} onChange={(e) => setVariant(index, 'price', e.target.value)} />
+                  </Field>
+                  <Field label="Battery type">
+                    <Input value={variant.batteryType} onChange={(e) => setVariant(index, 'batteryType', e.target.value)} />
+                  </Field>
+                  <Field label="Battery capacity">
+                    <Input value={variant.batteryCapacity} onChange={(e) => setVariant(index, 'batteryCapacity', e.target.value)} />
+                  </Field>
+                  <Field label="Battery warranty">
+                    <Input value={variant.batteryWarranty} onChange={(e) => setVariant(index, 'batteryWarranty', e.target.value)} placeholder="6 months" />
+                  </Field>
+                  <Field label="Range (km)">
+                    <Input type="number" value={variant.range} onChange={(e) => setVariant(index, 'range', e.target.value)} />
+                  </Field>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Colours" hint="One per line">
           <Textarea rows={3} value={listToText(form.colors)} onChange={(e) => set('colors', textToList(e.target.value))} />
@@ -149,6 +237,10 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
           <Textarea rows={4} value={listToText(form.benefits)} onChange={(e) => set('benefits', textToList(e.target.value))} />
         </Field>
       </div>
+
+      {formError && (
+        <p className="text-sm text-red-600" role="alert">{formError}</p>
+      )}
 
       <div className="flex gap-3 pt-2">
         <Button type="button" variant="secondary" onClick={onCancel} fullWidth>

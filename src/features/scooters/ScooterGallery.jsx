@@ -4,11 +4,11 @@ import { ScooterImage } from '@/components/common/ScooterImage';
 import { cn } from '@/lib/utils';
 
 /**
- * Large product gallery with thumbnail strip. Falls back to branded
- * placeholders when no real images exist.
+ * Product gallery — single placeholder when no photos; thumbs only for real images.
  */
 export function ScooterGallery({ scooter }) {
-  const images = scooter.images?.length ? scooter.images : [null, null, null];
+  const realImages = (scooter.images || []).filter(Boolean);
+  const images = realImages.length ? realImages : [null];
   const [active, setActive] = useState(0);
 
   return (
@@ -24,7 +24,7 @@ export function ScooterGallery({ scooter }) {
           >
             <ScooterImage
               src={images[active]}
-              alt={`${scooter.name} view ${active + 1}`}
+              alt={scooter.name}
               hue={scooter.hue}
               name={scooter.name}
               loading="eager"
@@ -35,16 +35,17 @@ export function ScooterGallery({ scooter }) {
         </AnimatePresence>
       </div>
 
-      {images.length > 1 && (
+      {realImages.length > 1 && (
         <div className="no-scrollbar mt-4 flex gap-3 overflow-x-auto pb-1">
-          {images.map((img, i) => (
+          {realImages.map((img, i) => (
             <button
-              key={i}
+              key={img + i}
+              type="button"
               onClick={() => setActive(i)}
               aria-label={`View image ${i + 1}`}
               className={cn(
                 'shrink-0 overflow-hidden rounded-xl ring-2 transition',
-                active === i ? 'ring-brand-500' : 'ring-line hover:ring-brand-200'
+                active === i ? 'ring-brand-500' : 'ring-line hover:ring-brand-200',
               )}
             >
               <ScooterImage

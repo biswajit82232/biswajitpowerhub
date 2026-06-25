@@ -133,6 +133,7 @@ export function batteryUpgradeWhatsappMessage(scooterName) {
 export const NAV_LINKS = [
   { label: 'Home', to: '/' },
   { label: 'Scooters', to: '/scooters' },
+  { label: 'Compare', to: '/compare' },
   { label: 'Parts', to: '/accessories' },
   { label: 'Reviews', to: '/reviews' },
   { label: 'Contact', to: '/contact' },

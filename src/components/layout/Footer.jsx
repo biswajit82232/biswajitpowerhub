@@ -41,7 +41,7 @@ export function Footer() {
               Ready to ride electric?
             </h2>
             <p className="mt-2 max-w-md text-sm text-white/70">
-              Visit our Berhampore showroom or message us — expert guidance, zero pressure.
+              Visit our {site.address.city} showroom or message us — expert guidance, zero pressure.
             </p>
           </div>
           <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
@@ -67,7 +67,7 @@ export function Footer() {
           <div className="lg:col-span-4">
             <Logo light />
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/70">
-              Premium low-speed electric scooters in Berhampore. No licence, no registration* for
+              Premium low-speed electric scooters in {site.address.city}. No licence, no registration* for
               eligible models — low running cost, home charging, and custom battery upgrades for extra range.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">

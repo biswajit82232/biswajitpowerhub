@@ -43,37 +43,25 @@
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.vercel.app/scooters/spark-lite</loc>
+    <loc>https://biswajitpowerhub.vercel.app/scooters/single-light</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.vercel.app/scooters/urban-pro</loc>
+    <loc>https://biswajitpowerhub.vercel.app/scooters/double-light</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.vercel.app/scooters/breeze-x</loc>
+    <loc>https://biswajitpowerhub.vercel.app/scooters/activa</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://biswajitpowerhub.vercel.app/scooters/metro-eco</loc>
-    <lastmod>2026-06-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://biswajitpowerhub.vercel.app/scooters/thunder-gt</loc>
-    <lastmod>2026-06-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://biswajitpowerhub.vercel.app/scooters/glide-mini</loc>
+    <loc>https://biswajitpowerhub.vercel.app/scooters/zoom</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>

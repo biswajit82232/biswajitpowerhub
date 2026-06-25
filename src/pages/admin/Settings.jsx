@@ -15,7 +15,7 @@ import {
 } from '@/features/site/siteService';
 import { formatHoursGroups } from '@/features/site/siteHours';
 import { DAY_KEYS, DAY_LABELS, DEFAULT_DAY_HOURS } from '@/config/site';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { isValidPhone } from '@/features/leads/validation';
 
 function HoursPreview({ hours }) {
   const groups = formatHoursGroups(hours);
@@ -78,6 +78,17 @@ export default function Settings() {
     const phones = form.phones.map((p) => p.replace(/\D/g, '')).filter(Boolean);
     if (!phones.length) {
       toast('Add at least one phone number.', 'error');
+      return;
+    }
+    for (const p of phones) {
+      if (!isValidPhone(p)) {
+        toast('Enter valid 10-digit mobile numbers.', 'error');
+        return;
+      }
+    }
+    const wa = form.whatsapp.replace(/\D/g, '');
+    if (wa && wa.length < 10) {
+      toast('WhatsApp number looks invalid.', 'error');
       return;
     }
     if (!form.address.line?.trim()) {

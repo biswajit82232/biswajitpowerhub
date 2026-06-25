@@ -4,7 +4,8 @@ import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { PageLoader } from '@/components/ui/Loading';
+import { RouteLoader } from '@/components/ui/Loading';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { AccessoryImage } from '@/components/common/AccessoryImage';
 import { getAccessoryById } from '@/features/accessories/accessoryService';
@@ -20,7 +21,23 @@ export default function AccessoryDetails() {
   const { site } = useSite();
   const { data: accessory, loading } = useAsync(() => getAccessoryById(id), [id]);
 
-  if (loading) return <PageLoader label="Loading accessory" />;
+  if (loading) {
+    return (
+      <RouteLoader label="Loading accessory">
+        <div className="container-px py-10">
+          <Skeleton className="h-4 w-32" />
+          <div className="mt-6 grid gap-8 lg:grid-cols-2">
+            <Skeleton className="aspect-square rounded-3xl" />
+            <div className="space-y-4">
+              <Skeleton className="h-9 w-2/3" />
+              <Skeleton className="h-10 w-36" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </div>
+        </div>
+      </RouteLoader>
+    );
+  }
   if (!accessory) {
     return (
       <div className="container-px py-20">

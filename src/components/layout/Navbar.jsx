@@ -24,6 +24,15 @@ export function Navbar() {
 
   useEffect(() => setOpen(false), [location.pathname]);
 
+  useEffect(() => {
+    if (!open) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   return (
     <header
       className={cn(

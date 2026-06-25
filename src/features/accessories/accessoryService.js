@@ -119,9 +119,11 @@ export async function uploadAccessoryImage(file, accessoryId) {
         const { data } = supabase.storage.from('accessory-images').getPublicUrl(path);
         return data.publicUrl;
       }
-      console.warn('[Storage] Accessory upload failed, falling back to base64:', error.message);
+      console.warn('[Storage] Accessory upload failed:', error.message);
+      throw new Error(error.message || 'Image upload failed');
     } catch (e) {
-      console.warn('[Storage] Accessory upload exception, falling back to base64:', e);
+      console.warn('[Storage] Accessory upload exception:', e);
+      throw e instanceof Error ? e : new Error('Image upload failed');
     }
   }
   return new Promise((resolve, reject) => {

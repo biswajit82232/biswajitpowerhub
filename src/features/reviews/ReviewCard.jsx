@@ -13,7 +13,7 @@ export function ReviewCard({ review, className }) {
       <div className="flex items-center justify-between gap-2">
         <Quote className="h-6 w-6 text-brand-200 sm:h-7 sm:w-7" fill="currentColor" />
         <span className="inline-flex items-center gap-1 rounded-full bg-accent-50 px-2 py-0.5 text-[0.65rem] font-semibold text-accent-700">
-          <BadgeCheck className="h-3 w-3" /> Verified buyer
+          <BadgeCheck className="h-3 w-3" /> Customer review
         </span>
       </div>
       <Stars value={review.rating} className="mt-3" size={15} />

@@ -1,4 +1,5 @@
 import { clamp } from './utils';
+import { parseBatteryKwh } from './battery';
 
 /**
  * EV real-world usage model.
@@ -6,12 +7,6 @@ import { clamp } from './utils';
  */
 export const CHARGE_EFFICIENCY = 0.9;
 const BASELINE_WEIGHT = 70;
-
-function parseKwh(capacity) {
-  if (typeof capacity === 'number') return capacity;
-  const m = String(capacity || '').match(/([\d.]+)/);
-  return m ? parseFloat(m[1]) : 2;
-}
 
 export function simulate({
   scooter,
@@ -21,7 +16,7 @@ export function simulate({
   petrolPricePerLitre = 110,
   petrolMileageKmPerLitre = 40,
 }) {
-  const capacityKwh = parseKwh(scooter?.batteryCapacity);
+  const capacityKwh = parseBatteryKwh(scooter?.batteryCapacity);
   const claimedRange = Number(scooter?.range) || 80;
   const realFactor = Number(scooter?.realRangeFactor) || 0.83;
 

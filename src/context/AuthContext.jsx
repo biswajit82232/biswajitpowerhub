@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { isAdminEmail, adminAccessHint } from '@/lib/adminAccess';
 
 const AuthContext = createContext(null);
 
@@ -26,8 +27,16 @@ export function AuthProvider({ children }) {
     if (!isSupabaseConfigured || !supabase) {
       throw new Error('Supabase is not configured. Add credentials to enable admin login.');
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
+
+    const signedInEmail = data.session?.user?.email;
+    if (!isAdminEmail(signedInEmail)) {
+      await supabase.auth.signOut();
+      throw new Error(
+        adminAccessHint() || 'This account is not authorized for admin access.',
+      );
+    }
   };
 
   const signOut = async () => {

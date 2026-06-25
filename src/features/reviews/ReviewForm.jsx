@@ -21,6 +21,10 @@ export function ReviewForm({ scooters = [] }) {
   const validate = () => {
     const e = {};
     if (!isValidName(form.name)) e.name = 'Please enter your name';
+    const rating = Number(form.rating);
+    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+      e.rating = 'Please select a rating between 1 and 5';
+    }
     if (!form.review || form.review.trim().length < 10) e.review = 'Tell us a little more (10+ characters)';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -77,6 +81,7 @@ export function ReviewForm({ scooters = [] }) {
       <div>
         <Label>Your Rating</Label>
         <StarInput value={form.rating} onChange={(rating) => setForm({ ...form, rating })} />
+        {errors.rating && <p className="mt-1 text-xs text-red-600">{errors.rating}</p>}
       </div>
 
       <Field label="Scooter Purchased" htmlFor="rv-scooter">

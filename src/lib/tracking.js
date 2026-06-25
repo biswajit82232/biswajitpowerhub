@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase';
 import { trackGAEvent } from './googleAnalytics';
+import { clearCache } from './cache';
 
 /**
  * Lead tracking & scoring engine (Phase 5).
@@ -38,6 +39,21 @@ const SCORE_WEIGHTS = {
   [EVENT.TEST_RIDE_BOOKED]: 35,
   [EVENT.CONTACT_FORM]: 25,
 };
+
+const POPULARITY_EVENTS = new Set([
+  EVENT.SCOOTER_VIEW,
+  EVENT.EMI_USED,
+  EVENT.TEST_RIDE_BOOKED,
+  EVENT.CALLBACK_REQUEST,
+]);
+
+let popularityBustTimer;
+
+function schedulePopularityCacheBust() {
+  if (typeof window === 'undefined') return;
+  clearTimeout(popularityBustTimer);
+  popularityBustTimer = setTimeout(() => clearCache('popularity_engine'), 3000);
+}
 
 export function getVisitorId() {
   if (typeof window === 'undefined') return null;
@@ -90,18 +106,21 @@ export async function trackEvent(type, meta = {}) {
   writeLocalEvents(events);
 
   if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('lead_events').insert({
-        visitor_id: visitorId,
-        event_type: type,
-        meta,
-      });
-    } catch {
-      /* fail silently — analytics must never break UX */
+    const { error } = await supabase.from('lead_events').insert({
+      visitor_id: visitorId,
+      event_type: type,
+      meta,
+    });
+    if (error) {
+      console.warn('[Tracking] lead_events insert failed:', error.message);
     }
   }
 
   trackGAEvent(type, meta);
+
+  if (POPULARITY_EVENTS.has(type)) {
+    schedulePopularityCacheBust();
+  }
 }
 
 /**

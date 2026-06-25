@@ -15,9 +15,11 @@ export async function uploadHeroImage(file) {
         const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
         return data.publicUrl;
       }
-      console.warn('[Storage] Hero upload failed, using base64:', error.message);
+      console.warn('[Storage] Hero upload failed:', error.message);
+      throw new Error(error.message || 'Image upload failed');
     } catch (e) {
-      console.warn('[Storage] Hero upload exception, using base64:', e);
+      console.warn('[Storage] Hero upload exception:', e);
+      throw e instanceof Error ? e : new Error('Image upload failed');
     }
   }
   return new Promise((resolve, reject) => {

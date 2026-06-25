@@ -2,8 +2,9 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { withTimeout } from '@/lib/utils';
 import { SCOOTERS } from '@/data/scooters';
+import { normalizeScooter } from '@/lib/scooterVariants';
 
-const CACHE_KEY = 'scooters_v2';
+const CACHE_KEY = 'scooters_v4';
 const CACHE_TTL = 5 * 60;
 const FETCH_TIMEOUT_MS = 8000;
 
@@ -26,6 +27,7 @@ function fromRow(row) {
     topSpeed: Number(row.top_speed),
     chargingTime: row.charging_time,
     warranty: row.warranty,
+    batteryWarranty: row.battery_warranty,
     motor: row.motor,
     weight: row.weight,
     loadCapacity: row.load_capacity,
@@ -37,7 +39,12 @@ function fromRow(row) {
     description: row.description || '',
     features: row.features || [],
     benefits: row.benefits || [],
+    variants: Array.isArray(row.variants) ? row.variants : [],
   };
+}
+
+function normalizeAll(list) {
+  return list.map(normalizeScooter);
 }
 
 /** Convert app shape -> Supabase row for inserts/updates. */
@@ -57,6 +64,7 @@ export function toRow(s) {
     top_speed: s.topSpeed,
     charging_time: s.chargingTime,
     warranty: s.warranty,
+    battery_warranty: s.batteryWarranty,
     motor: s.motor,
     weight: s.weight,
     load_capacity: s.loadCapacity,
@@ -68,6 +76,7 @@ export function toRow(s) {
     description: s.description || '',
     features: s.features || [],
     benefits: s.benefits || [],
+    variants: s.variants || [],
   };
 }
 
@@ -78,32 +87,31 @@ function bustScooterCache() {
 
 export async function getScooters() {
   return fetchWithCache(CACHE_KEY, async () => {
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data, error } = await withTimeout(
-          supabase.from('scooters').select('*').order('price', { ascending: true }),
-          FETCH_TIMEOUT_MS,
-          'Scooter catalog fetch timed out',
-        );
-
-        if (!error && Array.isArray(data)) {
-          return data.map(fromRow);
-        }
-
-        if (error?.code === '42P01') {
-          return SCOOTERS;
-        }
-
-        console.warn('[Scooters] Supabase fetch failed:', error?.message || 'Unknown error');
-      } catch (err) {
-        console.warn('[Scooters] Supabase fetch failed:', err.message);
-      }
-
-      return SCOOTERS;
+    if (!isSupabaseConfigured || !supabase) {
+      return normalizeAll(SCOOTERS);
     }
 
-    return SCOOTERS;
-  }, CACHE_TTL);
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('scooters').select('*').order('price', { ascending: true }),
+        FETCH_TIMEOUT_MS,
+        'Scooter catalog fetch timed out',
+      );
+
+      if (!error && Array.isArray(data)) {
+        return normalizeAll(data.map(fromRow));
+      }
+
+      if (error?.code === '42P01') {
+        return normalizeAll(SCOOTERS);
+      }
+
+      throw new Error(error?.message || 'Scooter catalog fetch failed');
+    } catch (err) {
+      console.warn('[Scooters] Supabase fetch failed:', err.message);
+      throw err;
+    }
+  }, CACHE_TTL).catch(() => normalizeAll(SCOOTERS));
 }
 
 export async function getScooterById(id) {
@@ -115,7 +123,7 @@ export async function getScooterById(id) {
         'Scooter fetch timed out',
       );
 
-      if (!error && data) return fromRow(data);
+      if (!error && data) return normalizeScooter(fromRow(data));
       if (!error) return null;
     } catch (err) {
       console.warn('[Scooters] Single fetch failed:', err.message);
@@ -173,9 +181,11 @@ export async function uploadScooterImage(file, scooterId) {
         const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
         return data.publicUrl;
       }
-      console.warn('[Storage] Upload failed, falling back to base64:', error.message);
+      console.warn('[Storage] Upload failed:', error.message);
+      throw new Error(error.message || 'Image upload failed');
     } catch (e) {
-      console.warn('[Storage] Upload exception, falling back to base64:', e);
+      console.warn('[Storage] Upload exception:', e);
+      throw e instanceof Error ? e : new Error('Image upload failed');
     }
   }
   return new Promise((resolve, reject) => {

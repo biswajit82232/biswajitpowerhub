@@ -18,22 +18,17 @@ async function upsertLead({ name, phone, source, scooter }) {
   const leadScore = Math.max(score, rawScore);
 
   if (isSupabaseConfigured && supabase) {
-    try {
-      await supabase.from('leads').upsert(
-        {
-          visitor_id: visitorId,
-          name,
-          phone,
-          last_source: source,
-          interested_scooter: scooter || null,
-          score: leadScore,
-          classification,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'visitor_id' }
-      );
-    } catch {
-      /* ignore */
+    const { error } = await supabase.rpc('upsert_lead', {
+      p_visitor_id: visitorId,
+      p_name: name,
+      p_phone: phone,
+      p_last_source: source,
+      p_interested_scooter: scooter || null,
+      p_score: leadScore,
+      p_classification: classification,
+    });
+    if (error) {
+      console.warn('[Leads] upsert_lead failed:', error.message);
     }
   }
   return { readinessPercent, score: leadScore, classification };

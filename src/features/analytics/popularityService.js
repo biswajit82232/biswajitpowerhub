@@ -29,11 +29,13 @@ function normalizeEvent(row) {
 
 export async function fetchRawEvents(limit = 8000) {
   if (isSupabaseConfigured && supabase) {
-    const { data } = await supabase
-      .from('lead_events')
-      .select('event_type, meta, created_at, visitor_id')
-      .order('created_at', { ascending: false })
-      .limit(limit);
+    const { data, error } = await supabase.rpc('get_analytics_events', {
+      p_limit: limit,
+    });
+    if (error) {
+      console.warn('[Analytics] get_analytics_events failed:', error.message);
+      return localEvents().map(normalizeEvent);
+    }
     return (data || []).map(normalizeEvent);
   }
   return localEvents().map(normalizeEvent);

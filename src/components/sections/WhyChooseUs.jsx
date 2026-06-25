@@ -46,7 +46,7 @@ const ITEMS = [
   {
     icon: Wallet,
     title: 'Low Running Cost',
-    desc: 'Spend a fraction of petrol costs — as low as ₹0.18 per kilometre.',
+    desc: 'Spend a fraction of petrol costs — remarkably low per kilometre.',
     gradient: 'from-amber-500 to-orange-500',
     glow: 'rgba(245,158,11,0.18)',
     bg: 'from-amber-50/80 to-orange-50/40',
@@ -107,7 +107,7 @@ const ITEMS = [
   {
     icon: Wallet,
     title: 'Low Running Cost',
-    desc: 'Spend a fraction of petrol costs — as low as ₹0.18 per kilometre.',
+    desc: 'Spend a fraction of petrol costs — remarkably low per kilometre.',
     gradient: 'from-amber-500 to-orange-500',
     glow: 'rgba(245,158,11,0.18)',
     bg: 'from-amber-50/80 to-orange-50/40',

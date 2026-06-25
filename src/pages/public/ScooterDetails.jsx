@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate, useSearchParams } from 'react-router-dom';
 import {
   BatteryCharging, Gauge, Timer, ShieldCheck, Cpu, Weight, Users, Palette,
   Check, MessageCircle, CalendarCheck, ChevronLeft, Sparkles,
@@ -9,22 +9,27 @@ import { Reveal } from '@/components/common/Reveal';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { PageLoader } from '@/components/ui/Loading';
+import { RouteLoader } from '@/components/ui/Loading';
+import { ScooterDetailsSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ScooterGallery } from '@/features/scooters/ScooterGallery';
 import { PremiumPerksStrip } from '@/components/sections/PremiumPerks';
 import { EMICalculator } from '@/features/emi/EMICalculator';
 import { TestRideForm } from '@/features/leads/TestRideForm';
+import { VariantSelector } from '@/features/scooters/VariantSelector';
 import { getScooterById, getScooters } from '@/features/scooters/scooterService';
 import { getScooterInsights } from '@/features/analytics/popularityService';
 import { useFinance } from '@/context/FinanceSettingsContext';
 import { getAllValueBadges } from '@/lib/valueBadges';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
+import { getScooterVariants, withVariant, hasVariants } from '@/lib/scooterVariants';
+import { resolveLegacyScooterId } from '@/lib/legacyScooters';
 import { STOCK_LABELS } from '@/data/scooters';
 import { whatsappUrl, SITE_URL, batteryUpgradeWhatsappMessage } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
+import { scrollToTop } from '@/components/common/ScrollToTop';
 
 function Spec({ icon: Icon, label, value }) {
   return (
@@ -42,7 +47,22 @@ function Spec({ icon: Icon, label, value }) {
 
 export default function ScooterDetails() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const legacy = resolveLegacyScooterId(id);
+
+  if (legacy !== undefined) {
+    if (legacy === null) return <Navigate to="/scooters" replace />;
+    const variant = searchParams.get('variant') || legacy.variant;
+    const q = variant ? `?variant=${variant}` : '';
+    return <Navigate to={`/scooters/${legacy.id}${q}`} replace />;
+  }
+
+  return <ScooterDetailsPage id={id} initialVariantId={searchParams.get('variant')} />;
+}
+
+function ScooterDetailsPage({ id, initialVariantId }) {
   const { site } = useSite();
+  const [, setSearchParams] = useSearchParams();
   const { data: scooter, loading } = useAsync(() => getScooterById(id), [id]);
   const { settings } = useFinance();
   const { data: insights } = useAsync(async () => {
@@ -50,13 +70,49 @@ export default function ScooterDetails() {
     return getScooterInsights(all);
   }, []);
   const [testRideOpen, setTestRideOpen] = useState(false);
+  const [variantId, setVariantId] = useState(null);
+
+  useEffect(() => {
+    scrollToTop();
+  }, [id]);
+
+  useEffect(() => {
+    if (scooter) {
+      const variants = getScooterVariants(scooter);
+      const preferred = initialVariantId && variants.some((v) => v.id === initialVariantId)
+        ? initialVariantId
+        : variants[0]?.id;
+      setVariantId(preferred ?? null);
+    }
+  }, [scooter?.id, initialVariantId]);
+
+  const display = scooter ? withVariant(scooter, variantId) : null;
+
+  const handleVariantChange = (nextId) => {
+    setVariantId(nextId);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (nextId) next.set('variant', nextId);
+        else next.delete('variant');
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   useEffect(() => {
     if (scooter) trackEvent(EVENT.SCOOTER_VIEW, { scooterId: scooter.id, name: scooter.name });
   }, [scooter]);
 
-  if (loading) return <PageLoader label="Loading scooter" />;
-  if (!scooter) {
+  if (loading) {
+    return (
+      <RouteLoader label="Loading scooter">
+        <ScooterDetailsSkeleton />
+      </RouteLoader>
+    );
+  }
+  if (!scooter || !display) {
     return (
       <div className="container-px py-20">
         <EmptyState
@@ -73,7 +129,9 @@ export default function ScooterDetails() {
   const popularityTags = [];
   if (insights?.popularWeekIds?.has?.(scooter.id)) popularityTags.push({ label: '🔥 Trending this week', tone: 'hot' });
   if (insights?.topIntentMonthIds?.has?.(scooter.id)) popularityTags.push({ label: '⭐ Top pick this month', tone: 'warm' });
-  const waMessage = `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${formatINR(scooter.price)}). Please share more details.`;
+  const waMessage = display.selectedVariant
+    ? `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} — ${display.selectedVariant.name} (${formatINR(display.price)}). Please share more details.`
+    : `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${formatINR(display.price)}). Please share more details.`;
   const batteryUpgradeWaMessage = batteryUpgradeWhatsappMessage(scooter.name);
 
   const productSchema = {
@@ -85,16 +143,29 @@ export default function ScooterDetails() {
     image: scooter.images?.[0] || `${SITE_URL}/logo-512.png`,
     brand: { '@type': 'Brand', name: scooter.brand },
     description: scooter.description,
-    offers: {
-      '@type': 'Offer',
-      url: `${SITE_URL}/scooters/${scooter.id}`,
-      price: scooter.price,
-      priceCurrency: 'INR',
-      availability:
-        scooter.stock === 'out_of_stock'
-          ? 'https://schema.org/OutOfStock'
-          : 'https://schema.org/InStock',
-    },
+    offers: hasVariants(scooter)
+      ? {
+          '@type': 'AggregateOffer',
+          url: `${SITE_URL}/scooters/${scooter.id}`,
+          priceCurrency: 'INR',
+          lowPrice: Math.min(...getScooterVariants(scooter).map((v) => v.price)),
+          highPrice: Math.max(...getScooterVariants(scooter).map((v) => v.price)),
+          offerCount: getScooterVariants(scooter).length,
+          availability:
+            scooter.stock === 'out_of_stock'
+              ? 'https://schema.org/OutOfStock'
+              : 'https://schema.org/InStock',
+        }
+      : {
+          '@type': 'Offer',
+          url: `${SITE_URL}/scooters/${scooter.id}`,
+          price: display.price,
+          priceCurrency: 'INR',
+          availability:
+            scooter.stock === 'out_of_stock'
+              ? 'https://schema.org/OutOfStock'
+              : 'https://schema.org/InStock',
+        },
   };
 
   return (
@@ -127,13 +198,53 @@ export default function ScooterDetails() {
             <p className="mt-1 break-words text-base text-muted">{scooter.tagline}</p>
 
             <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
-              <span className="break-words font-display text-3xl font-extrabold text-heading sm:text-4xl">{formatINR(scooter.price)}</span>
-              <span className="pb-1 text-sm text-muted">on-road price</span>
+              <span className="break-words font-display text-3xl font-extrabold text-heading sm:text-4xl">{formatINR(display.price)}</span>
+              <span className="pb-1 text-sm text-muted">on-road price{display.selectedVariant ? ` · ${display.selectedVariant.name}` : ''}</span>
             </div>
+
+            <VariantSelector scooter={scooter} selectedId={variantId} onChange={handleVariantChange} />
 
             <p className="mt-5 break-words leading-relaxed text-body">{scooter.description}</p>
 
             <PremiumPerksStrip />
+
+            {/* Battery upgrade */}
+            <div className="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-50 via-white to-accent-50 p-5 ring-1 ring-brand-100 sm:p-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-card sm:h-11 sm:w-11">
+                  <BatteryCharging className="h-5 w-5" strokeWidth={2.2} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display text-base font-bold text-heading sm:text-lg">Want more range?</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-body">
+                    Increase mileage with a higher AH battery — custom modifications tailored to your daily riding needs.
+                  </p>
+                  <ul className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                    {[
+                      'Higher AH battery options',
+                      'Custom modification available',
+                      'Extended range on the same model',
+                      'Expert fitting at our showroom',
+                    ].map((item) => (
+                      <li key={item} className="flex items-start gap-2 text-xs text-body sm:text-sm">
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" strokeWidth={2.5} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    href={whatsappUrl(batteryUpgradeWaMessage, site)}
+                    variant="whatsapp"
+                    size="md"
+                    icon={MessageCircle}
+                    className="mt-4"
+                    onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'battery-upgrade', scooterId: scooter.id })}
+                  >
+                    Contact us to know more
+                  </Button>
+                </div>
+              </div>
+            </div>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button
@@ -153,10 +264,10 @@ export default function ScooterDetails() {
 
             {/* Quick specs */}
             <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Spec icon={BatteryCharging} label="Range" value={`${scooter.range} km`} />
-              <Spec icon={Gauge} label="Top speed" value={`${scooter.topSpeed} km/h`} />
-              <Spec icon={Timer} label="Charging time" value={scooter.chargingTime} />
-              <Spec icon={ShieldCheck} label="Warranty" value={scooter.warranty} />
+              <Spec icon={BatteryCharging} label="Range" value={`${display.range} km`} />
+              <Spec icon={Gauge} label="Top speed" value={`${display.topSpeed} km/h`} />
+              <Spec icon={Timer} label="Charging time" value={display.chargingTime} />
+              <Spec icon={ShieldCheck} label="Warranty" value={display.warranty} />
             </div>
           </Reveal>
         </div>
@@ -166,53 +277,18 @@ export default function ScooterDetails() {
           <div className="order-2 min-w-0 lg:order-1 lg:col-span-3">
             <h2 className="break-words font-display text-display-md font-bold text-heading">Specifications</h2>
             <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <Spec icon={BatteryCharging} label="Battery type" value={scooter.batteryType} />
-              <Spec icon={Cpu} label="Battery capacity" value={scooter.batteryCapacity} />
-              <Spec icon={Gauge} label="Range" value={`${scooter.range} km`} />
-              <Spec icon={Gauge} label="Top speed" value={`${scooter.topSpeed} km/h`} />
-              <Spec icon={Timer} label="Charging" value={scooter.chargingTime} />
-              <Spec icon={Cpu} label="Motor" value={scooter.motor} />
-              <Spec icon={Weight} label="Weight" value={scooter.weight} />
-              <Spec icon={Users} label="Load capacity" value={scooter.loadCapacity} />
-              <Spec icon={ShieldCheck} label="Warranty" value={scooter.warranty} />
-            </div>
-
-            {/* Battery upgrade */}
-            <div className="mt-8 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-50 via-white to-accent-50 p-6 ring-1 ring-brand-100 sm:p-7">
-              <div className="flex items-start gap-4">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-card">
-                  <BatteryCharging className="h-6 w-6" strokeWidth={2.2} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-display text-lg font-bold text-heading">Want more range?</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-body">
-                    You can increase the mileage on this scooter with a more powerful AH battery. We offer custom battery modifications tailored to your daily riding needs — so you go farther on every charge.
-                  </p>
-                  <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {[
-                      'Higher AH battery options',
-                      'Custom modification available',
-                      'Extended range on the same model',
-                      'Expert fitting at our showroom',
-                    ].map((item) => (
-                      <li key={item} className="flex items-start gap-2 text-sm text-body">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" strokeWidth={2.5} />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    href={whatsappUrl(batteryUpgradeWaMessage, site)}
-                    variant="whatsapp"
-                    size="md"
-                    icon={MessageCircle}
-                    className="mt-5"
-                    onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'battery-upgrade', scooterId: scooter.id })}
-                  >
-                    Contact us to know more
-                  </Button>
-                </div>
-              </div>
+              <Spec icon={BatteryCharging} label="Battery type" value={display.batteryType} />
+              {display.batteryWarranty && (
+                <Spec icon={ShieldCheck} label="Battery warranty" value={display.batteryWarranty} />
+              )}
+              <Spec icon={Cpu} label="Battery capacity" value={display.batteryCapacity} />
+              <Spec icon={Gauge} label="Range" value={`${display.range} km`} />
+              <Spec icon={Gauge} label="Top speed" value={`${display.topSpeed} km/h`} />
+              <Spec icon={Timer} label="Charging" value={display.chargingTime} />
+              <Spec icon={Cpu} label="Motor" value={display.motor} />
+              <Spec icon={Weight} label="Weight" value={display.weight} />
+              <Spec icon={Users} label="Load capacity" value={display.loadCapacity} />
+              <Spec icon={ShieldCheck} label="Warranty" value={display.warranty} />
             </div>
 
             {/* Colors */}
@@ -269,7 +345,7 @@ export default function ScooterDetails() {
           {/* EMI — shown before full specs on mobile */}
           <div className="order-1 min-w-0 lg:order-2 lg:col-span-2">
             <div className="lg:sticky lg:top-[calc(var(--header-offset)+1.5rem)] lg:self-start">
-              <EMICalculator price={scooter.price} settings={settings} scooterId={scooter.id} />
+              <EMICalculator price={display.price} settings={settings} scooterId={scooter.id} />
             </div>
           </div>
         </div>
@@ -279,7 +355,7 @@ export default function ScooterDetails() {
         <p className="mb-4 text-sm text-muted">
           Ride the <span className="font-semibold text-heading">{scooter.name}</span> at our {site.address.city} showroom.
         </p>
-        <TestRideForm scooter={scooter} onSuccess={() => setTimeout(() => setTestRideOpen(false), 2500)} />
+        <TestRideForm scooter={display} onSuccess={() => setTimeout(() => setTestRideOpen(false), 2500)} />
       </Modal>
     </>
   );

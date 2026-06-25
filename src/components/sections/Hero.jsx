@@ -4,13 +4,7 @@ import { ScooterImage } from '@/components/common/ScooterImage';
 import { SITE, whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
-
-const STATS = [
-  { value: '120 km', label: 'Max range' },
-  { value: '₹0.18', label: 'Per km cost' },
-  { value: '0 RTO', label: 'Paperwork*' },
-  { value: '4 hrs', label: 'Full charge' },
-];
+import { formatCostPerKm } from '@/lib/catalogStats';
 
 const CHIPS = [
   { icon: Wrench, label: '3 Free Servicing', color: 'text-rose-600' },
@@ -22,8 +16,20 @@ const CHIPS = [
 /** Stagger delay utility — GPU-only CSS animation */
 const d = (ms) => ({ animationDelay: `${ms}ms` });
 
-export function Hero({ heroImageUrl }) {
+/** Marketing copy on hero — not tied to live catalog max */
+const HERO_MAX_RANGE_KM = 120;
+
+export function Hero({ heroImageUrl, catalogStats }) {
   const { site } = useSite();
+  const costPerKm = formatCostPerKm(catalogStats?.minCostPerKm ?? 0.2);
+  const chargeLabel = catalogStats?.chargingLabel ?? '4–6 hrs';
+
+  const stats = [
+    { value: `${HERO_MAX_RANGE_KM} km`, label: 'Max range' },
+    { value: costPerKm, label: 'From per km' },
+    { value: '0 RTO', label: 'Paperwork*' },
+    { value: chargeLabel, label: 'Full charge' },
+  ];
 
   return (
     <section className="relative overflow-x-clip">
@@ -127,7 +133,7 @@ export function Hero({ heroImageUrl }) {
                 </span>
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">Up to</p>
-                  <p className="font-display text-lg font-extrabold text-heading">120 km range</p>
+                  <p className="font-display text-lg font-extrabold text-heading">{HERO_MAX_RANGE_KM} km range</p>
                 </div>
               </div>
             </div>
@@ -139,7 +145,7 @@ export function Hero({ heroImageUrl }) {
                 </span>
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">Cost</p>
-                  <p className="font-display text-sm font-extrabold text-heading">₹0.18/km</p>
+                  <p className="font-display text-sm font-extrabold text-heading">{costPerKm}/km</p>
                 </div>
               </div>
             </div>
@@ -151,7 +157,7 @@ export function Hero({ heroImageUrl }) {
       <div className="relative border-t border-brand-100/60 bg-gradient-to-r from-brand-50/80 via-cyan-50/60 to-teal-50/80">
         <div className="container-px">
           <div className="grid grid-cols-2 divide-x divide-brand-100/60 sm:grid-cols-4">
-            {STATS.map(({ value, label }, i) => (
+            {stats.map(({ value, label }, i) => (
               <div
                 key={label}
                 className="flex animate-hero-rise flex-col items-center gap-0.5 px-2 py-4 text-center sm:px-4 sm:py-5"

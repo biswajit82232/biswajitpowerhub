@@ -33,7 +33,9 @@ export function TestRideForm({ scooter, onSuccess }) {
     try {
       await submitTestRide({
         ...form,
-        scooter: scooter?.name,
+        scooter: scooter?.selectedVariant
+          ? `${scooter.name} — ${scooter.selectedVariant.name}`
+          : scooter?.name,
         scooterId: scooter?.id,
       });
       setDone(true);

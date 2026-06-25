@@ -32,8 +32,8 @@ export const REVIEWS = [
     name: 'Amit Pramanik',
     rating: 4,
     review:
-      'Dubble Light replaced my old petrol scooter. Getting 55–60 km regularly, running cost is peanuts. Minus one star only because I wanted a longer charging cable — otherwise showroom was very helpful.',
-    scooter: 'Dubble Light',
+      'Double Light replaced my old petrol scooter. Getting 55–60 km regularly, running cost is peanuts. Minus one star only because I wanted a longer charging cable — otherwise showroom was very helpful.',
+    scooter: 'Double Light',
     photo: '',
     status: 'approved',
     featured: false,
@@ -44,8 +44,8 @@ export const REVIEWS = [
     name: 'Moumita Ghosh',
     rating: 5,
     review:
-      'Ceeon BMW range is serious — they claim 120 km and I got close on a long run towards Murshidabad and back. Feels planted on highway stretches. Worth the ₹75,000 if you travel far often.',
-    scooter: 'Ceeon BMW',
+      'Went with the Activa Lithium Pro for long trips towards Murshidabad — got close to 95 km on a careful run. Feels planted and worth the upgrade if you travel far often.',
+    scooter: 'Activa',
     photo: '',
     status: 'approved',
     featured: true,
@@ -56,7 +56,7 @@ export const REVIEWS = [
     name: 'Sayan Mondal',
     rating: 5,
     review:
-      'Test rode Activa, OLA and Zoom before deciding. Zoom felt best for my daily Lalbagh office run — 70 km range, smooth pickup. Staff never rushed us, answered every silly question.',
+      'Test rode Activa and Zoom before deciding. Zoom felt best for my daily Lalbagh office run — 70 km range on Standard, smooth pickup. Staff never rushed us, answered every silly question.',
     scooter: 'Zoom',
     photo: '',
     status: 'approved',
@@ -68,8 +68,8 @@ export const REVIEWS = [
     name: 'Priya Banerjee',
     rating: 5,
     review:
-      'Took the OLA — looks premium and rides quiet. We worked out fuel vs electric: husband’s bike was ₹70–80/day, this is maybe ₹15–20 charging at home. Very happy with the purchase.',
-    scooter: 'OLA',
+      'Took the Zoom Lithium Pro — looks premium and rides quiet. We worked out fuel vs electric: husband’s bike was ₹70–80/day, this is maybe ₹15–20 charging at home. Very happy with the purchase.',
+    scooter: 'Zoom',
     photo: '',
     status: 'approved',
     featured: true,
@@ -80,8 +80,8 @@ export const REVIEWS = [
     name: 'Arindam Roy',
     rating: 5,
     review:
-      'Bought Dubble Light for shop errands around town. Light, easy in narrow lanes, 60 km is plenty for the whole day. Honest pricing at Biswajit Power Hub — already sent two neighbours here.',
-    scooter: 'Dubble Light',
+      'Bought Double Light for shop errands around town. Light, easy in narrow lanes, 60 km is plenty for the whole day. Honest pricing at Biswajit Power Hub — already sent two neighbours here.',
+    scooter: 'Double Light',
     photo: '',
     status: 'approved',
     featured: false,

@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { ArrowRight, PhoneCall, Sparkles } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Section, SectionHeading } from '@/components/common/Section';
@@ -23,6 +22,7 @@ import { useFinance } from '@/context/FinanceSettingsContext';
 import { SITE, SITE_URL } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { openingHoursSchema } from '@/lib/schemaHelpers';
+import { computeCatalogStats } from '@/lib/catalogStats';
 
 /** Decorative gradient divider between sections */
 function GradientDivider({ flip = false }) {
@@ -66,6 +66,10 @@ export default function Home() {
     () => (allScooters?.length ? getScooterInsights(allScooters) : Promise.resolve(null)),
     [allScooters?.length],
   );
+  const catalogStats = useMemo(
+    () => computeCatalogStats(allScooters || []),
+    [allScooters],
+  );
   const reviewAvg = reviews?.length
     ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)
     : null;
@@ -78,7 +82,7 @@ export default function Home() {
         jsonLd={localBusinessSchema}
       />
 
-      <Hero heroImageUrl={financeSettings?.heroImageUrl} />
+      <Hero heroImageUrl={financeSettings?.heroImageUrl} catalogStats={catalogStats} />
 
       <PromotionalOffers />
 
@@ -111,7 +115,18 @@ export default function Home() {
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
           {scootersLoading
             ? Array.from({ length: 3 }).map((_, i) => <ScooterCardSkeleton key={i} />)
-            : featured?.map((s, i) => <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />)}
+            : featured?.length
+              ? featured.map((s, i) => (
+                <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />
+              ))
+              : (
+                <div className="col-span-full rounded-2xl bg-surface-alt px-6 py-10 text-center text-sm text-muted ring-1 ring-line">
+                  Browse our full range of electric scooters.{' '}
+                  <Button to="/scooters" variant="ghost" size="sm" className="inline-flex px-1">
+                    View all models
+                  </Button>
+                </div>
+              )}
         </div>
 
         <div className="mt-8 text-center sm:hidden">
