@@ -3,9 +3,16 @@
  * Loads deferred after first paint to protect performance.
  */
 
-export const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || '';
+export const GA_MEASUREMENT_ID =
+  import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || 'G-2971LBJ2NV';
 
 export const isGoogleAnalyticsConfigured = Boolean(GA_MEASUREMENT_ID);
+
+/** True when gtag was loaded from index.html (avoid duplicate first page_view). */
+export function isGtagLoadedFromHtml() {
+  return typeof document !== 'undefined'
+    && Boolean(document.querySelector('script[src*="googletagmanager.com/gtag/js"]'));
+}
 
 let initStarted = false;
 
@@ -28,10 +35,12 @@ function loadGtagScript() {
   document.head.appendChild(script);
 }
 
-/** Initialise GA once — deferred until browser is idle */
+/** Initialise GA once — skips if index.html already loaded gtag.js */
 export function initGoogleAnalytics() {
   if (!isGoogleAnalyticsConfigured || initStarted || typeof window === 'undefined') return;
   initStarted = true;
+
+  if (window.gtag) return;
 
   const start = () => loadGtagScript();
   if ('requestIdleCallback' in window) {
