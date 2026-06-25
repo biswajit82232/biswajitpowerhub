@@ -94,7 +94,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface/90 px-3 py-2.5 backdrop-blur-xl lg:hidden">
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface px-3 py-2.5 lg:hidden">
         <Logo compact />
         <button onClick={() => setOpen(true)} className="tap-target rounded-xl p-2 text-heading" aria-label="Open menu">
           <Menu className="h-5 w-5" />
@@ -104,7 +104,7 @@ export default function AdminLayout() {
       <AnimatePresence>
         {open && (
           <div className="fixed inset-0 z-50 lg:hidden">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-heading/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-heading/45" onClick={() => setOpen(false)} />
             <motion.aside
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}

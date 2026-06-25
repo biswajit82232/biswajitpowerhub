@@ -81,7 +81,7 @@ export function Modal({ open, onClose, title, children, className, size = 'md' }
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-heading/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-heading/50 max-lg:bg-heading/55 lg:backdrop-blur-sm"
             aria-hidden
           />
           <motion.div
@@ -103,7 +103,7 @@ export function Modal({ open, onClose, title, children, className, size = 'md' }
             )}
           >
             {(title || onClose) && (
-              <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line bg-surface/95 px-5 py-4 backdrop-blur sm:px-6">
+              <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line bg-surface px-5 py-4 sm:bg-surface/95 sm:backdrop-blur sm:px-6">
                 {title && (
                   <h3 id="modal-title" className="text-lg font-bold text-heading">
                     {title}

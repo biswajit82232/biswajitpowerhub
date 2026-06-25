@@ -217,7 +217,7 @@ export default function Home() {
 
           <div className="relative z-10 grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
             <Reveal className="text-white">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm ring-1 ring-white/20">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/25 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white ring-1 ring-white/20 sm:bg-white/15 sm:backdrop-blur-sm">
                 <PhoneCall className="h-3.5 w-3.5" /> Free Callback
               </span>
               <h2 className="mt-4 font-display text-display-md font-extrabold text-white">

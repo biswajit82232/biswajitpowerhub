@@ -147,12 +147,12 @@
     min-width: 44px;
   }
 
-  /* Glassmorphism card — backdrop-blur only on sm+ (too slow on low-end mobile) */
+  /* Glass cards — no backdrop-blur on touch devices (Android screenshots go black) */
   .glass {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.6);
   }
-  @media (min-width: 640px) {
+  @media (min-width: 640px) and (hover: hover) and (pointer: fine) {
     .glass {
       background: rgba(255, 255, 255, 0.72);
       backdrop-filter: blur(12px) saturate(160%);
@@ -160,10 +160,22 @@
     }
   }
   .glass-dark {
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    background: rgba(15, 23, 42, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .glass-dark {
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+    }
+  }
+
+  /* Marquee GPU layers — disable will-change on phones to avoid black captures */
+  @media (hover: none) and (pointer: coarse) {
+    .will-change-transform {
+      will-change: auto;
+    }
   }
 
   /* Gradient text — blue to teal */

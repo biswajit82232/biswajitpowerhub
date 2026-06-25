@@ -37,7 +37,8 @@ export function Navbar() {
     <header
       className={cn(
         'fixed inset-x-0 top-0 z-50 w-full border-b transition-shadow duration-300 ease-premium',
-        'bg-surface/95 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/90',
+        /* Solid bg on mobile — backdrop-blur causes black screenshots on many Android devices */
+        'bg-surface lg:bg-surface/95 lg:backdrop-blur-xl',
         'pt-[env(safe-area-inset-top,0px)]',
         scrolled ? 'border-line/80 shadow-soft' : 'border-line/60',
       )}
@@ -104,7 +105,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 top-[var(--header-offset)] z-40 bg-heading/30 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 top-[var(--header-offset)] z-40 bg-heading/40 lg:hidden"
               onClick={() => setOpen(false)}
             />
             <motion.div
