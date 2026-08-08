@@ -128,3 +128,28 @@ export const SCOOTER_SEO = {
       'Sporty Zoom e-scooter available in Berhampore. No licence required. Low running cost. Test ride today at Chunakhali.',
   },
 };
+
+/** Stable product identifier for schema / inventory (e.g. BPH-ACTIVA) */
+export function productSku(scooterId) {
+  return `BPH-${String(scooterId || '').toUpperCase().replace(/-/g, '_')}`;
+}
+
+/**
+ * AggregateRating from approved reviews for a scooter display name.
+ * Returns null when there are fewer than 1 matching reviews (omit from schema).
+ */
+export function productAggregateRating(reviews, scooterName) {
+  if (!Array.isArray(reviews) || !scooterName) return null;
+  const matched = reviews.filter(
+    (r) => r?.scooter && String(r.scooter).toLowerCase() === String(scooterName).toLowerCase(),
+  );
+  if (!matched.length) return null;
+  const sum = matched.reduce((a, r) => a + Number(r.rating || 0), 0);
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: (sum / matched.length).toFixed(1),
+    bestRating: '5',
+    worstRating: '1',
+    reviewCount: String(matched.length),
+  };
+}

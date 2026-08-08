@@ -10,12 +10,20 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { SEO_READY_SCOOTER_IDS } from '../src/data/seoReady.js';
+import { SCOOTERS } from '../src/data/scooters.js';
+import { REVIEWS } from '../src/data/reviews.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DIST = join(ROOT, 'dist');
 const BASE = (process.env.VITE_SITE_URL || 'https://biswajitpowerhub.in').replace(/\/$/, '');
 const SEO_READY = new Set(SEO_READY_SCOOTER_IDS);
+const GSC_VERIFICATION = (
+  process.env.VITE_GOOGLE_SITE_VERIFICATION ||
+  process.env.VITE_GSC_VERIFICATION ||
+  ''
+).trim();
+const CATALOG = Object.fromEntries(SCOOTERS.map((s) => [s.id, s]));
 
 const SCOOTER_SEO = {
   activa: {
@@ -43,6 +51,25 @@ const SCOOTER_SEO = {
     name: 'Zoom Electric Scooter',
   },
 };
+
+function skuFor(id) {
+  return `BPH-${String(id).toUpperCase().replace(/-/g, '_')}`;
+}
+
+function ratingForScooter(displayName) {
+  const matched = REVIEWS.filter(
+    (r) => r.status === 'approved' && r.scooter?.toLowerCase() === displayName.toLowerCase(),
+  );
+  if (!matched.length) return null;
+  const sum = matched.reduce((a, r) => a + Number(r.rating || 0), 0);
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: (sum / matched.length).toFixed(1),
+    bestRating: '5',
+    worstRating: '1',
+    reviewCount: String(matched.length),
+  };
+}
 
 const ROUTES = [
   {
@@ -148,13 +175,13 @@ function humanizeId(id) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-async function fetchCatalogRows(table) {
+async function fetchCatalogRows(table, select = 'id,name') {
   const url = process.env.VITE_SUPABASE_URL;
   const key = process.env.VITE_SUPABASE_ANON_KEY;
   if (!url || !key) return [];
 
   try {
-    const res = await fetch(`${url}/rest/v1/${table}?select=id,name&order=name.asc`, {
+    const res = await fetch(`${url}/rest/v1/${table}?select=${encodeURIComponent(select)}&order=name.asc`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -164,6 +191,17 @@ async function fetchCatalogRows(table) {
     console.warn(`[fallback-prerender] Supabase ${table} fetch failed:`, e.message);
     return [];
   }
+}
+
+/** Live catalog images/prices keyed by scooter id (Supabase when available). */
+async function fetchScooterEnrichment() {
+  const rows = await fetchCatalogRows('scooters', 'id,name,price,images,variants');
+  const map = {};
+  for (const row of rows) {
+    if (!row?.id) continue;
+    map[row.id] = row;
+  }
+  return map;
 }
 
 async function buildNoindexCatalogRoutes() {
@@ -264,32 +302,68 @@ function localBusinessSchema() {
   };
 }
 
-function productSchema(name, path) {
+function productSchema(route, enrichment = {}) {
+  const id = route.productId;
+  const seed = CATALOG[id] || {};
+  const live = enrichment[id] || {};
+  const name = route.productName || live.name || seed.name || 'Electric Scooter';
+  const shortName = (seed.name || live.name || name).replace(/\s*Electric Scooter$/i, '');
+  const variants = Array.isArray(live.variants) && live.variants.length
+    ? live.variants
+    : seed.variants || [];
+  const prices = variants.map((v) => Number(v.price)).filter((n) => Number.isFinite(n) && n > 0);
+  const low = prices.length ? Math.min(...prices) : Number(live.price || seed.price) || 0;
+  const high = prices.length ? Math.max(...prices) : low;
+  const images = (Array.isArray(live.images) ? live.images : seed.images || []).filter(Boolean);
+  const rating = ratingForScooter(shortName);
+  const seller = {
+    '@type': 'LocalBusiness',
+    name: 'BISWAJIT POWER HUB',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Chunakhali Bus Stand, Nimtala',
+      addressLocality: 'Berhampore',
+      addressRegion: 'West Bengal',
+      postalCode: '742149',
+      addressCountry: 'IN',
+    },
+  };
+
+  const offers =
+    prices.length > 1
+      ? {
+          '@type': 'AggregateOffer',
+          url: canonicalFor(route.path),
+          priceCurrency: 'INR',
+          price: String(low),
+          lowPrice: String(low),
+          highPrice: String(high),
+          offerCount: String(prices.length),
+          availability: 'https://schema.org/InStock',
+          seller,
+        }
+      : {
+          '@type': 'Offer',
+          url: canonicalFor(route.path),
+          priceCurrency: 'INR',
+          price: String(low || high || 0),
+          availability: 'https://schema.org/InStock',
+          seller,
+        };
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name,
-    image: `${BASE}/logo-512.png`,
-    description: `Premium low-speed electric scooter available at Biswajit Power Hub, Berhampore.`,
-    brand: { '@type': 'Brand', name: 'PowerHub' },
-    offers: {
-      '@type': 'Offer',
-      url: canonicalFor(path),
-      priceCurrency: 'INR',
-      availability: 'https://schema.org/InStock',
-      seller: {
-        '@type': 'LocalBusiness',
-        name: 'BISWAJIT POWER HUB',
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: 'Chunakhali Bus Stand, Nimtala',
-          addressLocality: 'Berhampore',
-          addressRegion: 'West Bengal',
-          postalCode: '742149',
-          addressCountry: 'IN',
-        },
-      },
-    },
+    sku: skuFor(id),
+    mpn: id,
+    image: images.length ? images : [`${BASE}/og-image.png`],
+    description:
+      seed.description ||
+      `Premium low-speed ${name} available at Biswajit Power Hub, Berhampore. No licence required for eligible models.`,
+    brand: { '@type': 'Brand', name: seed.brand || 'PowerHub' },
+    ...(rating ? { aggregateRating: rating } : {}),
+    offers,
   };
 }
 
@@ -334,12 +408,12 @@ function faqSchema() {
   };
 }
 
-function schemasFor(route) {
+function schemasFor(route, enrichment = {}) {
   if (route.schema === 'none' || route.noindex) return [];
   const crumbs = breadcrumbSchema(route.path, route.h1 || route.title);
   if (route.schema === 'local') return [crumbs, localBusinessSchema()];
   if (route.schema === 'faq') return [crumbs, faqSchema()];
-  if (route.schema === 'product') return [crumbs, productSchema(route.productName, route.path)];
+  if (route.schema === 'product') return [crumbs, productSchema(route, enrichment)];
   return [crumbs];
 }
 
@@ -387,10 +461,26 @@ function injectMeta(html, route) {
     : 'index, follow, max-image-preview:large';
   out = out.replace('</head>', `    <meta name="robots" content="${robots}" />\n  </head>`);
 
+  // hreflang
+  out = out.replace(/<link\s+rel="alternate"\s+hreflang="[^"]*"\s+href="[^"]*"\s*\/?>\s*/gi, '');
+  out = out.replace(
+    '</head>',
+    `    <link rel="alternate" hreflang="en-IN" href="${url}" />\n    <link rel="alternate" hreflang="x-default" href="${url}" />\n  </head>`,
+  );
+
+  // Optional GSC verification (set VITE_GOOGLE_SITE_VERIFICATION in Vercel)
+  out = out.replace(/<meta\s+name="google-site-verification"\s+content="[^"]*"\s*\/?>\s*/gi, '');
+  if (GSC_VERIFICATION) {
+    out = out.replace(
+      '</head>',
+      `    <meta name="google-site-verification" content="${escapeHtml(GSC_VERIFICATION)}" />\n  </head>`,
+    );
+  }
+
   // Strip previous injected ld+json from fallback runs; keep GA scripts
   out = out.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/gi, '');
 
-  const scripts = schemasFor(route)
+  const scripts = schemasFor(route, route._enrichment || {})
     .map((s) => `    <script type="application/ld+json">${JSON.stringify(s)}</script>`)
     .join('\n');
   if (scripts) out = out.replace('</head>', `${scripts}\n  </head>`);
@@ -417,8 +507,12 @@ if (!existsSync(shellPath)) {
 }
 
 const shell = readFileSync(shellPath, 'utf8');
+const enrichment = await fetchScooterEnrichment();
 const catalogNoindex = await buildNoindexCatalogRoutes();
-const allRoutes = [...ROUTES, ...catalogNoindex];
+const allRoutes = [
+  ...ROUTES.map((r) => (r.schema === 'product' ? { ...r, _enrichment: enrichment } : r)),
+  ...catalogNoindex,
+];
 
 let count = 0;
 let noindexCount = 0;

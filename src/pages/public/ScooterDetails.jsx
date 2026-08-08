@@ -30,8 +30,15 @@ import { whatsappUrl, SITE_URL, batteryUpgradeWhatsappMessage } from '@/config/s
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { scrollToTop } from '@/components/common/ScrollToTop';
-import { breadcrumbList, localBusinessRef, SCOOTER_SEO } from '@/lib/schemaHelpers';
+import {
+  breadcrumbList,
+  localBusinessRef,
+  SCOOTER_SEO,
+  productSku,
+  productAggregateRating,
+} from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { getApprovedReviews } from '@/features/reviews/reviewService';
 
 function Spec({ icon: Icon, label, value }) {
   return (
@@ -66,6 +73,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   const { site } = useSite();
   const [, setSearchParams] = useSearchParams();
   const { data: scooter, loading } = useAsync(() => getScooterById(id), [id]);
+  const { data: reviews } = useAsync(() => getApprovedReviews(), []);
   const { settings } = useFinance();
   const { data: insights } = useAsync(async () => {
     const all = await getScooters();
@@ -137,6 +145,13 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   const batteryUpgradeWaMessage = batteryUpgradeWhatsappMessage(scooter.name);
 
   const seller = localBusinessRef(site);
+  const variants = getScooterVariants(scooter);
+  const lowPrice = hasVariants(scooter)
+    ? Math.min(...variants.map((v) => v.price))
+    : display.price;
+  const highPrice = hasVariants(scooter)
+    ? Math.max(...variants.map((v) => v.price))
+    : display.price;
   const offerBase = {
     url: `${SITE_URL}/scooters/${scooter.id}`,
     priceCurrency: 'INR',
@@ -146,27 +161,32 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         : 'https://schema.org/InStock',
     seller,
   };
+  const productImages = (scooter.images || []).filter(Boolean);
+  const aggregateRating = productAggregateRating(reviews, scooter.name);
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: `${scooter.name} Electric Scooter`,
-    sku: scooter.id,
+    sku: productSku(scooter.id),
+    mpn: scooter.id,
     url: `${SITE_URL}/scooters/${scooter.id}`,
-    image: scooter.images?.[0] || `${SITE_URL}/logo-512.png`,
-    brand: { '@type': 'Brand', name: scooter.brand || scooter.name },
+    image: productImages.length ? productImages : [`${SITE_URL}/og-image.png`],
+    brand: { '@type': 'Brand', name: scooter.brand || 'PowerHub' },
     description: scooter.description,
+    ...(aggregateRating ? { aggregateRating } : {}),
     offers: hasVariants(scooter)
       ? {
           '@type': 'AggregateOffer',
           ...offerBase,
-          lowPrice: Math.min(...getScooterVariants(scooter).map((v) => v.price)),
-          highPrice: Math.max(...getScooterVariants(scooter).map((v) => v.price)),
-          offerCount: getScooterVariants(scooter).length,
+          price: String(lowPrice),
+          lowPrice: String(lowPrice),
+          highPrice: String(highPrice),
+          offerCount: String(variants.length),
         }
       : {
           '@type': 'Offer',
           ...offerBase,
-          price: display.price,
+          price: String(display.price),
         },
   };
   const detailSeo = SCOOTER_SEO[scooter.id] || {

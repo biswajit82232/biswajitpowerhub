@@ -2,6 +2,10 @@ import { Helmet } from 'react-helmet-async';
 import { SITE, SITE_URL } from '@/config/site';
 
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
+const GSC_VERIFICATION =
+  import.meta.env.VITE_GOOGLE_SITE_VERIFICATION?.trim() ||
+  import.meta.env.VITE_GSC_VERIFICATION?.trim() ||
+  '';
 
 /**
  * Per-page SEO: title, description, canonical, OG/Twitter, optional JSON-LD.
@@ -34,8 +38,13 @@ export function SEO({
       <title>{fullTitle}</title>
       <meta name="description" content={desc} />
       <link rel="canonical" href={canonical} />
+      <link rel="alternate" hrefLang="en-IN" href={canonical} />
+      <link rel="alternate" hrefLang="x-default" href={canonical} />
       {!noindex && <meta name="robots" content="index, follow, max-image-preview:large" />}
       {noindex && <meta name="robots" content="noindex, nofollow" />}
+      {GSC_VERIFICATION ? (
+        <meta name="google-site-verification" content={GSC_VERIFICATION} />
+      ) : null}
 
       <meta property="og:site_name" content={SITE.name} />
       <meta property="og:locale" content="en_IN" />
