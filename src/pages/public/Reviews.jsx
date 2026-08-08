@@ -13,6 +13,7 @@ import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { getScooters } from '@/features/scooters/scooterService';
 import { breadcrumbList } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { SITE_URL } from '@/config/site';
 
 const PAGE_SIZE = 10;
 
@@ -46,6 +47,9 @@ export default function Reviews() {
         '@context': 'https://schema.org',
         '@type': 'LocalBusiness',
         name: 'BISWAJIT POWER HUB',
+        url: SITE_URL,
+        logo: `${SITE_URL}/logo-512.png`,
+        image: `${SITE_URL}/logo-512.png`,
         description: 'Electric scooter dealership in Berhampore, West Bengal',
         aggregateRating: {
           '@type': 'AggregateRating',

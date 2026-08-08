@@ -236,9 +236,10 @@ function localBusinessSchema() {
     '@id': `${BASE}/#dealership`,
     name: 'BISWAJIT POWER HUB',
     url: BASE,
-    image: `${BASE}/logo-512.png`,
+    logo: `${BASE}/logo-512.png`,
+    image: [`${BASE}/logo-512.png`, `${BASE}/og-image.png`],
     telephone: '+919635505436',
-    priceRange: '₹₹',
+    priceRange: 'INR',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Chunakhali Bus Stand, Nimtala',

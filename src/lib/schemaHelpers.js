@@ -44,6 +44,8 @@ export function localBusinessRef(site = SITE) {
     '@type': 'LocalBusiness',
     name: SITE.name,
     url: SITE_URL,
+    logo: `${SITE_URL}/logo-512.png`,
+    image: `${SITE_URL}/logo-512.png`,
     telephone: `+91${site.phones?.[0] || SITE.phones[0]}`,
     address: postalAddressSchema(site.address),
   };

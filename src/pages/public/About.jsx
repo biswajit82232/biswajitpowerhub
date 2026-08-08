@@ -31,6 +31,8 @@ export default function About() {
         '@id': `${SITE_URL}/#dealership`,
         name: SITE.name,
         url: `${SITE_URL}/about`,
+        logo: `${SITE_URL}/logo-512.png`,
+        image: `${SITE_URL}/logo-512.png`,
         description: SITE.description,
         telephone: site.phones.map((p) => `+91${p}`),
         address: postalAddressSchema(site.address),
