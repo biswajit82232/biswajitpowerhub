@@ -191,6 +191,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         image={scooter.images?.[0]}
         jsonLd={detailJsonLd}
         titleTemplate={false}
+        noindex={!SCOOTER_SEO[scooter.id]}
       />
 
       <div className="container-px min-w-0 pb-10 pt-6 sm:pb-14 sm:pt-10">

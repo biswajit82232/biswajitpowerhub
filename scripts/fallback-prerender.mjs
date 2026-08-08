@@ -2,15 +2,20 @@
  * Puppeteer-free SEO prerender fallback.
  * Copies dist/index.html into route folders and injects unique title/meta/canonical/JSON-LD/noscript.
  * Runs after vite build (+ optional puppeteer prerender). Safe to overwrite route HTML.
+ *
+ * Only ROUTES below get indexable SEO HTML. Extra Supabase catalog URLs get noindex stubs
+ * so crawlers never see the homepage shell as duplicate content.
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { SEO_READY_SCOOTER_IDS } from '../src/data/seoReady.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const DIST = join(ROOT, 'dist');
 const BASE = (process.env.VITE_SITE_URL || 'https://biswajitpowerhub.in').replace(/\/$/, '');
+const SEO_READY = new Set(SEO_READY_SCOOTER_IDS);
 
 const SCOOTER_SEO = {
   activa: {
@@ -119,7 +124,81 @@ const ROUTES = [
     h1: 'Privacy Policy',
     schema: 'crumbs',
   },
+  {
+    path: '/dealership',
+    title: 'Dealership Inquiry | Biswajit Power Hub',
+    description: 'Internal dealership inquiry page — not part of the public catalogue.',
+    h1: 'Dealership',
+    schema: 'none',
+    noindex: true,
+  },
+  {
+    path: '/updates',
+    title: 'Updates | Biswajit Power Hub',
+    description: 'Internal updates page — not part of the public catalogue.',
+    h1: 'Updates',
+    schema: 'none',
+    noindex: true,
+  },
 ];
+
+function humanizeId(id) {
+  return String(id)
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+async function fetchCatalogRows(table) {
+  const url = process.env.VITE_SUPABASE_URL;
+  const key = process.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) return [];
+
+  try {
+    const res = await fetch(`${url}/rest/v1/${table}?select=id,name&order=name.asc`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    return Array.isArray(rows) ? rows : [];
+  } catch (e) {
+    console.warn(`[fallback-prerender] Supabase ${table} fetch failed:`, e.message);
+    return [];
+  }
+}
+
+async function buildNoindexCatalogRoutes() {
+  const scooters = await fetchCatalogRows('scooters');
+  const accessories = await fetchCatalogRows('accessories');
+  const routes = [];
+
+  for (const row of scooters) {
+    if (!row?.id || SEO_READY.has(row.id)) continue;
+    const name = row.name || humanizeId(row.id);
+    routes.push({
+      path: `/scooters/${row.id}`,
+      title: `${name} Electric Scooter | Biswajit Power Hub, Berhampore`,
+      description: `${name} electric scooter details at Biswajit Power Hub, Berhampore. Contact the showroom for availability.`,
+      h1: name,
+      schema: 'none',
+      noindex: true,
+    });
+  }
+
+  for (const row of accessories) {
+    if (!row?.id) continue;
+    const name = row.name || humanizeId(row.id);
+    routes.push({
+      path: `/accessories/${row.id}`,
+      title: `${name} | Biswajit Power Hub`,
+      description: `${name} spare parts and accessories at Biswajit Power Hub, Berhampore.`,
+      h1: name,
+      schema: 'none',
+      noindex: true,
+    });
+  }
+
+  return routes;
+}
 
 function escapeHtml(s) {
   return String(s)
@@ -255,6 +334,7 @@ function faqSchema() {
 }
 
 function schemasFor(route) {
+  if (route.schema === 'none' || route.noindex) return [];
   const crumbs = breadcrumbSchema(route.path, route.h1 || route.title);
   if (route.schema === 'local') return [crumbs, localBusinessSchema()];
   if (route.schema === 'faq') return [crumbs, faqSchema()];
@@ -299,13 +379,20 @@ function injectMeta(html, route) {
   out = out.replace(/name="twitter:description"\s+content="[^"]*"/i, `name="twitter:description" content="${desc}"`);
   out = out.replace(/name="twitter:image"\s+content="[^"]*"/i, `name="twitter:image" content="${og}"`);
 
+  // Robots: replace existing or inject
+  out = out.replace(/<meta\s+name="robots"\s+content="[^"]*"\s*\/?>\s*/gi, '');
+  const robots = route.noindex
+    ? 'noindex, nofollow'
+    : 'index, follow, max-image-preview:large';
+  out = out.replace('</head>', `    <meta name="robots" content="${robots}" />\n  </head>`);
+
   // Strip previous injected ld+json from fallback runs; keep GA scripts
   out = out.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/gi, '');
 
   const scripts = schemasFor(route)
     .map((s) => `    <script type="application/ld+json">${JSON.stringify(s)}</script>`)
     .join('\n');
-  out = out.replace('</head>', `${scripts}\n  </head>`);
+  if (scripts) out = out.replace('</head>', `${scripts}\n  </head>`);
 
   const ns = noscriptBlock(route);
   if (/<div id="root">[\s\S]*?<\/div>/i.test(out)) {
@@ -328,18 +415,22 @@ if (!existsSync(shellPath)) {
   process.exit(1);
 }
 
-// Use a pristine shell: prefer the file Vite wrote before puppeteer overwrote root.
-// Puppeteer may have replaced index.html with a full render — still usable as shell.
 const shell = readFileSync(shellPath, 'utf8');
+const catalogNoindex = await buildNoindexCatalogRoutes();
+const allRoutes = [...ROUTES, ...catalogNoindex];
 
 let count = 0;
-for (const route of ROUTES) {
+let noindexCount = 0;
+for (const route of allRoutes) {
   const html = injectMeta(shell, route);
   const out = outPathFor(route.path);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html, 'utf8');
   count += 1;
-  console.log(`[fallback-prerender] ${route.path}`);
+  if (route.noindex) noindexCount += 1;
+  console.log(`[fallback-prerender] ${route.path}${route.noindex ? ' (noindex)' : ''}`);
 }
 
-console.log(`[fallback-prerender] wrote ${count} routes for ${BASE}`);
+console.log(
+  `[fallback-prerender] wrote ${count} routes for ${BASE} (${noindexCount} noindex stubs)`,
+);

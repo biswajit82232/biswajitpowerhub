@@ -53,11 +53,23 @@ export default function App() {
         <Route path="privacy" element={<Privacy />} />
         <Route
           path="dealership"
-          element={<InternalStub title="Dealership (internal)" heading="Dealership" path="/dealership" />}
+          element={
+            <InternalStub
+              title="Dealership Inquiry | Biswajit Power Hub"
+              heading="Dealership"
+              path="/dealership"
+            />
+          }
         />
         <Route
           path="updates"
-          element={<InternalStub title="Updates (internal)" heading="Updates" path="/updates" />}
+          element={
+            <InternalStub
+              title="Updates | Biswajit Power Hub"
+              heading="Updates"
+              path="/updates"
+            />
+          }
         />
         <Route path="*" element={<NotFound />} />
       </Route>

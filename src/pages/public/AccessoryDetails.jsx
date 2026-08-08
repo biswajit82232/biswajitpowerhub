@@ -77,10 +77,12 @@ export default function AccessoryDetails() {
   return (
     <>
       <SEO
-        title={accessory.name}
+        title={`${accessory.name} | Biswajit Power Hub`}
         description={accessory.description || `${accessory.name} — ${accessory.category} for electric scooters.`}
         path={`/accessories/${accessory.id}`}
         jsonLd={productSchema}
+        titleTemplate={false}
+        noindex
       />
 
       <div className="container-px py-6 sm:py-10">
