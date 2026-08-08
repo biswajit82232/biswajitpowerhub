@@ -1,0 +1,5 @@
+# Supabase CLI config — project ref from VITE_SUPABASE_URL
+project_id = "njismcewpiwjmotzwbkn"
+
+[db]
+major_version = 15
