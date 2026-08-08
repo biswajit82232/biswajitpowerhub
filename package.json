@@ -7,8 +7,9 @@
   "scripts": {
     "dev": "vite",
     "dev:http": "vite --mode http",
-    "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/prerender.mjs && node scripts/fallback-prerender.mjs",
+    "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/fallback-prerender.mjs",
     "prerender": "node scripts/prerender.mjs",
+    "prerender:browser": "node scripts/prerender.mjs && node scripts/fallback-prerender.mjs",
     "prerender:fallback": "node scripts/fallback-prerender.mjs",
     "brand-pngs": "node scripts/generate-brand-pngs.mjs",
     "preview": "vite preview",
@@ -37,7 +38,6 @@
     "eslint-plugin-react-refresh": "^0.4.11",
     "pg": "^8.13.1",
     "postcss": "^8.4.45",
-    "puppeteer": "^23.11.1",
     "tailwindcss": "^3.4.11",
     "vite": "^5.4.3"
   }

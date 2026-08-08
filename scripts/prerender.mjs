@@ -83,8 +83,11 @@ function outPathForRoute(route) {
 }
 
 async function main() {
-  if (process.env.SKIP_PRERENDER === '1') {
-    console.warn('[prerender] SKIP_PRERENDER=1 — skipping');
+  // Vercel build images lack Chrome system libs (libnss3, etc.) — use fallback-prerender.mjs instead
+  if (process.env.SKIP_PRERENDER === '1' || process.env.VERCEL === '1') {
+    console.warn(
+      '[prerender] skipping browser prerender on Vercel/CI — fallback-prerender.mjs handles SEO HTML',
+    );
     return;
   }
 
