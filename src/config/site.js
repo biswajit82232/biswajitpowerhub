@@ -58,11 +58,14 @@ export const CONTACT_DEFAULTS = {
       'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Bus+Stand+Nimtala+Berhampore+Murshidabad+742149&output=embed',
     staticImage:
       'https://maps.googleapis.com/maps/api/staticmap?center=24.0987,88.2519&zoom=15&size=800x400&markers=color:red%7C24.0987,88.2519&key=',
-    /** Set VITE_GOOGLE_PLACE_ID in env for a working “Write a Google review” link */
-    placeId: (import.meta.env.VITE_GOOGLE_PLACE_ID || '').trim(),
-    reviewLink: (import.meta.env.VITE_GOOGLE_PLACE_ID || '').trim()
-      ? `https://search.google.com/local/writereview?placeid=${String(import.meta.env.VITE_GOOGLE_PLACE_ID).trim()}`
-      : 'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore',
+    /** Set VITE_GOOGLE_PLACE_ID in env to override; default is live GBP listing */
+    placeId: (import.meta.env.VITE_GOOGLE_PLACE_ID || 'ChIJP_miqYx9-TkR9z1fb-iGyxI').trim(),
+    reviewLink: (() => {
+      const id = (import.meta.env.VITE_GOOGLE_PLACE_ID || 'ChIJP_miqYx9-TkR9z1fb-iGyxI').trim();
+      return id
+        ? `https://search.google.com/local/writereview?placeid=${id}`
+        : 'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore';
+    })(),
   },
   hours: { ...INITIAL_HOURS },
 };
