@@ -140,6 +140,7 @@ export default function Home() {
       <Hero heroImageUrl={financeSettings?.heroImageUrl} catalogStats={catalogStats} />
 
       <PromotionalOffers />
+      <GradientDivider />
       <PremiumPerks />
 
       <GradientDivider />
@@ -243,17 +244,16 @@ export default function Home() {
               Hours: {site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}. We do not sell online — call, WhatsApp,
               or get directions and meet us in person for a free test ride.
             </p>
-            <a
+            <Button
               href={site.maps.link}
-              target="_blank"
-              rel="noopener noreferrer"
+              variant="directions"
+              size="lg"
+              icon={MapPin}
+              className="mt-4"
               onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-map' })}
-              className="not-prose mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-7 py-3.5 text-base font-bold text-white"
-              style={{ backgroundColor: '#4285f4' }}
             >
-              <MapPin className="h-5 w-5" aria-hidden />
               Get Directions
-            </a>
+            </Button>
             <a
               href={site.maps.link}
               target="_blank"

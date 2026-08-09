@@ -48,14 +48,14 @@ export function Hero({ heroImageUrl, catalogStats }) {
             </span>
           </div>
 
-          <h1 className="mt-5 font-display text-display-md font-extrabold text-heading sm:text-display-lg">
+          <h1 className="mt-4 font-display text-display-md font-extrabold text-heading sm:mt-5 sm:text-display-lg">
             <span className="animate-hero-rise block" style={d(60)}>
               Biswajit Power Hub — Best Electric Scooter Dealer in Berhampore, Murshidabad
             </span>
           </h1>
 
           <p
-            className="mx-auto mt-5 max-w-xl animate-hero-rise text-base leading-relaxed text-body sm:text-lg lg:mx-0"
+            className="mx-auto mt-4 max-w-xl animate-hero-rise text-base leading-relaxed text-body sm:mt-5 sm:text-lg lg:mx-0"
             style={d(120)}
           >
             Premium Low-Speed Electric Scooters. No Licence. No Registration. Test Ride Today at
@@ -63,7 +63,7 @@ export function Hero({ heroImageUrl, catalogStats }) {
           </p>
 
           <div
-            className="mt-7 flex animate-hero-rise flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start"
+            className="mt-6 flex animate-hero-rise flex-col gap-3 sm:mt-7 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start"
             style={d(180)}
           >
             <Button
@@ -100,7 +100,7 @@ export function Hero({ heroImageUrl, catalogStats }) {
           </div>
 
           <div
-            className="mt-8 flex animate-hero-rise flex-wrap items-center justify-center gap-2.5 lg:justify-start"
+            className="mt-6 flex animate-hero-rise flex-wrap items-center justify-center gap-2.5 sm:mt-8 lg:justify-start"
             style={d(240)}
           >
             {CHIPS.map(({ icon: Icon, label, color }) => (
