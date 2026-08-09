@@ -13,7 +13,8 @@ import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { getScooters } from '@/features/scooters/scooterService';
 import { breadcrumbList, buildReviewedProductRef } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { SITE_URL } from '@/config/site';
+import { SITE_URL, GBP_RATING } from '@/config/site';
+import { REVIEWS as SEED_REVIEWS } from '@/data/reviews';
 
 const PAGE_SIZE = 10;
 
@@ -22,29 +23,35 @@ export default function Reviews() {
   const { data: scooters } = useAsync(() => getScooters(), []);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const avg = useMemo(() => {
-    if (!reviews?.length) return 0;
-    return reviews.reduce((a, r) => a + r.rating, 0) / reviews.length;
+  const displayReviews = useMemo(() => {
+    if (reviews?.length) return reviews;
+    return SEED_REVIEWS.filter((r) => r.status === 'approved');
   }, [reviews]);
 
+  const avg = useMemo(() => {
+    if (!displayReviews?.length) return GBP_RATING.ratingValue;
+    return displayReviews.reduce((a, r) => a + r.rating, 0) / displayReviews.length;
+  }, [displayReviews]);
+
   const visibleReviews = useMemo(
-    () => (reviews || []).slice(0, visibleCount),
-    [reviews, visibleCount]
+    () => (displayReviews || []).slice(0, visibleCount),
+    [displayReviews, visibleCount],
   );
 
-  const hasMore = (reviews?.length || 0) > visibleCount;
-  const remaining = Math.max(0, (reviews?.length || 0) - visibleCount);
+  const hasMore = (displayReviews?.length || 0) > visibleCount;
+  const remaining = Math.max(0, (displayReviews?.length || 0) - visibleCount);
 
   const reviewSchemas = useMemo(() => {
     const crumbs = breadcrumbList([
       { name: 'Home', path: '/' },
       { name: 'Reviews', path: '/reviews' },
     ]);
-    if (!reviews?.length) return [crumbs];
-
     const scooterByName = new Map(
       (scooters || []).map((s) => [String(s.name).toLowerCase(), s]),
     );
+    const list = displayReviews || [];
+    const ratingValue = list.length ? avg.toFixed(1) : String(GBP_RATING.ratingValue);
+    const reviewCount = list.length ? String(list.length) : String(GBP_RATING.reviewCount);
 
     return [
       crumbs,
@@ -58,34 +65,38 @@ export default function Reviews() {
         description: 'Electric scooter dealership in Berhampore, Murshidabad, West Bengal',
         aggregateRating: {
           '@type': 'AggregateRating',
-          ratingValue: avg.toFixed(1),
+          ratingValue,
           bestRating: '5',
           worstRating: '1',
-          reviewCount: String(reviews.length),
+          reviewCount,
         },
-        review: reviews.slice(0, 5).map((r) => ({
-          '@type': 'Review',
-          author: { '@type': 'Person', name: r.name },
-          datePublished: r.created_at || undefined,
-          reviewRating: {
-            '@type': 'Rating',
-            ratingValue: String(r.rating),
-            bestRating: '5',
-            worstRating: '1',
-          },
-          reviewBody: r.review,
-          ...(r.scooter
-            ? (() => {
-                const reviewed = buildReviewedProductRef(
-                  scooterByName.get(String(r.scooter).toLowerCase()),
-                );
-                return reviewed ? { itemReviewed: reviewed } : {};
-              })()
-            : {}),
-        })),
+        ...(list.length
+          ? {
+              review: list.slice(0, 5).map((r) => ({
+                '@type': 'Review',
+                author: { '@type': 'Person', name: r.name },
+                datePublished: r.created_at || undefined,
+                reviewRating: {
+                  '@type': 'Rating',
+                  ratingValue: String(r.rating),
+                  bestRating: '5',
+                  worstRating: '1',
+                },
+                reviewBody: r.review,
+                ...(r.scooter
+                  ? (() => {
+                      const reviewed = buildReviewedProductRef(
+                        scooterByName.get(String(r.scooter).toLowerCase()),
+                      );
+                      return reviewed ? { itemReviewed: reviewed } : {};
+                    })()
+                  : {}),
+              })),
+            }
+          : {}),
       },
     ];
-  }, [reviews, avg, scooters]);
+  }, [displayReviews, avg, scooters]);
 
   return (
     <>
@@ -97,7 +108,7 @@ export default function Reviews() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt/50">
+      <section className="border-b border-line bg-[#f5f5f5]/50">
         <div className="container-px py-12 sm:py-16">
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Reviews' }]} />
           <Reveal>
@@ -107,60 +118,50 @@ export default function Reviews() {
             <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
               Customer Reviews — Biswajit Power Hub, Berhampore
             </h1>
-            {reviews?.length > 0 && (
-              <div className="mt-4 flex items-center gap-3">
-                <Stars value={avg} size={22} />
-                <span className="font-display text-xl font-extrabold text-heading">{avg.toFixed(1)}</span>
-                <span className="text-sm text-muted">from {reviews.length} reviews</span>
-              </div>
-            )}
+            <p className="mt-3 max-w-2xl text-body">
+              Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single
+              Light, or Double Light at our Chunakhali showroom — no licence models, honest pricing, and
+              walk-in support.
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              <Stars value={Number(avg)} size={22} />
+              <span className="font-display text-xl font-extrabold text-heading">
+                {Number(avg).toFixed(1)}
+              </span>
+              <span className="text-sm text-muted">
+                from {displayReviews?.length || GBP_RATING.reviewCount} reviews
+              </span>
+            </div>
           </Reveal>
         </div>
       </section>
 
       <div className="container-px py-12">
-        {/* Form first — no sticky sidebar, avoids scroll overlap with long review lists */}
-        <Reveal className="mx-auto max-w-xl">
-          <div className="mb-6 rounded-2xl bg-brand-50 p-5 ring-1 ring-brand-100 sm:p-6">
-            <h2 className="font-display text-lg font-bold text-heading">Leave Us a Review on Google</h2>
-            <p className="mt-1 text-sm text-body">
-              Bought from our Chunakhali showroom? Your Google review helps other Berhampore riders find us.
-            </p>
-            <Button
-              href="https://www.google.com/search?q=Biswajit+Power+Hub+Berhampore"
-              variant="primary"
-              className="mt-4 min-h-11"
-              icon={Star}
-            >
-              Write a Google review
-            </Button>
-          </div>
-          <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-7">
-            <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-              <PenLine className="h-5 w-5 text-brand-500" /> Write a review
-            </h2>
-            <p className="mt-1 text-sm text-muted">Help others choose with confidence.</p>
-            <div className="mt-5">
-              <ReviewForm scooters={scooters || []} />
-            </div>
-          </div>
-        </Reveal>
+        <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
+          What Our Customers Say
+        </h2>
+        <p className="mt-4 max-w-3xl text-body">
+          From first-time EV buyers in Berhampore town to longer Murshidabad commuters, customers praise
+          free test rides, clear EMI guidance, battery upgrade options, and the convenience of a showroom
+          right at Chunakhali Bus Stand. Below are detailed testimonials — star ratings, model purchased,
+          and neighbourhood — so you can decide with confidence before your visit.
+        </p>
 
-        <div className="mt-12 sm:mt-14">
-          {loading ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8">
+          {loading && !displayReviews?.length ? (
+            <div className="grid gap-6 sm:grid-cols-2">
               {Array.from({ length: 6 }).map((_, i) => (
                 <ReviewCardSkeleton key={i} />
               ))}
             </div>
-          ) : reviews?.length === 0 ? (
-            <EmptyState icon={Star} title="No reviews yet" description="Be the first to share your experience above!" />
+          ) : !displayReviews?.length ? (
+            <EmptyState icon={Star} title="No reviews yet" description="Be the first to share your experience below!" />
           ) : (
             <>
-              <RevealGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <RevealGroup className="grid gap-6 sm:grid-cols-2">
                 {visibleReviews.map((r) => (
                   <RevealItem key={r.id}>
-                    <ReviewCard review={r} className="h-full" />
+                    <ReviewCard review={r} className="h-full rounded-xl shadow-soft" />
                   </RevealItem>
                 ))}
               </RevealGroup>
@@ -171,6 +172,7 @@ export default function Reviews() {
                     variant="secondary"
                     size="md"
                     icon={ChevronDown}
+                    className="min-h-12"
                     onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
                   >
                     Load more reviews ({remaining} left)
@@ -180,6 +182,35 @@ export default function Reviews() {
             </>
           )}
         </div>
+
+        <Reveal className="mx-auto mt-14 max-w-xl">
+          <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
+            Leave Us a Review
+          </h2>
+          <div className="mt-6 rounded-xl bg-[#ff6600]/5 p-5 ring-1 ring-[#ff6600]/20 sm:p-6">
+            <p className="text-sm text-body">
+              Bought from our Chunakhali showroom? Your Google review helps other Berhampore and
+              Murshidabad riders find Biswajit Power Hub.
+            </p>
+            <Button
+              href="https://www.google.com/search?q=Biswajit+Power+Hub+Berhampore"
+              variant="primary"
+              className="mt-4 min-h-12"
+              icon={Star}
+            >
+              Leave a Review on Google
+            </Button>
+          </div>
+          <div className="mt-6 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-7">
+            <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
+              <PenLine className="h-5 w-5 text-[#ff6600]" /> Write a review on our site
+            </h3>
+            <p className="mt-1 text-sm text-muted">Help others choose with confidence.</p>
+            <div className="mt-5">
+              <ReviewForm scooters={scooters || []} />
+            </div>
+          </div>
+        </Reveal>
       </div>
     </>
   );

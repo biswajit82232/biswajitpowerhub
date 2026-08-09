@@ -6,6 +6,7 @@ import App from './App.jsx';
 import { AuthProvider } from '@/context/AuthContext';
 import { SiteSettingsProvider } from '@/context/SiteSettingsContext';
 import { FinanceSettingsProvider } from '@/context/FinanceSettingsContext';
+import { SitePhotosProvider } from '@/context/SitePhotosContext';
 import { ToastProvider } from '@/components/ui/Toast';
 import './index.css';
 
@@ -16,9 +17,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <AuthProvider>
           <SiteSettingsProvider>
             <FinanceSettingsProvider>
-              <ToastProvider>
-                <App />
-              </ToastProvider>
+              <SitePhotosProvider>
+                <ToastProvider>
+                  <App />
+                </ToastProvider>
+              </SitePhotosProvider>
             </FinanceSettingsProvider>
           </SiteSettingsProvider>
         </AuthProvider>

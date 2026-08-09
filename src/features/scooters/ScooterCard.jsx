@@ -9,7 +9,7 @@ import { useFinance } from '@/context/FinanceSettingsContext';
 import { STOCK_LABELS } from '@/data/scooters';
 import { hasVariants, getStartingPrice } from '@/lib/scooterVariants';
 
-export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [] }) {
+export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [], imageOverride }) {
   const { settings } = useFinance();
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
   const startingPrice = getStartingPrice(scooter);
@@ -18,6 +18,7 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
     label: `${b.emoji} ${b.label}`,
     tone: b.tone,
   }))];
+  const imgSrc = imageOverride || scooter.images?.[0];
 
   return (
     <motion.article
@@ -25,20 +26,27 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.06, 0.3), ease: [0.22, 1, 0.36, 1] }}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-surface ring-1 ring-line shadow-soft transition-shadow duration-300 hover:shadow-card-hover"
+      className="group flex h-full flex-col overflow-hidden rounded-xl bg-white shadow-soft ring-1 ring-line transition duration-300 hover:-translate-y-1 hover:shadow-card-hover"
     >
       <Link to={`/scooters/${scooter.id}`} className="relative block">
         <ScooterImage
-          src={scooter.images?.[0]}
-          alt={`${scooter.name} electric scooter`}
+          src={imgSrc}
+          alt={`${scooter.name} electric scooter at Biswajit Power Hub Berhampore`}
           hue={scooter.hue}
           name={scooter.name}
-          className="aspect-[4/3] w-full bg-surface-alt transition-transform duration-500 group-hover:scale-[1.03]"
+          width={600}
+          height={400}
+          loading="lazy"
+          className="aspect-[3/2] w-full max-w-full bg-[#e0e0e0] transition-transform duration-500 group-hover:scale-[1.03]"
         />
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2">
+          {scooter.noLicence && (
+            <span className="inline-flex items-center rounded-full bg-[#25d366] px-2.5 py-1 text-xs font-bold text-white shadow-sm">
+              ✓ No Licence Required
+            </span>
+          )}
           <Badge tone={stock.tone}>{stock.label}</Badge>
-          {scooter.noLicence && <Badge tone="brand">No Licence*</Badge>}
-          {extraBadges.slice(0, 2).map((b) => (
+          {extraBadges.slice(0, 1).map((b) => (
             <Badge key={b.label} tone={b.tone}>{b.label}</Badge>
           ))}
         </div>
@@ -64,7 +72,7 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
         </div>
 
         <div className="mt-auto pt-5">
-          <div className="flex items-end justify-between">
+          <div className="flex items-end justify-between gap-2">
             <div>
               <p className="text-xs font-medium text-muted">Starting at</p>
               <p className="font-display text-2xl font-extrabold text-heading">
@@ -79,10 +87,10 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
             </div>
             <Link
               to={`/scooters/${scooter.id}`}
-              className="tap-target inline-flex items-center gap-1 rounded-full bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 transition-all duration-300 group-hover:bg-brand-gradient group-hover:text-white"
+              className="tap-target inline-flex min-h-11 items-center gap-1 rounded-lg bg-[#ff6600]/10 px-4 py-2.5 text-sm font-semibold text-[#ff6600] transition-all duration-300 group-hover:bg-[#ff6600] group-hover:text-white"
               aria-label={`View details for ${scooter.name}`}
             >
-              View
+              View Details
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>

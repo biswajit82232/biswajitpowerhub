@@ -32,7 +32,7 @@ export function MobileLocalCTA() {
           style={{ backgroundColor: '#ff6600' }}
         >
           <Phone className="h-4 w-4" aria-hidden />
-          Call Now
+          Call
         </a>
         <a
           href={mapsHref}

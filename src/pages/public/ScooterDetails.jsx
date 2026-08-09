@@ -210,19 +210,47 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             <VariantSelector scooter={scooter} selectedId={variantId} onChange={handleVariantChange} />
 
             <p className="mt-5 break-words leading-relaxed text-body">{scooter.description}</p>
-            <p className="mt-3 text-sm leading-relaxed text-body">
-              Visit Biswajit Power Hub in Berhampore, Murshidabad for a free test ride of the {scooter.name}.
-              Low running cost, home charging, and no licence required on this low-speed model. Compare all
-              options on our{' '}
-              <Link to="/best-electric-scooters-berhampore" className="font-semibold text-brand-700 hover:underline">
-                best electric scooters in Berhampore
-              </Link>{' '}
-              page or browse{' '}
-              <Link to="/scooters" className="font-semibold text-brand-700 hover:underline">
-                all scooters
-              </Link>
-              .
-            </p>
+            <div className="mt-6 space-y-6 text-sm leading-relaxed text-body sm:text-base">
+              <div>
+                <h2 className="font-display text-xl font-extrabold text-heading sm:text-2xl">
+                  Why riders in Berhampore choose the {scooter.name}
+                </h2>
+                <p className="mt-3">
+                  The {scooter.name} is one of the most requested low-speed electric scooters at Biswajit
+                  Power Hub in Berhampore, Murshidabad. Eligible units need no driving licence and no RTO
+                  registration, charge at home for roughly ₹0.30–₹0.50 per km, and include 3 free servicing
+                  plus 1 year motor &amp; controller warranty. Visit Chunakhali Bus Stand for a free test
+                  ride, EMI guidance, and exchange offers on your old petrol or electric scooter.
+                </p>
+                <p className="mt-3">
+                  Compare all options on our{' '}
+                  <Link to="/best-electric-scooters-berhampore" className="font-semibold text-[#ff6600] hover:underline">
+                    best electric scooters in Berhampore
+                  </Link>{' '}
+                  page, explore{' '}
+                  <Link to="/battery-upgrade-berhampore" className="font-semibold text-[#ff6600] hover:underline">
+                    battery upgrades
+                  </Link>{' '}
+                  if you need more range, or browse{' '}
+                  <Link to="/scooters" className="font-semibold text-[#ff6600] hover:underline">
+                    all scooters
+                  </Link>
+                  . Call 096355 05436 before you visit to confirm colour and stock across Murshidabad.
+                </p>
+              </div>
+              <div>
+                <h2 className="font-display text-xl font-extrabold text-heading sm:text-2xl">
+                  Price, range &amp; showroom support in Murshidabad
+                </h2>
+                <p className="mt-3">
+                  On-road pricing for the {scooter.name} starts near {formatINR(display.price)} depending on
+                  variant. Typical range is about {display.range} km per charge with a top speed of{' '}
+                  {display.topSpeed} km/h — ideal for Berhampore town rides and many Murshidabad daily
+                  routes. Our team explains Standard vs Lithium Pro packs where available, fits genuine
+                  spare parts, and never rushes a decision. Monday–Saturday 9 AM–8 PM · Sunday Closed.
+                </p>
+              </div>
+            </div>
 
             <PremiumPerksStrip />
 

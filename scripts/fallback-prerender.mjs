@@ -102,6 +102,8 @@ const ROUTES = [
       'Biswajit Power Hub — best electric scooters in Berhampore, Murshidabad. No licence. From ₹38,999. Call 096355 05436 for test ride at Chunakhali.',
     h1: 'Biswajit Power Hub — Best Electric Scooter Dealer in Berhampore, Murshidabad',
     schema: 'local',
+    crawlText:
+      'Best electric scooters in Berhampore under ₹50,000 at Biswajit Power Hub, Chunakhali Bus Stand, Murshidabad. Popular models: Activa, Zoom, Single Light and Double Light — no licence required. Why choose Biswajit Power Hub? Honest pricing, free test rides, EMI, exchange, and custom battery upgrades with genuine spare parts. Visit Monday to Saturday 9 AM to 8 PM. Call 096355 05436. Frequently asked questions cover licence rules, prices from ₹38,999, range, EMI, and exchange.',
   },
   {
     path: '/scooters',

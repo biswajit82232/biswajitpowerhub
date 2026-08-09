@@ -54,7 +54,12 @@ export default function Scooters() {
     : `${filtered.length} model${filtered.length !== 1 ? 's' : ''}`;
 
   const scootersJsonLd = useMemo(() => {
-    const list = scooters || [];
+    const SEO_MODELS = [
+      { id: 'activa', name: 'Activa Electric Scooter' },
+      { id: 'zoom', name: 'Zoom Electric Scooter' },
+      { id: 'single-light', name: 'Single Light Electric Scooter' },
+      { id: 'double-light', name: 'Double Light Electric Scooter' },
+    ];
     return [
       breadcrumbList([
         { name: 'Home', path: '/' },
@@ -65,15 +70,15 @@ export default function Scooters() {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: 'Electric Scooters at Biswajit Power Hub',
-        itemListElement: list.slice(0, 8).map((s, i) => ({
+        itemListElement: SEO_MODELS.map((s, i) => ({
           '@type': 'ListItem',
           position: i + 1,
-          name: `${s.name} Electric Scooter`,
+          name: s.name,
           url: `https://biswajitpowerhub.in/scooters/${s.id}`,
         })),
       },
     ];
-  }, [scooters]);
+  }, []);
 
   return (
     <>

@@ -50,17 +50,18 @@ export default function BestElectricScooters() {
       ]}
       jsonLd={jsonLd}
     >
-      <h2>Compare the best e-scooters in Berhampore</h2>
+      <h2>Top Electric Scooters Compared</h2>
       <p>
         Shoppers searching for the best electric scooters in Berhampore usually want three things: a fair
         on-road price under ₹50,000, zero licence paperwork, and a showroom they can trust in Murshidabad.
         Biswajit Power Hub specialises in low-speed electric scooters that meet those needs — with home
-        charging, 3 free servicing, and 1 year motor &amp; controller warranty on every purchase.
+        charging, 3 free servicing, and 1 year motor &amp; controller warranty on every purchase. Use the
+        comparison below to shortlist models before your free test ride at Chunakhali Bus Stand.
       </p>
 
-      <div className="not-prose overflow-x-auto rounded-2xl ring-1 ring-line">
+      <div className="not-prose overflow-x-auto rounded-xl ring-1 ring-line">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-surface-alt text-heading">
+          <thead className="bg-[#f5f5f5] text-heading">
             <tr>
               <th className="px-4 py-3 font-bold">Model</th>
               <th className="px-4 py-3 font-bold">Price</th>
@@ -79,7 +80,7 @@ export default function BestElectricScooters() {
                 <td className="px-4 py-3">{r.topSpeed}</td>
                 <td className="px-4 py-3">{r.bestFor}</td>
                 <td className="px-4 py-3">
-                  <Link to={`/scooters/${r.slug}`} className="font-semibold text-brand-700 hover:underline">
+                  <Link to={`/scooters/${r.slug}`} className="font-semibold text-[#ff6600] hover:underline">
                     {r.model} electric scooter in Berhampore
                   </Link>
                 </td>
@@ -89,25 +90,42 @@ export default function BestElectricScooters() {
         </table>
       </div>
 
-      <h2>Why Biswajit Power Hub is the best EV dealer in Murshidabad</h2>
+      <h2>Which Model is Best for You?</h2>
       <p>
-        Unlike online-only sellers, we run a physical showroom at Chunakhali Bus Stand so you can sit on the
-        scooter, check battery options, and take a free{' '}
-        <Link to="/test-ride-berhampore">test ride in Berhampore</Link> before you decide. Our team explains
-        EMI, exchange offers on old scooters, and custom{' '}
-        <Link to="/battery-upgrade-berhampore">battery upgrades</Link> in plain language. Customers across
-        Berhampore and Murshidabad choose us for honest pricing, genuine spares, and after-sales service —
-        not pressure selling.
+        Choosing the best e-scooter in Murshidabad depends on daily kilometres, budget, and who will ride.
+        If you travel Berhampore–Kandi or similar longer routes, start with the{' '}
+        <Link to="/scooters/activa">Activa electric scooter in Berhampore</Link>. For a premium daily
+        commute feel, try <Link to="/scooters/zoom">Zoom</Link>. Families who want comfort without a high
+        ticket often prefer <Link to="/scooters/double-light">Double Light</Link>. First-time buyers watching
+        every rupee usually land on <Link to="/scooters/single-light">Single Light</Link> from ₹38,999.
+      </p>
+      <ul>
+        <li>All four models are low-speed (≤25 km/h) — no licence / no RTO registration on eligible units</li>
+        <li>Home charging typically ₹0.30–₹0.50 per km versus petrol queues</li>
+        <li>EMI and exchange options available at the Chunakhali showroom</li>
+        <li>Custom battery upgrades if you outgrow stock range later</li>
+      </ul>
+      <p>
+        Still unsure? Book a{' '}
+        <Link to="/test-ride-berhampore">free test ride in Berhampore</Link> and sit on each scooter — the
+        right choice becomes obvious in minutes.
+      </p>
+
+      <h2>Why Buy From Biswajit Power Hub?</h2>
+      <p>
+        Unlike online-only sellers, we run a physical showroom at Chunakhali Bus Stand so you can check
+        battery options, ask about{' '}
+        <Link to="/battery-upgrade-berhampore">battery upgrades</Link>, and leave with clear EMI numbers —
+        not pressure selling. Customers across Berhampore and Murshidabad choose us for honest pricing,
+        genuine spares, and after-sales service you can walk into. Ready to compare in person? Call
+        096355 05436 or visit Monday to Saturday, 9 AM to 8 PM.
       </p>
       <p>
-        If you want the best e-scooty in Murshidabad without licence hassles, start with the{' '}
-        <Link to="/scooters/activa">Activa electric scooter in Berhampore</Link> for long trips, or the{' '}
-        <Link to="/scooters/single-light">Single Light</Link> if budget is your top priority. Every model is
-        low-speed (≤25 km/h), charge-at-home, and ready for same-day showroom delivery when stock allows.
-      </p>
-      <p>
-        Ready to compare in person? Call 096355 05436 or walk into Biswajit Power Hub near Chunakhali Bus
-        Stand — Monday to Saturday, 9 AM to 8 PM.
+        Also explore{' '}
+        <Link to="/low-budget-electric-scooters-berhampore">low budget electric scooters in Berhampore</Link>{' '}
+        and our{' '}
+        <Link to="/no-licence-electric-scooters-west-bengal">no licence electric scooters West Bengal</Link>{' '}
+        guide before you buy.
       </p>
     </SeoLandingLayout>
   );

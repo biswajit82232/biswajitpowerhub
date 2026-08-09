@@ -36,30 +36,41 @@ export default function BatteryUpgrade() {
       breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Battery Upgrade' }]}
       jsonLd={jsonLd}
     >
-      <h2>What is a battery upgrade?</h2>
+      <h2>Increase Your Scooter&apos;s Range</h2>
       <p>
-        A battery upgrade replaces or modifies your e-scooter’s battery pack with a higher ampere-hour
-        (AH) option so you travel farther between charges. At our Chunakhali showroom we assess your
-        daily distance across Berhampore / Murshidabad, recommend a compatible pack, and fit it with
-        proper connectors and safety checks. Pricing starts from affordable rates depending on AH and
-        chemistry — WhatsApp 096355 05436 for a quote.
+        Increase your scooter&apos;s range with a custom battery upgrade at Biswajit Power Hub in
+        Berhampore. Many Murshidabad riders love their low-speed e-scooter but wish one charge covered
+        Berhampore–Kandi or longer market days. A higher ampere-hour (AH) pack — or stepping up to Lithium
+        Pro on eligible models — stretches kilometres between plugs so you keep the chassis you already
+        trust instead of buying brand new.
       </p>
-
-      <h2>Upgrade vs buying a new scooter</h2>
       <p>
-        If your current low-speed scooter still rides well but range is short, upgrading the battery is
-        often cheaper than buying new. If you also want a fresher model, compare our{' '}
-        <Link to="/scooters">electric scooters</Link> — including Lithium Pro variants on{' '}
-        <Link to="/scooters/activa">Activa</Link> and <Link to="/scooters/zoom">Zoom</Link> — then decide
-        with our team on the showroom floor.
+        Typical stock range on our models sits around 60–80 km depending on load, road, and riding style.
+        After an upgrade, customers often report noticeably longer daily usefulness for school, shop, and
+        office routes across Murshidabad. WhatsApp 096355 05436 with your scooter make and current AH for
+        a quick estimate, or walk into Chunakhali Bus Stand for an on-the-spot assessment.
       </p>
+      <ul>
+        <li>Higher AH options matched to your daily kilometres</li>
+        <li>Genuine batteries and connectors fitted at the showroom</li>
+        <li>Advice on Standard vs Lithium Pro when buying new</li>
+        <li>Spare parts: tyres, panels, mirrors, controllers</li>
+      </ul>
 
-      <h2>Spare parts &amp; controllers</h2>
+      <h2>Battery Upgrade Process</h2>
       <p>
-        We stock batteries, tyres, body panels, mirrors, and controllers. Bring your scooter to Biswajit
-        Power Hub near Chunakhali Bus Stand, Berhampore — Monday to Saturday 9 AM–8 PM (Sunday closed).
-        Pair upgrades with a <Link to="/test-ride-berhampore">test ride</Link> if you are switching
-        models, or explore <Link to="/exchange-old-scooter-berhampore">exchange offers</Link>.
+        Our battery upgrade process is straightforward. Bring your e-scooter to Biswajit Power Hub near
+        Chunakhali Bus Stand, Berhampore. We inspect the controller, connectors, and chassis, recommend a
+        compatible pack, share clear pricing, and schedule fitment — usually the same visit when parts are
+        in stock. Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed.
+      </p>
+      <p>
+        If your scooter is ageing overall, compare our{' '}
+        <Link to="/scooters">electric scooters</Link> — including{' '}
+        <Link to="/scooters/activa">Activa</Link> and <Link to="/scooters/zoom">Zoom</Link> Lithium Pro
+        options — then decide with our team. Pair upgrades with a{' '}
+        <Link to="/test-ride-berhampore">test ride</Link> if you are switching models, or explore{' '}
+        <Link to="/exchange-old-scooter-berhampore">exchange offers</Link> on older petrol scooters.
       </p>
     </SeoLandingLayout>
   );

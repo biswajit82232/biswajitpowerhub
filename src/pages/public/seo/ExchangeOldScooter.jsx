@@ -36,28 +36,40 @@ export default function ExchangeOldScooter() {
       breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Exchange Offer' }]}
       jsonLd={jsonLd}
     >
-      <h2>How exchange works</h2>
+      <h2>How Exchange Works</h2>
       <p>
-        Bring your old scooter to our showroom near Chunakhali Bus Stand. Our team inspects condition,
-        age, and market demand, then offers a fair exchange price against any of our low-speed electric
-        models — including the budget-friendly{' '}
-        <Link to="/scooters/single-light">Single Light</Link> from ₹38,999 and the long-range{' '}
-        <Link to="/scooters/activa">Activa</Link>. No obligation; you can walk away after the valuation.
+        How exchange works at Biswajit Power Hub: bring your old petrol or electric scooter to our
+        showroom near Chunakhali Bus Stand in Berhampore. Our team inspects condition, age, and local
+        market demand, then offers a fair exchange price against any of our low-speed electric models —
+        including the budget-friendly <Link to="/scooters/single-light">Single Light</Link> from ₹38,999
+        and the long-range <Link to="/scooters/activa">Activa</Link>. There is no obligation; you can walk
+        away after the valuation with zero pressure.
+      </p>
+      <ul>
+        <li>Free on-the-spot valuation at Chunakhali, Berhampore</li>
+        <li>Credit applied toward Activa, Zoom, Double Light, or Single Light</li>
+        <li>EMI available on the balance after exchange</li>
+        <li>Pair with a free test ride the same visit</li>
+      </ul>
+      <p>
+        Call or WhatsApp 096355 05436 with your old model’s year and condition before you arrive so we can
+        prepare a realistic range for Murshidabad market values.
       </p>
 
-      <h2>Why exchange into an EV in Murshidabad</h2>
+      <h2>Get the Best Value for Your Old Scooter</h2>
       <p>
-        Petrol costs keep rising while home charging on our scooters stays around ₹0.30–₹0.50 per km.
-        Combined with no licence / no RTO paperwork on eligible models, exchange customers in Berhampore
-        often cut monthly running costs dramatically. Ask about EMI on the balance after exchange credit.
+        Get the best value for your old scooter by arriving with service history if you have it, a charged
+        battery (for e-scooters), and realistic photos of scratches or panel damage. Clean scooters with
+        matching papers typically fetch stronger exchange offers. Petrol costs keep rising while home
+        charging on our scooters stays around ₹0.30–₹0.50 per km — combined with no licence / no RTO
+        paperwork on eligible models, Berhampore customers often cut monthly running costs dramatically
+        after switching.
       </p>
-
-      <h2>Visit or call today</h2>
       <p>
-        Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. Call 096355 05436 or WhatsApp to tell
-        us your old model before you arrive. Pair exchange with a{' '}
+        Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. Pair exchange with a{' '}
         <Link to="/test-ride-berhampore">free test ride</Link> and compare the{' '}
-        <Link to="/low-budget-electric-scooters-berhampore">low budget electric scooters</Link> we stock.
+        <Link to="/low-budget-electric-scooters-berhampore">low budget electric scooters</Link> we stock
+        across Murshidabad.
       </p>
     </SeoLandingLayout>
   );

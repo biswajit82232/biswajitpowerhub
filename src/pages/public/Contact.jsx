@@ -8,7 +8,7 @@ import { CallbackForm } from '@/features/leads/CallbackForm';
 import { useToast } from '@/components/ui/Toast';
 import { submitContact } from '@/features/leads/leadService';
 import { isValidName, isValidPhone, isValidEmail } from '@/features/leads/validation';
-import { SITE, whatsappUrl, telUrl } from '@/config/site';
+import { SITE, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { breadcrumbList } from '@/lib/schemaHelpers';
@@ -61,24 +61,10 @@ function ContactMessageForm() {
       <Field label="Message" htmlFor="ct-msg" required error={errors.message}>
         <Textarea id="ct-msg" rows={4} value={form.message} error={errors.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="How can we help?" />
       </Field>
-      <Button type="submit" variant="primary" size="lg" fullWidth loading={loading} icon={Send}>
+      <Button type="submit" variant="primary" size="lg" fullWidth loading={loading} icon={Send} className="min-h-12">
         Send Message
       </Button>
     </form>
-  );
-}
-
-function InfoRow({ icon: Icon, title, children }) {
-  return (
-    <div className="flex items-start gap-4">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
-        <Icon className="h-5 w-5" />
-      </span>
-      <div>
-        <p className="text-sm font-bold text-heading">{title}</p>
-        <div className="mt-0.5 text-sm text-body">{children}</div>
-      </div>
-    </div>
   );
 }
 
@@ -103,11 +89,11 @@ export default function Contact() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt/50">
+      <section className="border-b border-line bg-[#f5f5f5]/50">
         <div className="container-px py-12 sm:py-16">
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Contact' }]} />
           <Reveal>
-            <span className="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-600">
+            <span className="inline-flex items-center rounded-full bg-[#ff6600]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#ff6600]">
               Contact
             </span>
             <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
@@ -123,22 +109,18 @@ export default function Contact() {
 
       <div className="container-px py-12">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-          {/* Info + map */}
-          <div>
+          <div className="space-y-8">
             <Reveal>
-              <div className="space-y-6 rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
-                <InfoRow icon={Phone} title="Call us">
-                  <div className="flex flex-col gap-1">
-                    {site.phones.map((p) => (
-                      <a key={p} href={telUrl(p, site)} onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })} className="font-medium transition hover:text-brand-700">
-                        +91 {p}
-                      </a>
-                    ))}
-                  </div>
-                </InfoRow>
-                <InfoRow icon={MapPin} title="Visit our showroom">
-                  <address className="not-italic">
-                    Biswajit Power Hub
+              <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
+                Visit Our Showroom in Berhampore
+              </h2>
+              <div className="mt-6 space-y-5 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-8">
+                <div className="flex items-start gap-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#4285f4]/10 text-[#4285f4]">
+                    <MapPin className="h-6 w-6" />
+                  </span>
+                  <address className="not-italic text-base leading-relaxed text-body">
+                    <strong className="font-display text-lg text-heading">{SITE.name}</strong>
                     <br />
                     Chunakhali Bus Stand, Nimtala
                     <br />
@@ -146,52 +128,94 @@ export default function Contact() {
                     <br />
                     West Bengal — 742149, India
                     <br />
-                    <span className="mt-1 block text-muted">Landmark: Near Chunakhali Bus Stand</span>
+                    <span className="mt-2 block font-medium text-[#ff6600]">
+                      Near Chunakhali Bus Stand
+                    </span>
                   </address>
-                </InfoRow>
-                <InfoRow icon={Clock} title="Opening hours">
-                  Monday–Saturday: 9:00 AM – 8:00 PM
-                  <br />
-                  Sunday: Closed
-                </InfoRow>
-                <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-                  <Button href={whatsappUrl(undefined, site)} variant="whatsapp" icon={MessageCircle} fullWidth onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}>
-                    WhatsApp Us
-                  </Button>
-                  <Button
-                    href={site.maps.link}
-                    variant="secondary"
-                    icon={Navigation}
-                    fullWidth
-                    onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
-                  >
-                    Get Directions
-                  </Button>
                 </div>
+
+                <a
+                  href={site.maps.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg px-7 py-3.5 text-base font-bold text-white sm:w-auto"
+                  style={{ backgroundColor: '#4285f4' }}
+                >
+                  <Navigation className="h-5 w-5" aria-hidden />
+                  Get Directions
+                </a>
+
+                <a
+                  href={site.maps.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact-map' })}
+                  className="block overflow-hidden rounded-xl ring-1 ring-line"
+                >
+                  <img
+                    src="https://maps.wikimedia.org/img/osm-intl,15,24.0987,88.2519,800x400.png"
+                    alt="Map placeholder — Biswajit Power Hub near Chunakhali Bus Stand Berhampore"
+                    width={800}
+                    height={400}
+                    loading="lazy"
+                    className="h-48 w-full max-w-full object-cover sm:h-56"
+                  />
+                  <span className="block bg-[#f5f5f5] px-4 py-2 text-center text-xs text-muted">
+                    Static map preview — tap for Google Maps directions
+                  </span>
+                </a>
               </div>
             </Reveal>
 
-            <Reveal delay={0.1} className="mt-6">
-              <div className="overflow-hidden rounded-2xl ring-1 ring-line shadow-soft">
-                <iframe
-                  title="BISWAJIT POWER HUB location"
-                  src={site.maps.embed}
-                  width="100%"
-                  height="320"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  allowFullScreen
-                />
+            <Reveal delay={0.05}>
+              <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
+                Contact Information
+              </h2>
+              <div className="mt-6 space-y-4 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-8">
+                <a
+                  href={telUrl(undefined, site)}
+                  onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })}
+                  className="flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-lg font-bold text-white"
+                  style={{ backgroundColor: '#ff6600' }}
+                >
+                  <Phone className="h-5 w-5" />
+                  Call {formatPhoneDisplay(site.phones[0])}
+                </a>
+                <a
+                  href={whatsappUrl(undefined, site)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}
+                  className="flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-lg font-bold text-white"
+                  style={{ backgroundColor: '#25d366' }}
+                >
+                  <MessageCircle className="h-5 w-5" />
+                  Chat on WhatsApp
+                </a>
+                <div className="flex items-start gap-3 pt-2 text-sm text-body">
+                  <Clock className="mt-0.5 h-5 w-5 shrink-0 text-muted" />
+                  <table className="w-full text-left">
+                    <tbody>
+                      <tr>
+                        <td className="py-1 pr-4 font-medium text-heading">Mon–Sat</td>
+                        <td className="py-1">9:00 AM – 8:00 PM</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 pr-4 font-medium text-heading">Sunday</td>
+                        <td className="py-1">Closed</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </Reveal>
           </div>
 
-          {/* Forms */}
           <div className="space-y-6">
             <Reveal>
-              <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-8">
-                <h2 className="font-display text-xl font-bold text-heading">Send us a message</h2>
+              <div className="rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-8">
+                <h3 className="font-display text-xl font-bold text-heading">Send us a message</h3>
                 <p className="mt-1 text-sm text-muted">We typically reply within a few hours.</p>
                 <div className="mt-5">
                   <ContactMessageForm />
@@ -200,10 +224,10 @@ export default function Contact() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <div className="rounded-2xl bg-brand-gradient p-6 shadow-card sm:p-8">
-                <h2 className="font-display text-xl font-bold text-white">Prefer a callback?</h2>
-                <p className="mt-1 text-sm text-white/85">Drop your number and we'll call you.</p>
-                <div className="mt-5 rounded-2xl bg-surface p-5">
+              <div className="rounded-xl p-6 shadow-card sm:p-8" style={{ background: 'linear-gradient(135deg, #ff6600, #4285f4)' }}>
+                <h3 className="font-display text-xl font-bold text-white">Prefer a callback?</h3>
+                <p className="mt-1 text-sm text-white/90">Drop your number and we&apos;ll call you.</p>
+                <div className="mt-5 rounded-xl bg-white p-5">
                   <CallbackForm compact />
                 </div>
               </div>

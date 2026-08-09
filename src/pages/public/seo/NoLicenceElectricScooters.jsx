@@ -37,44 +37,45 @@ export default function NoLicenceElectricScooters() {
       ]}
       jsonLd={jsonLd}
     >
-      <h2>What the Motor Vehicles rules allow</h2>
+      <h2>Do You Need a Licence for Electric Scooters?</h2>
       <p>
-        Under Central Motor Vehicles rules, electric vehicles with a maximum speed not exceeding 25 km/h
-        and motor power within the notified low-speed category are generally treated differently from
-        conventional motorcycles and scooters. In practical terms for West Bengal riders, that means
-        eligible low-speed e-scooters do not require a driving licence or RTO registration the way
-        petrol scooters do. Always ride safely, follow traffic sense, and confirm current rules if your
-        use case is commercial.
+        Do you need a licence for electric scooters in West Bengal? For eligible low-speed models — maximum
+        speed not exceeding 25 km/h and motor power within the notified category under Central Motor
+        Vehicles rules — the answer is generally no driving licence and no RTO registration the way petrol
+        scooters require. That is exactly the category Biswajit Power Hub stocks in Berhampore for
+        Murshidabad families who want simple, legal ownership. Always ride safely, follow traffic sense, and
+        confirm current rules if your use case is commercial.
+      </p>
+      <p>
+        High-speed electric scooters and motorcycles are different — those still need licence and
+        registration. If a seller cannot clearly explain the speed limit and category, ask before you pay.
+        Our team at Chunakhali Bus Stand walks every customer through the difference in plain language.
       </p>
 
-      <h2>Models at Biswajit Power Hub that qualify</h2>
+      <h2>Which Models Require No Registration?</h2>
       <p>
-        Every showroom model we sell is a low-speed (≤25 km/h) electric scooter designed for no-licence
-        use: <Link to="/scooters/activa">Activa electric scooter in Berhampore</Link>,{' '}
+        Which models require no registration at our showroom? Every showroom model we sell is a low-speed
+        (≤25 km/h) electric scooter designed for no-licence use:{' '}
+        <Link to="/scooters/activa">Activa electric scooter in Berhampore</Link>,{' '}
         <Link to="/scooters/zoom">Zoom</Link>, <Link to="/scooters/double-light">Double Light</Link>, and{' '}
         <Link to="/scooters/single-light">Single Light</Link>. Prices start from ₹38,999. You charge at
-        home, pay a fraction of petrol cost per kilometre, and skip registration queues.
+        home, pay a fraction of petrol cost per kilometre, and skip registration queues across Murshidabad.
       </p>
-
-      <h2>Common myths about no-licence e-scooters</h2>
       <ul>
-        <li>
-          <strong>Myth:</strong> “Any electric scooter is licence-free.”{' '}
-          <strong>Fact:</strong> Only low-speed eligible models qualify — high-speed EVs still need
-          licence and registration.
-        </li>
-        <li>
-          <strong>Myth:</strong> “No paperwork means no service.”{' '}
-          <strong>Fact:</strong> We include 3 free servicing and motor/controller warranty from our
-          Berhampore showroom.
-        </li>
-        <li>
-          <strong>Myth:</strong> “You can’t get EMI without registration.”{' '}
-          <strong>Fact:</strong> Ask our team — financing options are available on showroom purchases.
-        </li>
+        <li>Activa — longer Berhampore / Murshidabad trips</li>
+        <li>Zoom — premium daily commute feel</li>
+        <li>Double Light — family errands and comfort</li>
+        <li>Single Light — lowest entry price from ₹38,999</li>
       </ul>
 
-      <h2>Test ride a no-licence scooter in Murshidabad</h2>
+      <h2>Legal Low-Speed EVs in West Bengal</h2>
+      <p>
+        Legal low-speed EVs in West Bengal are popular because they remove paperwork friction while cutting
+        running costs. Common myths we hear in Berhampore: “any electric scooter is licence-free” (false —
+        only low-speed eligible models), and “no paperwork means no service” (false — we include 3 free
+        servicing and motor/controller warranty). Financing is also available on showroom purchases; ask
+        about EMI even without RTO papers on eligible units.
+      </p>
       <p>
         The best way to understand a no-licence electric scooter is to ride one. Book a free{' '}
         <Link to="/test-ride-berhampore">test ride in Berhampore</Link> at Chunakhali Bus Stand — no

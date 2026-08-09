@@ -1,25 +1,33 @@
 import { MessageCircle, Phone, Navigation, Zap, ShieldCheck, Wrench, Star, RefreshCw } from 'lucide-react';
-import Button from '@/components/ui/Button';
-import { ScooterImage } from '@/components/common/ScooterImage';
+import { SiteImage } from '@/components/common/SiteImage';
 import { SITE, whatsappUrl, telUrl, formatPhoneDisplay, GBP_RATING } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useSitePhotos } from '@/context/SitePhotosContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { formatCostPerKm } from '@/lib/catalogStats';
 
 const CHIPS = [
-  { icon: Star, label: `${GBP_RATING.ratingValue}/5 Customer Rating`, color: 'text-amber-600' },
-  { icon: Wrench, label: '3 Free Servicing', color: 'text-rose-600' },
-  { icon: ShieldCheck, label: '1 Year Warranty', color: 'text-indigo-600' },
-  { icon: RefreshCw, label: 'Exchange Offers', color: 'text-brand-600' },
+  { icon: Star, label: `${GBP_RATING.ratingValue}/5 Customer Rating`, color: 'text-amber-300' },
+  { icon: Wrench, label: '3 Free Servicing', color: 'text-orange-300' },
+  { icon: ShieldCheck, label: '1 Year Warranty', color: 'text-sky-300' },
+  { icon: RefreshCw, label: 'Exchange Offers', color: 'text-emerald-300' },
 ];
 
 const d = (ms) => ({ animationDelay: `${ms}ms` });
 const HERO_MAX_RANGE_KM = 120;
 
+const CTA_BASE =
+  'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-base font-bold text-white transition active:scale-[0.98] sm:w-auto';
+
 export function Hero({ heroImageUrl, catalogStats }) {
   const { site } = useSite();
+  const { photos } = useSitePhotos();
   const costPerKm = formatCostPerKm(catalogStats?.minCostPerKm ?? 0.3);
   const chargeLabel = catalogStats?.chargingLabel ?? '4–6 hrs';
+  const imageUrl = photos?.hero?.url || heroImageUrl || null;
+  const imageAlt =
+    photos?.hero?.alt ||
+    'Biswajit Power Hub electric scooter showroom at Chunakhali Bus Stand Berhampore Murshidabad';
 
   const stats = [
     { value: `${HERO_MAX_RANGE_KM} km`, label: 'Max range' },
@@ -29,30 +37,26 @@ export function Hero({ heroImageUrl, catalogStats }) {
   ];
 
   return (
-    <section className="relative overflow-x-clip">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_20%_-10%,#DBEAFE,transparent_60%),radial-gradient(ellipse_80%_60%_at_80%_10%,#CCFBF1,transparent_55%)] bg-bg" />
-      </div>
-
-      <div className="container-px grid items-center gap-10 pb-10 pt-10 sm:pb-14 sm:pt-14 lg:grid-cols-2 lg:gap-12 lg:py-20">
+    <section className="relative overflow-x-clip" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)' }}>
+      <div className="container-px grid items-center gap-10 pb-12 pt-10 sm:pb-16 sm:pt-14 lg:grid-cols-2 lg:gap-12 lg:py-20">
         <div className="text-center lg:text-left">
           <div className="animate-hero-rise" style={d(0)}>
-            <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand-50 to-accent-50 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-brand-700 ring-1 ring-brand-200 sm:px-4 sm:text-xs">
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-gradient">
+            <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white/90 ring-1 ring-white/15 sm:px-4 sm:text-xs lg:justify-start">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full" style={{ backgroundColor: '#ff6600' }}>
                 <Zap className="h-2.5 w-2.5 text-white" fill="white" />
               </span>
               {SITE.name} · Berhampore
             </span>
           </div>
 
-          <h1 className="mt-5 font-display text-2xl font-extrabold leading-tight text-heading sm:text-3xl lg:text-4xl">
+          <h1 className="mt-5 font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl lg:text-4xl">
             <span className="animate-hero-rise block" style={d(60)}>
               Biswajit Power Hub — Best Electric Scooter Dealer in Berhampore, Murshidabad
             </span>
           </h1>
 
           <p
-            className="mx-auto mt-5 max-w-xl animate-hero-rise text-base leading-relaxed text-body sm:text-lg lg:mx-0"
+            className="mx-auto mt-5 max-w-xl animate-hero-rise text-base leading-relaxed text-white/70 sm:text-lg lg:mx-0"
             style={d(120)}
           >
             Premium Low-Speed Electric Scooters. No Licence. No Registration. Test Ride Today at
@@ -63,37 +67,37 @@ export function Hero({ heroImageUrl, catalogStats }) {
             className="mt-7 flex animate-hero-rise flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start"
             style={d(180)}
           >
-            <Button
+            <a
               href={telUrl(undefined, site)}
-              target="_self"
-              size="md"
-              variant="primary"
-              icon={Phone}
-              className="min-h-11"
+              className={CTA_BASE}
+              style={{ backgroundColor: '#ff6600' }}
               onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'hero' })}
             >
+              <Phone className="h-5 w-5" aria-hidden />
               Call: {formatPhoneDisplay(site.phones[0]).replace('+91 ', '0')}
-            </Button>
-            <Button
+            </a>
+            <a
               href={whatsappUrl(undefined, site)}
-              size="md"
-              variant="whatsapp"
-              icon={MessageCircle}
-              className="min-h-11"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={CTA_BASE}
+              style={{ backgroundColor: '#25d366' }}
               onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'hero' })}
             >
+              <MessageCircle className="h-5 w-5" aria-hidden />
               WhatsApp
-            </Button>
-            <Button
+            </a>
+            <a
               href={site.maps.link}
-              size="md"
-              variant="secondary"
-              icon={Navigation}
-              className="min-h-11"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={CTA_BASE}
+              style={{ backgroundColor: '#4285f4' }}
               onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'hero' })}
             >
+              <Navigation className="h-5 w-5" aria-hidden />
               Get Directions
-            </Button>
+            </a>
           </div>
 
           <div
@@ -103,7 +107,7 @@ export function Hero({ heroImageUrl, catalogStats }) {
             {CHIPS.map(({ icon: Icon, label, color }) => (
               <span
                 key={label}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-body ring-1 ring-line"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/85 ring-1 ring-white/10"
               >
                 <Icon className={`h-3.5 w-3.5 ${color}`} />
                 {label}
@@ -112,40 +116,25 @@ export function Hero({ heroImageUrl, catalogStats }) {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-md animate-hero-scale pb-10 sm:pb-12 lg:max-w-none lg:pb-0" style={d(180)}>
-          <div className="relative rounded-3xl bg-white p-3 ring-1 ring-blue-100">
-            <ScooterImage
-              src={heroImageUrl}
-              alt="Biswajit Power Hub showroom at Chunakhali Bus Stand Berhampore Murshidabad"
-              className="aspect-[4/3] w-full rounded-2xl object-cover"
+        <div className="relative mx-auto w-full max-w-md animate-hero-scale pb-4 sm:pb-6 lg:max-w-none lg:pb-0" style={d(180)}>
+          <div className="relative overflow-hidden rounded-xl ring-1 ring-white/10">
+            <SiteImage
+              src={imageUrl}
+              alt={imageAlt}
+              width={1200}
+              height={600}
               loading="eager"
+              className="w-full"
+              placeholderLabel="Upload showroom photo here"
             />
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {stats.map((s) => (
-                <div key={s.label} className="rounded-xl bg-surface-alt px-2 py-2 text-center">
-                  <p className="font-display text-sm font-extrabold text-heading">{s.value}</p>
-                  <p className="text-[0.65rem] text-muted">{s.label}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <img
-                src="/logo-192.png"
-                alt="Activa electric scooter test ride at Berhampore showroom"
-                width={192}
-                height={192}
-                loading="lazy"
-                className="h-24 w-full rounded-xl object-contain bg-surface-alt p-2 ring-1 ring-line"
-              />
-              <img
-                src="/og-image.png"
-                alt="Zoom low-speed e-scooter no licence required West Bengal"
-                width={400}
-                height={210}
-                loading="lazy"
-                className="h-24 w-full rounded-xl object-cover ring-1 ring-line"
-              />
-            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {stats.map((s) => (
+              <div key={s.label} className="rounded-lg bg-white/5 px-2 py-3 text-center ring-1 ring-white/10">
+                <p className="font-display text-sm font-extrabold text-white">{s.value}</p>
+                <p className="mt-0.5 text-[0.65rem] text-white/55">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

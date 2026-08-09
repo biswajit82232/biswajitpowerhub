@@ -36,31 +36,43 @@ export default function TestRide() {
       breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Test Ride' }]}
       jsonLd={jsonLd}
     >
-      <h2>No appointment needed</h2>
+      <h2>How to Book a Free Test Ride</h2>
       <p>
-        Walk into our showroom Monday–Saturday between 9:00 AM and 8:00 PM (Sunday closed). Tell us which
-        model you want to try — <Link to="/scooters/activa">Activa</Link>,{' '}
+        How to book a free test ride in Berhampore: simply walk into Biswajit Power Hub at Chunakhali Bus
+        Stand Monday–Saturday between 9:00 AM and 8:00 PM (Sunday closed). No appointment is required for
+        our low-speed models. Prefer a heads-up? Call or WhatsApp 096355 05436 and tell us which scooter
+        you want to try — <Link to="/scooters/activa">Activa</Link>,{' '}
         <Link to="/scooters/zoom">Zoom</Link>, <Link to="/scooters/double-light">Double Light</Link>, or{' '}
-        <Link to="/scooters/single-light">Single Light</Link> — and we will arrange a supervised test ride
-        around the Chunakhali area when stock and weather allow.
+        <Link to="/scooters/single-light">Single Light</Link> — so we can keep that colour ready when stock
+        allows.
       </p>
-
-      <h2>What to bring</h2>
       <ul>
-        <li>Your phone number so we can follow up on EMI or exchange if you like the ride</li>
+        <li>Bring your phone number for EMI / exchange follow-up if you like the ride</li>
         <li>A driving licence is <strong>not</strong> required for our low-speed models</li>
-        <li>Optional: your old scooter if you want an on-the-spot{' '}
+        <li>
+          Optional: bring your old scooter for an on-the-spot{' '}
           <Link to="/exchange-old-scooter-berhampore">exchange valuation</Link>
         </li>
+        <li>Wear closed footwear; rides are short and supervised near the showroom</li>
       </ul>
-
-      <h2>Safety &amp; showroom address</h2>
       <p>
-        Rides are short, supervised, and limited to safe nearby roads. Wear closed footwear. Address:
-        Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149. Call 096355 05436 or
-        WhatsApp to confirm today’s available models. Browse the{' '}
-        <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> before
-        you visit.
+        Customers across Murshidabad appreciate that we never rush the decision — sit on multiple models,
+        ask battery questions, and leave with clear numbers.
+      </p>
+
+      <h2>What to Expect at Our Showroom</h2>
+      <p>
+        What to expect at our showroom: a friendly walkthrough of no-licence rules in West Bengal, side-by-side
+        comparison of Activa, Zoom, Single Light, and Double Light, and a supervised ride on safe nearby
+        roads around Chunakhali when weather and traffic allow. Address: Chunakhali Bus Stand, Nimtala,
+        Berhampore, Murshidabad, West Bengal 742149 — easy landmark for anyone travelling across the
+        district.
+      </p>
+      <p>
+        After the ride we can discuss EMI,{' '}
+        <Link to="/battery-upgrade-berhampore">battery upgrades</Link>, and today’s on-road price. Browse
+        the <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link>{' '}
+        guide before you visit so you already know which two models to shortlist.
       </p>
     </SeoLandingLayout>
   );

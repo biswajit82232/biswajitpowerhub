@@ -6,9 +6,9 @@ import { cn } from '@/lib/utils';
 
 const VARIANTS = {
   primary:
-    'bg-brand-gradient text-white shadow-soft hover:shadow-card-hover',
+    'bg-[#ff6600] text-white shadow-soft hover:bg-[#e65c00]',
   solid:
-    'bg-brand-600 text-white shadow-soft hover:bg-brand-700',
+    'bg-[#ff6600] text-white shadow-soft hover:bg-[#e65c00]',
   secondary:
     'bg-surface text-heading ring-1 ring-line shadow-soft hover:ring-brand-200 hover:text-brand-700',
   accent:
@@ -18,7 +18,9 @@ const VARIANTS = {
   outline:
     'bg-transparent text-brand-700 ring-1.5 ring-brand-500/40 hover:bg-brand-50',
   whatsapp:
-    'bg-[#25D366] text-white shadow-soft hover:brightness-105',
+    'bg-[#25d366] text-white shadow-soft hover:brightness-105',
+  directions:
+    'bg-[#4285f4] text-white shadow-soft hover:bg-[#3367d6]',
   danger:
     'bg-red-500 text-white shadow-soft hover:bg-red-600',
 };
