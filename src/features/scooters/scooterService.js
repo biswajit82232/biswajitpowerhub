@@ -2,29 +2,30 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { withTimeout } from '@/lib/utils';
 import { SCOOTERS } from '@/data/scooters';
-import { SEO_READY_SCOOTER_IDS } from '@/data/seoReady';
 import { normalizeScooter } from '@/lib/scooterVariants';
 
-const CACHE_KEY = 'scooters_v5';
-const CACHE_TTL = 5 * 60;
+const CACHE_KEY = 'scooters_v6';
+const CACHE_TTL = 60;
 const FETCH_TIMEOUT_MS = 8000;
-const SEO_READY = new Set(SEO_READY_SCOOTER_IDS);
 const SEED_BY_ID = Object.fromEntries(SCOOTERS.map((s) => [s.id, s]));
 
 /**
  * Normalize a Supabase row (snake_case) to the app's camelCase scooter shape.
- * Hero (SEO-ready) models keep public list prices from src/data/scooters.js so
- * UI, meta, and Product schema stay aligned when admin catalog prices drift.
+ * Admin/DB values win. Seed catalog only fills empty optional fields.
  */
 function fromRow(row) {
-  const base = {
+  const seed = SEED_BY_ID[row.id];
+  const images = Array.isArray(row.images) ? row.images : [];
+  const variants = Array.isArray(row.variants) ? row.variants : [];
+
+  return {
     id: row.id,
     name: row.name,
     brand: row.brand,
-    tagline: row.tagline,
+    tagline: row.tagline || seed?.tagline || '',
     price: Number(row.price),
     hue: row.hue || 'blue',
-    images: Array.isArray(row.images) ? row.images : [],
+    images: images.length ? images : seed?.images || [],
     batteryType: row.battery_type,
     batteryCapacity: row.battery_capacity,
     range: Number(row.range_km),
@@ -41,22 +42,10 @@ function fromRow(row) {
     noRegistration: row.no_registration,
     stock: row.stock_status,
     featured: row.featured,
-    description: row.description || '',
+    description: row.description || seed?.description || '',
     features: row.features || [],
     benefits: row.benefits || [],
-    variants: Array.isArray(row.variants) ? row.variants : [],
-  };
-
-  const seed = SEED_BY_ID[row.id];
-  if (!seed || !SEO_READY.has(row.id)) return base;
-
-  return {
-    ...base,
-    price: seed.price,
-    variants: Array.isArray(seed.variants) ? seed.variants : base.variants,
-    description: base.description || seed.description || '',
-    tagline: base.tagline || seed.tagline,
-    images: base.images?.length ? base.images : seed.images || [],
+    variants: variants.length ? variants : Array.isArray(seed?.variants) ? seed.variants : [],
   };
 }
 

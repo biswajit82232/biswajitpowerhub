@@ -9,11 +9,11 @@ import {
   DAY_KEYS,
 } from '@/config/site';
 
-const CACHE_KEY = 'site_settings_v2';
+const CACHE_KEY = 'site_settings_v3';
 const LEGACY_CACHE_KEY = 'site_settings';
 const LOCAL_KEY = 'bph_site_settings';
 const ROW_ID = 1;
-const CACHE_TTL = 60;
+const CACHE_TTL = 30;
 
 export { DAY_KEYS, DEFAULT_DAY_HOURS, INITIAL_HOURS };
 
@@ -84,7 +84,8 @@ function writeLocal(settings) {
       address_country: settings.address.country,
       maps_link: settings.maps.link,
       maps_embed: settings.maps.embed,
-      hours: settings.hours,
+      // Persist per-day hours (not legacy summary strings)
+      hours: settings.hoursPerDay || settings.hours,
     }));
   } catch (_) { /* ignore */ }
 }
@@ -158,7 +159,8 @@ export async function saveSiteSettings(settings) {
       address_country: merged.address.country,
       maps_link: merged.maps.link,
       maps_embed: merged.maps.embed,
-      hours: merged.hours,
+      // Must store per-day hours — legacy summary strings cannot be read back
+      hours: merged.hoursPerDay || hours,
       updated_at: new Date().toISOString(),
     };
     const { error } = await supabase.from('site_settings').upsert(row);

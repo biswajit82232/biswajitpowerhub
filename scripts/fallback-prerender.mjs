@@ -509,18 +509,15 @@ function productSchema(route, enrichment = {}) {
   const live = enrichment[id] || {};
   const name = route.productName || live.name || seed.name || 'Electric Scooter';
   const shortName = (seed.name || live.name || name).replace(/\s*Electric Scooter$/i, '');
-  // SEO-ready hero models: use seed list prices so Product schema matches meta/copy.
-  // Live Supabase can drift; keep images/stock from live, prices from src/data/scooters.js.
-  const useSeedPrices = SEO_READY.has(id) && (seed.variants?.length || seed.price);
-  const variants = useSeedPrices
-    ? seed.variants || []
-    : Array.isArray(live.variants) && live.variants.length
+  // Prefer live Supabase catalog when available so admin price updates match schema.
+  const variants =
+    Array.isArray(live.variants) && live.variants.length
       ? live.variants
       : seed.variants || [];
   const prices = variants.map((v) => Number(v.price)).filter((n) => Number.isFinite(n) && n > 0);
   const low = prices.length
     ? Math.min(...prices)
-    : Number((useSeedPrices ? seed.price : live.price || seed.price) || 0);
+    : Number(live.price || seed.price || 0);
   const high = prices.length ? Math.max(...prices) : low;
   const images = (Array.isArray(live.images) ? live.images : seed.images || []).filter(Boolean);
   const rating = ratingForScooter(shortName);

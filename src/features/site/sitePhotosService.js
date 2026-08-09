@@ -160,19 +160,22 @@ export async function saveSitePhotos(photos) {
       .select('id');
 
     if (updateError) {
-      throw new Error(
-        updateError.message?.includes('photos')
-          ? 'Photo cloud save failed — run migration add_site_photos_json.sql in Supabase, then try again.'
-          : updateError.message || 'Could not save photos to cloud.',
+      const missingCol =
+        /photos/i.test(updateError.message || '') ||
+        updateError.code === 'PGRST204' ||
+        updateError.code === '42703';
+      if (!missingCol) {
+        throw new Error(updateError.message || 'Could not save photos to cloud.');
+      }
+      console.warn(
+        '[sitePhotos] photos column missing — run add_site_photos_json.sql. Saving hero URL only.',
       );
-    }
-
-    if (!updated?.length) {
+    } else if (!updated?.length) {
       const { error: insertError } = await supabase.from('site_settings').insert({
         id: SETTINGS_ROW_ID,
         photos: next,
       });
-      if (insertError) {
+      if (insertError && !/photos/i.test(insertError.message || '')) {
         throw new Error(insertError.message || 'Could not save photos to cloud.');
       }
     }

@@ -100,13 +100,26 @@ export async function saveFinanceSettings(settings) {
 /** Save homepage hero image only (stored in finance_settings.hero_image_url). */
 export async function saveHeroImage(heroImageUrl) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase
+  const payload = {
+    hero_image_url: heroImageUrl ?? null,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data: updated, error: updateError } = await supabase
     .from('finance_settings')
-    .update({
-      hero_image_url: heroImageUrl ?? null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', ROW_ID);
-  if (error) throw error;
+    .update(payload)
+    .eq('id', ROW_ID)
+    .select('id');
+
+  if (updateError) throw updateError;
+
+  if (!updated?.length) {
+    const { error: insertError } = await supabase.from('finance_settings').insert({
+      id: ROW_ID,
+      ...payload,
+    });
+    if (insertError) throw insertError;
+  }
+
   bustFinanceCache();
 }
