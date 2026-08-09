@@ -18,7 +18,9 @@ export function Footer() {
 
   return (
     <footer className="relative mt-auto overflow-x-hidden bg-footer-navy pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-white lg:pb-0">
-      <div className="h-1 bg-brand-gradient-r" />
+      <div className="pointer-events-none absolute inset-0 bg-glow-blue opacity-25" aria-hidden />
+      <div className="pointer-events-none absolute inset-0 bg-hero-mesh opacity-10" aria-hidden />
+      <div className="relative h-1 bg-brand-gradient-r" />
 
       <div className="container-px relative z-10 py-12 sm:py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
@@ -36,12 +38,12 @@ export function Footer() {
             <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-brand-200/80">
               Quick Links
             </h3>
-            <ul className="mt-5 space-y-3">
+            <ul className="mt-5 space-y-2">
               {FOOTER_QUICK_LINKS.map((l) => (
                 <li key={l.to}>
                   <Link
                     to={l.to}
-                    className="text-sm text-white/75 transition hover:text-white hover:underline"
+                    className="inline-flex min-h-11 items-center rounded-md px-1 text-sm text-white/75 transition hover:bg-white/10 hover:text-white hover:underline"
                   >
                     {l.label}
                   </Link>
@@ -69,7 +71,7 @@ export function Footer() {
                 <a
                   href={telUrl(primaryPhone, site)}
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'footer' })}
-                  className="font-semibold text-white transition hover:text-brand-200 hover:underline"
+                  className="inline-flex min-h-11 items-center rounded-md px-1 font-semibold text-white transition hover:bg-white/10 hover:text-brand-200 hover:underline"
                 >
                   {formatPhoneDisplay(primaryPhone)}
                 </a>
@@ -82,7 +84,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'footer-nap' })}
-                  className="inline-flex items-center gap-1.5 font-semibold text-white transition hover:text-brand-200 hover:underline"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-1 font-semibold text-white transition hover:bg-white/10 hover:text-brand-200 hover:underline"
                 >
                   <MessageCircle className="h-4 w-4" aria-hidden />
                   Chat on WhatsApp
@@ -99,7 +101,7 @@ export function Footer() {
               <a
                 href={telUrl(primaryPhone, site)}
                 onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'footer-icon' })}
-                className="inline-flex items-center gap-2 text-white/60 transition hover:text-white"
+                className="tap-target inline-flex items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"
                 aria-label={`Call ${formatPhoneDisplay(primaryPhone)}`}
               >
                 <Phone className="h-4 w-4" />
@@ -109,7 +111,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 bg-heading/40">
+      <div className="relative z-10 border-t border-white/10 bg-heading/40">
         <div className="container-px py-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <p className="text-sm text-white/60">
@@ -119,15 +121,15 @@ export function Footer() {
               Best Electric Scooters in Berhampore | No Licence Required | Low Running Cost
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 text-sm">
-              <Link to="/terms" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
+              <Link to="/terms" className="inline-flex min-h-11 items-center rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
                 Terms of Service
               </Link>
               <span className="text-white/25" aria-hidden>·</span>
-              <Link to="/privacy" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
+              <Link to="/privacy" className="inline-flex min-h-11 items-center rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
                 Privacy Policy
               </Link>
               <span className="text-white/25" aria-hidden>·</span>
-              <Link to="/about" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
+              <Link to="/about" className="inline-flex min-h-11 items-center rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
                 About
               </Link>
             </div>

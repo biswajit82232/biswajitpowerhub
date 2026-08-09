@@ -54,10 +54,10 @@ export function Navbar() {
               to={link.to}
               className={({ isActive }) =>
                 cn(
-                  'whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-semibold transition-all duration-300 ease-premium xl:px-4',
+                  'whitespace-nowrap rounded-full px-2.5 py-2 text-sm transition-all duration-300 ease-premium xl:px-4',
                   isActive
-                    ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-100'
-                    : 'text-body hover:bg-brand-50/60 hover:text-brand-700'
+                    ? 'bg-brand-50 font-bold text-brand-700 ring-1 ring-brand-200 shadow-soft'
+                    : 'font-semibold text-body hover:bg-brand-50/60 hover:text-brand-700'
                 )
               }
             >
@@ -68,7 +68,7 @@ export function Navbar() {
 
         <div className="hidden shrink-0 items-center gap-2 lg:flex">
           <Button
-            variant="secondary"
+            variant="primary"
             size="sm"
             href={telUrl(undefined, site)}
             target="_self"
@@ -135,7 +135,7 @@ export function Navbar() {
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <Button
-                  variant="secondary"
+                  variant="primary"
                   href={telUrl(undefined, site)}
                   target="_self"
                   icon={Phone}

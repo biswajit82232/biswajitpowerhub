@@ -1,4 +1,5 @@
 import { Phone, Navigation } from 'lucide-react';
+import Button from '@/components/ui/Button';
 import { SITE, telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
@@ -21,24 +22,29 @@ export function MobileLocalCTA() {
       aria-label="Call or get directions"
     >
       <div className="mx-auto grid w-full max-w-lg grid-cols-2 gap-2">
-        <a
+        <Button
           href={telUrl(undefined, site)}
+          target="_self"
+          variant="primary"
+          size="sm"
+          icon={Phone}
+          fullWidth
+          className="min-h-11 rounded-lg"
           onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'mobile_sticky' })}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3 text-sm font-bold text-white transition hover:bg-brand-500 active:scale-[0.98]"
         >
-          <Phone className="h-4 w-4" aria-hidden />
           Call
-        </a>
-        <a
+        </Button>
+        <Button
           href={mapsHref}
-          target="_blank"
-          rel="noopener noreferrer"
+          variant="directions"
+          size="sm"
+          icon={Navigation}
+          fullWidth
+          className="min-h-11 rounded-lg"
           onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'mobile_sticky' })}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#4285f4] px-3 text-sm font-bold text-white transition hover:bg-[#3367d6] active:scale-[0.98]"
         >
-          <Navigation className="h-4 w-4" aria-hidden />
           Directions
-        </a>
+        </Button>
       </div>
       <span className="sr-only">{SITE.name}</span>
     </div>
