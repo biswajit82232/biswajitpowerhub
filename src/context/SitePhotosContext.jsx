@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   DEFAULT_SITE_PHOTOS,
-  readSitePhotos,
+  loadSitePhotos,
   saveSitePhotos as persistPhotos,
 } from '@/features/site/sitePhotosService';
 import { getFinanceSettings } from '@/features/finance/financeService';
@@ -14,16 +14,16 @@ export function SitePhotosProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const local = readSitePhotos();
+      const loaded = await loadSitePhotos();
       try {
         const finance = await getFinanceSettings();
-        if (finance?.heroImageUrl && !local.hero?.url) {
-          local.hero = { ...local.hero, url: finance.heroImageUrl };
+        if (finance?.heroImageUrl && !loaded.hero?.url) {
+          loaded.hero = { ...loaded.hero, url: finance.heroImageUrl };
         }
       } catch {
         /* ignore */
       }
-      if (!cancelled) setPhotos(local);
+      if (!cancelled) setPhotos(loaded);
     })();
     return () => {
       cancelled = true;
@@ -37,7 +37,11 @@ export function SitePhotosProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ photos, savePhotos, refresh: () => setPhotos(readSitePhotos()) }),
+    () => ({
+      photos,
+      savePhotos,
+      refresh: async () => setPhotos(await loadSitePhotos()),
+    }),
     [photos, savePhotos],
   );
 

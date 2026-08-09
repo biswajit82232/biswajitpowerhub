@@ -9,12 +9,14 @@ import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
-import { adminAccessHint } from '@/lib/adminAccess';
+import { adminAccessHint, getAdminEmails } from '@/lib/adminAccess';
 
 export default function AdminLogin() {
   const { signIn, session } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const adminEmails = getAdminEmails();
+  const emailPlaceholder = adminEmails[0] || 'admin@biswajitpowerhub.com';
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,6 +76,20 @@ export default function AdminLogin() {
               </div>
             )}
 
+            {adminEmails.length > 0 && (
+              <div className="mt-5 rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">
+                Sign in with your allowed admin email
+                {adminEmails.length === 1 ? (
+                  <>
+                    : <span className="font-semibold">{adminEmails[0]}</span>
+                  </>
+                ) : (
+                  ' (must match the allowlist).'
+                )}
+                {' '}Password is the one set in Supabase → Authentication → Users.
+              </div>
+            )}
+
             {adminAccessHint() && (
               <div className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 {adminAccessHint()}
@@ -84,7 +100,7 @@ export default function AdminLogin() {
               <Field label="Email" htmlFor="email" required>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted" />
-                  <Input id="email" type="email" autoComplete="email" placeholder="admin@biswajitpowerhub.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="pl-11" required />
+                  <Input id="email" type="email" autoComplete="email" placeholder={emailPlaceholder} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="pl-11" required />
                 </div>
               </Field>
               <Field label="Password" htmlFor="password" required>

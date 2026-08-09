@@ -16,6 +16,7 @@ import {
 import { formatHoursGroups } from '@/features/site/siteHours';
 import { DAY_KEYS, DAY_LABELS, DEFAULT_DAY_HOURS } from '@/config/site';
 import { isValidPhone } from '@/features/leads/validation';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 function HoursPreview({ hours }) {
   const groups = formatHoursGroups(hours);

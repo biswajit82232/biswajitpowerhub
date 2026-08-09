@@ -21,6 +21,7 @@ const ORDER = [
   'create_storage_bucket.sql',
   'add_promotional_offers.sql',
   'add_site_settings.sql',
+  'add_site_photos_json.sql',
   'add_file_charges.sql',
   'add_accessories.sql',
   'create_accessory_images_bucket.sql',

@@ -19,6 +19,7 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 3 | `create_storage_bucket.sql` | Scooter image uploads bucket + policies |
 | 4 | `add_promotional_offers.sql` | Homepage promotional offers table |
 | 5 | `add_site_settings.sql` | Admin-editable contact, hours, address |
+| 5b | `add_site_photos_json.sql` | Cloud-persist homepage/about photo slots |
 | 6 | `add_file_charges.sql` | Loan file charges for EMI calculator |
 | 7 | `add_accessories.sql` | Accessories & parts catalog table |
 | 8 | `create_accessory_images_bucket.sql` | Accessory image uploads bucket + policies |
