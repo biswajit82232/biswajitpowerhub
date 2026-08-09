@@ -27,28 +27,32 @@ const CATALOG = Object.fromEntries(SCOOTERS.map((s) => [s.id, s]));
 
 const SCOOTER_SEO = {
   activa: {
-    title: 'Activa Electric Scooter — Price & Specs | Biswajit Power Hub, Berhampore',
+    title: 'Activa Electric Scooter in Berhampore — Price, Features & Test Ride',
     description:
-      'Buy Activa electric scooter in Berhampore. No licence, no registration. Long-range comfort. 1 year warranty. Visit our showroom today.',
+      'Buy Activa electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹45,999. Book test ride. Call 096355 05436.',
     name: 'Activa Electric Scooter',
+    h1: 'Activa Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'single-light': {
-    title: 'Single Light Electric Scooter — 80km Range | No Licence | Berhampore',
+    title: 'Single Light Electric Scooter in Berhampore — Price & Test Ride',
     description:
-      'Affordable Single Light e-scooter at Biswajit Power Hub. 80 km range, home charging, no licence needed. Call 096355 05436.',
+      'Buy Single Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹38,999. Book test ride. Call 096355 05436.',
     name: 'Single Light Electric Scooter',
+    h1: 'Single Light Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'double-light': {
-    title: 'Double Light Electric Scooter — Dual Headlight | Berhampore',
+    title: 'Double Light Electric Scooter in Berhampore — Price & Test Ride',
     description:
-      'Stylish Double Light electric scooter in Berhampore. Low speed, no registration. Visit Chunakhali Bus Stand showroom.',
+      'Buy Double Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹40,999. Book test ride. Call 096355 05436.',
     name: 'Double Light Electric Scooter',
+    h1: 'Double Light Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   zoom: {
-    title: 'Zoom Electric Scooter — Sporty & Efficient | Biswajit Power Hub',
+    title: 'Zoom Electric Scooter in Berhampore — Price, Features & Test Ride',
     description:
-      'Sporty Zoom e-scooter available in Berhampore. No licence required. Low running cost. Test ride today at Chunakhali.',
+      'Buy Zoom electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹42,999. Book test ride. Call 096355 05436.',
     name: 'Zoom Electric Scooter',
+    h1: 'Zoom Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
 };
 
@@ -71,13 +75,32 @@ function ratingForScooter(displayName) {
   };
 }
 
+function reviewsForScooter(displayName, limit = 5) {
+  const matched = REVIEWS.filter(
+    (r) => r.status === 'approved' && r.scooter?.toLowerCase() === displayName.toLowerCase(),
+  ).slice(0, limit);
+  if (!matched.length) return null;
+  return matched.map((r) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.name },
+    ...(r.created_at ? { datePublished: r.created_at } : {}),
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: String(r.rating),
+      bestRating: '5',
+      worstRating: '1',
+    },
+    reviewBody: r.review,
+  }));
+}
+
 const ROUTES = [
   {
     path: '/',
-    title: 'Electric Scooter Dealer in Berhampore | Biswajit Power Hub',
+    title: 'Best Electric Scooter Dealer Berhampore | Biswajit Power Hub',
     description:
-      'Buy premium low-speed electric scooters in Berhampore, West Bengal. No licence, no registration. Activa, Single Light, Double Light, Zoom models. 1 year warranty.',
-    h1: 'Biswajit Power Hub — Premium Electric Scooters in Berhampore',
+      'Biswajit Power Hub — best electric scooters in Berhampore, Murshidabad. No licence. From ₹38,999. Call 096355 05436 for test ride at Chunakhali.',
+    h1: 'Biswajit Power Hub — Best Electric Scooter Dealer in Berhampore, Murshidabad',
     schema: 'local',
   },
   {
@@ -92,33 +115,81 @@ const ROUTES = [
     path: `/scooters/${id}`,
     title: seo.title,
     description: seo.description,
-    h1: seo.name,
+    h1: seo.h1 || seo.name,
     schema: 'product',
     productName: seo.name,
     productId: id,
   })),
   {
+    path: '/best-electric-scooters-berhampore',
+    title: 'Best Electric Scooters in Berhampore (2026) | Biswajit Power Hub',
+    description:
+      'Compare the best electric scooters in Berhampore. Activa, Zoom, Single Light & Double Light. No licence. Test ride at Chunakhali. Call 096355 05436.',
+    h1: 'Best Electric Scooters in Berhampore (2026) — Top Models Compared',
+    schema: 'crumbs',
+  },
+  {
+    path: '/low-budget-electric-scooters-berhampore',
+    title: 'Low Budget Electric Scooters Berhampore | From ₹38,999',
+    description:
+      'Affordable electric scooters in Berhampore. Low budget, no licence models. EMI available. Visit Biswajit Power Hub, Chunakhali. Call 096355 05436.',
+    h1: 'Low Budget Electric Scooters in Berhampore & Murshidabad — Starting ₹38,999',
+    schema: 'crumbs',
+  },
+  {
+    path: '/no-licence-electric-scooters-west-bengal',
+    title: 'No Licence Electric Scooters in West Bengal (2026) Guide',
+    description:
+      'No licence, no registration electric scooters in West Bengal. Legal low-speed EVs at Biswajit Power Hub, Berhampore. Test ride today. Call 096355 05436.',
+    h1: 'No Licence Electric Scooters in West Bengal (2026) — Complete Guide',
+    schema: 'crumbs',
+  },
+  {
+    path: '/battery-upgrade-berhampore',
+    title: 'Electric Scooter Battery Upgrade in Berhampore | Extra Range',
+    description:
+      'Custom battery upgrades for electric scooters in Berhampore. Increase your range at Biswajit Power Hub, Chunakhali. Call 096355 05436.',
+    h1: 'Electric Scooter Battery Upgrade in Berhampore — Extra Range',
+    schema: 'crumbs',
+  },
+  {
+    path: '/test-ride-berhampore',
+    title: 'Free Test Ride Electric Scooter in Berhampore | Book Today',
+    description:
+      'Free electric scooter test rides in Berhampore. No appointment needed at Biswajit Power Hub, Chunakhali. No licence models. Call 096355 05436.',
+    h1: 'Free Test Ride Electric Scooter in Berhampore — Book Today',
+    schema: 'crumbs',
+  },
+  {
+    path: '/exchange-old-scooter-berhampore',
+    title: 'Exchange Old Scooter in Berhampore | Biswajit Power Hub',
+    description:
+      'Exchange your old petrol or electric scooter in Berhampore. Free valuation at Biswajit Power Hub, Chunakhali. Call 096355 05436.',
+    h1: 'Exchange Old Scooter in Berhampore — Free Valuation',
+    schema: 'crumbs',
+  },
+  {
     path: '/contact',
     title: 'Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub',
     description:
       'Visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore. Electric scooter dealer. Call 096355 05436 or WhatsApp us.',
-    h1: 'Visit Our Showroom in Berhampore',
+    h1: 'Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub',
     schema: 'contact',
   },
   {
     path: '/reviews',
-    title: 'Customer Reviews & Testimonials | Biswajit Power Hub, Berhampore',
+    title: 'Customer Reviews — Biswajit Power Hub, Berhampore',
     description:
-      'See what customers say about Biswajit Power Hub. Premium electric scooters and battery solutions in Berhampore.',
-    h1: 'Customer Reviews',
+      'Customer reviews of Biswajit Power Hub electric scooters in Berhampore, Murshidabad. Leave a Google review after your visit.',
+    h1: 'Customer Reviews — Biswajit Power Hub, Berhampore',
     schema: 'crumbs',
   },
   {
     path: '/about',
     title: 'About Biswajit Power Hub — EV Dealer in Berhampore, Murshidabad',
     description:
-      'Trusted multi-brand electric scooter showroom in Berhampore, West Bengal. Batteries, E-Rickshaws, and E-Scooty at Chunakhali.',
-    h1: 'About Biswajit Power Hub',
+      'Trusted electric scooter showroom in Berhampore, Murshidabad. No licence EVs, battery upgrades, test rides at Chunakhali Bus Stand.',
+    h1: 'About Biswajit Power Hub — Trusted EV Dealer in Berhampore, Murshidabad',
     schema: 'crumbs',
   },
   {
@@ -150,6 +221,15 @@ const ROUTES = [
     description: 'Privacy policy for Biswajit Power Hub website. How we handle your data at our Berhampore showroom.',
     h1: 'Privacy Policy',
     schema: 'crumbs',
+  },
+  {
+    path: '/ad-landing',
+    title: 'No Licence Electric Scooters in Berhampore — Test Ride Today',
+    description:
+      'No licence electric scooters in Berhampore. Test ride at Biswajit Power Hub, Chunakhali. Call 096355 05436.',
+    h1: 'No Licence Electric Scooters in Berhampore — Test Ride Today',
+    schema: 'none',
+    noindex: true,
   },
   {
     path: '/dealership',
@@ -267,17 +347,82 @@ function breadcrumbSchema(path, title) {
   return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items };
 }
 
+function sellerRef() {
+  return {
+    '@type': 'LocalBusiness',
+    name: 'BISWAJIT POWER HUB',
+    url: BASE,
+    logo: `${BASE}/logo-512.png`,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Chunakhali Bus Stand, Nimtala',
+      addressLocality: 'Berhampore',
+      addressRegion: 'West Bengal',
+      postalCode: '742149',
+      addressCountry: 'IN',
+    },
+  };
+}
+
+function offerForScooter(scooter, url) {
+  const variants = Array.isArray(scooter.variants) ? scooter.variants : [];
+  const prices = variants.map((v) => Number(v.price)).filter((n) => Number.isFinite(n) && n > 0);
+  const seller = sellerRef();
+  if (prices.length > 1) {
+    const low = Math.min(...prices);
+    const high = Math.max(...prices);
+    return {
+      '@type': 'AggregateOffer',
+      url,
+      price: String(low),
+      lowPrice: String(low),
+      highPrice: String(high),
+      offerCount: String(prices.length),
+      priceCurrency: 'INR',
+      availability: 'https://schema.org/InStock',
+      seller,
+    };
+  }
+  const price = prices[0] || Number(scooter.price) || 0;
+  return {
+    '@type': 'Offer',
+    url,
+    price: String(price),
+    priceCurrency: 'INR',
+    availability: 'https://schema.org/InStock',
+    seller,
+  };
+}
+
+function offerCatalogItems() {
+  return SCOOTERS.map((scooter) => {
+    const url = `${BASE}/scooters/${scooter.id}`;
+    const offer = offerForScooter(scooter, url);
+    return {
+      ...offer,
+      itemOffered: {
+        '@type': 'Product',
+        name: `${scooter.name} Electric Scooter`,
+        url,
+        offers: offer,
+      },
+    };
+  });
+}
+
 function localBusinessSchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store'],
+    '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store', 'AutoDealer'],
     '@id': `${BASE}/#dealership`,
     name: 'BISWAJIT POWER HUB',
     url: BASE,
     logo: `${BASE}/logo-512.png`,
     image: [`${BASE}/logo-512.png`, `${BASE}/og-image.png`],
+    description:
+      'Premium low-speed electric scooter dealer in Berhampore, West Bengal. No licence, no registration on eligible models.',
     telephone: '+919635505436',
-    priceRange: 'INR',
+    priceRange: '₹₹',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Chunakhali Bus Stand, Nimtala',
@@ -299,6 +444,11 @@ function localBusinessSchema() {
       'https://www.instagram.com/biswajitpowerhub',
       'https://www.facebook.com/BiswajitPowerHub',
     ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Electric Scooters',
+      itemListElement: offerCatalogItems(),
+    },
   };
 }
 
@@ -316,18 +466,8 @@ function productSchema(route, enrichment = {}) {
   const high = prices.length ? Math.max(...prices) : low;
   const images = (Array.isArray(live.images) ? live.images : seed.images || []).filter(Boolean);
   const rating = ratingForScooter(shortName);
-  const seller = {
-    '@type': 'LocalBusiness',
-    name: 'BISWAJIT POWER HUB',
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Chunakhali Bus Stand, Nimtala',
-      addressLocality: 'Berhampore',
-      addressRegion: 'West Bengal',
-      postalCode: '742149',
-      addressCountry: 'IN',
-    },
-  };
+  const review = reviewsForScooter(shortName);
+  const seller = sellerRef();
 
   const offers =
     prices.length > 1
@@ -363,6 +503,7 @@ function productSchema(route, enrichment = {}) {
       `Premium low-speed ${name} available at Biswajit Power Hub, Berhampore. No licence required for eligible models.`,
     brand: { '@type': 'Brand', name: seed.brand || 'PowerHub' },
     ...(rating ? { aggregateRating: rating } : {}),
+    ...(review ? { review } : {}),
     offers,
   };
 }

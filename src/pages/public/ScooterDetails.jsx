@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, Navigate, useSearchParams } from 'react-router-dom';
 import {
   BatteryCharging, Gauge, Timer, ShieldCheck, Cpu, Weight, Users, Palette,
-  Check, MessageCircle, CalendarCheck, ChevronLeft, Sparkles,
+  Check, MessageCircle, CalendarCheck, ChevronLeft, Sparkles, Phone,
 } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
@@ -23,19 +23,17 @@ import { useFinance } from '@/context/FinanceSettingsContext';
 import { getAllValueBadges } from '@/lib/valueBadges';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
-import { getScooterVariants, withVariant, hasVariants } from '@/lib/scooterVariants';
+import { getScooterVariants, withVariant } from '@/lib/scooterVariants';
 import { resolveLegacyScooterId } from '@/lib/legacyScooters';
 import { STOCK_LABELS } from '@/data/scooters';
-import { whatsappUrl, SITE_URL, batteryUpgradeWhatsappMessage } from '@/config/site';
+import { whatsappUrl, batteryUpgradeWhatsappMessage, telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { scrollToTop } from '@/components/common/ScrollToTop';
 import {
   breadcrumbList,
-  localBusinessRef,
+  buildScooterProductSchema,
   SCOOTER_SEO,
-  productSku,
-  productAggregateRating,
 } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
@@ -144,51 +142,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
     : `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${formatINR(display.price)}). Please share more details.`;
   const batteryUpgradeWaMessage = batteryUpgradeWhatsappMessage(scooter.name);
 
-  const seller = localBusinessRef(site);
-  const variants = getScooterVariants(scooter);
-  const lowPrice = hasVariants(scooter)
-    ? Math.min(...variants.map((v) => v.price))
-    : display.price;
-  const highPrice = hasVariants(scooter)
-    ? Math.max(...variants.map((v) => v.price))
-    : display.price;
-  const offerBase = {
-    url: `${SITE_URL}/scooters/${scooter.id}`,
-    priceCurrency: 'INR',
-    availability:
-      scooter.stock === 'out_of_stock'
-        ? 'https://schema.org/OutOfStock'
-        : 'https://schema.org/InStock',
-    seller,
-  };
-  const productImages = (scooter.images || []).filter(Boolean);
-  const aggregateRating = productAggregateRating(reviews, scooter.name);
-  const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: `${scooter.name} Electric Scooter`,
-    sku: productSku(scooter.id),
-    mpn: scooter.id,
-    url: `${SITE_URL}/scooters/${scooter.id}`,
-    image: productImages.length ? productImages : [`${SITE_URL}/og-image.png`],
-    brand: { '@type': 'Brand', name: scooter.brand || 'PowerHub' },
-    description: scooter.description,
-    ...(aggregateRating ? { aggregateRating } : {}),
-    offers: hasVariants(scooter)
-      ? {
-          '@type': 'AggregateOffer',
-          ...offerBase,
-          price: String(lowPrice),
-          lowPrice: String(lowPrice),
-          highPrice: String(highPrice),
-          offerCount: String(variants.length),
-        }
-      : {
-          '@type': 'Offer',
-          ...offerBase,
-          price: String(display.price),
-        },
-  };
+  const productSchema = buildScooterProductSchema(scooter, { reviews, site });
   const detailSeo = SCOOTER_SEO[scooter.id] || {
     title: `${scooter.name} Electric Scooter | Biswajit Power Hub, Berhampore`,
     description: scooter.description,
@@ -243,7 +197,9 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 <Badge key={b.id} tone={b.tone}>{b.emoji} {b.label}</Badge>
               ))}
             </div>
-            <h1 className="mt-4 break-words font-display text-display-md font-extrabold text-heading">{scooter.name}</h1>
+            <h1 className="mt-4 break-words font-display text-display-md font-extrabold text-heading sm:text-3xl">
+              {detailSeo.h1 || `${scooter.name} Electric Scooter in Berhampore — Price, Features & Test Ride`}
+            </h1>
             <p className="mt-1 break-words text-base text-muted">{scooter.tagline}</p>
 
             <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
@@ -254,6 +210,19 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             <VariantSelector scooter={scooter} selectedId={variantId} onChange={handleVariantChange} />
 
             <p className="mt-5 break-words leading-relaxed text-body">{scooter.description}</p>
+            <p className="mt-3 text-sm leading-relaxed text-body">
+              Visit Biswajit Power Hub in Berhampore, Murshidabad for a free test ride of the {scooter.name}.
+              Low running cost, home charging, and no licence required on this low-speed model. Compare all
+              options on our{' '}
+              <Link to="/best-electric-scooters-berhampore" className="font-semibold text-brand-700 hover:underline">
+                best electric scooters in Berhampore
+              </Link>{' '}
+              page or browse{' '}
+              <Link to="/scooters" className="font-semibold text-brand-700 hover:underline">
+                all scooters
+              </Link>
+              .
+            </p>
 
             <PremiumPerksStrip />
 
@@ -295,19 +264,39 @@ function ScooterDetailsPage({ id, initialVariantId }) {
               </div>
             </div>
 
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Button
+                href={telUrl(undefined, site)}
+                target="_self"
+                variant="primary"
+                size="lg"
+                icon={Phone}
+                fullWidth
+                className="sm:flex-1"
+                onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
+              >
+                Call showroom
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
+                icon={CalendarCheck}
+                fullWidth
+                className="sm:flex-1"
+                onClick={() => setTestRideOpen(true)}
+              >
+                Book test ride
+              </Button>
               <Button
                 href={whatsappUrl(waMessage, site)}
                 variant="whatsapp"
                 size="lg"
                 icon={MessageCircle}
                 fullWidth
+                className="sm:flex-1"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
               >
-                Enquire on WhatsApp
-              </Button>
-              <Button variant="primary" size="lg" icon={CalendarCheck} fullWidth onClick={() => setTestRideOpen(true)}>
-                Book Test Ride
+                WhatsApp
               </Button>
             </div>
 

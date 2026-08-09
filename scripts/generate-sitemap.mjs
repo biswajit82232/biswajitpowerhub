@@ -12,11 +12,17 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const STATIC_PAGES = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
   { path: '/scooters', priority: '0.9', changefreq: 'weekly' },
-  { path: '/accessories', priority: '0.7', changefreq: 'weekly' },
+  { path: '/best-electric-scooters-berhampore', priority: '0.9', changefreq: 'weekly' },
+  { path: '/low-budget-electric-scooters-berhampore', priority: '0.85', changefreq: 'weekly' },
+  { path: '/no-licence-electric-scooters-west-bengal', priority: '0.85', changefreq: 'weekly' },
+  { path: '/battery-upgrade-berhampore', priority: '0.8', changefreq: 'monthly' },
+  { path: '/test-ride-berhampore', priority: '0.8', changefreq: 'monthly' },
+  { path: '/exchange-old-scooter-berhampore', priority: '0.75', changefreq: 'monthly' },
+  { path: '/accessories', priority: '0.6', changefreq: 'weekly' },
   { path: '/reviews', priority: '0.7', changefreq: 'weekly' },
-  { path: '/compare', priority: '0.6', changefreq: 'monthly' },
+  { path: '/compare', priority: '0.5', changefreq: 'monthly' },
   { path: '/about', priority: '0.6', changefreq: 'monthly' },
-  { path: '/contact', priority: '0.8', changefreq: 'monthly' },
+  { path: '/contact', priority: '0.85', changefreq: 'monthly' },
   { path: '/terms', priority: '0.3', changefreq: 'yearly' },
   { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
 ];
@@ -48,6 +54,7 @@ Allow: /
 Disallow: /admin
 Disallow: /dealership
 Disallow: /updates
+Disallow: /ad-landing
 
 Sitemap: ${BASE}/sitemap.xml
 `;
@@ -55,5 +62,5 @@ Sitemap: ${BASE}/sitemap.xml
 writeFileSync('public/sitemap.xml', sitemap);
 writeFileSync('public/robots.txt', robots);
 console.log(
-  `[sitemap] Generated ${urls.length} URLs for ${BASE} (${scooterIds.length} SEO-ready scooters, 0 accessory detail pages)`,
+  `[sitemap] Generated ${urls.length} URLs for ${BASE} (${scooterIds.length} SEO-ready scooters, SEO landings included)`,
 );

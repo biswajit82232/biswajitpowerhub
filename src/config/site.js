@@ -5,7 +5,7 @@
 
 import { toLegacyHours } from '@/features/site/siteHours';
 
-/** Per-day hours seed — Mon–Sat 9–8, Sun 11–6 */
+/** Per-day hours seed — Mon–Sat 9–8, Sunday Closed */
 export const INITIAL_HOURS = {
   mon: { open: '09:00', close: '20:00', closed: false },
   tue: { open: '09:00', close: '20:00', closed: false },
@@ -13,11 +13,11 @@ export const INITIAL_HOURS = {
   thu: { open: '09:00', close: '20:00', closed: false },
   fri: { open: '09:00', close: '20:00', closed: false },
   sat: { open: '09:00', close: '20:00', closed: false },
-  sun: { open: '11:00', close: '18:00', closed: false },
+  sun: { open: '09:00', close: '20:00', closed: true },
 };
 
-/** Default time range when resetting a day in admin (9 AM – 8:30 PM) */
-export const DEFAULT_DAY_HOURS = { open: '09:00', close: '20:30', closed: false };
+/** Default time range when resetting a day in admin (9 AM – 8:00 PM) */
+export const DEFAULT_DAY_HOURS = { open: '09:00', close: '20:00', closed: false };
 
 export const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -31,22 +31,34 @@ export const DAY_LABELS = {
   sun: 'Sunday',
 };
 
+/** Google review / GBP-aligned rating — keep in sync with live Google reviews */
+export const GBP_RATING = {
+  ratingValue: 4.8,
+  reviewCount: 12,
+  bestRating: 5,
+  worstRating: 1,
+};
+
 /** Defaults for contact & location — used until admin settings load */
 export const CONTACT_DEFAULTS = {
-  phones: ['9635505436', '9775441797'],
+  phones: ['9635505436'],
   whatsapp: '919635505436',
   address: {
     line: 'Chunakhali Bus Stand, Nimtala',
     city: 'Berhampore',
+    district: 'Murshidabad',
     state: 'West Bengal',
     pincode: '742149',
     country: 'India',
-    full: 'Chunakhali Bus Stand, Nimtala, Berhampore, West Bengal, 742149, India',
+    full: 'Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal, 742149, India',
   },
   maps: {
-    link: 'https://maps.app.goo.gl/jRPDFP7DyfPocFEj8?g_st=ac',
+    link: 'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore',
     embed:
-      'https://www.google.com/maps?q=Chunakhali%20Bus%20Stand%2C%20Nimtala%2C%20Berhampore%2C%20West%20Bengal%20742149&output=embed',
+      'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Bus+Stand+Nimtala+Berhampore+Murshidabad+742149&output=embed',
+    staticImage:
+      'https://maps.googleapis.com/maps/api/staticmap?center=24.0987,88.2519&zoom=15&size=800x400&markers=color:red%7C24.0987,88.2519&key=',
+    reviewLink: 'https://search.google.com/local/writereview?placeid=',
   },
   hours: { ...INITIAL_HOURS },
 };
@@ -55,12 +67,12 @@ export const CONTACT_DEFAULTS = {
 export const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://biswajitpowerhub.in').replace(/\/$/, '');
 
 export const SITE = {
-  name: 'BISWAJIT POWER HUB',
+  name: 'Biswajit Power Hub',
   shortName: 'Power Hub',
   tagline: 'Powering Every Ride',
   type: 'EV Dealership & Showroom',
   description:
-    'Premium low-speed electric scooters in Berhampore, West Bengal. Ride electric, save more, power every ride.',
+    'Visit Biswajit Power Hub showroom in Berhampore for premium low-speed electric scooters. Call for a test ride — no licence, no registration for eligible models.',
 
   ...CONTACT_DEFAULTS,
   hours: toLegacyHours(CONTACT_DEFAULTS.hours),
@@ -71,7 +83,7 @@ export const SITE = {
     youtube: '',
   },
 
-  /** Approximate showroom coordinates (Chunakhali, Berhampore) for LocalBusiness schema */
+  /** Showroom coordinates (Chunakhali, Berhampore) for LocalBusiness schema */
   geo: {
     latitude: '24.0987',
     longitude: '88.2519',
@@ -80,8 +92,8 @@ export const SITE = {
   url: SITE_URL,
 };
 
-export function buildAddressFull({ line, state, pincode, country }) {
-  return [line, state, pincode, country].filter(Boolean).join(', ');
+export function buildAddressFull({ line, city, district, state, pincode, country }) {
+  return [line, city, district, state, pincode, country].filter(Boolean).join(', ');
 }
 
 /** Merge admin-editable fields into a full site object */
@@ -133,22 +145,34 @@ export const BATTERY_UPGRADE_TAGLINE =
   'Need more mileage? We offer custom higher-AH battery upgrades on eligible models — contact us to know more.';
 
 export function batteryUpgradeWhatsappMessage(scooterName) {
-  return `Hi BISWAJIT POWER HUB, I'm interested in a custom battery upgrade${scooterName ? ` for the ${scooterName}` : ''} to increase mileage. Please share options and pricing.`;
+  return `Hi Biswajit Power Hub, I'm interested in a custom battery upgrade${scooterName ? ` for the ${scooterName}` : ''} to increase mileage. Please share options and pricing.`;
 }
 
 export const NAV_LINKS = [
   { label: 'Home', to: '/' },
   { label: 'Scooters', to: '/scooters' },
-  { label: 'Compare', to: '/compare' },
-  { label: 'Parts', to: '/accessories' },
+  { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
+  { label: 'Low Budget', to: '/low-budget-electric-scooters-berhampore' },
+  { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
   { label: 'Reviews', to: '/reviews' },
-  { label: 'About', to: '/about' },
   { label: 'Contact', to: '/contact' },
+];
+
+/** Extra footer SEO links (not all in primary nav) */
+export const FOOTER_SEO_LINKS = [
+  { label: 'Best Electric Scooters Berhampore', to: '/best-electric-scooters-berhampore' },
+  { label: 'Low Budget E-Scooters', to: '/low-budget-electric-scooters-berhampore' },
+  { label: 'No Licence Scooters WB', to: '/no-licence-electric-scooters-west-bengal' },
+  { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
+  { label: 'Free Test Ride', to: '/test-ride-berhampore' },
+  { label: 'Exchange Old Scooter', to: '/exchange-old-scooter-berhampore' },
+  { label: 'About', to: '/about' },
+  { label: 'Compare Models', to: '/compare' },
 ];
 
 /** WhatsApp deep link — pass site from useSite() when available */
 export function whatsappUrl(
-  message = "Hi BISWAJIT POWER HUB, I'd like to know more about your electric scooters.",
+  message = "Hi Biswajit Power Hub, I'd like to know more about your electric scooters.",
   site = SITE,
 ) {
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
@@ -157,15 +181,22 @@ export function whatsappUrl(
 /** WhatsApp link to a customer/lead phone (10-digit Indian mobile or full intl number) */
 export function whatsappCustomerUrl(
   phone,
-  message = "Hi, this is BISWAJIT POWER HUB. We'd like to follow up on your inquiry.",
+  message = "Hi, this is Biswajit Power Hub. We'd like to follow up on your inquiry.",
 ) {
   const digits = String(phone || '').replace(/\D/g, '');
   if (!digits) return whatsappUrl(message);
   const num = digits.length === 10 ? `91${digits}` : digits;
-  return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${num}?text=${encodeURICommand(message)}`;
 }
 
 export function telUrl(phone, site = SITE) {
   const num = phone || site.phones[0];
   return `tel:+91${num}`;
+}
+
+/** Display phone for UI */
+export function formatPhoneDisplay(phone = SITE.phones[0]) {
+  const d = String(phone).replace(/\D/g, '');
+  if (d.length === 10) return `+91 ${d.slice(0, 5)} ${d.slice(5)}`;
+  return `+91 ${d}`;
 }

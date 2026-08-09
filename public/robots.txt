@@ -3,5 +3,6 @@ Allow: /
 Disallow: /admin
 Disallow: /dealership
 Disallow: /updates
+Disallow: /ad-landing
 
 Sitemap: https://biswajitpowerhub.in/sitemap.xml

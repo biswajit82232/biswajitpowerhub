@@ -1,0 +1,140 @@
+import { Phone, MessageCircle, Navigation } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { SEO } from '@/components/common/SEO';
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { Reveal } from '@/components/common/Reveal';
+import Button from '@/components/ui/Button';
+import { SITE, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
+import { trackEvent, EVENT } from '@/lib/tracking';
+import { SITE_FAQS } from '@/data/seoContent';
+
+export function ShowroomCtaRow({ from = 'seo-landing' }) {
+  const { site } = useSite();
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <Button
+        href={telUrl(undefined, site)}
+        target="_self"
+        variant="primary"
+        size="lg"
+        icon={Phone}
+        className="min-h-11"
+        onClick={() => trackEvent(EVENT.CALL_CLICK, { from })}
+      >
+        Call: {formatPhoneDisplay(site.phones[0]).replace('+91 ', '0')}
+      </Button>
+      <Button
+        href={whatsappUrl(undefined, site)}
+        variant="whatsapp"
+        size="lg"
+        icon={MessageCircle}
+        className="min-h-11"
+        onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from })}
+      >
+        WhatsApp
+      </Button>
+      <Button
+        href={site.maps.link}
+        variant="secondary"
+        size="lg"
+        icon={Navigation}
+        className="min-h-11"
+        onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from })}
+      >
+        Get Directions
+      </Button>
+    </div>
+  );
+}
+
+export function FaqSection({ faqs = SITE_FAQS, title = 'Frequently Asked Questions' }) {
+  return (
+    <section className="mt-14" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" className="font-display text-2xl font-extrabold text-heading sm:text-3xl">
+        {title}
+      </h2>
+      <div className="mt-6 space-y-3">
+        {faqs.map((f) => (
+          <details
+            key={f.question}
+            className="group rounded-2xl bg-surface p-4 ring-1 ring-line open:shadow-soft sm:p-5"
+          >
+            <summary className="cursor-pointer list-none font-display text-base font-bold text-heading marker:content-none [&::-webkit-details-marker]:hidden">
+              <span className="flex items-start justify-between gap-3">
+                {f.question}
+                <span className="shrink-0 text-brand-600 transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p className="mt-3 text-sm leading-relaxed text-body">{f.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Shared shell for SEO intent landing pages.
+ */
+export function SeoLandingLayout({
+  title,
+  description,
+  path,
+  breadcrumbs,
+  h1,
+  intro,
+  jsonLd,
+  children,
+  showFaq = true,
+}) {
+  return (
+    <>
+      <SEO title={title} description={description} path={path} jsonLd={jsonLd} titleTemplate={false} />
+      <article>
+        <header className="border-b border-line bg-surface-alt/50">
+          <div className="container-px py-10 sm:py-14">
+            <Breadcrumbs items={breadcrumbs} />
+            <Reveal>
+              <h1 className="mt-3 max-w-4xl font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
+                {h1}
+              </h1>
+              {intro ? (
+                <p className="mt-4 max-w-3xl text-base leading-relaxed text-body sm:text-lg">{intro}</p>
+              ) : null}
+              <div className="mt-6">
+                <ShowroomCtaRow from={path} />
+              </div>
+            </Reveal>
+          </div>
+        </header>
+
+        <div className="container-px py-10 sm:py-14">
+          <Reveal>
+            <div className="prose-seo mx-auto max-w-3xl space-y-6 text-body [&_a]:font-semibold [&_a]:text-brand-700 [&_a]:underline-offset-2 hover:[&_a]:underline [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading [&_h2]:sm:text-3xl [&_li]:leading-relaxed [&_p]:leading-relaxed [&_strong]:text-heading">
+              {children}
+            </div>
+          </Reveal>
+
+          <div className="mx-auto mt-10 max-w-3xl">
+            <p className="text-sm text-muted">
+              Looking for models? Browse{' '}
+              <Link to="/scooters" className="font-semibold text-brand-700 hover:underline">
+                all electric scooters
+              </Link>{' '}
+              or{' '}
+              <Link to="/contact" className="font-semibold text-brand-700 hover:underline">
+                visit our showroom
+              </Link>{' '}
+              at {SITE.name}, Berhampore.
+            </p>
+            {showFaq ? <FaqSection /> : null}
+            <div className="mt-10">
+              <ShowroomCtaRow from={`${path}-bottom`} />
+            </div>
+          </div>
+        </div>
+      </article>
+    </>
+  );
+}

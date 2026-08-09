@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { PublicLayout } from '@/components/layout/PublicLayout';
+import { BareAdsLayout } from '@/components/layout/BareAdsLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 
 // Public pages (lazy for code-splitting)
@@ -17,6 +18,13 @@ const Terms = lazy(() => import('@/pages/public/Terms'));
 const Privacy = lazy(() => import('@/pages/public/Privacy'));
 const InternalStub = lazy(() => import('@/pages/public/InternalStub'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
+const BestElectricScooters = lazy(() => import('@/pages/public/seo/BestElectricScooters'));
+const LowBudgetElectricScooters = lazy(() => import('@/pages/public/seo/LowBudgetElectricScooters'));
+const NoLicenceElectricScooters = lazy(() => import('@/pages/public/seo/NoLicenceElectricScooters'));
+const BatteryUpgrade = lazy(() => import('@/pages/public/seo/BatteryUpgrade'));
+const TestRide = lazy(() => import('@/pages/public/seo/TestRide'));
+const ExchangeOldScooter = lazy(() => import('@/pages/public/seo/ExchangeOldScooter'));
+const AdLanding = lazy(() => import('@/pages/public/AdLanding'));
 
 // Admin (separate chunk)
 const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'));
@@ -49,6 +57,12 @@ export default function App() {
         <Route path="reviews" element={<Reviews />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="best-electric-scooters-berhampore" element={<BestElectricScooters />} />
+        <Route path="low-budget-electric-scooters-berhampore" element={<LowBudgetElectricScooters />} />
+        <Route path="no-licence-electric-scooters-west-bengal" element={<NoLicenceElectricScooters />} />
+        <Route path="battery-upgrade-berhampore" element={<BatteryUpgrade />} />
+        <Route path="test-ride-berhampore" element={<TestRide />} />
+        <Route path="exchange-old-scooter-berhampore" element={<ExchangeOldScooter />} />
         <Route path="terms" element={<Terms />} />
         <Route path="privacy" element={<Privacy />} />
         <Route
@@ -72,6 +86,11 @@ export default function App() {
           }
         />
         <Route path="*" element={<NotFound />} />
+      </Route>
+
+      {/* Ads landing — bare layout, noindex */}
+      <Route element={<BareAdsLayout />}>
+        <Route path="ad-landing" element={<AdLanding />} />
       </Route>
 
       {/* Admin */}

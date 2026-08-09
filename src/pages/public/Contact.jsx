@@ -84,7 +84,6 @@ function InfoRow({ icon: Icon, title, children }) {
 
 export default function Contact() {
   const { site } = useSite();
-  const hourLines = site.hours.groups || [];
   const contactJsonLd = useMemo(
     () =>
       breadcrumbList([
@@ -111,10 +110,12 @@ export default function Contact() {
             <span className="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-600">
               Contact
             </span>
-            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">{SITE.name}</h1>
-            <p className="mt-2 text-base font-semibold text-gradient">{SITE.tagline}</p>
+            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
+              Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub
+            </h1>
             <p className="mt-3 max-w-xl text-body">
-              We&apos;d love to help you find the perfect electric ride. Questions about custom battery upgrades? Reach out any way you like.
+              Near Chunakhali Bus Stand, Nimtala. Call or WhatsApp for prices, EMI, and test rides — we
+              don&apos;t sell online.
             </p>
           </Reveal>
         </div>
@@ -136,21 +137,34 @@ export default function Contact() {
                   </div>
                 </InfoRow>
                 <InfoRow icon={MapPin} title="Visit our showroom">
-                  {site.address.full}
+                  <address className="not-italic">
+                    Biswajit Power Hub
+                    <br />
+                    Chunakhali Bus Stand, Nimtala
+                    <br />
+                    Berhampore, Murshidabad
+                    <br />
+                    West Bengal — 742149, India
+                    <br />
+                    <span className="mt-1 block text-muted">Landmark: Near Chunakhali Bus Stand</span>
+                  </address>
                 </InfoRow>
                 <InfoRow icon={Clock} title="Opening hours">
-                  {hourLines.map((g, i) => (
-                    <span key={g.label}>
-                      {i > 0 && <br />}
-                      {g.label}: {g.text}
-                    </span>
-                  ))}
+                  Monday–Saturday: 9:00 AM – 8:00 PM
+                  <br />
+                  Sunday: Closed
                 </InfoRow>
                 <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                   <Button href={whatsappUrl(undefined, site)} variant="whatsapp" icon={MessageCircle} fullWidth onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}>
                     WhatsApp Us
                   </Button>
-                  <Button href={site.maps.link} variant="secondary" icon={Navigation} fullWidth>
+                  <Button
+                    href={site.maps.link}
+                    variant="secondary"
+                    icon={Navigation}
+                    fullWidth
+                    onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
+                  >
                     Get Directions
                   </Button>
                 </div>

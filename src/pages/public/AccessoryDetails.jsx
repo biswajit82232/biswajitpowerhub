@@ -12,7 +12,8 @@ import { getAccessoryById } from '@/features/accessories/accessoryService';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
 import { STOCK_LABELS } from '@/data/scooters';
-import { whatsappUrl, SITE_URL } from '@/config/site';
+import { buildAccessoryProductSchema } from '@/lib/schemaHelpers';
+import { whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
@@ -53,26 +54,7 @@ export default function AccessoryDetails() {
   const stock = STOCK_LABELS[accessory.stock] || STOCK_LABELS.in_stock;
   const waMessage = `Hi BISWAJIT POWER HUB, I'm interested in ${accessory.name} (${formatINR(accessory.price)}). Is it available?`;
 
-  const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: accessory.name,
-    sku: accessory.id,
-    url: `${SITE_URL}/accessories/${accessory.id}`,
-    image: accessory.images?.[0] || `${SITE_URL}/logo-512.png`,
-    description: accessory.description,
-    category: accessory.category,
-    offers: {
-      '@type': 'Offer',
-      url: `${SITE_URL}/accessories/${accessory.id}`,
-      price: accessory.price,
-      priceCurrency: 'INR',
-      availability:
-        accessory.stock === 'out_of_stock'
-          ? 'https://schema.org/OutOfStock'
-          : 'https://schema.org/InStock',
-    },
-  };
+  const productSchema = buildAccessoryProductSchema(accessory, { site });
 
   return (
     <>

@@ -1,4 +1,6 @@
 import { DAY_KEYS, DAY_LABELS, SITE, SITE_URL } from '@/config/site';
+import { getScooterVariants, getStartingPrice } from '@/lib/scooterVariants';
+import { SITE_FAQS, MODEL_SEO_META } from '@/data/seoContent';
 
 const SCHEMA_DAYS = {
   mon: 'Monday',
@@ -82,57 +84,214 @@ export function faqPageSchema(faqs) {
   };
 }
 
-export const SCOOTER_FAQS = [
-  {
-    question: 'Do I need a licence to ride these electric scooters?',
-    answer:
-      'No licence or registration is required for our low-speed electric scooter models as they comply with RTO regulations for vehicles under 25 km/h.',
-  },
-  {
-    question: 'What is the range of these electric scooters?',
-    answer:
-      'Our scooters offer ranges from about 50 km to 120 km per charge depending on the model and battery option. We also offer custom battery upgrades for extra range.',
-  },
-  {
-    question: 'Where is your showroom located?',
-    answer:
-      'We are located at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149.',
-  },
-  {
-    question: 'Do you provide warranty and servicing?',
-    answer:
-      'Yes, all our electric scooters come with motor and controller warranty plus 3 free servicing sessions.',
-  },
-];
+export const SCOOTER_FAQS = SITE_FAQS;
 
 /** SEO copy keyed by scooter id */
 export const SCOOTER_SEO = {
-  activa: {
-    title: 'Activa Electric Scooter — Price & Specs | Biswajit Power Hub, Berhampore',
-    description:
-      'Buy Activa electric scooter in Berhampore. No licence, no registration. Long-range comfort. 1 year warranty. Visit our showroom today.',
-  },
-  'single-light': {
-    title: 'Single Light Electric Scooter — 80km Range | No Licence | Berhampore',
-    description:
-      'Affordable Single Light e-scooter at Biswajit Power Hub. 80 km range, home charging, no licence needed. Call 096355 05436.',
-  },
-  'double-light': {
-    title: 'Double Light Electric Scooter — Dual Headlight | Berhampore',
-    description:
-      'Stylish Double Light electric scooter in Berhampore. Low speed, no registration. Visit Chunakhali Bus Stand showroom.',
-  },
-  zoom: {
-    title: 'Zoom Electric Scooter — Sporty & Efficient | Biswajit Power Hub',
-    description:
-      'Sporty Zoom e-scooter available in Berhampore. No licence required. Low running cost. Test ride today at Chunakhali.',
-  },
+  activa: MODEL_SEO_META.activa,
+  'single-light': MODEL_SEO_META['single-light'],
+  'double-light': MODEL_SEO_META['double-light'],
+  zoom: MODEL_SEO_META.zoom,
 };
 
 /** Stable product identifier for schema / inventory (e.g. BPH-ACTIVA) */
 export function productSku(scooterId) {
   return `BPH-${String(scooterId || '').toUpperCase().replace(/-/g, '_')}`;
 }
+
+/** Schema.org availability URL from stock status */
+export function productAvailability(stock) {
+  return stock === 'out_of_stock'
+    ? 'https://schema.org/OutOfStock'
+    : 'https://schema.org/InStock';
+}
+
+/** Single Offer block — price must be a string for Google Product rich results */
+export function buildProductOffer({ url, price, priceCurrency = 'INR', stock = 'in_stock', seller }) {
+  return {
+    '@type': 'Offer',
+    url,
+    price: String(price),
+    priceCurrency,
+    availability: productAvailability(stock),
+    itemCondition: 'https://schema.org/NewCondition',
+    priceValidUntil: '2026-12-31',
+    ...(seller ? { seller } : {}),
+  };
+}
+
+/** AggregateOffer for scooters with battery variants */
+export function buildAggregateProductOffer({
+  url,
+  lowPrice,
+  highPrice,
+  offerCount,
+  stock = 'in_stock',
+  seller,
+}) {
+  return {
+    '@type': 'AggregateOffer',
+    url,
+    price: String(lowPrice),
+    lowPrice: String(lowPrice),
+    highPrice: String(highPrice),
+    offerCount: String(offerCount),
+    priceCurrency: 'INR',
+    availability: productAvailability(stock),
+    itemCondition: 'https://schema.org/NewCondition',
+    priceValidUntil: '2026-12-31',
+    ...(seller ? { seller } : {}),
+  };
+}
+
+/** Review[] for a product from approved reviews */
+export function productReviewsSchema(reviews, scooterName, limit = 5) {
+  if (!Array.isArray(reviews) || !scooterName) return undefined;
+  const matched = reviews
+    .filter(
+      (r) => r?.scooter && String(r.scooter).toLowerCase() === String(scooterName).toLowerCase(),
+    )
+    .slice(0, limit);
+  if (!matched.length) return undefined;
+  return matched.map((r) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.name },
+    ...(r.created_at ? { datePublished: r.created_at } : {}),
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: String(r.rating),
+      bestRating: '5',
+      worstRating: '1',
+    },
+    reviewBody: r.review,
+  }));
+}
+
+/**
+ * Valid Product schema for a scooter — includes required offers and optional
+ * aggregateRating / review when review data is available.
+ */
+export function buildScooterProductSchema(scooter, { reviews, site } = {}) {
+  if (!scooter) return null;
+  const seller = localBusinessRef(site);
+  const variants = getScooterVariants(scooter);
+  const url = `${SITE_URL}/scooters/${scooter.id}`;
+  const productImages = (scooter.images || []).filter(Boolean);
+  const aggregateRating = reviews ? productAggregateRating(reviews, scooter.name) : null;
+  const review = reviews ? productReviewsSchema(reviews, scooter.name) : undefined;
+
+  let offers;
+  if (variants.length) {
+    const prices = variants.map((v) => v.price);
+    offers = buildAggregateProductOffer({
+      url,
+      lowPrice: Math.min(...prices),
+      highPrice: Math.max(...prices),
+      offerCount: variants.length,
+      stock: scooter.stock,
+      seller,
+    });
+  } else {
+    offers = buildProductOffer({
+      url,
+      price: scooter.price,
+      stock: scooter.stock,
+      seller,
+    });
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: `${scooter.name} Electric Scooter`,
+    sku: productSku(scooter.id),
+    mpn: scooter.id,
+    url,
+    image: productImages.length ? productImages : [`${SITE_URL}/og-image.png`],
+    brand: { '@type': 'Brand', name: scooter.brand || 'PowerHub' },
+    description: scooter.description,
+    offers,
+    ...(aggregateRating ? { aggregateRating } : {}),
+    ...(review ? { review } : {}),
+  };
+}
+
+/** OfferCatalog itemListElement entries for LocalBusiness hasOfferCatalog */
+export function buildScooterOfferCatalogItems(scooters, site) {
+  if (!Array.isArray(scooters)) return [];
+  const seller = localBusinessRef(site);
+  return scooters.map((scooter) => {
+    const url = `${SITE_URL}/scooters/${scooter.id}`;
+    const variants = getScooterVariants(scooter);
+    const startingPrice = getStartingPrice(scooter);
+    const offer =
+      variants.length > 1
+        ? buildAggregateProductOffer({
+            url,
+            lowPrice: Math.min(...variants.map((v) => v.price)),
+            highPrice: Math.max(...variants.map((v) => v.price)),
+            offerCount: variants.length,
+            stock: scooter.stock,
+            seller,
+          })
+        : buildProductOffer({
+            url,
+            price: startingPrice,
+            stock: scooter.stock,
+            seller,
+          });
+    return {
+      ...offer,
+      itemOffered: {
+        '@type': 'Product',
+        name: `${scooter.name} Electric Scooter`,
+        url,
+        offers: offer,
+      },
+    };
+  });
+}
+
+/** Valid Product schema for an accessory */
+export function buildAccessoryProductSchema(accessory, { site } = {}) {
+  if (!accessory) return null;
+  const url = `${SITE_URL}/accessories/${accessory.id}`;
+  const seller = localBusinessRef(site);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: accessory.name,
+    sku: accessory.id,
+    url,
+    image: accessory.images?.[0] || `${SITE_URL}/logo-512.png`,
+    description: accessory.description,
+    category: accessory.category,
+    offers: buildProductOffer({
+      url,
+      price: accessory.price,
+      stock: accessory.stock,
+      seller,
+    }),
+  };
+}
+
+/** Minimal Product reference for Review.itemReviewed (must include offers) */
+export function buildReviewedProductRef(scooter) {
+  if (!scooter) return null;
+  const url = `${SITE_URL}/scooters/${scooter.id}`;
+  const startingPrice = getStartingPrice(scooter);
+  return {
+    '@type': 'Product',
+    name: `${scooter.name} Electric Scooter`,
+    url,
+    offers: buildProductOffer({
+      url,
+      price: startingPrice,
+      stock: scooter.stock,
+    }),
+  };
+}
+
 
 /**
  * AggregateRating from approved reviews for a scooter display name.

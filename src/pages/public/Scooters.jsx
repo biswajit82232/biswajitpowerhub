@@ -53,16 +53,27 @@ export default function Scooters() {
     ? 'Loading…'
     : `${filtered.length} model${filtered.length !== 1 ? 's' : ''}`;
 
-  const scootersJsonLd = useMemo(
-    () => [
+  const scootersJsonLd = useMemo(() => {
+    const list = scooters || [];
+    return [
       breadcrumbList([
         { name: 'Home', path: '/' },
         { name: 'Scooters', path: '/scooters' },
       ]),
       faqPageSchema(SCOOTER_FAQS),
-    ],
-    [],
-  );
+      {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'Electric Scooters at Biswajit Power Hub',
+        itemListElement: list.slice(0, 8).map((s, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: `${s.name} Electric Scooter`,
+          url: `https://biswajitpowerhub.in/scooters/${s.id}`,
+        })),
+      },
+    ];
+  }, [scooters]);
 
   return (
     <>

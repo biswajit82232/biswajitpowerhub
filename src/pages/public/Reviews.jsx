@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useAsync } from '@/hooks/useAsync';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { getScooters } from '@/features/scooters/scooterService';
-import { breadcrumbList } from '@/lib/schemaHelpers';
+import { breadcrumbList, buildReviewedProductRef } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { SITE_URL } from '@/config/site';
 
@@ -41,22 +41,27 @@ export default function Reviews() {
       { name: 'Reviews', path: '/reviews' },
     ]);
     if (!reviews?.length) return [crumbs];
+
+    const scooterByName = new Map(
+      (scooters || []).map((s) => [String(s.name).toLowerCase(), s]),
+    );
+
     return [
       crumbs,
       {
         '@context': 'https://schema.org',
         '@type': 'LocalBusiness',
-        name: 'BISWAJIT POWER HUB',
+        name: 'Biswajit Power Hub',
         url: SITE_URL,
         logo: `${SITE_URL}/logo-512.png`,
         image: `${SITE_URL}/logo-512.png`,
-        description: 'Electric scooter dealership in Berhampore, West Bengal',
+        description: 'Electric scooter dealership in Berhampore, Murshidabad, West Bengal',
         aggregateRating: {
           '@type': 'AggregateRating',
           ratingValue: avg.toFixed(1),
           bestRating: '5',
           worstRating: '1',
-          reviewCount: reviews.length,
+          reviewCount: String(reviews.length),
         },
         review: reviews.slice(0, 5).map((r) => ({
           '@type': 'Review',
@@ -70,18 +75,23 @@ export default function Reviews() {
           },
           reviewBody: r.review,
           ...(r.scooter
-            ? { itemReviewed: { '@type': 'Product', name: r.scooter } }
+            ? (() => {
+                const reviewed = buildReviewedProductRef(
+                  scooterByName.get(String(r.scooter).toLowerCase()),
+                );
+                return reviewed ? { itemReviewed: reviewed } : {};
+              })()
             : {}),
         })),
       },
     ];
-  }, [reviews, avg]);
+  }, [reviews, avg, scooters]);
 
   return (
     <>
       <SEO
-        title="Customer Reviews & Testimonials | Biswajit Power Hub, Berhampore"
-        description="See what customers say about Biswajit Power Hub. Premium electric scooters and battery solutions in Berhampore."
+        title="Customer Reviews — Biswajit Power Hub, Berhampore"
+        description="Customer reviews of Biswajit Power Hub electric scooters in Berhampore, Murshidabad. Leave a Google review after your visit."
         path="/reviews"
         jsonLd={reviewSchemas}
         titleTemplate={false}
@@ -94,7 +104,9 @@ export default function Reviews() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-600">
               <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" /> Reviews
             </span>
-            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">What our riders say</h1>
+            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
+              Customer Reviews — Biswajit Power Hub, Berhampore
+            </h1>
             {reviews?.length > 0 && (
               <div className="mt-4 flex items-center gap-3">
                 <Stars value={avg} size={22} />
@@ -109,6 +121,20 @@ export default function Reviews() {
       <div className="container-px py-12">
         {/* Form first — no sticky sidebar, avoids scroll overlap with long review lists */}
         <Reveal className="mx-auto max-w-xl">
+          <div className="mb-6 rounded-2xl bg-brand-50 p-5 ring-1 ring-brand-100 sm:p-6">
+            <h2 className="font-display text-lg font-bold text-heading">Leave Us a Review on Google</h2>
+            <p className="mt-1 text-sm text-body">
+              Bought from our Chunakhali showroom? Your Google review helps other Berhampore riders find us.
+            </p>
+            <Button
+              href="https://www.google.com/search?q=Biswajit+Power+Hub+Berhampore"
+              variant="primary"
+              className="mt-4 min-h-11"
+              icon={Star}
+            >
+              Write a Google review
+            </Button>
+          </div>
           <div className="rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-7">
             <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
               <PenLine className="h-5 w-5 text-brand-500" /> Write a review

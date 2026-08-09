@@ -16,6 +16,8 @@ export const isGoogleAdsConfigured = Boolean(GOOGLE_ADS_ID && /^AW-/.test(GOOGLE
 /** Conversion labels created in Google Ads UI (suffix after AW-XXXX/) */
 export const ADS_CONVERSION_LABELS = {
   phone_click: 'phone_call_lead',
+  directions_click: 'directions_click',
+  get_directions: 'directions_click',
   whatsapp_click: 'whatsapp_lead',
   form_submit: 'contact_form_submit',
   contact_form: 'contact_form_submit',
@@ -129,6 +131,7 @@ const GA_EVENT_MAP = {
   simulator_used: 'simulator_use',
   whatsapp_click: 'whatsapp_click',
   call_click: 'phone_click',
+  directions_click: 'get_directions',
   callback_request: 'generate_lead',
   test_ride_booked: 'generate_lead',
   contact_form: 'form_submit',
@@ -152,6 +155,9 @@ export function trackGAEvent(type, meta = {}) {
   }
   if (type === 'call_click') {
     params.event_label = meta.from || 'phone';
+  }
+  if (type === 'directions_click') {
+    params.event_label = meta.from || 'directions';
   }
   if (type === 'contact_form') {
     params.event_category = 'lead';
