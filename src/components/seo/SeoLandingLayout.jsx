@@ -92,32 +92,33 @@ export function SeoLandingLayout({
     <>
       <SEO title={title} description={description} path={path} jsonLd={jsonLd} titleTemplate={false} />
       <article>
-        <header className="border-b border-line bg-surface-alt/50">
-          <div className="container-px py-10 sm:py-14">
+        <header className="relative overflow-hidden border-b border-line bg-sky-fade">
+          <div className="pointer-events-none absolute inset-0 bg-hero-mesh opacity-70" aria-hidden />
+          <div className="container-px relative py-12 sm:py-16 lg:py-20">
             <Breadcrumbs items={breadcrumbs} />
             <Reveal>
-              <h1 className="mt-3 max-w-4xl font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
+              <h1 className="mt-4 max-w-4xl font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl lg:text-5xl">
                 {h1}
               </h1>
               {intro ? (
-                <p className="mt-4 max-w-3xl text-base leading-relaxed text-body sm:text-lg">{intro}</p>
+                <p className="mt-5 max-w-3xl text-base leading-relaxed text-body sm:text-lg">{intro}</p>
               ) : null}
-              <div className="mt-6">
+              <div className="mt-8">
                 <ShowroomCtaRow from={path} />
               </div>
             </Reveal>
           </div>
         </header>
 
-        <div className="container-px py-10 sm:py-14">
+        <div className="container-px py-12 sm:py-16">
           <Reveal>
             <div className="prose-seo mx-auto max-w-[800px] space-y-6 px-0 text-body [&_a]:font-semibold [&_a]:text-brand-600 [&_a]:underline-offset-2 hover:[&_a]:underline [&_h2]:mt-10 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading [&_h2]:sm:text-3xl [&_li]:leading-relaxed [&_p]:leading-relaxed [&_strong]:text-heading [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
               {children}
             </div>
           </Reveal>
 
-          <div className="mx-auto mt-10 max-w-[800px] rounded-2xl bg-surface-alt p-6 ring-1 ring-brand-100 sm:p-8">
-            <p className="font-display text-lg font-bold text-heading">Visit our showroom</p>
+          <div className="mx-auto mt-12 max-w-[800px] rounded-2xl bg-surface-alt p-6 shadow-soft ring-1 ring-brand-100 sm:p-8">
+            <p className="font-display text-lg font-bold text-heading sm:text-xl">Visit our showroom</p>
             <p className="mt-1 text-sm text-muted">
               Looking for models? Browse{' '}
               <Link to="/scooters" className="font-semibold text-brand-600 hover:underline">
