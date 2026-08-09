@@ -99,10 +99,10 @@ export function Hero({ heroImageUrl }) {
             </Button>
             <Button
               href={site.maps.link}
-              variant="ghost"
+              variant="directions"
               size="lg"
               icon={Navigation}
-              className="w-full text-white/90 hover:bg-white/10 hover:text-white sm:w-auto"
+              className="w-full sm:w-auto"
               onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'hero' })}
             >
               Get Directions

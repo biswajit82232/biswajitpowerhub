@@ -240,7 +240,7 @@ export default function Contact() {
                 </Button>
                 <Button
                   href={site.maps.link}
-                  variant="ghost"
+                  variant="directions"
                   size="lg"
                   icon={Navigation}
                   onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}

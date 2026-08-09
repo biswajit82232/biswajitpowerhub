@@ -294,7 +294,7 @@ export default function Home() {
               </Button>
               <Button
                 href={site.maps.link}
-                variant="ghost"
+                variant="directions"
                 icon={Navigation}
                 onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-visit' })}
               >

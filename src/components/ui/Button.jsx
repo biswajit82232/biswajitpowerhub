@@ -19,7 +19,7 @@ const VARIANTS = {
   whatsapp:
     'bg-[#25d366] text-white shadow-soft hover:brightness-105',
   directions:
-    'bg-transparent text-heading ring-1 ring-line hover:bg-surface-alt',
+    'bg-[#4285f4] text-white shadow-soft hover:bg-[#3367d6]',
   danger:
     'bg-red-500 text-white shadow-soft hover:bg-red-600',
   softSuccess:
