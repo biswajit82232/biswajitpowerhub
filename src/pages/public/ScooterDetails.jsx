@@ -224,15 +224,15 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 </p>
                 <p className="mt-3">
                   Compare all options on our{' '}
-                  <Link to="/best-electric-scooters-berhampore" className="font-semibold text-[#ff6600] hover:underline">
+                  <Link to="/best-electric-scooters-berhampore" className="font-semibold text-brand-600 hover:underline">
                     best electric scooters in Berhampore
                   </Link>{' '}
                   page, explore{' '}
-                  <Link to="/battery-upgrade-berhampore" className="font-semibold text-[#ff6600] hover:underline">
+                  <Link to="/battery-upgrade-berhampore" className="font-semibold text-brand-600 hover:underline">
                     battery upgrades
                   </Link>{' '}
                   if you need more range, or browse{' '}
-                  <Link to="/scooters" className="font-semibold text-[#ff6600] hover:underline">
+                  <Link to="/scooters" className="font-semibold text-brand-600 hover:underline">
                     all scooters
                   </Link>
                   . Call 096355 05436 before you visit to confirm colour and stock across Murshidabad.
@@ -376,12 +376,12 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             {/* Features */}
             <div className="mt-8">
               <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-                <Sparkles className="h-5 w-5 text-accent-500" /> Features
+                <Sparkles className="h-5 w-5 text-brand-500" /> Features
               </h3>
               <ul className="mt-4 grid grid-cols-1 gap-3">
                 {scooter.features?.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 break-words text-sm text-body">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-50 text-accent-600">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
                       <Check className="h-3.5 w-3.5" strokeWidth={3} />
                     </span>
                     {f}

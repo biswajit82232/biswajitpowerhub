@@ -7,17 +7,17 @@ import { trackEvent, EVENT } from '@/lib/tracking';
 import { formatCostPerKm } from '@/lib/catalogStats';
 
 const CHIPS = [
-  { icon: Star, label: `${GBP_RATING.ratingValue}/5 Customer Rating`, color: 'text-amber-300' },
-  { icon: Wrench, label: '3 Free Servicing', color: 'text-orange-300' },
-  { icon: ShieldCheck, label: '1 Year Warranty', color: 'text-sky-300' },
-  { icon: Zap, label: 'No Licence Models', color: 'text-emerald-300' },
+  { icon: Star, label: `${GBP_RATING.ratingValue}/5 Customer Rating`, color: 'text-amber-500' },
+  { icon: Wrench, label: '3 Free Servicing', color: 'text-brand-600' },
+  { icon: ShieldCheck, label: '1 Year Warranty', color: 'text-sky-600' },
+  { icon: Zap, label: 'No Licence Models', color: 'text-brand-500' },
 ];
 
 const d = (ms) => ({ animationDelay: `${ms}ms` });
 const HERO_MAX_RANGE_KM = 120;
 
 const CTA_BASE =
-  'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg px-6 py-3.5 text-base font-bold text-white transition active:scale-[0.98] sm:w-auto';
+  'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-bold text-white shadow-soft transition duration-300 ease-premium active:scale-[0.98] sm:w-auto';
 
 export function Hero({ heroImageUrl, catalogStats }) {
   const { site } = useSite();
@@ -37,26 +37,27 @@ export function Hero({ heroImageUrl, catalogStats }) {
   ];
 
   return (
-    <section className="relative overflow-x-clip" style={{ background: 'linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)' }}>
-      <div className="container-px grid items-center gap-10 pb-12 pt-10 sm:pb-16 sm:pt-14 lg:grid-cols-2 lg:gap-12 lg:py-20">
+    <section className="relative overflow-x-clip bg-sky-fade">
+      <div className="pointer-events-none absolute inset-0 bg-hero-mesh" aria-hidden />
+      <div className="container-px relative grid items-center gap-8 pb-12 pt-10 sm:gap-10 sm:pb-16 sm:pt-14 lg:grid-cols-2 lg:gap-12 lg:py-20">
         <div className="text-center lg:text-left">
           <div className="animate-hero-rise" style={d(0)}>
-            <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white/90 ring-1 ring-white/15 sm:px-4 sm:text-xs lg:justify-start">
-              <span className="flex h-4 w-4 items-center justify-center rounded-full" style={{ backgroundColor: '#ff6600' }}>
+            <span className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-brand-700 shadow-soft ring-1 ring-brand-100 sm:px-4 sm:text-xs lg:justify-start">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-600">
                 <Zap className="h-2.5 w-2.5 text-white" fill="white" />
               </span>
               {SITE.name} · Berhampore
             </span>
           </div>
 
-          <h1 className="mt-5 font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl lg:text-4xl">
+          <h1 className="mt-5 font-display text-display-md font-extrabold text-heading sm:text-display-lg">
             <span className="animate-hero-rise block" style={d(60)}>
               Biswajit Power Hub — Best Electric Scooter Dealer in Berhampore, Murshidabad
             </span>
           </h1>
 
           <p
-            className="mx-auto mt-5 max-w-xl animate-hero-rise text-base leading-relaxed text-white/70 sm:text-lg lg:mx-0"
+            className="mx-auto mt-5 max-w-xl animate-hero-rise text-base leading-relaxed text-body sm:text-lg lg:mx-0"
             style={d(120)}
           >
             Premium Low-Speed Electric Scooters. No Licence. No Registration. Test Ride Today at
@@ -69,8 +70,7 @@ export function Hero({ heroImageUrl, catalogStats }) {
           >
             <a
               href={telUrl(undefined, site)}
-              className={CTA_BASE}
-              style={{ backgroundColor: '#ff6600' }}
+              className={`${CTA_BASE} bg-brand-600 hover:bg-brand-700`}
               onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'hero' })}
             >
               <Phone className="h-5 w-5" aria-hidden />
@@ -80,8 +80,7 @@ export function Hero({ heroImageUrl, catalogStats }) {
               href={whatsappUrl(undefined, site)}
               target="_blank"
               rel="noopener noreferrer"
-              className={CTA_BASE}
-              style={{ backgroundColor: '#25d366' }}
+              className={`${CTA_BASE} bg-[#25d366] hover:brightness-105`}
               onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'hero' })}
             >
               <MessageCircle className="h-5 w-5" aria-hidden />
@@ -91,8 +90,7 @@ export function Hero({ heroImageUrl, catalogStats }) {
               href={site.maps.link}
               target="_blank"
               rel="noopener noreferrer"
-              className={CTA_BASE}
-              style={{ backgroundColor: '#4285f4' }}
+              className={`${CTA_BASE} bg-[#4285f4] hover:bg-[#3367d6]`}
               onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'hero' })}
             >
               <Navigation className="h-5 w-5" aria-hidden />
@@ -107,7 +105,7 @@ export function Hero({ heroImageUrl, catalogStats }) {
             {CHIPS.map(({ icon: Icon, label, color }) => (
               <span
                 key={label}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/85 ring-1 ring-white/10"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-heading shadow-soft ring-1 ring-brand-100/80"
               >
                 <Icon className={`h-3.5 w-3.5 ${color}`} />
                 {label}
@@ -117,22 +115,26 @@ export function Hero({ heroImageUrl, catalogStats }) {
         </div>
 
         <div className="relative mx-auto w-full max-w-md animate-hero-scale pb-4 sm:pb-6 lg:max-w-none lg:pb-0" style={d(180)}>
-          <div className="relative overflow-hidden rounded-xl ring-1 ring-white/10">
+          <div className="relative overflow-hidden rounded-2xl bg-surface shadow-card ring-1 ring-brand-100">
             <SiteImage
               src={imageUrl}
               alt={imageAlt}
               width={1200}
               height={600}
               loading="eager"
+              fetchPriority="high"
               className="w-full"
               placeholderLabel="Upload showroom photo here"
             />
           </div>
-          <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {stats.map((s) => (
-              <div key={s.label} className="rounded-lg bg-white/5 px-2 py-3 text-center ring-1 ring-white/10">
-                <p className="font-display text-sm font-extrabold text-white">{s.value}</p>
-                <p className="mt-0.5 text-[0.65rem] text-white/55">{s.label}</p>
+              <div
+                key={s.label}
+                className="rounded-xl bg-white/90 px-2 py-3 text-center shadow-soft ring-1 ring-brand-100/80"
+              >
+                <p className="font-display text-sm font-extrabold text-brand-700">{s.value}</p>
+                <p className="mt-0.5 text-[0.65rem] text-muted">{s.label}</p>
               </div>
             ))}
           </div>

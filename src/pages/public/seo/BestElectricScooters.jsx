@@ -61,7 +61,7 @@ export default function BestElectricScooters() {
 
       <div className="not-prose overflow-x-auto rounded-xl ring-1 ring-line">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-[#f5f5f5] text-heading">
+          <thead className="bg-surface-alt text-heading">
             <tr>
               <th className="px-4 py-3 font-bold">Model</th>
               <th className="px-4 py-3 font-bold">Price</th>
@@ -80,7 +80,7 @@ export default function BestElectricScooters() {
                 <td className="px-4 py-3">{r.topSpeed}</td>
                 <td className="px-4 py-3">{r.bestFor}</td>
                 <td className="px-4 py-3">
-                  <Link to={`/scooters/${r.slug}`} className="font-semibold text-[#ff6600] hover:underline">
+                  <Link to={`/scooters/${r.slug}`} className="font-semibold text-brand-600 hover:underline">
                     {r.model} electric scooter in Berhampore
                   </Link>
                 </td>

@@ -17,17 +17,14 @@ export function Footer() {
   const primaryPhone = site.phones[0];
 
   return (
-    <footer
-      className="relative mt-auto overflow-x-hidden text-white"
-      style={{ backgroundColor: '#0f0f0f' }}
-    >
-      <div className="h-1" style={{ background: 'linear-gradient(90deg, #ff6600, #4285f4)' }} />
+    <footer className="relative mt-auto overflow-x-hidden bg-footer-navy pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-white lg:pb-0">
+      <div className="h-1 bg-brand-gradient-r" />
 
       <div className="container-px relative z-10 py-12 sm:py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
           {/* Brand */}
           <div>
-            <Logo light className="scale-90 origin-left" />
+            <Logo light className="origin-left scale-90" />
             <p className="mt-4 font-display text-lg font-bold text-white">{SITE.name}</p>
             <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/70">
               Premium Electric Scooters in Berhampore, Murshidabad
@@ -36,7 +33,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-white/50">
+            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-brand-200/80">
               Quick Links
             </h3>
             <ul className="mt-5 space-y-3">
@@ -55,7 +52,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-white/50">
+            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-brand-200/80">
               Contact
             </h3>
             <div className="mt-5 space-y-4 text-sm text-white/75">
@@ -72,7 +69,7 @@ export function Footer() {
                 <a
                   href={telUrl(primaryPhone, site)}
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'footer' })}
-                  className="font-semibold text-white transition hover:underline"
+                  className="font-semibold text-white transition hover:text-brand-200 hover:underline"
                 >
                   {formatPhoneDisplay(primaryPhone)}
                 </a>
@@ -85,7 +82,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'footer-nap' })}
-                  className="inline-flex items-center gap-1.5 font-semibold text-white transition hover:underline"
+                  className="inline-flex items-center gap-1.5 font-semibold text-white transition hover:text-brand-200 hover:underline"
                 >
                   <MessageCircle className="h-4 w-4" aria-hidden />
                   Chat on WhatsApp
@@ -93,7 +90,7 @@ export function Footer() {
               </p>
 
               <p className="flex items-start gap-2 leading-relaxed">
-                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-white/50" aria-hidden />
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-brand-300/70" aria-hidden />
                 <span>
                   Hours: Mon–Sat: 9:00 AM – 8:00 PM | Sunday: Closed
                 </span>
@@ -112,7 +109,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10" style={{ backgroundColor: '#1a1a1a' }}>
+      <div className="border-t border-white/10 bg-heading/40">
         <div className="container-px py-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <p className="text-sm text-white/60">
@@ -122,15 +119,15 @@ export function Footer() {
               Best Electric Scooters in Berhampore | No Licence Required | Low Running Cost
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2 text-sm">
-              <Link to="/terms" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/8 hover:text-white">
+              <Link to="/terms" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
                 Terms of Service
               </Link>
               <span className="text-white/25" aria-hidden>·</span>
-              <Link to="/privacy" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/8 hover:text-white">
+              <Link to="/privacy" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
                 Privacy Policy
               </Link>
               <span className="text-white/25" aria-hidden>·</span>
-              <Link to="/about" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/8 hover:text-white">
+              <Link to="/about" className="rounded-md px-2 py-1 text-white/70 transition hover:bg-white/10 hover:text-white">
                 About
               </Link>
             </div>

@@ -55,7 +55,7 @@ export function TestRideForm({ scooter, onSuccess }) {
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center gap-3 py-6 text-center"
       >
-        <CheckCircle2 className="h-12 w-12 text-accent-500" />
+        <CheckCircle2 className="h-12 w-12 text-brand-500" />
         <h3 className="text-lg font-bold text-heading">Test ride requested!</h3>
         <p className="max-w-xs text-sm text-body">
           We'll confirm your {scooter?.name} test ride on {form.date} at {form.time}.

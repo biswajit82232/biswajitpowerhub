@@ -11,6 +11,7 @@ export function SiteImage({
   width = 800,
   height = 600,
   loading = 'lazy',
+  fetchPriority,
   className,
   imgClassName,
   placeholderLabel = 'Upload Photo',
@@ -20,7 +21,7 @@ export function SiteImage({
 
   return (
     <div
-      className={cn('relative isolate overflow-hidden bg-[#e0e0e0]', className)}
+      className={cn('relative isolate overflow-hidden bg-brand-50', className)}
       style={{ aspectRatio: width && height ? `${width} / ${height}` : undefined }}
     >
       {show ? (
@@ -31,6 +32,7 @@ export function SiteImage({
           height={height}
           loading={loading}
           decoding="async"
+          fetchPriority={fetchPriority}
           onError={() => setErrored(true)}
           className={cn('h-full w-full max-w-full object-cover', imgClassName)}
         />
@@ -40,8 +42,8 @@ export function SiteImage({
           role="img"
           aria-label={alt || placeholderLabel}
         >
-          <ImageIcon className="h-8 w-8 text-[#9a9a9a]" strokeWidth={1.5} />
-          <span className="text-sm font-semibold text-[#6b6b6b]">{placeholderLabel}</span>
+          <ImageIcon className="h-8 w-8 text-brand-300" strokeWidth={1.5} />
+          <span className="text-sm font-semibold text-muted">{placeholderLabel}</span>
           {alt ? <span className="sr-only">{alt}</span> : null}
         </div>
       )}

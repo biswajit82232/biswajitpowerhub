@@ -37,7 +37,7 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
           width={600}
           height={400}
           loading="lazy"
-          className="aspect-[3/2] w-full max-w-full bg-[#e0e0e0] transition-transform duration-500 group-hover:scale-[1.03]"
+          className="aspect-[3/2] w-full max-w-full bg-brand-50 transition-transform duration-500 group-hover:scale-[1.03]"
         />
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2">
           {scooter.noLicence && (
@@ -62,11 +62,11 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
 
         <div className="mt-4 flex items-center gap-4 text-sm text-body">
           <span className="inline-flex items-center gap-1.5">
-            <BatteryCharging className="h-4 w-4 text-accent-500" strokeWidth={2.2} />
+            <BatteryCharging className="h-4 w-4 text-brand-500" strokeWidth={2.2} />
             {scooter.range} km
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Gauge className="h-4 w-4 text-brand-500" strokeWidth={2.2} />
+            <Gauge className="h-4 w-4 text-sky-500" strokeWidth={2.2} />
             {scooter.topSpeed} km/h
           </span>
         </div>
@@ -81,13 +81,13 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
               {hasVariants(scooter) && (
                 <p className="mt-0.5 text-xs text-muted">Standard & Lithium Pro</p>
               )}
-              <p className="mt-0.5 text-xs font-semibold text-accent-600">
+              <p className="mt-0.5 text-xs font-semibold text-brand-600">
                 EMI from {formatINR(emi)}/mo
               </p>
             </div>
             <Link
               to={`/scooters/${scooter.id}`}
-              className="tap-target inline-flex min-h-11 items-center gap-1 rounded-lg bg-[#ff6600]/10 px-4 py-2.5 text-sm font-semibold text-[#ff6600] transition-all duration-300 group-hover:bg-[#ff6600] group-hover:text-white"
+              className="tap-target inline-flex min-h-11 items-center gap-1 rounded-xl bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 transition-all duration-300 group-hover:bg-brand-600 group-hover:text-white"
               aria-label={`View details for ${scooter.name}`}
             >
               View Details

@@ -44,7 +44,7 @@ export function CallbackForm({ compact = false }) {
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-accent-50 px-6 py-10 text-center"
       >
-        <CheckCircle2 className="h-12 w-12 text-accent-500" />
+        <CheckCircle2 className="h-12 w-12 text-brand-500" />
         <h3 className="text-lg font-bold text-heading">Request received!</h3>
         <p className="max-w-xs text-sm text-body">
           Our team will call <span className="font-semibold">{form.name}</span> at {form.phone} very soon.

@@ -108,11 +108,11 @@ export default function Reviews() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-[#f5f5f5]/50">
+      <section className="border-b border-line bg-surface-alt">
         <div className="container-px py-12 sm:py-16">
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Reviews' }]} />
           <Reveal>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-600">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 ring-1 ring-brand-100">
               <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" /> Reviews
             </span>
             <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
@@ -187,7 +187,7 @@ export default function Reviews() {
           <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
             Leave Us a Review
           </h2>
-          <div className="mt-6 rounded-xl bg-[#ff6600]/5 p-5 ring-1 ring-[#ff6600]/20 sm:p-6">
+          <div className="mt-6 rounded-xl bg-brand-50 p-5 ring-1 ring-brand-100 sm:p-6">
             <p className="text-sm text-body">
               Bought from our Chunakhali showroom? Your Google review helps other Berhampore and
               Murshidabad riders find Biswajit Power Hub.
@@ -203,7 +203,7 @@ export default function Reviews() {
           </div>
           <div className="mt-6 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-7">
             <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-              <PenLine className="h-5 w-5 text-[#ff6600]" /> Write a review on our site
+              <PenLine className="h-5 w-5 text-brand-600" /> Write a review on our site
             </h3>
             <p className="mt-1 text-sm text-muted">Help others choose with confidence.</p>
             <div className="mt-5">

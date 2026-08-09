@@ -11,19 +11,19 @@ const ICONS = {
 
 const CARD_STYLE = {
   servicing: {
-    gradient: 'from-amber-500 to-orange-500',
-    bg: 'bg-amber-50/60',
-    ring: 'ring-amber-100',
+    gradient: 'from-brand-500 to-sky-500',
+    bg: 'bg-brand-50/70',
+    ring: 'ring-brand-100',
   },
   warranty: {
-    gradient: 'from-blue-500 to-cyan-500',
-    bg: 'bg-blue-50/60',
+    gradient: 'from-blue-600 to-brand-500',
+    bg: 'bg-blue-50/70',
     ring: 'ring-blue-100',
   },
   batteryUpgrade: {
-    gradient: 'from-emerald-500 to-teal-500',
-    bg: 'bg-emerald-50/60',
-    ring: 'ring-emerald-100',
+    gradient: 'from-sky-500 to-cyan-500',
+    bg: 'bg-sky-50/70',
+    ring: 'ring-sky-100',
   },
 };
 

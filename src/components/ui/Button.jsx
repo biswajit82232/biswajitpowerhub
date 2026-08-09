@@ -1,18 +1,17 @@
 import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const VARIANTS = {
   primary:
-    'bg-[#ff6600] text-white shadow-soft hover:bg-[#e65c00]',
+    'bg-brand-600 text-white shadow-glow hover:bg-brand-700 hover:shadow-card-hover',
   solid:
-    'bg-[#ff6600] text-white shadow-soft hover:bg-[#e65c00]',
+    'bg-brand-600 text-white shadow-glow hover:bg-brand-700 hover:shadow-card-hover',
   secondary:
     'bg-surface text-heading ring-1 ring-line shadow-soft hover:ring-brand-200 hover:text-brand-700',
   accent:
-    'bg-accent-500 text-white shadow-soft hover:bg-accent-600',
+    'bg-brand-500 text-white shadow-soft hover:bg-brand-600',
   ghost:
     'bg-transparent text-body hover:bg-brand-50 hover:text-brand-700',
   outline:
@@ -99,16 +98,15 @@ const Button = forwardRef(function Button(
   }
 
   return (
-    <motion.button
+    <button
       ref={ref}
-      whileTap={{ scale: 0.97 }}
       type={props.type || 'button'}
       className={classes}
       disabled={disabled || loading}
       {...props}
     >
       {content}
-    </motion.button>
+    </button>
   );
 });
 

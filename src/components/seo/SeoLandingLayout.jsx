@@ -111,16 +111,16 @@ export function SeoLandingLayout({
 
         <div className="container-px py-10 sm:py-14">
           <Reveal>
-            <div className="prose-seo mx-auto max-w-[800px] space-y-6 px-0 text-body [&_a]:font-semibold [&_a]:text-[#ff6600] [&_a]:underline-offset-2 hover:[&_a]:underline [&_h2]:mt-10 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading [&_h2]:sm:text-3xl [&_li]:leading-relaxed [&_p]:leading-relaxed [&_strong]:text-heading [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
+            <div className="prose-seo mx-auto max-w-[800px] space-y-6 px-0 text-body [&_a]:font-semibold [&_a]:text-brand-600 [&_a]:underline-offset-2 hover:[&_a]:underline [&_h2]:mt-10 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading [&_h2]:sm:text-3xl [&_li]:leading-relaxed [&_p]:leading-relaxed [&_strong]:text-heading [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
               {children}
             </div>
           </Reveal>
 
-          <div className="mx-auto mt-10 max-w-[800px] rounded-xl bg-[#f5f5f5] p-6 ring-1 ring-line sm:p-8">
+          <div className="mx-auto mt-10 max-w-[800px] rounded-2xl bg-surface-alt p-6 ring-1 ring-brand-100 sm:p-8">
             <p className="font-display text-lg font-bold text-heading">Visit our showroom</p>
             <p className="mt-1 text-sm text-muted">
               Looking for models? Browse{' '}
-              <Link to="/scooters" className="font-semibold text-[#ff6600] hover:underline">
+              <Link to="/scooters" className="font-semibold text-brand-600 hover:underline">
                 all electric scooters
               </Link>{' '}
               or contact {SITE.name}, Berhampore.

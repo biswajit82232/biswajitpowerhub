@@ -7,122 +7,122 @@ const ITEMS = [
     icon: Wrench,
     title: '3 Free Servicing',
     desc: 'Complimentary scheduled service visits at our Berhampore showroom.',
-    gradient: 'from-rose-500 to-pink-500',
-    glow: 'rgba(244,63,94,0.18)',
-    bg: 'from-rose-50/80 to-pink-50/40',
-    ring: 'ring-rose-100',
-    bar: 'from-rose-400 to-pink-400',
+    gradient: 'from-brand-500 to-sky-500',
+    glow: 'rgba(37,99,235,0.18)',
+    bg: 'from-brand-50/80 to-sky-50/40',
+    ring: 'ring-brand-100',
+    bar: 'from-brand-400 to-sky-400',
   },
   {
     icon: ShieldCheck,
     title: '1 Yr Motor & Controller Warranty',
     desc: 'Full-year coverage on motor and controller — ride with confidence.',
-    gradient: 'from-indigo-500 to-blue-500',
-    glow: 'rgba(99,102,241,0.18)',
-    bg: 'from-indigo-50/80 to-blue-50/40',
-    ring: 'ring-indigo-100',
-    bar: 'from-indigo-400 to-blue-400',
+    gradient: 'from-blue-600 to-brand-500',
+    glow: 'rgba(37,99,235,0.18)',
+    bg: 'from-blue-50/80 to-brand-50/40',
+    ring: 'ring-blue-100',
+    bar: 'from-blue-400 to-brand-400',
   },
   {
     icon: Zap,
     title: 'No Licence Required*',
     desc: 'Ride away today — eligible low-speed models need no driving licence.',
-    gradient: 'from-blue-500 to-cyan-500',
-    glow: 'rgba(59,130,246,0.18)',
-    bg: 'from-blue-50/80 to-cyan-50/40',
-    ring: 'ring-blue-100',
-    bar: 'from-blue-400 to-cyan-400',
+    gradient: 'from-sky-500 to-cyan-500',
+    glow: 'rgba(14,165,233,0.18)',
+    bg: 'from-sky-50/80 to-cyan-50/40',
+    ring: 'ring-sky-100',
+    bar: 'from-sky-400 to-cyan-400',
   },
   {
     icon: FileX2,
     title: 'No Registration Required*',
     desc: 'Skip the RTO queues. Zero registration paperwork for eligible models.',
-    gradient: 'from-teal-500 to-emerald-500',
-    glow: 'rgba(20,184,166,0.18)',
-    bg: 'from-teal-50/80 to-emerald-50/40',
-    ring: 'ring-teal-100',
-    bar: 'from-teal-400 to-emerald-400',
+    gradient: 'from-brand-600 to-blue-500',
+    glow: 'rgba(29,78,216,0.18)',
+    bg: 'from-brand-50/80 to-blue-50/40',
+    ring: 'ring-brand-100',
+    bar: 'from-brand-400 to-blue-400',
   },
   {
     icon: Wallet,
     title: 'Low Running Cost',
     desc: 'Spend a fraction of petrol costs — remarkably low per kilometre.',
-    gradient: 'from-amber-500 to-orange-500',
-    glow: 'rgba(245,158,11,0.18)',
-    bg: 'from-amber-50/80 to-orange-50/40',
-    ring: 'ring-amber-100',
-    bar: 'from-amber-400 to-orange-400',
+    gradient: 'from-cyan-500 to-sky-500',
+    glow: 'rgba(6,182,212,0.18)',
+    bg: 'from-cyan-50/80 to-sky-50/40',
+    ring: 'ring-cyan-100',
+    bar: 'from-cyan-400 to-sky-400',
   },
   {
     icon: BatteryCharging,
     title: 'Home Charging',
     desc: 'Plug into any regular socket at home. Fully charged overnight.',
-    gradient: 'from-violet-500 to-purple-500',
-    glow: 'rgba(139,92,246,0.18)',
-    bg: 'from-violet-50/80 to-purple-50/40',
-    ring: 'ring-violet-100',
-    bar: 'from-violet-400 to-purple-400',
+    gradient: 'from-blue-500 to-indigo-500',
+    glow: 'rgba(59,130,246,0.18)',
+    bg: 'from-blue-50/80 to-indigo-50/40',
+    ring: 'ring-blue-100',
+    bar: 'from-blue-400 to-indigo-400',
   },
   // duplicate set for seamless loop
   {
     icon: Wrench,
     title: '3 Free Servicing',
     desc: 'Complimentary scheduled service visits at our Berhampore showroom.',
-    gradient: 'from-rose-500 to-pink-500',
-    glow: 'rgba(244,63,94,0.18)',
-    bg: 'from-rose-50/80 to-pink-50/40',
-    ring: 'ring-rose-100',
-    bar: 'from-rose-400 to-pink-400',
+    gradient: 'from-brand-500 to-sky-500',
+    glow: 'rgba(37,99,235,0.18)',
+    bg: 'from-brand-50/80 to-sky-50/40',
+    ring: 'ring-brand-100',
+    bar: 'from-brand-400 to-sky-400',
   },
   {
     icon: ShieldCheck,
     title: '1 Yr Motor & Controller Warranty',
     desc: 'Full-year coverage on motor and controller — ride with confidence.',
-    gradient: 'from-indigo-500 to-blue-500',
-    glow: 'rgba(99,102,241,0.18)',
-    bg: 'from-indigo-50/80 to-blue-50/40',
-    ring: 'ring-indigo-100',
-    bar: 'from-indigo-400 to-blue-400',
+    gradient: 'from-blue-600 to-brand-500',
+    glow: 'rgba(37,99,235,0.18)',
+    bg: 'from-blue-50/80 to-brand-50/40',
+    ring: 'ring-blue-100',
+    bar: 'from-blue-400 to-brand-400',
   },
   {
     icon: Zap,
     title: 'No Licence Required*',
     desc: 'Ride away today — eligible low-speed models need no driving licence.',
-    gradient: 'from-blue-500 to-cyan-500',
-    glow: 'rgba(59,130,246,0.18)',
-    bg: 'from-blue-50/80 to-cyan-50/40',
-    ring: 'ring-blue-100',
-    bar: 'from-blue-400 to-cyan-400',
+    gradient: 'from-sky-500 to-cyan-500',
+    glow: 'rgba(14,165,233,0.18)',
+    bg: 'from-sky-50/80 to-cyan-50/40',
+    ring: 'ring-sky-100',
+    bar: 'from-sky-400 to-cyan-400',
   },
   {
     icon: FileX2,
     title: 'No Registration Required*',
     desc: 'Skip the RTO queues. Zero registration paperwork for eligible models.',
-    gradient: 'from-teal-500 to-emerald-500',
-    glow: 'rgba(20,184,166,0.18)',
-    bg: 'from-teal-50/80 to-emerald-50/40',
-    ring: 'ring-teal-100',
-    bar: 'from-teal-400 to-emerald-400',
+    gradient: 'from-brand-600 to-blue-500',
+    glow: 'rgba(29,78,216,0.18)',
+    bg: 'from-brand-50/80 to-blue-50/40',
+    ring: 'ring-brand-100',
+    bar: 'from-brand-400 to-blue-400',
   },
   {
     icon: Wallet,
     title: 'Low Running Cost',
     desc: 'Spend a fraction of petrol costs — remarkably low per kilometre.',
-    gradient: 'from-amber-500 to-orange-500',
-    glow: 'rgba(245,158,11,0.18)',
-    bg: 'from-amber-50/80 to-orange-50/40',
-    ring: 'ring-amber-100',
-    bar: 'from-amber-400 to-orange-400',
+    gradient: 'from-cyan-500 to-sky-500',
+    glow: 'rgba(6,182,212,0.18)',
+    bg: 'from-cyan-50/80 to-sky-50/40',
+    ring: 'ring-cyan-100',
+    bar: 'from-cyan-400 to-sky-400',
   },
   {
     icon: BatteryCharging,
     title: 'Home Charging',
     desc: 'Plug into any regular socket at home. Fully charged overnight.',
-    gradient: 'from-violet-500 to-purple-500',
-    glow: 'rgba(139,92,246,0.18)',
-    bg: 'from-violet-50/80 to-purple-50/40',
-    ring: 'ring-violet-100',
-    bar: 'from-violet-400 to-purple-400',
+    gradient: 'from-blue-500 to-indigo-500',
+    glow: 'rgba(59,130,246,0.18)',
+    bg: 'from-blue-50/80 to-indigo-50/40',
+    ring: 'ring-blue-100',
+    bar: 'from-blue-400 to-indigo-400',
   },
 ];
 
@@ -144,8 +144,12 @@ function WhyMarquee() {
     ro.observe(track);
 
     let raf = 0;
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const tick = () => {
-      if (!pausedRef.current && !document.hidden) {
+      if (!reduceMotion && !pausedRef.current && !document.hidden) {
         if (halfRef.current <= 0) measure();
         const half = halfRef.current;
         if (half > 0) {
@@ -154,9 +158,9 @@ function WhyMarquee() {
           track.style.transform = `translate3d(${offsetRef.current}px,0,0)`;
         }
       }
-      raf = requestAnimationFrame(tick);
+      if (!reduceMotion) raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
+    if (!reduceMotion) raf = requestAnimationFrame(tick);
 
     return () => { cancelAnimationFrame(raf); ro.disconnect(); };
   }, []);
@@ -211,8 +215,8 @@ export function WhyChooseUs() {
   return (
     <Section id="why" className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10 hidden lg:block">
-        <div className="absolute -right-24 top-0 h-64 w-64 rounded-full bg-teal-100/30 blur-3xl" />
-        <div className="absolute -left-20 bottom-0 h-56 w-56 rounded-full bg-blue-100/30 blur-3xl" />
+        <div className="absolute -right-24 top-0 h-64 w-64 rounded-full bg-sky-100/40 blur-3xl" />
+        <div className="absolute -left-20 bottom-0 h-56 w-56 rounded-full bg-brand-100/40 blur-3xl" />
       </div>
 
       <SectionHeading

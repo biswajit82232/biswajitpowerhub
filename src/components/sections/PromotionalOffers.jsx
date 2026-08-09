@@ -29,12 +29,12 @@ function OfferCard({ offer, site }) {
   return (
     <div className="relative overflow-hidden rounded-3xl bg-heading shadow-card ring-1 ring-white/10">
       <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-brand-500/25 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-accent-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(59,130,246,0.12)_0%,transparent_45%,rgba(20,184,166,0.1)_100%)]" />
+      <div className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-sky-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(59,130,246,0.14)_0%,transparent_45%,rgba(14,165,233,0.1)_100%)]" />
 
       <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr,auto] lg:items-center lg:gap-10">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-accent-300 ring-1 ring-white/10">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-sky-300 ring-1 ring-white/10">
             <Sparkles className="h-3 w-3" />
             Limited Offer
           </span>
@@ -61,7 +61,7 @@ function OfferCard({ offer, site }) {
                 onClick={onCopy}
                 className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 font-mono text-sm font-bold tracking-widest text-white ring-1 ring-white/20 transition hover:bg-white/15"
               >
-                <Tag className="h-4 w-4 text-accent-300" />
+                <Tag className="h-4 w-4 text-sky-300" />
                 {offer.promoCode}
                 {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4 text-white/50" />}
               </button>

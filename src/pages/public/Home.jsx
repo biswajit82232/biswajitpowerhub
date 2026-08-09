@@ -37,7 +37,7 @@ import { trackEvent, EVENT } from '@/lib/tracking';
 function GradientDivider({ flip = false }) {
   return (
     <div
-      className={`h-px w-full bg-gradient-to-r from-transparent via-brand-200 to-transparent opacity-70 ${flip ? 'via-accent-200' : ''}`}
+      className={`h-px w-full bg-gradient-to-r from-transparent via-brand-200 to-transparent opacity-70 ${flip ? 'via-sky-300' : ''}`}
     />
   );
 }
@@ -144,7 +144,7 @@ export default function Home() {
 
       <GradientDivider />
       <Section>
-        <article className="mx-auto max-w-3xl space-y-10 text-body [&_a]:font-semibold [&_a]:text-[#ff6600] hover:[&_a]:underline [&_h2]:mt-2 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
+        <article className="mx-auto max-w-3xl space-y-10 text-body [&_a]:font-semibold [&_a]:text-brand-600 hover:[&_a]:underline [&_h2]:mt-2 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
           <Reveal>
             <h2>Best Electric Scooters in Berhampore Under ₹50,000</h2>
             <p>
@@ -269,7 +269,7 @@ export default function Home() {
                 loading="lazy"
                 className="h-48 w-full max-w-full object-cover sm:h-56"
               />
-              <span className="flex items-center justify-center gap-2 bg-[#f5f5f5] px-4 py-3 text-sm font-semibold text-[#4285f4]">
+              <span className="flex items-center justify-center gap-2 bg-surface-alt px-4 py-3 text-sm font-semibold text-[#4285f4]">
                 <MapPin className="h-4 w-4" /> Near Chunakhali Bus Stand — open in Google Maps
               </span>
             </a>
@@ -307,7 +307,7 @@ export default function Home() {
         />
         {!reviewsLoading && reviewAvg && (
           <Reveal className="mt-4 flex justify-center">
-            <div className="inline-flex items-center gap-2.5 rounded-full bg-amber-50 px-5 py-2.5 ring-1 ring-amber-200">
+            <div className="inline-flex items-center gap-2.5 rounded-full bg-brand-50 px-5 py-2.5 ring-1 ring-brand-200">
               <Stars value={Number(reviewAvg)} size={18} />
               <span className="font-display text-lg font-extrabold text-heading">{reviewAvg}</span>
               <span className="text-sm text-muted">
@@ -337,7 +337,7 @@ export default function Home() {
       <GradientDivider />
       <Section id="callback">
         <div className="relative overflow-hidden rounded-3xl shadow-card">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1D4ED8] via-[#0891B2] to-[#0D9488]" />
+          <div className="absolute inset-0 bg-brand-gradient" />
           <div className="relative z-10 grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
             <Reveal className="text-white">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/25 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">

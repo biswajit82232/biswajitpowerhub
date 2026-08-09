@@ -118,7 +118,7 @@ export default function AccessoryDetails() {
 
             {accessory.compatibility && (
               <p className="mt-3 flex items-center gap-2 text-sm text-body">
-                <Wrench className="h-4 w-4 text-accent-500" />
+                <Wrench className="h-4 w-4 text-brand-500" />
                 Fits: {accessory.compatibility}
               </p>
             )}

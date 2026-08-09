@@ -89,11 +89,11 @@ export default function Contact() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-[#f5f5f5]/50">
+      <section className="border-b border-line bg-surface-alt">
         <div className="container-px py-12 sm:py-16">
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Contact' }]} />
           <Reveal>
-            <span className="inline-flex items-center rounded-full bg-[#ff6600]/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#ff6600]">
+            <span className="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 ring-1 ring-brand-100">
               Contact
             </span>
             <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
@@ -128,7 +128,7 @@ export default function Contact() {
                     <br />
                     West Bengal — 742149, India
                     <br />
-                    <span className="mt-2 block font-medium text-[#ff6600]">
+                    <span className="mt-2 block font-medium text-brand-600">
                       Near Chunakhali Bus Stand
                     </span>
                   </address>
@@ -139,8 +139,7 @@ export default function Contact() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg px-7 py-3.5 text-base font-bold text-white sm:w-auto"
-                  style={{ backgroundColor: '#4285f4' }}
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#4285f4] px-7 py-3.5 text-base font-bold text-white transition hover:bg-[#3367d6] sm:w-auto"
                 >
                   <Navigation className="h-5 w-5" aria-hidden />
                   Get Directions
@@ -161,7 +160,7 @@ export default function Contact() {
                     loading="lazy"
                     className="h-48 w-full max-w-full object-cover sm:h-56"
                   />
-                  <span className="block bg-[#f5f5f5] px-4 py-2 text-center text-xs text-muted">
+                  <span className="block bg-surface-alt px-4 py-2 text-center text-xs text-muted">
                     Static map preview — tap for Google Maps directions
                   </span>
                 </a>
@@ -176,8 +175,7 @@ export default function Contact() {
                 <a
                   href={telUrl(undefined, site)}
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })}
-                  className="flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-lg font-bold text-white"
-                  style={{ backgroundColor: '#ff6600' }}
+                  className="flex min-h-12 items-center gap-3 rounded-xl bg-brand-600 px-4 py-3 text-lg font-bold text-white transition hover:bg-brand-700"
                 >
                   <Phone className="h-5 w-5" />
                   Call {formatPhoneDisplay(site.phones[0])}
@@ -187,8 +185,7 @@ export default function Contact() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}
-                  className="flex min-h-12 items-center gap-3 rounded-lg px-4 py-3 text-lg font-bold text-white"
-                  style={{ backgroundColor: '#25d366' }}
+                  className="flex min-h-12 items-center gap-3 rounded-xl bg-[#25d366] px-4 py-3 text-lg font-bold text-white transition hover:brightness-105"
                 >
                   <MessageCircle className="h-5 w-5" />
                   Chat on WhatsApp
@@ -224,7 +221,7 @@ export default function Contact() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <div className="rounded-xl p-6 shadow-card sm:p-8" style={{ background: 'linear-gradient(135deg, #ff6600, #4285f4)' }}>
+              <div className="rounded-xl bg-brand-gradient p-6 shadow-card sm:p-8">
                 <h3 className="font-display text-xl font-bold text-white">Prefer a callback?</h3>
                 <p className="mt-1 text-sm text-white/90">Drop your number and we&apos;ll call you.</p>
                 <div className="mt-5 rounded-xl bg-white p-5">

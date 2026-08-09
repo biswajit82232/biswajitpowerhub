@@ -56,11 +56,11 @@ export default function About() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-[#f5f5f5]/50">
+      <section className="border-b border-line bg-surface-alt">
         <div className="container-px py-12 sm:py-16">
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'About' }]} />
           <Reveal>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#ff6600]">About us</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">About us</p>
             <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
               About Biswajit Power Hub — Trusted EV Dealer in Berhampore, Murshidabad
             </h1>
@@ -109,15 +109,15 @@ export default function About() {
 
             <ul className="mt-8 space-y-4 text-sm text-muted">
               <li className="flex gap-3">
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[#ff6600]" />
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
                 <address className="not-italic">{site.address.full}</address>
               </li>
               <li className="flex gap-3">
-                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-[#ff6600]" />
+                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
                 <a
                   href={telUrl(undefined, site)}
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'about' })}
-                  className="font-medium text-heading transition hover:text-[#ff6600]"
+                  className="font-medium text-heading transition hover:text-brand-600"
                 >
                   {formatPhoneDisplay(site.phones[0])}
                 </a>
@@ -156,9 +156,9 @@ export default function About() {
             </div>
             <div className="mt-4 grid gap-4">
               {PERKS.map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="rounded-xl bg-[#f5f5f5] p-5 ring-1 ring-line">
+                <div key={title} className="rounded-xl bg-surface-alt p-5 ring-1 ring-line">
                   <div className="flex items-start gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#ff6600] ring-1 ring-line">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 ring-1 ring-line">
                       <Icon className="h-5 w-5" />
                     </span>
                     <div>

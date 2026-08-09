@@ -54,8 +54,10 @@ export function Navbar() {
               to={link.to}
               className={({ isActive }) =>
                 cn(
-                  'rounded-full px-4 py-2 text-sm font-semibold transition-colors',
-                  isActive ? 'text-brand-700' : 'text-body hover:text-brand-700'
+                  'rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ease-premium',
+                  isActive
+                    ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-100'
+                    : 'text-body hover:bg-brand-50/60 hover:text-brand-700'
                 )
               }
             >
@@ -76,7 +78,7 @@ export function Navbar() {
             Call
           </Button>
           <Button
-            variant="primary"
+            variant="whatsapp"
             size="sm"
             href={whatsappUrl(undefined, site)}
             icon={MessageCircle}
@@ -142,7 +144,7 @@ export function Navbar() {
                   Call Us
                 </Button>
                 <Button
-                  variant="primary"
+                  variant="whatsapp"
                   href={whatsappUrl(undefined, site)}
                   icon={MessageCircle}
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'mobile-menu' })}

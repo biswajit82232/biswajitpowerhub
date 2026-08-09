@@ -41,6 +41,7 @@ export default function AdLanding() {
             height={420}
             className="h-44 w-full rounded-2xl object-cover ring-1 ring-slate-200"
             loading="eager"
+            fetchPriority="high"
           />
           <img
             src={`${SITE_URL}/logo-512.png`}
@@ -59,7 +60,7 @@ export default function AdLanding() {
               trackEvent(EVENT.CALL_CLICK, { from: 'ad-landing' });
               trackAdsConversion('phone_click');
             }}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#ff6600] px-4 text-base font-bold text-white"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-base font-bold text-white transition hover:bg-brand-700"
           >
             <Phone className="h-5 w-5" />
             Call Now: {formatPhoneDisplay(phone).replace('+91 ', '0')}
