@@ -7,14 +7,13 @@ export function SectionHeading({ eyebrow, title, subtitle, align = 'center', cla
   return (
     <Reveal className={cn(centered ? 'mx-auto max-w-2xl text-center' : 'max-w-2xl', className)}>
       {eyebrow && (
-        <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-brand-50 to-sky-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-700 ring-1 ring-brand-200/70 shadow-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-gradient" />
+        <p className="mb-3 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-700">
           {eyebrow}
-        </span>
+        </p>
       )}
       <h2 className="text-display-lg font-extrabold text-heading">{title}</h2>
       {subtitle && (
-        <p className="mt-4 text-base leading-relaxed text-body sm:text-lg">{subtitle}</p>
+        <p className="mt-3 text-base leading-relaxed text-body sm:mt-4 sm:text-lg">{subtitle}</p>
       )}
     </Reveal>
   );

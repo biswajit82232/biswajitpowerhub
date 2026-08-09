@@ -3,11 +3,34 @@ import react from '@vitejs/plugin-react';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import path from 'path';
 
+function googleSiteVerificationPlugin() {
+  return {
+    name: 'google-site-verification',
+    transformIndexHtml(html) {
+      const token = (
+        process.env.VITE_GOOGLE_SITE_VERIFICATION ||
+        process.env.VITE_GSC_VERIFICATION ||
+        ''
+      ).trim();
+      if (token) {
+        return html.replace(
+          /content="%VITE_GOOGLE_SITE_VERIFICATION%"/g,
+          `content="${token.replace(/"/g, '&quot;')}"`,
+        );
+      }
+      return html.replace(
+        /\s*<!-- Search Console:[\s\S]*?-->\s*<meta\s+name="google-site-verification"[^>]*>\s*/i,
+        '\n',
+      );
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const useHttps = mode !== 'http';
 
   return {
-    plugins: [react(), ...(useHttps ? [basicSsl()] : [])],
+    plugins: [react(), googleSiteVerificationPlugin(), ...(useHttps ? [basicSsl()] : [])],
     server: {
       host: true,
       open: true,

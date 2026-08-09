@@ -1,6 +1,15 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, PhoneCall, Sparkles, MapPin } from 'lucide-react';
+import {
+  ArrowRight,
+  PhoneCall,
+  Sparkles,
+  MapPin,
+  Phone,
+  MessageCircle,
+  Clock,
+  Navigation,
+} from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Section, SectionHeading } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
@@ -19,7 +28,7 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { getScooterInsights } from '@/features/analytics/popularityService';
 import { useFinance } from '@/context/FinanceSettingsContext';
-import { SITE, SITE_URL, GBP_RATING } from '@/config/site';
+import { SITE, SITE_URL, GBP_RATING, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import {
   openingHoursSchema,
@@ -28,19 +37,10 @@ import {
   buildScooterOfferCatalogItems,
   faqPageSchema,
 } from '@/lib/schemaHelpers';
-import { computeCatalogStats } from '@/lib/catalogStats';
 import { SCOOTERS } from '@/data/scooters';
 import { SITE_FAQS } from '@/data/seoContent';
 import { FaqSection, ShowroomCtaRow } from '@/components/seo/SeoLandingLayout';
 import { trackEvent, EVENT } from '@/lib/tracking';
-
-function GradientDivider({ flip = false }) {
-  return (
-    <div
-      className={`h-px w-full bg-gradient-to-r from-transparent via-brand-200 to-transparent opacity-70 ${flip ? 'via-sky-300' : ''}`}
-    />
-  );
-}
 
 const HOME_GUIDES = [
   {
@@ -139,11 +139,6 @@ export default function Home() {
         '@type': 'WebSite',
         name: SITE.name,
         url: SITE_URL,
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: `${SITE_URL}/?q={search_term_string}`,
-          'query-input': 'required name=search_term_string',
-        },
       },
       faqPageSchema(SITE_FAQS),
     ];
@@ -161,7 +156,6 @@ export default function Home() {
     () => (allScooters?.length ? getScooterInsights(allScooters) : Promise.resolve(null)),
     [allScooters?.length],
   );
-  const catalogStats = useMemo(() => computeCatalogStats(allScooters || []), [allScooters]);
   const reviewAvg = reviews?.length
     ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)
     : String(GBP_RATING.ratingValue);
@@ -176,32 +170,16 @@ export default function Home() {
         titleTemplate={false}
       />
 
-      <Hero heroImageUrl={financeSettings?.heroImageUrl} catalogStats={catalogStats} />
+      <Hero heroImageUrl={financeSettings?.heroImageUrl} />
 
-      <PremiumPerks />
-
-      <GradientDivider flip />
-      <Section id="simulator" tight className="relative overflow-hidden bg-gradient-to-b from-slate-50/80 via-white to-slate-50/50">
-        <SectionHeading
-          eyebrow="Petrol costs more — every single km"
-          title="See What You'd Save by Going Electric"
-          subtitle="Pick your scooter, set your daily travel — your yearly savings show up instantly."
-        />
-        <Reveal className="mt-6 sm:mt-10" y={20}>
-          <EVSimulator scooters={allScooters || []} settings={financeSettings} loading={scootersLoading} />
-        </Reveal>
-      </Section>
-
-      <PromotionalOffers />
-
-      <GradientDivider />
+      {/* 1. Product wall */}
       <Section id="models" tight>
         <SectionHeading
           eyebrow="In stock now"
           title="Popular models"
           subtitle="Activa, Zoom, Single Light & Double Light — pick one for a free test ride."
         />
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
           {scootersLoading
             ? Array.from({ length: 4 }).map((_, i) => <ScooterCardSkeleton key={i} />)
             : modelGrid.map((s, i) => (
@@ -215,44 +193,25 @@ export default function Home() {
         </div>
       </Section>
 
-      <GradientDivider />
-      <Section id="callback">
-        <div className="relative overflow-hidden rounded-3xl shadow-card">
-          <div className="absolute inset-0 bg-brand-gradient" />
-          <div className="relative z-10 grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
-            <Reveal className="text-white">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/25 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                <PhoneCall className="h-3.5 w-3.5" /> Free Callback
-              </span>
-              <h2 className="mt-4 font-display text-display-md font-extrabold text-white">
-                Want Us To Call You?
-              </h2>
-              <p className="mt-3 max-w-md text-white/85 leading-relaxed">
-                Leave your number — we will help with models, EMI, battery upgrades, and test rides at
-                our Berhampore showroom.
-              </p>
-              <ul className="mt-6 space-y-2.5 text-sm text-white/90">
-                {['Model recommendations', 'EMI guidance', 'Battery upgrades', 'Test ride booking'].map(
-                  (item) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      {item}
-                    </li>
-                  ),
-                )}
-              </ul>
-            </Reveal>
-            <Reveal delay={0.1}>
-              <div className="glass rounded-2xl p-6 sm:p-8">
-                <h3 className="mb-4 font-display text-lg font-bold text-heading">Request your callback</h3>
-                <CallbackForm />
-              </div>
-            </Reveal>
-          </div>
-        </div>
+      {/* Slim offers strip — not a second hero */}
+      <PromotionalOffers />
+
+      {/* 2. Quiet ownership perks */}
+      <PremiumPerks />
+
+      {/* 3. Savings calculator */}
+      <Section id="simulator" tight className="relative overflow-hidden bg-section-alt">
+        <SectionHeading
+          eyebrow="Petrol costs more — every single km"
+          title="See What You'd Save by Going Electric"
+          subtitle="Pick your scooter, set your daily travel — your yearly savings show up instantly."
+        />
+        <Reveal className="mt-6 sm:mt-10" y={20}>
+          <EVSimulator scooters={allScooters || []} settings={financeSettings} loading={scootersLoading} />
+        </Reveal>
       </Section>
 
-      <GradientDivider flip />
+      {/* 4. Reviews */}
       <Section id="reviews">
         <SectionHeading
           eyebrow="Customer Reviews"
@@ -261,13 +220,13 @@ export default function Home() {
         />
         {!reviewsLoading && reviewAvg && (
           <Reveal className="mt-4 flex justify-center">
-            <div className="inline-flex items-center gap-2.5 rounded-full bg-brand-50 px-5 py-2.5 ring-1 ring-brand-200">
+            <p className="inline-flex items-center gap-2.5 text-heading">
               <Stars value={Number(reviewAvg)} size={18} />
-              <span className="font-display text-lg font-extrabold text-heading">{reviewAvg}</span>
+              <span className="font-display text-lg font-extrabold">{reviewAvg}</span>
               <span className="text-sm text-muted">
                 · {reviews?.length || GBP_RATING.reviewCount} reviews
               </span>
-            </div>
+            </p>
           </Reveal>
         )}
         <div className="mt-8">
@@ -288,24 +247,118 @@ export default function Home() {
         </div>
       </Section>
 
-      <GradientDivider />
-      <Section id="guides" tight className="bg-section-alt">
+      {/* 5. Visit the showroom */}
+      <Section id="visit" className="bg-section-alt">
+        <SectionHeading
+          eyebrow="Come see us"
+          title="Visit the showroom"
+          subtitle="Chunakhali Bus Stand, Nimtala — open every day for free test rides."
+        />
+        <Reveal className="mt-8 overflow-hidden rounded-2xl bg-surface ring-1 ring-line">
+          <iframe
+            src={site.maps.embed}
+            title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-52 w-full border-0 sm:h-64"
+            allowFullScreen
+          />
+          <div className="grid gap-6 p-6 sm:grid-cols-[1fr_auto] sm:items-center sm:p-8">
+            <div className="space-y-3 text-sm text-body">
+              <p className="flex items-start gap-2.5">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
+                <span>{site.address.full}</span>
+              </p>
+              <p className="flex items-center gap-2.5">
+                <Clock className="h-4 w-4 shrink-0 text-brand-600" />
+                <span>{site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}</span>
+              </p>
+            </div>
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+              <Button
+                href={telUrl(undefined, site)}
+                target="_self"
+                variant="primary"
+                icon={Phone}
+                onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'home-visit' })}
+              >
+                Call {formatPhoneDisplay(site.phones[0]).replace('+91 ', '0')}
+              </Button>
+              <Button
+                href={whatsappUrl(undefined, site)}
+                variant="whatsapp"
+                icon={MessageCircle}
+                onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'home-visit' })}
+              >
+                WhatsApp
+              </Button>
+              <Button
+                href={site.maps.link}
+                variant="ghost"
+                icon={Navigation}
+                onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-visit' })}
+              >
+                Directions
+              </Button>
+            </div>
+          </div>
+        </Reveal>
+      </Section>
+
+      {/* Callback after visit */}
+      <Section id="callback">
+        <div className="relative overflow-hidden rounded-2xl bg-brand-800">
+          <div className="relative z-10 grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
+            <Reveal className="text-white">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-sky-200/90">
+                <PhoneCall className="mr-1.5 inline h-3.5 w-3.5" /> Free Callback
+              </p>
+              <h2 className="mt-3 font-display text-display-md font-extrabold text-white">
+                Want Us To Call You?
+              </h2>
+              <p className="mt-3 max-w-md leading-relaxed text-white/80">
+                Leave your number — we will help with models, EMI, battery upgrades, and test rides at
+                our Berhampore showroom.
+              </p>
+              <ul className="mt-6 space-y-2 text-sm text-white/85">
+                {['Model recommendations', 'EMI guidance', 'Battery upgrades', 'Test ride booking'].map(
+                  (item) => (
+                    <li key={item} className="flex items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5 text-sky-300" />
+                      {item}
+                    </li>
+                  ),
+                )}
+              </ul>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="rounded-xl bg-white p-6 sm:p-8">
+                <h3 className="mb-4 font-display text-lg font-bold text-heading">Request your callback</h3>
+                <CallbackForm />
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </Section>
+
+      {/* 6. Guides + FAQ (SEO, quieter) */}
+      <Section id="guides" tight>
         <SectionHeading
           eyebrow="Local guides"
           title="Everything you need to know"
           subtitle="Short answers first — open a guide when you want the full detail."
         />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-8 border-t border-line pt-8 sm:grid-cols-2 lg:grid-cols-3">
           {HOME_GUIDES.map((guide, i) => (
             <Reveal key={guide.to} delay={i * 0.04}>
-              <article className="flex h-full flex-col rounded-2xl bg-surface p-5 ring-1 ring-line shadow-soft">
+              <article className="flex h-full flex-col">
                 <h3 className="font-display text-base font-extrabold leading-snug text-heading sm:text-lg">
                   {guide.title}
                 </h3>
                 <p className="mt-2 flex-1 text-sm leading-relaxed text-body">{guide.blurb}</p>
                 <Link
                   to={guide.to}
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition hover:text-brand-700 hover:underline"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 transition hover:text-brand-800"
                 >
                   {guide.cta}
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -314,25 +367,6 @@ export default function Home() {
             </Reveal>
           ))}
         </div>
-        <Reveal className="mt-8 overflow-hidden rounded-2xl shadow-card ring-1 ring-line">
-          <iframe
-            src={site.maps.embed}
-            title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="h-40 w-full border-0 sm:h-48"
-            allowFullScreen
-          />
-          <a
-            href={site.maps.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-map-image' })}
-            className="flex items-center justify-center gap-2 bg-surface-alt px-4 py-3 text-sm font-semibold text-[#4285f4] transition hover:bg-brand-50"
-          >
-            <MapPin className="h-4 w-4" /> Near Chunakhali Bus Stand — open in Google Maps
-          </a>
-        </Reveal>
       </Section>
 
       <Section>

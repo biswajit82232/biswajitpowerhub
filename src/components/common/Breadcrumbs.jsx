@@ -17,11 +17,11 @@ export function Breadcrumbs({ items = [], className }) {
             <li key={`${item.name}-${i}`} className="flex items-center gap-1">
               {i > 0 && <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-50" aria-hidden />}
               {isLast || !item.to ? (
-                <span className="font-medium text-heading" aria-current="page">
+                <span className="font-medium text-current opacity-95" aria-current="page">
                   {item.name}
                 </span>
               ) : (
-                <Link to={item.to} className="transition hover:text-brand-700">
+                <Link to={item.to} className="transition hover:text-brand-700 hover:opacity-100">
                   {item.name}
                 </Link>
               )}

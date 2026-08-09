@@ -21,6 +21,7 @@ const PERKS = [
 export default function About() {
   const { site } = useSite();
   const { photos } = useSitePhotos();
+  const aboutPhoto = photos?.about?.url || photos?.gallery?.[0]?.url || photos?.hero?.url || null;
 
   const jsonLd = useMemo(
     () => [
@@ -62,36 +63,59 @@ export default function About() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt">
-        <div className="container-px py-12 sm:py-16">
-          <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'About' }]} />
+      <section className="relative isolate min-h-[40vh] overflow-hidden bg-heading sm:min-h-[46vh]">
+        <SiteImage
+          src={aboutPhoto}
+          alt={
+            photos?.about?.alt ||
+            'Biswajit Power Hub team at Chunakhali showroom Berhampore Murshidabad'
+          }
+          width={1600}
+          height={900}
+          loading="eager"
+          className="absolute inset-0 h-full w-full !aspect-auto bg-heading"
+          imgClassName="object-cover object-center"
+          placeholderLabel="Upload team / showroom photo"
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-heading via-heading/60 to-heading/30"
+          aria-hidden
+        />
+        <div className="container-px relative flex min-h-[40vh] flex-col justify-end pb-10 pt-20 sm:min-h-[46vh] sm:pb-14">
+          <Breadcrumbs
+            items={[{ name: 'Home', to: '/' }, { name: 'About' }]}
+            className="mb-0 text-white/70 [&_a]:text-white/80 [&_a:hover]:text-white [&_[aria-current]]:text-white"
+          />
           <Reveal>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">About us</p>
-            <h1 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-heading sm:text-4xl">
-              About Biswajit Power Hub — Trusted EV Dealer in Berhampore, Murshidabad
+            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-sky-200/90">About us</p>
+            <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              A local showroom you can trust
             </h1>
+            <p className="mt-3 max-w-xl text-base text-white/80">
+              Biswajit Power Hub at Chunakhali — premium low-speed EVs for Berhampore and Murshidabad.
+            </p>
           </Reveal>
         </div>
       </section>
 
       <Section>
-        <div className="mx-auto grid max-w-[800px] gap-10 lg:max-w-none lg:grid-cols-2 lg:gap-14">
+        <div className="mx-auto max-w-3xl">
           <Reveal>
-            <div className="space-y-8 text-base leading-relaxed text-body [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading">
+            <div className="space-y-10 text-base leading-relaxed text-body [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading">
               <div>
                 <h2>What to expect when you visit</h2>
                 <p className="mt-4">
-                  Walk into Chunakhali Bus Stand and you will meet a local team — not a call centre.
-                  We help you compare Activa, Zoom, Single Light, and Double Light on the floor, explain
-                  no-licence rules for West Bengal in plain language, and never rush a Murshidabad family
-                  into the wrong battery pack. Sit on the seat, check under-seat storage, and take a free
-                  test ride on nearby roads before you decide.
+                  Walk into Chunakhali Bus Stand and you will meet a local team — not a call centre. We help
+                  you compare Activa, Zoom, Single Light, and Double Light on the floor, explain no-licence
+                  rules for West Bengal in plain language, and never rush a Murshidabad family into the wrong
+                  battery pack. Sit on the seat, check under-seat storage, and take a free test ride on nearby
+                  roads before you decide.
                 </p>
                 <p className="mt-4">
-                  Prefer a local shop over an online-only seller? So do our customers. Same-day questions
-                  about controllers, chargers, and servicing are answered in person. Bring a friend, ask
-                  about EMI slabs, and leave with a clear price — including 3 free servicing and warranty
-                  coverage — written down before you pay.
+                  Prefer a local shop over an online-only seller? So do our customers. Same-day questions about
+                  controllers, chargers, and servicing are answered in person. Bring a friend, ask about EMI
+                  slabs, and leave with a clear price — including 3 free servicing and warranty coverage —
+                  written down before you pay.
                 </p>
               </div>
 
@@ -102,35 +126,46 @@ export default function About() {
                   paperwork kept everyday families from switching to electric. Biswajit Power Hub opened at
                   Chunakhali Bus Stand to make clean, low-cost mobility practical: low-speed electric scooters
                   that need no driving licence and no RTO registration on eligible models. From day one we
-                  focused on showroom honesty — sit on the scooter, take a free test ride, and leave with
-                  clear EMI numbers instead of brochure pressure.
+                  focused on showroom honesty — sit on the scooter, take a free test ride, and leave with clear
+                  EMI numbers instead of brochure pressure.
                 </p>
                 <p className="mt-4">
-                  Over the years we have helped hundreds of local customers choose between Activa, Zoom,
-                  Single Light, and Double Light, arrange financing, and
-                  upgrade batteries for extra range. Our expertise is hands-on: walk-in servicing, genuine
-                  spare parts, and neighbours who already ride home from Chunakhali.
+                  Over the years we have helped hundreds of local customers choose between Activa, Zoom, Single
+                  Light, and Double Light, arrange financing, and upgrade batteries for extra range. Our
+                  expertise is hands-on: walk-in servicing, genuine spare parts, and neighbours who already ride
+                  home from Chunakhali.
                 </p>
               </div>
 
               <div>
                 <h2>Why We Started Biswajit Power Hub</h2>
                 <p className="mt-4">
-                  Why we started Biswajit Power Hub is simple: Murshidabad deserved a trusted electric scooter
-                  dealer who explains West Bengal no-licence rules in plain language and stands behind every
-                  sale. Online-only sellers cannot feel seat height with you or diagnose a controller the same
-                  afternoon. We built a showroom culture around affordability under ₹50,000, low running cost
-                  with home charging, and after-sales support you can actually visit.
+                  Murshidabad deserved a trusted electric scooter dealer who explains West Bengal no-licence
+                  rules in plain language and stands behind every sale. Online-only sellers cannot feel seat
+                  height with you or diagnose a controller the same afternoon. We built a showroom culture
+                  around affordability under ₹50,000, low running cost with home charging, and after-sales
+                  support you can actually visit.
                 </p>
                 <p className="mt-4">
                   <strong className="text-heading">Mission:</strong> Power every ride in Berhampore with
                   affordable, legal, low-running-cost electric scooters — backed by real showroom support in
-                  Murshidabad. NAP: {site.address.full}. {site.hours?.summaryShort || 'Open all days 9 AM–8:30 PM'}.
+                  Murshidabad. NAP: {site.address.full}.{' '}
+                  {site.hours?.summaryShort || 'Open all days 9 AM–8:30 PM'}.
                 </p>
               </div>
             </div>
 
-            <ul className="mt-8 space-y-4 text-sm text-muted">
+            <div className="mt-12 grid gap-8 border-t border-line pt-10 sm:grid-cols-3">
+              {PERKS.map(({ icon: Icon, title, desc }) => (
+                <div key={title}>
+                  <Icon className="h-5 w-5 text-brand-600" />
+                  <h3 className="mt-3 font-display text-lg font-bold text-heading">{title}</h3>
+                  <p className="mt-1 text-sm text-muted">{desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <ul className="mt-10 space-y-3 border-t border-line pt-8 text-sm text-muted">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
                 <address className="not-italic">{site.address.full}</address>
@@ -146,6 +181,7 @@ export default function About() {
                 </a>
               </li>
             </ul>
+
             <div className="mt-8 flex flex-wrap gap-3">
               <Button to="/scooters" variant="primary" className="min-h-12">
                 View scooters
@@ -162,35 +198,6 @@ export default function About() {
               <Button to="/contact" variant="secondary" className="min-h-12">
                 Contact &amp; map
               </Button>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.08}>
-            <div className="overflow-hidden rounded-xl ring-1 ring-line">
-              <SiteImage
-                src={photos?.about?.url}
-                alt={photos?.about?.alt || 'Biswajit Power Hub team at Chunakhali showroom Berhampore Murshidabad'}
-                width={800}
-                height={450}
-                loading="lazy"
-                className="w-full"
-                placeholderLabel="Upload team / showroom photo"
-              />
-            </div>
-            <div className="mt-4 grid gap-4">
-              {PERKS.map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="rounded-xl bg-surface-alt p-5 ring-1 ring-line">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-600 ring-1 ring-line">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <h3 className="font-display text-lg font-bold text-heading">{title}</h3>
-                      <p className="mt-1 text-sm text-muted">{desc}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </Reveal>
         </div>

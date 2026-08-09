@@ -2,17 +2,22 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { withTimeout } from '@/lib/utils';
 import { SCOOTERS } from '@/data/scooters';
+import { SEO_READY_SCOOTER_IDS } from '@/data/seoReady';
 import { normalizeScooter } from '@/lib/scooterVariants';
 
-const CACHE_KEY = 'scooters_v4';
+const CACHE_KEY = 'scooters_v5';
 const CACHE_TTL = 5 * 60;
 const FETCH_TIMEOUT_MS = 8000;
+const SEO_READY = new Set(SEO_READY_SCOOTER_IDS);
+const SEED_BY_ID = Object.fromEntries(SCOOTERS.map((s) => [s.id, s]));
 
 /**
  * Normalize a Supabase row (snake_case) to the app's camelCase scooter shape.
+ * Hero (SEO-ready) models keep public list prices from src/data/scooters.js so
+ * UI, meta, and Product schema stay aligned when admin catalog prices drift.
  */
 function fromRow(row) {
-  return {
+  const base = {
     id: row.id,
     name: row.name,
     brand: row.brand,
@@ -40,6 +45,18 @@ function fromRow(row) {
     features: row.features || [],
     benefits: row.benefits || [],
     variants: Array.isArray(row.variants) ? row.variants : [],
+  };
+
+  const seed = SEED_BY_ID[row.id];
+  if (!seed || !SEO_READY.has(row.id)) return base;
+
+  return {
+    ...base,
+    price: seed.price,
+    variants: Array.isArray(seed.variants) ? seed.variants : base.variants,
+    description: base.description || seed.description || '',
+    tagline: base.tagline || seed.tagline,
+    images: base.images?.length ? base.images : seed.images || [],
   };
 }
 

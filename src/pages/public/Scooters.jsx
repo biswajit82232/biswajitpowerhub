@@ -90,13 +90,11 @@ export default function Scooters() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt/50">
-        <div className="container-px py-6 sm:py-8">
+      <section className="border-b border-line">
+        <div className="container-px py-8 sm:py-10">
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Scooters' }]} />
           <Reveal>
-            <span className="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-600 sm:text-xs">
-              Our Range
-            </span>
+            <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-700">Our Range</p>
             <h1 className="mt-2 font-display text-2xl font-extrabold text-heading sm:text-display-lg">
               Find your perfect ride
             </h1>
@@ -162,9 +160,9 @@ export default function Scooters() {
             <p className="mt-2 max-w-2xl text-sm text-muted">
               Quick answers about licences, range, warranty, and our Berhampore showroom.
             </p>
-            <div className="mt-6 divide-y divide-line rounded-2xl ring-1 ring-line">
+            <div className="mt-6 divide-y divide-line border-t border-line">
               {SCOOTER_FAQS.map((faq) => (
-                <details key={faq.question} className="group px-4 py-3 sm:px-5">
+                <details key={faq.question} className="group py-3.5">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-heading marker:content-none [&::-webkit-details-marker]:hidden">
                     {faq.question}
                     <ChevronDown className="h-4 w-4 shrink-0 text-muted transition group-open:rotate-180" />

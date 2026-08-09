@@ -5,21 +5,21 @@ import { cn } from '@/lib/utils';
 
 const VARIANTS = {
   primary:
-    'bg-brand-600 text-white shadow-glow hover:bg-brand-700 hover:shadow-card-hover',
+    'bg-brand-700 text-white shadow-glow hover:bg-brand-800 hover:brightness-[1.03]',
   solid:
-    'bg-brand-600 text-white shadow-glow hover:bg-brand-700 hover:shadow-card-hover',
+    'bg-brand-700 text-white shadow-glow hover:bg-brand-800 hover:brightness-[1.03]',
   secondary:
-    'bg-surface text-heading ring-1 ring-line shadow-soft hover:ring-brand-200 hover:text-brand-700',
+    'bg-surface text-heading ring-1 ring-line hover:ring-heading/20 hover:text-heading',
   accent:
-    'bg-brand-500 text-white shadow-soft hover:bg-brand-600',
+    'bg-brand-600 text-white shadow-soft hover:bg-brand-700',
   ghost:
-    'bg-transparent text-body hover:bg-brand-50 hover:text-brand-700',
+    'bg-transparent text-body hover:bg-surface-alt hover:text-heading',
   outline:
-    'bg-transparent text-brand-700 ring-1.5 ring-brand-500/40 hover:bg-brand-50',
+    'bg-transparent text-brand-800 ring-1.5 ring-brand-600/35 hover:bg-brand-50',
   whatsapp:
     'bg-[#25d366] text-white shadow-soft hover:brightness-105',
   directions:
-    'bg-[#4285f4] text-white shadow-soft hover:bg-[#3367d6]',
+    'bg-transparent text-heading ring-1 ring-line hover:bg-surface-alt',
   danger:
     'bg-red-500 text-white shadow-soft hover:bg-red-600',
   softSuccess:

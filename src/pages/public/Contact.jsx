@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Phone, MapPin, Clock, MessageCircle, Send, Navigation } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
+import { SiteImage } from '@/components/common/SiteImage';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { CallbackForm } from '@/features/leads/CallbackForm';
@@ -10,6 +11,7 @@ import { submitContact } from '@/features/leads/leadService';
 import { isValidName, isValidPhone, isValidEmail } from '@/features/leads/validation';
 import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useSitePhotos } from '@/context/SitePhotosContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { breadcrumbList, postalAddressSchema, openingHoursSchema } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
@@ -49,19 +51,53 @@ function ContactMessageForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Name" htmlFor="ct-name" required error={errors.name}>
-          <Input id="ct-name" value={form.name} error={errors.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <Input
+            id="ct-name"
+            value={form.name}
+            error={errors.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
         </Field>
         <Field label="Phone" htmlFor="ct-phone" required error={errors.phone}>
-          <Input id="ct-phone" type="tel" inputMode="numeric" maxLength={10} value={form.phone} error={errors.phone} onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })} />
+          <Input
+            id="ct-phone"
+            type="tel"
+            inputMode="numeric"
+            maxLength={10}
+            value={form.phone}
+            error={errors.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
+          />
         </Field>
       </div>
       <Field label="Email" htmlFor="ct-email" error={errors.email} hint="Optional">
-        <Input id="ct-email" type="email" value={form.email} error={errors.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <Input
+          id="ct-email"
+          type="email"
+          value={form.email}
+          error={errors.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        />
       </Field>
       <Field label="Message" htmlFor="ct-msg" required error={errors.message}>
-        <Textarea id="ct-msg" rows={4} value={form.message} error={errors.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="How can we help?" />
+        <Textarea
+          id="ct-msg"
+          rows={4}
+          value={form.message}
+          error={errors.message}
+          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          placeholder="How can we help?"
+        />
       </Field>
-      <Button type="submit" variant="primary" size="lg" fullWidth loading={loading} icon={Send} className="min-h-12">
+      <Button
+        type="submit"
+        variant="primary"
+        size="lg"
+        fullWidth
+        loading={loading}
+        icon={Send}
+        className="min-h-12"
+      >
         Send Message
       </Button>
     </form>
@@ -70,6 +106,13 @@ function ContactMessageForm() {
 
 export default function Contact() {
   const { site } = useSite();
+  const { photos } = useSitePhotos();
+  const landmarkPhoto = photos?.gallery?.[0]?.url || photos?.hero?.url || photos?.about?.url || null;
+  const landmarkAlt =
+    photos?.gallery?.[0]?.alt ||
+    photos?.hero?.alt ||
+    'Biswajit Power Hub showroom near Chunakhali Bus Stand, Berhampore';
+
   const contactJsonLd = useMemo(
     () => [
       breadcrumbList([
@@ -110,87 +153,78 @@ export default function Contact() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt">
-        <div className="container-px py-12 sm:py-16">
-          <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Contact' }]} />
+      {/* Atmosphere: landmark / entrance photo first */}
+      <section className="relative isolate min-h-[42vh] overflow-hidden bg-heading sm:min-h-[48vh]">
+        <SiteImage
+          src={landmarkPhoto}
+          alt={landmarkAlt}
+          width={1600}
+          height={900}
+          loading="eager"
+          className="absolute inset-0 h-full w-full !aspect-auto bg-heading"
+          imgClassName="object-cover object-center"
+          placeholderLabel="Upload showroom entrance photo"
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-heading via-heading/55 to-heading/25"
+          aria-hidden
+        />
+        <div className="container-px relative flex min-h-[42vh] flex-col justify-end pb-10 pt-20 sm:min-h-[48vh] sm:pb-14">
+          <Breadcrumbs
+            items={[{ name: 'Home', to: '/' }, { name: 'Contact' }]}
+            className="mb-0 text-white/70 [&_a]:text-white/80 [&_a:hover]:text-white [&_[aria-current]]:text-white"
+          />
           <Reveal>
-            <span className="inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 ring-1 ring-brand-100">
-              Contact
-            </span>
-            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
-              Visit Our Showroom — Chunakhali, Berhampore
+            <h1 className="mt-4 font-display text-display-lg font-extrabold text-white">
+              Visit our showroom
             </h1>
-            <p className="mt-3 max-w-xl text-body">
-              Near Chunakhali Bus Stand, Nimtala. Call or WhatsApp for prices, EMI, and test rides — we
-              don&apos;t sell online.
+            <p className="mt-3 max-w-xl text-base text-white/80 sm:text-lg">
+              Near Chunakhali Bus Stand, Nimtala — walk in for a free test ride. We don&apos;t sell online.
             </p>
           </Reveal>
         </div>
       </section>
 
-      <div className="container-px py-12">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
-          <div className="space-y-8">
+      <div className="container-px py-12 sm:py-16">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+          {/* Place first: map + hours + CTAs */}
+          <div className="space-y-10">
             <Reveal>
-              <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
-                Visit Our Showroom in Berhampore
-              </h2>
-              <div className="mt-6 space-y-5 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-8">
-                <div className="flex items-start gap-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#4285f4]/10 text-[#4285f4]">
-                    <MapPin className="h-6 w-6" />
-                  </span>
-                  <address className="not-italic text-base leading-relaxed text-body">
-                    <strong className="font-display text-lg text-heading">{SITE.name}</strong>
-                    <br />
-                    Chunakhali Bus Stand, Nimtala
-                    <br />
-                    Berhampore, Murshidabad
-                    <br />
-                    West Bengal — 742149, India
-                    <br />
-                    <span className="mt-2 block font-medium text-brand-600">
-                      Near Chunakhali Bus Stand
-                    </span>
-                  </address>
-                </div>
+              <h2 className="font-display text-2xl font-extrabold text-heading">Find us in Berhampore</h2>
+              <address className="mt-4 not-italic leading-relaxed text-body">
+                <strong className="font-display text-lg text-heading">{SITE.name}</strong>
+                <br />
+                Chunakhali Bus Stand, Nimtala
+                <br />
+                Berhampore, Murshidabad, West Bengal — 742149
+              </address>
 
-                <div className="overflow-hidden rounded-2xl shadow-card ring-1 ring-line">
-                  <iframe
-                    src={site.maps.embed}
-                    title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="h-56 w-full border-0 sm:h-64"
-                    allowFullScreen
-                  />
-                </div>
-
-                <Button
-                  href={site.maps.link}
-                  variant="directions"
-                  size="lg"
-                  icon={Navigation}
-                  className="w-full sm:w-auto"
-                  onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
-                >
-                  Get Directions
-                </Button>
+              <div className="mt-6 overflow-hidden ring-1 ring-line">
+                <iframe
+                  src={site.maps.embed}
+                  title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-56 w-full border-0 sm:h-72"
+                  allowFullScreen
+                />
               </div>
-            </Reveal>
 
-            <Reveal delay={0.05}>
-              <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
-                Contact Information
-              </h2>
-              <div className="mt-6 space-y-4 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-8">
+              <div className="mt-5 flex items-start gap-3 text-sm text-body">
+                <Clock className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
+                <p>
+                  <span className="font-semibold text-heading">Hours — </span>
+                  {site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}
+                </p>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Button
                   href={telUrl(undefined, site)}
                   target="_self"
                   variant="primary"
                   size="lg"
                   icon={Phone}
-                  fullWidth
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })}
                 >
                   Call {formatPhoneDisplay(site.phones[0])}
@@ -200,42 +234,45 @@ export default function Contact() {
                   variant="whatsapp"
                   size="lg"
                   icon={MessageCircle}
-                  fullWidth
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}
                 >
                   Chat on WhatsApp
                 </Button>
-                <div className="flex items-start gap-3 pt-2 text-sm text-body">
-                  <Clock className="mt-0.5 h-5 w-5 shrink-0 text-muted" />
-                  <table className="w-full text-left">
-                    <tbody>
-                      <tr>
-                        <td className="py-1 pr-4 font-medium text-heading">Hours</td>
-                        <td className="py-1">{site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <Button
+                  href={site.maps.link}
+                  variant="ghost"
+                  size="lg"
+                  icon={Navigation}
+                  onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
+                >
+                  Get Directions
+                </Button>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.05}>
+              <div className="flex items-start gap-3 border-t border-line pt-8 text-sm text-muted">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
+                <p>Landmark: Chunakhali Bus Stand — easy to find from Nimtala and Berhampore town.</p>
               </div>
             </Reveal>
           </div>
 
-          <div className="space-y-6">
+          {/* Forms secondary */}
+          <div className="space-y-8">
             <Reveal>
-              <div className="rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-8">
-                <h3 className="font-display text-xl font-bold text-heading">Send us a message</h3>
-                <p className="mt-1 text-sm text-muted">We typically reply within a few hours.</p>
-                <div className="mt-5">
-                  <ContactMessageForm />
-                </div>
+              <h3 className="font-display text-xl font-bold text-heading">Send us a message</h3>
+              <p className="mt-1 text-sm text-muted">We typically reply within a few hours.</p>
+              <div className="mt-5 border-t border-line pt-5">
+                <ContactMessageForm />
               </div>
             </Reveal>
 
-            <Reveal delay={0.1}>
-              <div className="rounded-xl bg-brand-gradient p-6 shadow-card sm:p-8">
-                <h3 className="font-display text-xl font-bold text-white">Prefer a callback?</h3>
-                <p className="mt-1 text-sm text-white/90">Drop your number and we&apos;ll call you.</p>
-                <div className="mt-5 rounded-xl bg-white p-5">
+            <Reveal delay={0.08}>
+              <div className="border-t border-line pt-8">
+                <h3 className="font-display text-xl font-bold text-heading">Prefer a callback?</h3>
+                <p className="mt-1 text-sm text-muted">Drop your number and we&apos;ll call you.</p>
+                <div className="mt-5">
                   <CallbackForm compact />
                 </div>
               </div>

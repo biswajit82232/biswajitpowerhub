@@ -202,9 +202,6 @@ export function batteryUpgradeWhatsappMessage(scooterName) {
 export const NAV_LINKS = [
   { label: 'Home', to: '/' },
   { label: 'Scooters', to: '/scooters' },
-  { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
-  { label: 'Low Budget', to: '/low-budget-electric-scooters-berhampore' },
-  { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
   { label: 'Reviews', to: '/reviews' },
   { label: 'Contact', to: '/contact' },
 ];
