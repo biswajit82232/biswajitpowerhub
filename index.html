@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
 
-    <!-- Google tag (gtag.js) — GA4. Google Ads (AW-…) configured from VITE_GOOGLE_ADS_ID in src/lib/googleAnalytics.js -->
+    <!-- Google tag (gtag.js) — GA4. Google Ads (AW-…) via VITE_GOOGLE_ADS_ID in src/lib/googleAnalytics.js -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2971LBJ2NV"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -11,6 +11,9 @@
       gtag('js', new Date());
       gtag('config', 'G-2971LBJ2NV', { anonymize_ip: true });
     </script>
+
+    <!-- Search Console: set VITE_GOOGLE_SITE_VERIFICATION in Vercel, then redeploy -->
+    <meta name="google-site-verification" content="%VITE_GOOGLE_SITE_VERIFICATION%" />
 
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/logo-192.png" />
