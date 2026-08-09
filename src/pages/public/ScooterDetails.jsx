@@ -168,7 +168,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         noindex={!SCOOTER_SEO[scooter.id]}
       />
 
-      <div className="container-px min-w-0 pb-10 pt-6 sm:pb-14 sm:pt-10">
+      <div className="container-px min-w-0 pb-28 pt-6 sm:pb-14 sm:pt-10 lg:pb-14">
         <Breadcrumbs
           items={[
             { name: 'Home', to: '/' },
@@ -423,6 +423,39 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         </p>
         <TestRideForm scooter={display} onSuccess={() => setTimeout(() => setTestRideOpen(false), 2500)} />
       </Modal>
+
+      {/* Purchase-intent sticky CTA — sits above global MobileLocalCTA */}
+      <div
+        className="fixed inset-x-0 z-[9997] border-t border-line bg-surface/95 px-3 py-2 shadow-card lg:hidden bottom-[calc(4rem+env(safe-area-inset-bottom))]"
+        role="region"
+        aria-label={`Call about ${scooter.name}`}
+      >
+        <div className="mx-auto grid max-w-lg grid-cols-2 gap-2">
+          <Button
+            href={telUrl(undefined, site)}
+            target="_self"
+            variant="primary"
+            size="sm"
+            icon={Phone}
+            fullWidth
+            className="min-h-11 rounded-lg"
+            onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail-sticky', scooterId: scooter.id })}
+          >
+            Call about {scooter.name}
+          </Button>
+          <Button
+            href={whatsappUrl(waMessage, site)}
+            variant="whatsapp"
+            size="sm"
+            icon={MessageCircle}
+            fullWidth
+            className="min-h-11 rounded-lg"
+            onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail-sticky', scooterId: scooter.id })}
+          >
+            WhatsApp
+          </Button>
+        </div>
+      </div>
     </>
   );
 }

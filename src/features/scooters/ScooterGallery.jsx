@@ -4,16 +4,22 @@ import { ScooterImage } from '@/components/common/ScooterImage';
 import { cn } from '@/lib/utils';
 
 /**
- * Product gallery — single placeholder when no photos; thumbs only for real images.
+ * Product gallery — single intentional frame when no/one photo; thumbs only for 2+ real images.
  */
 export function ScooterGallery({ scooter }) {
   const realImages = (scooter.images || []).filter(Boolean);
   const images = realImages.length ? realImages : [null];
   const [active, setActive] = useState(0);
+  const isPlaceholderOnly = realImages.length === 0;
 
   return (
     <div>
-      <div className="relative overflow-hidden rounded-3xl bg-surface ring-1 ring-line shadow-soft">
+      <div
+        className={cn(
+          'relative overflow-hidden rounded-3xl bg-surface shadow-card ring-1 ring-line',
+          isPlaceholderOnly && 'ring-brand-100',
+        )}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
@@ -29,10 +35,18 @@ export function ScooterGallery({ scooter }) {
               name={scooter.name}
               loading="eager"
               fit="contain"
-              className="aspect-[4/3] w-full bg-surface-alt"
+              className={cn(
+                'w-full bg-surface-alt',
+                realImages.length <= 1 ? 'aspect-[5/4] sm:aspect-[4/3]' : 'aspect-[4/3]',
+              )}
             />
           </motion.div>
         </AnimatePresence>
+        {isPlaceholderOnly && (
+          <p className="border-t border-line bg-surface-alt/80 px-4 py-2.5 text-center text-xs text-muted">
+            Showroom photos coming soon — visit Chunakhali to see the {scooter.name} in person
+          </p>
+        )}
       </div>
 
       {realImages.length > 1 && (

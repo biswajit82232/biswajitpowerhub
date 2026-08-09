@@ -26,7 +26,7 @@ export function FloatingWhatsApp() {
           event_label: 'floating_whatsapp',
         })
       }
-      className="fixed right-[max(1rem,env(safe-area-inset-right))] z-[9998] shadow-lg bottom-[calc(5rem+env(safe-area-inset-bottom))] lg:bottom-[max(1.25rem,env(safe-area-inset-bottom))]"
+      className="fixed right-[max(1rem,env(safe-area-inset-right))] z-[9998] shadow-lg bottom-[calc(8.25rem+env(safe-area-inset-bottom))] lg:bottom-[max(1.25rem,env(safe-area-inset-bottom))]"
     />
   );
 }
