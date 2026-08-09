@@ -14,11 +14,13 @@ import { getScooters } from '@/features/scooters/scooterService';
 import { breadcrumbList, buildReviewedProductRef } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { SITE_URL, GBP_RATING } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { REVIEWS as SEED_REVIEWS } from '@/data/reviews';
 
 const PAGE_SIZE = 10;
 
 export default function Reviews() {
+  const { site } = useSite();
   const { data: reviews, loading } = useAsync(() => getApprovedReviews(), []);
   const { data: scooters } = useAsync(() => getScooters(), []);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -188,12 +190,13 @@ export default function Reviews() {
             Leave Us a Review
           </h2>
           <div className="mt-6 rounded-xl bg-brand-50 p-5 ring-1 ring-brand-100 sm:p-6">
-            <p className="text-sm text-body">
+            <p className="text-sm font-semibold text-heading">Leave a Google review</p>
+            <p className="mt-1 text-sm text-body">
               Bought from our Chunakhali showroom? Your Google review helps other Berhampore and
-              Murshidabad riders find Biswajit Power Hub.
+              Murshidabad riders find Biswajit Power Hub — and boosts local search ranking.
             </p>
             <Button
-              href="https://www.google.com/search?q=Biswajit+Power+Hub+Berhampore"
+              href={site.maps.reviewLink}
               variant="primary"
               className="mt-4 min-h-12"
               icon={Star}
@@ -205,7 +208,9 @@ export default function Reviews() {
             <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
               <PenLine className="h-5 w-5 text-brand-600" /> Write a review on our site
             </h3>
-            <p className="mt-1 text-sm text-muted">Help others choose with confidence.</p>
+            <p className="mt-1 text-sm text-muted">
+              Share your experience here too. Site reviews are held as <strong className="font-semibold text-heading">pending</strong> until our team approves them — they will not appear publicly until then.
+            </p>
             <div className="mt-5">
               <ReviewForm scooters={scooters || []} />
             </div>

@@ -60,7 +60,7 @@ export function ReviewForm({ scooters = [] }) {
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
         <h3 className="text-lg font-bold text-heading">Review submitted!</h3>
         <p className="max-w-xs text-sm text-body">
-          Thanks for sharing, {form.name}. We'll publish it after a quick review.
+          Thanks for sharing, {form.name}. Your review is <strong className="font-semibold text-heading">pending</strong> and will appear on this page after our team approves it.
         </p>
       </motion.div>
     );
