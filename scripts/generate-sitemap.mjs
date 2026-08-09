@@ -54,7 +54,6 @@ Allow: /
 Disallow: /admin
 Disallow: /dealership
 Disallow: /updates
-Disallow: /ad-landing
 
 Sitemap: ${BASE}/sitemap.xml
 `;
