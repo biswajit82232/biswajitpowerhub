@@ -54,8 +54,9 @@ export const CONTACT_DEFAULTS = {
   },
   maps: {
     link: 'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore',
+    /** Google iframe embed — use /maps/embed?pb= (legacy ?output=embed is blocked / 404) */
     embed:
-      'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Bus+Stand+Nimtala+Berhampore+Murshidabad+742149&output=embed',
+      'https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1splace_id:ChIJP_miqYx9-TkR9z1fb-iGyxI',
     staticImage:
       'https://maps.googleapis.com/maps/api/staticmap?center=24.0987,88.2519&zoom=15&size=800x400&markers=color:red%7C24.0987,88.2519&key=',
     /** Set VITE_GOOGLE_PLACE_ID in env to override; default is live GBP listing */
@@ -103,6 +104,18 @@ export function buildAddressFull({ line, city, district, state, pincode, country
   return [line, city, district, state, pincode, country].filter(Boolean).join(', ');
 }
 
+/** Working Google Maps iframe src from a Place ID (legacy ?output=embed is blocked). */
+export function mapsEmbedFromPlaceId(placeId) {
+  const id = (placeId || '').trim();
+  if (!id) return CONTACT_DEFAULTS.maps.embed;
+  return `https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1splace_id:${encodeURIComponent(id)}`;
+}
+
+function isLegacyMapsEmbed(url) {
+  if (!url || typeof url !== 'string') return true;
+  return url.includes('output=embed') || !url.includes('/maps/embed');
+}
+
 /** Merge admin-editable fields into a full site object */
 export function mergeSiteSettings(partial) {
   const address = {
@@ -115,12 +128,21 @@ export function mergeSiteSettings(partial) {
   const legacyHours = toLegacyHours(hoursPerDay);
 
   const maps = { ...CONTACT_DEFAULTS.maps, ...partial.maps };
-  const placeId = (maps.placeId || '').trim();
+  if (!maps.embed?.trim()) {
+    maps.embed = CONTACT_DEFAULTS.maps.embed;
+  }
+  const placeId = (maps.placeId || CONTACT_DEFAULTS.maps.placeId || '').trim();
   if (placeId) {
     maps.placeId = placeId;
     maps.reviewLink = `https://search.google.com/local/writereview?placeid=${placeId}`;
+    if (isLegacyMapsEmbed(maps.embed)) {
+      maps.embed = mapsEmbedFromPlaceId(placeId);
+    }
   } else if (!maps.reviewLink || maps.reviewLink.endsWith('placeid=')) {
     maps.reviewLink = maps.link || CONTACT_DEFAULTS.maps.link;
+  }
+  if (isLegacyMapsEmbed(maps.embed)) {
+    maps.embed = CONTACT_DEFAULTS.maps.embed;
   }
 
   return {

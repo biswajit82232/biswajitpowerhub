@@ -205,7 +205,11 @@ export default function Settings() {
             <Field label="Google Maps link" className="sm:col-span-2">
               <Input value={form.maps.link} onChange={(e) => setMaps('link', e.target.value)} />
             </Field>
-            <Field label="Map embed URL" hint="iframe src for contact page" className="sm:col-span-2">
+            <Field
+              label="Map embed URL"
+              hint="Must be a google.com/maps/embed URL (Share → Embed a map). Legacy ?output=embed links are blocked and auto-upgraded from Place ID."
+              className="sm:col-span-2"
+            >
               <Input value={form.maps.embed} onChange={(e) => setMaps('embed', e.target.value)} />
             </Field>
           </div>
