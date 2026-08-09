@@ -20,6 +20,7 @@ import {
   formatVariantSpec,
   getStartingPrice,
 } from '@/lib/scooterVariants';
+import { ShowroomCtaRow } from '@/components/seo/SeoLandingLayout';
 
 const MAX_SLOTS = 3;
 const LABEL_W = '8.75rem';
@@ -162,12 +163,17 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
           {/* Spec rows */}
           {rows.map((row, ri) => {
             const even = ri % 2 === 1;
+            const values = chosen.map((s) => row.get(s));
+            const differs = new Set(values).size > 1;
+            const isKeyRow = row.label === 'Price' || row.label === 'Range' || row.label === 'EMI from';
+
             return (
               <div key={row.label} className="contents">
                 <div
                   className={cn(
                     stickyLabelClass(even),
                     'border-b border-line px-3 py-3 text-xs font-semibold text-heading sm:text-sm',
+                    differs && isKeyRow && 'text-brand-700',
                     ri === rows.length - 1 && 'border-b-0',
                   )}
                 >
@@ -178,13 +184,16 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
                   <div
                     key={s.id}
                     className={cn(
-                      'border-b border-line px-3 py-3 text-xs leading-snug text-body sm:text-sm',
+                      'border-b border-line px-3 py-3 text-xs leading-snug sm:text-sm',
                       even ? 'bg-surface-alt' : 'bg-surface',
+                      differs
+                        ? 'font-semibold text-heading bg-brand-50/70'
+                        : 'text-body',
                       ci < chosen.length - 1 || showAdd ? 'border-r border-line' : '',
                       ri === rows.length - 1 && 'border-b-0',
                     )}
                   >
-                    {row.get(s)}
+                    {values[ci]}
                   </div>
                 ))}
 
@@ -327,6 +336,16 @@ export default function Compare() {
             </p>
           </Reveal>
         )}
+
+        <div className="mt-10 rounded-2xl bg-surface-alt p-5 ring-1 ring-brand-100 sm:mt-12 sm:p-8">
+          <p className="font-display text-lg font-bold text-heading">Ready to decide?</p>
+          <p className="mt-1 text-sm text-muted">
+            Call or WhatsApp for today&apos;s stock, EMI, and a free test ride at Chunakhali.
+          </p>
+          <div className="mt-5">
+            <ShowroomCtaRow from="compare" />
+          </div>
+        </div>
       </div>
     </>
   );
