@@ -893,6 +893,7 @@ function crawlableBody(route) {
   </div>
   <p style="text-align:center;margin:2rem 0 0;color:#999;font-size:0.875rem;">© 2026 Biswajit Power Hub. Electric Scooter Dealer in Berhampore, Murshidabad.</p>
   <p style="text-align:center;margin:0.5rem 0 0;color:#ccc;font-size:0.875rem;">Best Electric Scooters in Berhampore | No Licence Required | Low Running Cost</p>
+  <p style="text-align:center;margin:0.75rem 0 0;font-size:0.875rem;"><a href="${BASE}/terms" style="color:#bbb;">Terms of Service</a> · <a href="${BASE}/privacy" style="color:#bbb;">Privacy Policy</a> · <a href="${BASE}/about" style="color:#bbb;">About</a></p>
 </footer>
 <div role="navigation" aria-label="Call or get directions" style="position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:0.5rem;padding:0.5rem;padding-bottom:calc(0.5rem + env(safe-area-inset-bottom));background:#1a1a1a;">
   <a href="tel:+919635505436" style="flex:1;display:flex;min-height:48px;align-items:center;justify-content:center;background:#ff6600;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Call</a>
