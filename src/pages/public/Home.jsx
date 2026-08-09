@@ -42,6 +42,44 @@ function GradientDivider({ flip = false }) {
   );
 }
 
+const HOME_GUIDES = [
+  {
+    title: 'Best Electric Scooters in Berhampore Under ₹50,000',
+    blurb:
+      'Low-speed EVs with no licence paperwork, honest pricing, and free test rides at Chunakhali Bus Stand.',
+    to: '/best-electric-scooters-berhampore',
+    cta: 'Learn more',
+  },
+  {
+    title: 'Popular Models: Activa, Zoom, Single Light & Double Light',
+    blurb:
+      'Four hero models for every budget — compare range, feel, and price before your showroom visit.',
+    to: '/scooters',
+    cta: 'Learn more',
+  },
+  {
+    title: 'No Licence / No Registration Models',
+    blurb:
+      'Eligible ≤25 km/h scooters mean no driving licence and no RTO registration for most buyers in West Bengal.',
+    to: '/no-licence-electric-scooters-west-bengal',
+    cta: 'Learn more',
+  },
+  {
+    title: 'Custom Battery Upgrades & Spare Parts',
+    blurb:
+      'Extra range packs plus genuine batteries, tyres, panels, and controllers at the Berhampore showroom.',
+    to: '/battery-upgrade-berhampore',
+    cta: 'Learn more',
+  },
+  {
+    title: 'Visit Our Showroom — Chunakhali Bus Stand',
+    blurb:
+      'Walk in for a free test ride at Nimtala, Berhampore. Easy landmark, same-day model guidance.',
+    to: '/contact',
+    cta: 'Learn more',
+  },
+];
+
 export default function Home() {
   const { site } = useSite();
   const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
@@ -66,6 +104,7 @@ export default function Home() {
           latitude: SITE.geo.latitude,
           longitude: SITE.geo.longitude,
         },
+        hasMap: site.maps?.link || SITE.maps.link,
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
         sameAs: [SITE.social.instagram, SITE.social.facebook].filter(Boolean),
         slogan: SITE.tagline,
@@ -139,152 +178,7 @@ export default function Home() {
 
       <Hero heroImageUrl={financeSettings?.heroImageUrl} catalogStats={catalogStats} />
 
-      <PromotionalOffers />
-      <GradientDivider />
       <PremiumPerks />
-
-      <GradientDivider />
-      <Section>
-        <article className="mx-auto max-w-3xl space-y-10 text-body [&_a]:font-semibold [&_a]:text-brand-600 hover:[&_a]:underline [&_h2]:mt-2 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
-          <Reveal>
-            <h2>Best Electric Scooters in Berhampore Under ₹50,000</h2>
-            <p>
-              If you are searching for the best electric scooters in Berhampore under ₹50,000, Biswajit
-              Power Hub is the local showroom built for Murshidabad families who want clean mobility without
-              licence paperwork. Every model we sell is a low-speed electric scooter (≤25 km/h) — no driving
-              licence and no RTO registration for eligible units — so your on-road cost stays close to the
-              showroom price. From school runs in Berhampore town to weekly markets across Murshidabad,
-              riders choose us for honest pricing, free test rides at Chunakhali Bus Stand, and after-sales
-              support you can walk into.
-            </p>
-            <p>
-              Our four hero models cover every budget band under fifty thousand on Standard batteries:
-              Activa (~₹45,999) for longer Murshidabad trips, Zoom (~₹42,999) for a premium daily commute,
-              Double Light (~₹40,999) for family errands, and Single Light (~₹38,999) as the entry pick.
-              Typical home charging lands around ₹0.30–₹0.50 per km, with 3 free servicing and 1 year motor
-              &amp; controller warranty included. Compare them side-by-side on our{' '}
-              <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> guide,
-              or walk into the showroom and sit on each scooter before you decide — zero pressure.
-            </p>
-          </Reveal>
-
-          <Reveal>
-            <h2>Popular Models: Activa, Zoom, Single Light &amp; Double Light</h2>
-            <p>
-              Popular models at Biswajit Power Hub — Activa, Zoom, Single Light, and Double Light — are
-              stocked for quick test rides in Berhampore. Activa suits riders who need more range for
-              Berhampore–Kandi or Berhampore–Jalangi routes. Zoom feels planted and premium for office
-              commutes across Murshidabad. Double Light balances comfort and price for family errands, while
-              Single Light keeps the cash outlay lowest for first-time EV buyers.
-            </p>
-            <ul>
-              <li>No licence / no registration on eligible low-speed models</li>
-              <li>EMI guidance and free test rides at Chunakhali</li>
-              <li>
-                <Link to="/no-licence-electric-scooters-west-bengal">No licence models</Link>,{' '}
-                <Link to="/test-ride-berhampore">test rides</Link>, and{' '}
-                <Link to="/accessories">spare parts</Link>
-              </li>
-              <li>Custom battery upgrades when you need extra range</li>
-              <li>Genuine spare parts: batteries, tyres, panels, controllers</li>
-            </ul>
-            <div className="not-prose mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {scootersLoading
-                ? Array.from({ length: 4 }).map((_, i) => <ScooterCardSkeleton key={i} />)
-                : modelGrid.map((s, i) => (
-                    <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />
-                  ))}
-            </div>
-            <div className="not-prose mt-8 text-center">
-              <Button to="/scooters" variant="secondary" iconRight={ArrowRight}>
-                View all scooters
-              </Button>
-            </div>
-          </Reveal>
-
-          <Reveal>
-            <h2>Why Choose Biswajit Power Hub?</h2>
-            <p>
-              Why choose Biswajit Power Hub over online-only sellers? Because electric scooters in Berhampore
-              are a showroom decision — battery feel, seat height, and real-world range matter more than a
-              brochure. We explain Central Motor Vehicles rules for low-speed EVs in West Bengal in plain
-              language, help you pick between Standard and Lithium Pro packs where available, and never rush
-              a Murshidabad customer into the wrong model. Our team lives here: we know Chunakhali traffic,
-              monsoon charging habits, and which scooter fits a shopkeeper versus a college student.
-            </p>
-            <p>
-              Customers also trust us for transparent EMI slabs and walk-in
-              servicing — not a distant call-centre warranty. Read{' '}
-              <Link to="/reviews">customer reviews from Berhampore and Murshidabad</Link>, then call
-              096355 05436 or WhatsApp to confirm today’s colours and stock.
-            </p>
-          </Reveal>
-
-          <Reveal>
-            <h2>Custom Battery Upgrades &amp; Spare Parts</h2>
-            <p>
-              Need more kilometres for Berhampore–Kandi runs? We specialise in custom battery upgrades and
-              stock genuine spare parts — batteries, tyres, body panels, mirrors, and controllers. Many
-              Murshidabad riders upgrade an existing chassis instead of buying brand new when the frame is
-              still strong. Bring your e-scooter to Chunakhali for a fitment quote, or ask about Lithium Pro
-              options on Activa and Zoom before you purchase.
-            </p>
-            <p>
-              Explore our full{' '}
-              <Link to="/battery-upgrade-berhampore">battery upgrade service in Berhampore</Link> and keep
-              running costs low with home charging instead of petrol queues.
-            </p>
-          </Reveal>
-
-          <Reveal>
-            <h2>Visit Our Showroom — Chunakhali Bus Stand, Berhampore</h2>
-            <p>
-              Visit our showroom at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal —
-              742149. Landmark: right at the bus stand, easy to find from anywhere in Murshidabad district.
-              Hours: {site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}. We do not sell online — call, WhatsApp,
-              or get directions and meet us in person for a free test ride.
-            </p>
-            <Button
-              href={site.maps.link}
-              variant="directions"
-              size="lg"
-              icon={MapPin}
-              className="mt-4"
-              onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-map' })}
-            >
-              Get Directions
-            </Button>
-            <div className="not-prose mt-4 overflow-hidden rounded-2xl shadow-card ring-1 ring-line">
-              <iframe
-                src={site.maps.embed}
-                title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="h-48 w-full border-0 sm:h-56"
-                allowFullScreen
-              />
-              <a
-                href={site.maps.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-map-image' })}
-                className="flex items-center justify-center gap-2 bg-surface-alt px-4 py-3 text-sm font-semibold text-[#4285f4] transition hover:bg-brand-50"
-              >
-                <MapPin className="h-4 w-4" /> Near Chunakhali Bus Stand — open in Google Maps
-              </a>
-            </div>
-          </Reveal>
-        </article>
-      </Section>
-
-      <Section>
-        <div className="mx-auto max-w-3xl">
-          <FaqSection faqs={SITE_FAQS} />
-          <div className="mt-8">
-            <ShowroomCtaRow from="home-faq" />
-          </div>
-        </div>
-      </Section>
 
       <GradientDivider flip />
       <Section id="simulator" tight className="relative overflow-hidden bg-gradient-to-b from-slate-50/80 via-white to-slate-50/50">
@@ -296,6 +190,66 @@ export default function Home() {
         <Reveal className="mt-6 sm:mt-10" y={20}>
           <EVSimulator scooters={allScooters || []} settings={financeSettings} loading={scootersLoading} />
         </Reveal>
+      </Section>
+
+      <PromotionalOffers />
+
+      <GradientDivider />
+      <Section id="models" tight>
+        <SectionHeading
+          eyebrow="In stock now"
+          title="Popular models"
+          subtitle="Activa, Zoom, Single Light & Double Light — pick one for a free test ride."
+        />
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {scootersLoading
+            ? Array.from({ length: 4 }).map((_, i) => <ScooterCardSkeleton key={i} />)
+            : modelGrid.map((s, i) => (
+                <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />
+              ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Button to="/scooters" variant="secondary" iconRight={ArrowRight}>
+            View all scooters
+          </Button>
+        </div>
+      </Section>
+
+      <GradientDivider />
+      <Section id="callback">
+        <div className="relative overflow-hidden rounded-3xl shadow-card">
+          <div className="absolute inset-0 bg-brand-gradient" />
+          <div className="relative z-10 grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
+            <Reveal className="text-white">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/25 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+                <PhoneCall className="h-3.5 w-3.5" /> Free Callback
+              </span>
+              <h2 className="mt-4 font-display text-display-md font-extrabold text-white">
+                Want Us To Call You?
+              </h2>
+              <p className="mt-3 max-w-md text-white/85 leading-relaxed">
+                Leave your number — we will help with models, EMI, battery upgrades, and test rides at
+                our Berhampore showroom.
+              </p>
+              <ul className="mt-6 space-y-2.5 text-sm text-white/90">
+                {['Model recommendations', 'EMI guidance', 'Battery upgrades', 'Test ride booking'].map(
+                  (item) => (
+                    <li key={item} className="flex items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      {item}
+                    </li>
+                  ),
+                )}
+              </ul>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="glass rounded-2xl p-6 sm:p-8">
+                <h3 className="mb-4 font-display text-lg font-bold text-heading">Request your callback</h3>
+                <CallbackForm />
+              </div>
+            </Reveal>
+          </div>
+        </div>
       </Section>
 
       <GradientDivider flip />
@@ -335,38 +289,57 @@ export default function Home() {
       </Section>
 
       <GradientDivider />
-      <Section id="callback">
-        <div className="relative overflow-hidden rounded-3xl shadow-card">
-          <div className="absolute inset-0 bg-brand-gradient" />
-          <div className="relative z-10 grid items-center gap-8 p-8 sm:p-12 lg:grid-cols-2">
-            <Reveal className="text-white">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/25 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                <PhoneCall className="h-3.5 w-3.5" /> Free Callback
-              </span>
-              <h2 className="mt-4 font-display text-display-md font-extrabold text-white">
-                Want Us To Call You?
-              </h2>
-              <p className="mt-3 max-w-md text-white/85 leading-relaxed">
-                Leave your number — we will help with models, EMI, battery upgrades, and test rides at
-                our Berhampore showroom.
-              </p>
-              <ul className="mt-6 space-y-2.5 text-sm text-white/90">
-                {['Model recommendations', 'EMI guidance', 'Battery upgrades', 'Test ride booking'].map(
-                  (item) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      {item}
-                    </li>
-                  ),
-                )}
-              </ul>
+      <Section id="guides" tight className="bg-section-alt">
+        <SectionHeading
+          eyebrow="Local guides"
+          title="Everything you need to know"
+          subtitle="Short answers first — open a guide when you want the full detail."
+        />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {HOME_GUIDES.map((guide, i) => (
+            <Reveal key={guide.to} delay={i * 0.04}>
+              <article className="flex h-full flex-col rounded-2xl bg-surface p-5 ring-1 ring-line shadow-soft">
+                <h3 className="font-display text-base font-extrabold leading-snug text-heading sm:text-lg">
+                  {guide.title}
+                </h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-body">{guide.blurb}</p>
+                <Link
+                  to={guide.to}
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition hover:text-brand-700 hover:underline"
+                >
+                  {guide.cta}
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </article>
             </Reveal>
-            <Reveal delay={0.1}>
-              <div className="glass rounded-2xl p-6 sm:p-8">
-                <h3 className="mb-4 font-display text-lg font-bold text-heading">Request your callback</h3>
-                <CallbackForm />
-              </div>
-            </Reveal>
+          ))}
+        </div>
+        <Reveal className="mt-8 overflow-hidden rounded-2xl shadow-card ring-1 ring-line">
+          <iframe
+            src={site.maps.embed}
+            title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-40 w-full border-0 sm:h-48"
+            allowFullScreen
+          />
+          <a
+            href={site.maps.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-map-image' })}
+            className="flex items-center justify-center gap-2 bg-surface-alt px-4 py-3 text-sm font-semibold text-[#4285f4] transition hover:bg-brand-50"
+          >
+            <MapPin className="h-4 w-4" /> Near Chunakhali Bus Stand — open in Google Maps
+          </a>
+        </Reveal>
+      </Section>
+
+      <Section>
+        <div className="mx-auto max-w-3xl">
+          <FaqSection faqs={SITE_FAQS} />
+          <div className="mt-8">
+            <ShowroomCtaRow from="home-faq" />
           </div>
         </div>
       </Section>

@@ -244,7 +244,7 @@ export function whatsappCustomerUrl(
   const digits = String(phone || '').replace(/\D/g, '');
   if (!digits) return whatsappUrl(message);
   const num = digits.length === 10 ? `91${digits}` : digits;
-  return `https://wa.me/${num}?text=${encodeURICommand(message)}`;
+  return `https://wa.me/${num}?text=${encodeURIComponent(message)}`;
 }
 
 export function telUrl(phone, site = SITE) {

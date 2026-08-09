@@ -14,10 +14,13 @@ The SEO overhaul in this repo is correct for **non-www** (`https://biswajitpower
 1. Open **Project → Settings → Domains**
 2. Set **`biswajitpowerhub.in` (apex) as the primary** production domain
 3. Set **`www.biswajitpowerhub.in` to Redirect to apex** (`biswajitpowerhub.in`) — not the other way around
-4. Environment variables (Production):
+4. Environment variables (Production) — see `output/VERCEL_ENV.md`:
    - `VITE_SITE_URL=https://biswajitpowerhub.in`
-   - Optional: `VITE_GOOGLE_ADS_ID=AW-XXXXXXXXX` when Ads is ready
-   - Existing Supabase / GA vars unchanged
+   - `VITE_GA_MEASUREMENT_ID=G-ZPSM06SEY4`
+   - `VITE_GOOGLE_ADS_ID=AW-17924759668`
+   - `VITE_ADMIN_EMAILS=biswajitpowerhub@gmail.com`
+   - `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` (from Supabase API settings)
+   - Optional: `VITE_GOOGLE_SITE_VERIFICATION` when Search Console HTML verify is ready
 5. Deploy **this branch to Production** (not only a Preview deployment)
 
 ## Build / deploy commands

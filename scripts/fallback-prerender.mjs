@@ -429,7 +429,8 @@ function localBusinessSchema() {
       postalCode: '742149',
       addressCountry: 'IN',
     },
-    geo: { '@type': 'GeoCoordinates', latitude: '24.0987', longitude: '88.2519' },
+    geo: { '@type': 'GeoCoordinates', latitude: '24.116865', longitude: '88.2914134' },
+    hasMap: 'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -659,7 +660,7 @@ function schemasFor(route, enrichment = {}) {
   return [crumbs];
 }
 
-const MAPS_URL = 'https://maps.google.com/?q=Biswajit+Power+Hub+Chunakhali+Berhampore';
+const MAPS_URL = 'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7';
 
 /** Per-route H2 sections for crawlable HTML (Google reads this without JS). */
 const PAGE_H2S = {

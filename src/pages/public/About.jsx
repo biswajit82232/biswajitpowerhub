@@ -39,6 +39,12 @@ export default function About() {
         description: SITE.description,
         telephone: `+91${site.phones[0]}`,
         address: postalAddressSchema(site.address),
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: SITE.geo.latitude,
+          longitude: SITE.geo.longitude,
+        },
+        hasMap: site.maps?.link || SITE.maps.link,
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
         sameAs: [SITE.social.instagram, SITE.social.facebook].filter(Boolean),
       },

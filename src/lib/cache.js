@@ -78,13 +78,19 @@ export async function fetchWithCache(key, fetcher, ttlSeconds = 300) {
 export function clearCache(key) {
   if (key) {
     MEM.delete(key);
-    try { localStorage.removeItem(LS_PREFIX + key); } catch (_) {}
+    try {
+      localStorage.removeItem(LS_PREFIX + key);
+    } catch {
+      /* storage unavailable */
+    }
   } else {
     MEM.clear();
     try {
       Object.keys(localStorage)
         .filter((k) => k.startsWith(LS_PREFIX))
         .forEach((k) => localStorage.removeItem(k));
-    } catch (_) {}
+    } catch {
+      /* storage unavailable */
+    }
   }
 }

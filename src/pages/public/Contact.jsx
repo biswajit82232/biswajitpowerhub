@@ -8,10 +8,10 @@ import { CallbackForm } from '@/features/leads/CallbackForm';
 import { useToast } from '@/components/ui/Toast';
 import { submitContact } from '@/features/leads/leadService';
 import { isValidName, isValidPhone, isValidEmail } from '@/features/leads/validation';
-import { SITE, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
+import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
-import { breadcrumbList } from '@/lib/schemaHelpers';
+import { breadcrumbList, postalAddressSchema, openingHoursSchema } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 
 function ContactMessageForm() {
@@ -71,12 +71,33 @@ function ContactMessageForm() {
 export default function Contact() {
   const { site } = useSite();
   const contactJsonLd = useMemo(
-    () =>
+    () => [
       breadcrumbList([
         { name: 'Home', path: '/' },
         { name: 'Contact', path: '/contact' },
       ]),
-    [],
+      {
+        '@context': 'https://schema.org',
+        '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store'],
+        '@id': `${SITE_URL}/#dealership`,
+        name: SITE.name,
+        url: `${SITE_URL}/contact`,
+        logo: `${SITE_URL}/logo-512.png`,
+        image: `${SITE_URL}/logo-512.png`,
+        description: SITE.description,
+        telephone: `+91${site.phones[0]}`,
+        address: postalAddressSchema(site.address),
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: SITE.geo.latitude,
+          longitude: SITE.geo.longitude,
+        },
+        hasMap: site.maps.link,
+        openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
+        sameAs: [SITE.social.instagram, SITE.social.facebook].filter(Boolean),
+      },
+    ],
+    [site],
   );
 
   return (
@@ -97,7 +118,7 @@ export default function Contact() {
               Contact
             </span>
             <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
-              Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub
+              Visit Our Showroom — Chunakhali, Berhampore
             </h1>
             <p className="mt-3 max-w-xl text-body">
               Near Chunakhali Bus Stand, Nimtala. Call or WhatsApp for prices, EMI, and test rides — we

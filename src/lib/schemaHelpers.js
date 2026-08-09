@@ -60,12 +60,17 @@ export function breadcrumbList(items) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: item.name,
-      item: item.path === '/' ? `${SITE_URL}/` : `${SITE_URL}${item.path.replace(/\/$/, '')}`,
-    })),
+    itemListElement: items.map((item, index) => {
+      const path = item.path || '/';
+      const itemUrl =
+        path === '/' ? `${SITE_URL}/` : `${SITE_URL}${String(path).replace(/\/$/, '')}`;
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: itemUrl,
+      };
+    }),
   };
 }
 
