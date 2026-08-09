@@ -53,19 +53,23 @@ export const CONTACT_DEFAULTS = {
     full: 'Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal, 742149, India',
   },
   maps: {
-    link: 'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore',
-    /** Google iframe embed — use /maps/embed?pb= (legacy ?output=embed is blocked / 404) */
+    link: 'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
+    /**
+     * Official Google Maps “Share → Embed a map” URL for BISWAJIT POWER HUB.
+     * Includes the business name card (CID + !2s name). Do not use bare place_id embeds —
+     * those only show a pin without the shop name.
+     */
     embed:
-      'https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1splace_id:ChIJP_miqYx9-TkR9z1fb-iGyxI',
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3641.5628218243573!2d88.2914134!3d24.116864999999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f97d8ca9a2f93f%3A0x12cb86e86f5f3df7!2sBISWAJIT%20POWER%20HUB!5e0!3m2!1sen!2sin!4v1786301323227!5m2!1sen!2sin',
     staticImage:
-      'https://maps.googleapis.com/maps/api/staticmap?center=24.0987,88.2519&zoom=15&size=800x400&markers=color:red%7C24.0987,88.2519&key=',
+      'https://maps.googleapis.com/maps/api/staticmap?center=24.116865,88.2914134&zoom=16&size=800x400&markers=color:red%7C24.116865,88.2914134&key=',
     /** Set VITE_GOOGLE_PLACE_ID in env to override; default is live GBP listing */
     placeId: (import.meta.env.VITE_GOOGLE_PLACE_ID || 'ChIJP_miqYx9-TkR9z1fb-iGyxI').trim(),
     reviewLink: (() => {
       const id = (import.meta.env.VITE_GOOGLE_PLACE_ID || 'ChIJP_miqYx9-TkR9z1fb-iGyxI').trim();
       return id
         ? `https://search.google.com/local/writereview?placeid=${id}`
-        : 'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore';
+        : 'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7';
     })(),
   },
   hours: { ...INITIAL_HOURS },
@@ -91,10 +95,10 @@ export const SITE = {
     youtube: '',
   },
 
-  /** Showroom coordinates (Chunakhali, Berhampore) for LocalBusiness schema */
+  /** Showroom coordinates from live GBP listing (Chunakhali, Berhampore) */
   geo: {
-    latitude: '24.0987',
-    longitude: '88.2519',
+    latitude: '24.116865',
+    longitude: '88.2914134',
   },
 
   url: SITE_URL,
@@ -104,16 +108,25 @@ export function buildAddressFull({ line, city, district, state, pincode, country
   return [line, city, district, state, pincode, country].filter(Boolean).join(', ');
 }
 
-/** Working Google Maps iframe src from a Place ID (legacy ?output=embed is blocked). */
+const DEFAULT_PLACE_ID = 'ChIJP_miqYx9-TkR9z1fb-iGyxI';
+
+/** Working Google Maps iframe src — named embed for our GBP; place_id fallback otherwise. */
 export function mapsEmbedFromPlaceId(placeId) {
   const id = (placeId || '').trim();
-  if (!id) return CONTACT_DEFAULTS.maps.embed;
+  if (!id || id === DEFAULT_PLACE_ID) return CONTACT_DEFAULTS.maps.embed;
   return `https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1splace_id:${encodeURIComponent(id)}`;
 }
 
 function isLegacyMapsEmbed(url) {
   if (!url || typeof url !== 'string') return true;
-  return url.includes('output=embed') || !url.includes('/maps/embed');
+  if (url.includes('output=embed')) return true;
+  if (!url.includes('/maps/embed')) return true;
+  // Bare place_id / minimal mfe embeds show a pin without the shop name card
+  if (url.includes('place_id:')) return true;
+  if (url.includes('origin=mfe') && /!1m2!2m1!1s/.test(url)) return true;
+  // Full Share→Embed URLs include the business name as !2s…
+  if (!url.includes('!2s') && !url.includes('%21%32%73')) return true;
+  return false;
 }
 
 /** Merge admin-editable fields into a full site object */
