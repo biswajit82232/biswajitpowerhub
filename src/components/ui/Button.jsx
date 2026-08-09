@@ -22,12 +22,22 @@ const VARIANTS = {
     'bg-[#4285f4] text-white shadow-soft hover:bg-[#3367d6]',
   danger:
     'bg-red-500 text-white shadow-soft hover:bg-red-600',
+  softSuccess:
+    'bg-emerald-50 text-emerald-600 hover:bg-emerald-100',
+  softDanger:
+    'bg-red-50 text-red-500 hover:bg-red-100',
+  softNeutral:
+    'bg-slate-100 text-slate-600 hover:bg-slate-200',
+  softBrand:
+    'bg-brand-50 text-brand-600 hover:bg-brand-100',
 };
 
 const SIZES = {
+  xs: 'h-9 px-3 text-xs gap-1.5',
   sm: 'h-10 px-4 text-sm gap-1.5',
   md: 'h-12 px-5 text-[0.95rem] gap-2',
   lg: 'h-14 px-7 text-base gap-2.5',
+  icon: 'h-14 w-14 p-0 text-2xl',
 };
 
 const Button = forwardRef(function Button(

@@ -1,5 +1,6 @@
 import { Phone, MessageCircle, Navigation, Check } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
+import Button from '@/components/ui/Button';
 import { SITE, whatsappUrl, telUrl, formatPhoneDisplay, SITE_URL } from '@/config/site';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
@@ -53,34 +54,37 @@ export default function AdLanding() {
         </div>
 
         <div className="mt-8 flex flex-col gap-3">
-          <a
+          <Button
             href={telUrl(phone)}
+            target="_self"
+            variant="primary"
+            size="lg"
+            icon={Phone}
+            fullWidth
             onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'ad-landing' })}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-base font-bold text-white transition hover:bg-brand-700"
           >
-            <Phone className="h-5 w-5" />
             Call Now: {formatPhoneDisplay(phone).replace('+91 ', '0')}
-          </a>
-          <a
+          </Button>
+          <Button
             href={whatsappUrl('Hi, I saw your ad — I want a test ride', SITE)}
-            target="_blank"
-            rel="noopener noreferrer"
+            variant="whatsapp"
+            size="lg"
+            icon={MessageCircle}
+            fullWidth
             onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'ad-landing' })}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#25d366] px-4 text-base font-bold text-white"
           >
-            <MessageCircle className="h-5 w-5" />
             WhatsApp Us
-          </a>
-          <a
+          </Button>
+          <Button
             href={maps}
-            target="_blank"
-            rel="noopener noreferrer"
+            variant="directions"
+            size="lg"
+            icon={Navigation}
+            fullWidth
             onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'ad-landing' })}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#4285f4] px-4 text-base font-bold text-white"
           >
-            <Navigation className="h-5 w-5" />
             Get Directions
-          </a>
+          </Button>
         </div>
 
         <address className="mt-8 rounded-2xl bg-white p-5 text-sm not-italic leading-relaxed text-slate-700 ring-1 ring-slate-200">

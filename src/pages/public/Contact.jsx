@@ -134,16 +134,16 @@ export default function Contact() {
                   </address>
                 </div>
 
-                <a
+                <Button
                   href={site.maps.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  variant="directions"
+                  size="lg"
+                  icon={Navigation}
+                  className="w-full sm:w-auto"
                   onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#4285f4] px-7 py-3.5 text-base font-bold text-white transition hover:bg-[#3367d6] sm:w-auto"
                 >
-                  <Navigation className="h-5 w-5" aria-hidden />
                   Get Directions
-                </a>
+                </Button>
 
                 <a
                   href={site.maps.link}
@@ -172,24 +172,27 @@ export default function Contact() {
                 Contact Information
               </h2>
               <div className="mt-6 space-y-4 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-8">
-                <a
+                <Button
                   href={telUrl(undefined, site)}
+                  target="_self"
+                  variant="primary"
+                  size="lg"
+                  icon={Phone}
+                  fullWidth
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })}
-                  className="flex min-h-12 items-center gap-3 rounded-xl bg-brand-600 px-4 py-3 text-lg font-bold text-white transition hover:bg-brand-700"
                 >
-                  <Phone className="h-5 w-5" />
                   Call {formatPhoneDisplay(site.phones[0])}
-                </a>
-                <a
+                </Button>
+                <Button
                   href={whatsappUrl(undefined, site)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  variant="whatsapp"
+                  size="lg"
+                  icon={MessageCircle}
+                  fullWidth
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}
-                  className="flex min-h-12 items-center gap-3 rounded-xl bg-[#25d366] px-4 py-3 text-lg font-bold text-white transition hover:brightness-105"
                 >
-                  <MessageCircle className="h-5 w-5" />
                   Chat on WhatsApp
-                </a>
+                </Button>
                 <div className="flex items-start gap-3 pt-2 text-sm text-body">
                   <Clock className="mt-0.5 h-5 w-5 shrink-0 text-muted" />
                   <table className="w-full text-left">

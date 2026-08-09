@@ -3,6 +3,7 @@ import { Star, Check, X, EyeOff, Sparkles, Camera, ImageIcon } from 'lucide-reac
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Badge } from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import { Stars } from '@/components/ui/StarRating';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -69,34 +70,40 @@ function ReviewPhotoAdmin({ review, onUpdated }) {
             className="h-28 w-full max-w-[200px] rounded-lg object-cover ring-1 ring-line sm:h-24"
           />
           <div className="flex flex-wrap gap-2">
-            <button
+            <Button
               type="button"
+              variant="softBrand"
+              size="xs"
+              icon={Camera}
               disabled={uploading}
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-600 transition hover:bg-brand-100 disabled:opacity-50"
             >
-              <Camera className="h-3.5 w-3.5" /> Change
-            </button>
-            <button
+              Change
+            </Button>
+            <Button
               type="button"
+              variant="softNeutral"
+              size="xs"
               disabled={uploading}
               onClick={remove}
-              className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 disabled:opacity-50"
             >
               Remove
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
+          icon={Camera}
           disabled={uploading}
+          loading={uploading}
           onClick={() => inputRef.current?.click()}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-surface px-3 py-3 text-sm font-medium text-brand-600 ring-1 ring-line transition hover:bg-brand-50 disabled:opacity-50 sm:w-auto sm:px-4"
+          className="w-full rounded-lg sm:w-auto"
         >
-          <Camera className="h-4 w-4" />
-          {uploading ? 'Uploading…' : 'Upload photo'}
-        </button>
+          Upload photo
+        </Button>
       )}
       <input
         ref={inputRef}
@@ -165,18 +172,42 @@ export default function AdminReviews() {
               )}
 
               <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:flex sm:flex-wrap">
-                <button onClick={() => act(() => setReviewStatus(r.id, 'approved'), 'Review approved.')} className="inline-flex items-center justify-center gap-1.5 rounded-full bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-600 transition hover:bg-emerald-100 sm:text-sm">
-                  <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Approve
-                </button>
-                <button onClick={() => act(() => setReviewStatus(r.id, 'rejected'), 'Review rejected.')} className="inline-flex items-center justify-center gap-1.5 rounded-full bg-red-50 px-3 py-2 text-xs font-semibold text-red-500 transition hover:bg-red-100 sm:text-sm">
-                  <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Reject
-                </button>
-                <button onClick={() => act(() => setReviewStatus(r.id, 'hidden'), 'Review hidden.')} className="inline-flex items-center justify-center gap-1.5 rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 sm:text-sm">
-                  <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Hide
-                </button>
-                <button onClick={() => act(() => setReviewFeatured(r.id, !r.featured), r.featured ? 'Unfeatured.' : 'Featured.')} className="inline-flex items-center justify-center gap-1.5 rounded-full bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-600 transition hover:bg-brand-100 sm:text-sm">
-                  <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> {r.featured ? 'Unfeature' : 'Feature'}
-                </button>
+                <Button
+                  type="button"
+                  variant="softSuccess"
+                  size="xs"
+                  icon={Check}
+                  onClick={() => act(() => setReviewStatus(r.id, 'approved'), 'Review approved.')}
+                >
+                  Approve
+                </Button>
+                <Button
+                  type="button"
+                  variant="softDanger"
+                  size="xs"
+                  icon={X}
+                  onClick={() => act(() => setReviewStatus(r.id, 'rejected'), 'Review rejected.')}
+                >
+                  Reject
+                </Button>
+                <Button
+                  type="button"
+                  variant="softNeutral"
+                  size="xs"
+                  icon={EyeOff}
+                  onClick={() => act(() => setReviewStatus(r.id, 'hidden'), 'Review hidden.')}
+                >
+                  Hide
+                </Button>
+                <Button
+                  type="button"
+                  variant="softBrand"
+                  size="xs"
+                  icon={Sparkles}
+                  onClick={() => act(() => setReviewFeatured(r.id, !r.featured), r.featured ? 'Unfeatured.' : 'Featured.')}
+                >
+                  {r.featured ? 'Unfeature' : 'Feature'}
+                </Button>
               </div>
             </div>
           ))}

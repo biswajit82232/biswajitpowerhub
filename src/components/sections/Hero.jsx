@@ -1,5 +1,6 @@
 import { MessageCircle, Phone, Navigation, Zap, ShieldCheck, Wrench, Star } from 'lucide-react';
 import { SiteImage } from '@/components/common/SiteImage';
+import Button from '@/components/ui/Button';
 import { SITE, whatsappUrl, telUrl, formatPhoneDisplay, GBP_RATING } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
@@ -15,9 +16,6 @@ const CHIPS = [
 
 const d = (ms) => ({ animationDelay: `${ms}ms` });
 const HERO_MAX_RANGE_KM = 120;
-
-const CTA_BASE =
-  'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-base font-bold text-white shadow-soft transition duration-300 ease-premium active:scale-[0.98] sm:w-auto';
 
 export function Hero({ heroImageUrl, catalogStats }) {
   const { site } = useSite();
@@ -68,34 +66,37 @@ export function Hero({ heroImageUrl, catalogStats }) {
             className="mt-7 flex animate-hero-rise flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start"
             style={d(180)}
           >
-            <a
+            <Button
               href={telUrl(undefined, site)}
-              className={`${CTA_BASE} bg-brand-600 hover:bg-brand-700`}
+              target="_self"
+              variant="primary"
+              size="lg"
+              icon={Phone}
+              className="w-full sm:w-auto"
               onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'hero' })}
             >
-              <Phone className="h-5 w-5" aria-hidden />
               Call: {formatPhoneDisplay(site.phones[0]).replace('+91 ', '0')}
-            </a>
-            <a
+            </Button>
+            <Button
               href={whatsappUrl(undefined, site)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${CTA_BASE} bg-[#25d366] hover:brightness-105`}
+              variant="whatsapp"
+              size="lg"
+              icon={MessageCircle}
+              className="w-full sm:w-auto"
               onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'hero' })}
             >
-              <MessageCircle className="h-5 w-5" aria-hidden />
               WhatsApp
-            </a>
-            <a
+            </Button>
+            <Button
               href={site.maps.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${CTA_BASE} bg-[#4285f4] hover:bg-[#3367d6]`}
+              variant="directions"
+              size="lg"
+              icon={Navigation}
+              className="w-full sm:w-auto"
               onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'hero' })}
             >
-              <Navigation className="h-5 w-5" aria-hidden />
               Get Directions
-            </a>
+            </Button>
           </div>
 
           <div
