@@ -134,6 +134,17 @@ export default function Contact() {
                   </address>
                 </div>
 
+                <div className="overflow-hidden rounded-2xl shadow-card ring-1 ring-line">
+                  <iframe
+                    src={site.maps.embed}
+                    title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="h-56 w-full border-0 sm:h-64"
+                    allowFullScreen
+                  />
+                </div>
+
                 <Button
                   href={site.maps.link}
                   variant="directions"
@@ -144,26 +155,6 @@ export default function Contact() {
                 >
                   Get Directions
                 </Button>
-
-                <a
-                  href={site.maps.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact-map' })}
-                  className="block overflow-hidden rounded-xl ring-1 ring-line"
-                >
-                  <img
-                    src="https://maps.wikimedia.org/img/osm-intl,15,24.0987,88.2519,800x400.png"
-                    alt="Map placeholder — Biswajit Power Hub near Chunakhali Bus Stand Berhampore"
-                    width={800}
-                    height={400}
-                    loading="lazy"
-                    className="h-48 w-full max-w-full object-cover sm:h-56"
-                  />
-                  <span className="block bg-surface-alt px-4 py-2 text-center text-xs text-muted">
-                    Static map preview — tap for Google Maps directions
-                  </span>
-                </a>
               </div>
             </Reveal>
 

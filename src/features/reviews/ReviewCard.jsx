@@ -1,8 +1,14 @@
+import { Link } from 'react-router-dom';
 import { Quote, BadgeCheck } from 'lucide-react';
 import { Stars } from '@/components/ui/StarRating';
+import { SCOOTERS } from '@/data/scooters';
 import { cn } from '@/lib/utils';
 
 export function ReviewCard({ review, className }) {
+  const scooterMatch = review.scooter
+    ? SCOOTERS.find((s) => s.name.toLowerCase() === String(review.scooter).toLowerCase())
+    : null;
+
   return (
     <figure
       className={cn(
@@ -36,7 +42,19 @@ export function ReviewCard({ review, className }) {
       <figcaption className="mt-4 border-t border-line pt-4">
         <p className="break-words text-sm font-bold text-heading">{review.name}</p>
         {review.scooter && (
-          <p className="break-words text-xs text-muted">Owns the {review.scooter}</p>
+          <p className="break-words text-xs text-muted">
+            Owns the{' '}
+            {scooterMatch ? (
+              <Link
+                to={`/scooters/${scooterMatch.id}`}
+                className="font-semibold text-brand-600 underline-offset-2 hover:underline"
+              >
+                {review.scooter}
+              </Link>
+            ) : (
+              review.scooter
+            )}
+          </p>
         )}
       </figcaption>
     </figure>

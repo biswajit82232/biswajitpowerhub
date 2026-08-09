@@ -73,6 +73,23 @@ export default function About() {
           <Reveal>
             <div className="space-y-8 text-base leading-relaxed text-body [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:text-heading">
               <div>
+                <h2>What to expect when you visit</h2>
+                <p className="mt-4">
+                  Walk into Chunakhali Bus Stand and you will meet a local team — not a call centre.
+                  We help you compare Activa, Zoom, Single Light, and Double Light on the floor, explain
+                  no-licence rules for West Bengal in plain language, and never rush a Murshidabad family
+                  into the wrong battery pack. Sit on the seat, check under-seat storage, and take a free
+                  test ride on nearby roads before you decide.
+                </p>
+                <p className="mt-4">
+                  Prefer a local shop over an online-only seller? So do our customers. Same-day questions
+                  about controllers, chargers, and servicing are answered in person. Bring a friend, ask
+                  about EMI slabs, and leave with a clear price — including 3 free servicing and warranty
+                  coverage — written down before you pay.
+                </p>
+              </div>
+
+              <div>
                 <h2>Our Story</h2>
                 <p className="mt-4">
                   Our story begins in Berhampore, Murshidabad — where rising petrol costs and complicated
