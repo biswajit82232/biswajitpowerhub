@@ -47,13 +47,13 @@ export default function TestRide() {
         allows.
       </p>
       <ul>
-        <li>Bring your phone number for EMI / exchange follow-up if you like the ride</li>
+        <li>Bring your phone number for EMI follow-up if you like the ride</li>
         <li>A driving licence is <strong>not</strong> required for our low-speed models</li>
-        <li>
-          Optional: bring your old scooter for an on-the-spot{' '}
-          <Link to="/exchange-old-scooter-berhampore">exchange valuation</Link>
-        </li>
         <li>Wear closed footwear; rides are short and supervised near the showroom</li>
+        <li>
+          Ask about <Link to="/accessories">genuine spare parts</Link> and{' '}
+          <Link to="/battery-upgrade-berhampore">battery upgrades</Link> after the ride
+        </li>
       </ul>
       <p>
         Customers across Murshidabad appreciate that we never rush the decision — sit on multiple models,

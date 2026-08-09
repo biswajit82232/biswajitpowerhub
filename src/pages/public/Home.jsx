@@ -178,7 +178,12 @@ export default function Home() {
             </p>
             <ul>
               <li>No licence / no registration on eligible low-speed models</li>
-              <li>EMI guidance and exchange offers on old petrol or electric scooters</li>
+              <li>EMI guidance and free test rides at Chunakhali</li>
+              <li>
+                <Link to="/no-licence-electric-scooters-west-bengal">No licence models</Link>,{' '}
+                <Link to="/test-ride-berhampore">test rides</Link>, and{' '}
+                <Link to="/accessories">spare parts</Link>
+              </li>
               <li>Custom battery upgrades when you need extra range</li>
               <li>Genuine spare parts: batteries, tyres, panels, controllers</li>
             </ul>
@@ -207,7 +212,7 @@ export default function Home() {
               monsoon charging habits, and which scooter fits a shopkeeper versus a college student.
             </p>
             <p>
-              Customers also trust us for transparent EMI slabs, fair exchange valuations, and walk-in
+              Customers also trust us for transparent EMI slabs and walk-in
               servicing — not a distant call-centre warranty. Read{' '}
               <Link to="/reviews">customer reviews from Berhampore and Murshidabad</Link>, then call
               096355 05436 or WhatsApp to confirm today’s colours and stock.

@@ -102,7 +102,7 @@ export default function BestElectricScooters() {
       <ul>
         <li>All four models are low-speed (≤25 km/h) — no licence / no RTO registration on eligible units</li>
         <li>Home charging typically ₹0.30–₹0.50 per km versus petrol queues</li>
-        <li>EMI and exchange options available at the Chunakhali showroom</li>
+        <li>EMI options available at the Chunakhali showroom</li>
         <li>Custom battery upgrades if you outgrow stock range later</li>
       </ul>
       <p>

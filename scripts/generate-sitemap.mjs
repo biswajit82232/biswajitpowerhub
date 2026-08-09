@@ -17,7 +17,6 @@ const STATIC_PAGES = [
   { path: '/no-licence-electric-scooters-west-bengal', priority: '0.85', changefreq: 'weekly' },
   { path: '/battery-upgrade-berhampore', priority: '0.8', changefreq: 'monthly' },
   { path: '/test-ride-berhampore', priority: '0.8', changefreq: 'monthly' },
-  { path: '/exchange-old-scooter-berhampore', priority: '0.75', changefreq: 'monthly' },
   { path: '/accessories', priority: '0.6', changefreq: 'weekly' },
   { path: '/reviews', priority: '0.7', changefreq: 'weekly' },
   { path: '/compare', priority: '0.5', changefreq: 'monthly' },

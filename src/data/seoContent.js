@@ -27,11 +27,6 @@ export const SITE_FAQS = [
       'Yes, EMI and financing options are available on all models. Contact us on WhatsApp at 096355 05436 or visit our showroom for details.',
   },
   {
-    question: 'Can I exchange my old petrol scooter?',
-    answer:
-      'Yes, we accept old petrol scooters and electric scooters in exchange. Bring your vehicle to our Chunakhali showroom for a free valuation and best exchange price.',
-  },
-  {
     question: 'Where is your showroom located?',
     answer:
       'We are located at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad — 742149, West Bengal. We are right at the bus stand, easy to find from anywhere in Murshidabad district.',

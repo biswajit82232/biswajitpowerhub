@@ -30,7 +30,7 @@ export default function LowBudgetElectricScooters() {
       description="Affordable electric scooters in Berhampore. Low budget, no licence models. EMI available. Visit Biswajit Power Hub, Chunakhali. Call 096355 05436."
       path={path}
       h1="Low Budget Electric Scooters in Berhampore & Murshidabad — Starting ₹38,999"
-      intro="Need a cheap electric scooter in Berhampore without compromising safety or showroom support? Biswajit Power Hub stocks low-budget, no-licence models starting at ₹38,999 — with EMI and exchange options."
+      intro="Need a cheap electric scooter in Berhampore without compromising safety or showroom support? Biswajit Power Hub stocks low-budget, no-licence models starting at ₹38,999 — with EMI options."
       breadcrumbs={[
         { name: 'Home', to: '/' },
         { name: 'Low Budget Electric Scooters' },
@@ -73,18 +73,18 @@ export default function LowBudgetElectricScooters() {
         use the savings simulator on the homepage after your visit.
       </p>
 
-      <h2>EMI &amp; Exchange Options Available</h2>
+      <h2>EMI Options Available</h2>
       <p>
-        Financing is available on all models — ask at the counter for current EMI slabs. We also accept{' '}
-        <Link to="/exchange-old-scooter-berhampore">exchange of old petrol or electric scooters</Link> for
-        a free valuation at Chunakhali. Pair a low budget model with exchange credit and many customers
-        drive out with minimal cash down. Battery upgrades later keep the same chassis useful longer if
-        your Murshidabad commute grows.
+        Financing is available on all models — ask at the counter for current EMI slabs. Many Berhampore
+        and Murshidabad families choose a low monthly payment and keep cash free for battery accessories
+        or a spare charger. Battery upgrades later keep the same chassis useful longer if your commute
+        grows.
       </p>
       <p>
         Visit Biswajit Power Hub in Berhampore Monday–Saturday 9 AM–8 PM, or call 096355 05436 / WhatsApp
         for today’s stock and EMI options. Free{' '}
-        <Link to="/test-ride-berhampore">test rides</Link> — no appointment needed.
+        <Link to="/test-ride-berhampore">test rides</Link> — no appointment needed. Browse{' '}
+        <Link to="/accessories">spare parts &amp; accessories</Link> while you are here.
       </p>
     </SeoLandingLayout>
   );

@@ -31,7 +31,7 @@ export const REVIEWS = [
     name: 'Amit P., Nimtala',
     rating: 5,
     review:
-      'Double Light replaced my old petrol scooter. Getting 55–60 km regularly, running cost is peanuts. Showroom near Chunakhali Bus Stand was very helpful with exchange.',
+      'Double Light replaced my old petrol scooter. Getting 55–60 km regularly, running cost is peanuts. Showroom near Chunakhali Bus Stand was very helpful with the purchase.',
     scooter: 'Double Light',
     photo: '',
     status: 'approved',

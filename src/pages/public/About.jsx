@@ -84,7 +84,7 @@ export default function About() {
                 </p>
                 <p className="mt-4">
                   Over the years we have helped hundreds of local customers choose between Activa, Zoom,
-                  Single Light, and Double Light, arrange financing, accept exchange of old scooters, and
+                  Single Light, and Double Light, arrange financing, and
                   upgrade batteries for extra range. Our expertise is hands-on: walk-in servicing, genuine
                   spare parts, and neighbours who already ride home from Chunakhali.
                 </p>

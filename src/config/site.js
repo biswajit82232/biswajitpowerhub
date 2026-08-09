@@ -158,17 +158,24 @@ export const NAV_LINKS = [
   { label: 'Contact', to: '/contact' },
 ];
 
-/** Extra footer SEO links (not all in primary nav) */
-export const FOOTER_SEO_LINKS = [
-  { label: 'Best Electric Scooters Berhampore', to: '/best-electric-scooters-berhampore' },
-  { label: 'Low Budget E-Scooters', to: '/low-budget-electric-scooters-berhampore' },
-  { label: 'No Licence Scooters WB', to: '/no-licence-electric-scooters-west-bengal' },
+/** Full footer Quick Links — every remaining indexable page (no exchange/updates) */
+export const FOOTER_QUICK_LINKS = [
+  { label: 'Home', to: '/' },
+  { label: 'Scooters', to: '/scooters' },
+  { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
+  { label: 'Low Budget', to: '/low-budget-electric-scooters-berhampore' },
+  { label: 'No Licence', to: '/no-licence-electric-scooters-west-bengal' },
   { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
-  { label: 'Free Test Ride', to: '/test-ride-berhampore' },
-  { label: 'Exchange Old Scooter', to: '/exchange-old-scooter-berhampore' },
+  { label: 'Test Ride', to: '/test-ride-berhampore' },
+  { label: 'Accessories', to: '/accessories' },
+  { label: 'Compare', to: '/compare' },
+  { label: 'Reviews', to: '/reviews' },
   { label: 'About', to: '/about' },
-  { label: 'Compare Models', to: '/compare' },
+  { label: 'Contact', to: '/contact' },
 ];
+
+/** @deprecated use FOOTER_QUICK_LINKS */
+export const FOOTER_SEO_LINKS = FOOTER_QUICK_LINKS;
 
 /** WhatsApp deep link — pass site from useSite() when available */
 export function whatsappUrl(

@@ -3,7 +3,7 @@ import { SEO } from '@/components/common/SEO';
 import Button from '@/components/ui/Button';
 
 /**
- * Thin noindex stub for legacy/internal URLs (/dealership, /updates).
+ * Thin noindex stub for legacy/internal URLs (/dealership).
  * Kept so old GSC entries don't 404 into redirect chains.
  */
 export default function InternalStub({ title = 'Internal page', heading, path = '/' }) {

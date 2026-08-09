@@ -103,7 +103,7 @@ const ROUTES = [
     h1: 'Biswajit Power Hub — Best Electric Scooter Dealer in Berhampore, Murshidabad',
     schema: 'local',
     crawlText:
-      'Best electric scooters in Berhampore under ₹50,000 at Biswajit Power Hub, Chunakhali Bus Stand, Murshidabad. Popular models: Activa, Zoom, Single Light and Double Light — no licence required. Why choose Biswajit Power Hub? Honest pricing, free test rides, EMI, exchange, and custom battery upgrades with genuine spare parts. Visit Monday to Saturday 9 AM to 8 PM. Call 096355 05436. Frequently asked questions cover licence rules, prices from ₹38,999, range, EMI, and exchange.',
+      'Best electric scooters in Berhampore under ₹50,000 at Biswajit Power Hub, Chunakhali Bus Stand, Murshidabad. Popular models: Activa, Zoom, Single Light and Double Light — no licence required. Why choose Biswajit Power Hub? Honest pricing, free test rides, EMI, and custom battery upgrades with genuine spare parts. Visit Monday to Saturday 9 AM to 8 PM. Call 096355 05436. Frequently asked questions cover licence rules, prices from ₹38,999, range, EMI.',
   },
   {
     path: '/scooters',
@@ -130,7 +130,7 @@ const ROUTES = [
     h1: 'Best Electric Scooters in Berhampore (2026) — Top Models Compared',
     schema: 'crumbs',
     crawlText:
-      'Compare Activa, Zoom, Double Light, and Single Light at Biswajit Power Hub in Berhampore and Murshidabad. Every model is a low-speed electric scooter with no licence and no RTO registration required. Prices start from ₹38,999. Visit Chunakhali Bus Stand for a free test ride, EMI options, exchange offers, and custom battery upgrades. We include 3 free servicing and 1 year motor and controller warranty.',
+      'Compare Activa, Zoom, Double Light, and Single Light at Biswajit Power Hub in Berhampore and Murshidabad. Every model is a low-speed electric scooter with no licence and no RTO registration required. Prices start from ₹38,999. Visit Chunakhali Bus Stand for a free test ride, EMI options, and custom battery upgrades. We include 3 free servicing and 1 year motor and controller warranty.',
   },
   {
     path: '/low-budget-electric-scooters-berhampore',
@@ -140,7 +140,7 @@ const ROUTES = [
     h1: 'Low Budget Electric Scooters in Berhampore & Murshidabad — Starting ₹38,999',
     schema: 'crumbs',
     crawlText:
-      'Looking for a cheap electric scooter in Berhampore? Single Light starts at approximately ₹38,999, with Double Light, Zoom, and Activa still under ₹50,000 on Standard batteries. Save on petrol with home charging around ₹0.30 to ₹0.50 per km. Ask about EMI and exchange of old scooters at our Murshidabad showroom near Chunakhali Bus Stand.',
+      'Looking for a cheap electric scooter in Berhampore? Single Light starts at approximately ₹38,999, with Double Light, Zoom, and Activa still under ₹50,000 on Standard batteries. Save on petrol with home charging around ₹0.30 to ₹0.50 per km. Ask about EMI options at our Murshidabad showroom near Chunakhali Bus Stand.',
   },
   {
     path: '/no-licence-electric-scooters-west-bengal',
@@ -172,16 +172,7 @@ const ROUTES = [
     crawlText:
       'Free supervised test rides are available at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore. No appointment needed Monday to Saturday 9 AM to 8 PM. A driving licence is not required for our low-speed models. Try Activa, Zoom, Double Light, or Single Light before you buy.',
   },
-  {
-    path: '/exchange-old-scooter-berhampore',
-    title: 'Exchange Old Scooter in Berhampore | Biswajit Power Hub',
-    description:
-      'Exchange your old petrol or electric scooter in Berhampore. Free valuation at Biswajit Power Hub, Chunakhali. Call 096355 05436.',
-    h1: 'Exchange Old Scooter in Berhampore — Free Valuation',
-    schema: 'crumbs',
-    crawlText:
-      'Exchange your old petrol or electric scooter for a no-licence EV at Biswajit Power Hub in Berhampore, Murshidabad. Free on-the-spot valuation at Chunakhali Bus Stand. Apply credit toward Single Light from ₹38,999 or other models, with EMI available on the balance.',
-  },
+
   {
     path: '/contact',
     title: 'Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub',
@@ -253,14 +244,7 @@ const ROUTES = [
     schema: 'none',
     noindex: true,
   },
-  {
-    path: '/updates',
-    title: 'Updates | Biswajit Power Hub',
-    description: 'Internal updates page — not part of the public catalogue.',
-    h1: 'Updates',
-    schema: 'none',
-    noindex: true,
-  },
+
 ];
 
 function humanizeId(id) {
@@ -618,14 +602,6 @@ function faqSchema() {
       },
       {
         '@type': 'Question',
-        name: 'Can I exchange my old petrol scooter?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes, we accept old petrol scooters and electric scooters in exchange. Bring your vehicle to our Chunakhali showroom for a free valuation and best exchange price.',
-        },
-      },
-      {
-        '@type': 'Question',
         name: 'Where is your showroom located?',
         acceptedAnswer: {
           '@type': 'Answer',
@@ -686,11 +662,11 @@ const PAGE_H2S = {
     },
     {
       h2: 'Popular Models: Activa, Zoom, Single Light & Double Light',
-      p: 'Popular models at Biswajit Power Hub — Activa, Zoom, Single Light, and Double Light — are stocked for quick test rides in Berhampore. Activa suits riders who need more range for Berhampore–Kandi or Berhampore–Jalangi routes. Zoom feels planted and premium for office commutes across Murshidabad. Double Light balances comfort and price for family errands, while Single Light keeps the cash outlay lowest for first-time EV buyers. Every model carries a No Licence Required badge for eligible low-speed use, with EMI guidance and exchange offers on old petrol or electric scooters.',
+      p: 'Popular models at Biswajit Power Hub — Activa, Zoom, Single Light, and Double Light — are stocked for quick test rides in Berhampore. Activa suits riders who need more range for Berhampore–Kandi or Berhampore–Jalangi routes. Zoom feels planted and premium for office commutes across Murshidabad. Double Light balances comfort and price for family errands, while Single Light keeps the cash outlay lowest for first-time EV buyers. Every model carries a No Licence Required badge for eligible low-speed use, with EMI guidance and free test rides.',
     },
     {
       h2: 'Why Choose Biswajit Power Hub?',
-      p: 'Why choose Biswajit Power Hub over online-only sellers? Because electric scooters in Berhampore are a showroom decision — battery feel, seat height, and real-world range matter more than a brochure. We explain Central Motor Vehicles rules for low-speed EVs in West Bengal in plain language, help you pick between Standard and Lithium Pro packs where available, and never rush a Murshidabad customer into the wrong model. Customers also trust us for transparent EMI slabs, fair exchange valuations, and walk-in servicing.',
+      p: 'Why choose Biswajit Power Hub over online-only sellers? Because electric scooters in Berhampore are a showroom decision — battery feel, seat height, and real-world range matter more than a brochure. We explain Central Motor Vehicles rules for low-speed EVs in West Bengal in plain language, help you pick between Standard and Lithium Pro packs where available, and never rush a Murshidabad customer into the wrong model. Customers also trust us for transparent EMI slabs and walk-in servicing.',
     },
     {
       h2: 'Custom Battery Upgrades & Spare Parts',
@@ -702,7 +678,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Frequently Asked Questions',
-      p: 'Common questions cover licence rules for low-speed EVs in West Bengal, prices from ₹38,999, range per charge, free test rides in Berhampore, EMI financing, exchange of old scooters, showroom location at Chunakhali, and spare parts plus battery upgrades. Call 096355 05436 for anything not listed here.',
+      p: 'Common questions cover licence rules for low-speed EVs in West Bengal, prices from ₹38,999, range per charge, free test rides in Berhampore, EMI financing, showroom location at Chunakhali, and spare parts plus battery upgrades. Call 096355 05436 for anything not listed here.',
     },
   ],
   '/best-electric-scooters-berhampore': [
@@ -712,7 +688,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Which Model is Best for You?',
-      p: 'Choosing the best e-scooter in Murshidabad depends on daily kilometres, budget, and who will ride. Longer Berhampore–Kandi or Berhampore–Jalangi routes favour Activa. Premium daily commute feel points to Zoom. Families who want comfort without a high ticket often prefer Double Light. First-time buyers watching every rupee usually land on Single Light from ₹38,999. All four models are low-speed (≤25 km/h) with EMI and exchange options available at the Chunakhali showroom, plus custom battery upgrades if you outgrow stock range later. Still unsure? Sit on each scooter during a free test ride — the right choice becomes obvious in minutes when you feel seat height, throttle response, and battery weight in person instead of guessing from a brochure.',
+      p: 'Choosing the best e-scooter in Murshidabad depends on daily kilometres, budget, and who will ride. Longer Berhampore–Kandi or Berhampore–Jalangi routes favour Activa. Premium daily commute feel points to Zoom. Families who want comfort without a high ticket often prefer Double Light. First-time buyers watching every rupee usually land on Single Light from ₹38,999. All four models are low-speed (≤25 km/h) with EMI options available at the Chunakhali showroom, plus custom battery upgrades if you outgrow stock range later. Still unsure? Sit on each scooter during a free test ride — the right choice becomes obvious in minutes when you feel seat height, throttle response, and battery weight in person instead of guessing from a brochure.',
     },
     {
       h2: 'Why Buy From Biswajit Power Hub?',
@@ -729,8 +705,8 @@ const PAGE_H2S = {
       p: 'Petrol scooters in Murshidabad often cost ₹150–₹300+ per week in fuel for daily city use. Our electric scooters typically run at about ₹0.30–₹0.50 per km with home charging. Example: 30 km/day ≈ ₹270–₹450 per month in electricity versus ₹2,000+ in petrol for many Berhampore riders. Over a year, that savings often covers a large part of your EMI — which is why low budget does not mean low value when you buy electric at Biswajit Power Hub.',
     },
     {
-      h2: 'EMI & Exchange Options Available',
-      p: 'Financing is available on all models — ask at the counter for current EMI slabs. We also accept exchange of old petrol or electric scooters for a free valuation at Chunakhali. Pair a low budget model with exchange credit and many customers drive out with minimal cash down. Visit Monday–Saturday 9 AM–8 PM, or call 096355 05436 for today’s stock and EMI options. Free test rides — no appointment needed.',
+      h2: 'EMI Options Available',
+      p: 'Financing is available on all models — ask at the counter for current EMI slabs. Many Berhampore and Murshidabad families choose a low monthly payment while keeping cash free for accessories or a spare charger. Visit Monday–Saturday 9 AM–8 PM, or call 096355 05436 for today’s stock and EMI options. Free test rides — no appointment needed.',
     },
   ],
   '/no-licence-electric-scooters-west-bengal': [
@@ -754,27 +730,17 @@ const PAGE_H2S = {
     },
     {
       h2: 'Battery Upgrade Process',
-      p: 'Bring your e-scooter to Biswajit Power Hub near Chunakhali Bus Stand, Berhampore. We inspect the controller, connectors, and chassis, recommend a compatible pack, share clear pricing, and schedule fitment — usually the same visit when parts are in stock. Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. If your scooter is ageing overall, compare Activa and Zoom Lithium Pro options, then decide with our team. Pair upgrades with a free test ride or explore exchange offers on older petrol scooters across Murshidabad.',
+      p: 'Bring your e-scooter to Biswajit Power Hub near Chunakhali Bus Stand, Berhampore. We inspect the controller, connectors, and chassis, recommend a compatible pack, share clear pricing, and schedule fitment — usually the same visit when parts are in stock. Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. If your scooter is ageing overall, compare Activa and Zoom Lithium Pro options, then decide with our team. Pair upgrades with a free test ride or browse spare parts and accessories at Chunakhali across Murshidabad.',
     },
   ],
   '/test-ride-berhampore': [
     {
       h2: 'How to Book a Free Test Ride',
-      p: 'How to book a free test ride in Berhampore: simply walk into Biswajit Power Hub at Chunakhali Bus Stand Monday–Saturday between 9:00 AM and 8:00 PM (Sunday closed). No appointment is required for our low-speed models. Prefer a heads-up? Call or WhatsApp 096355 05436 and tell us which scooter you want to try — Activa, Zoom, Double Light, or Single Light. Bring your phone number for EMI follow-up; a driving licence is not required for our low-speed models. Optional: bring your old scooter for an on-the-spot exchange valuation.',
+      p: 'How to book a free test ride in Berhampore: simply walk into Biswajit Power Hub at Chunakhali Bus Stand Monday–Saturday between 9:00 AM and 8:00 PM (Sunday closed). No appointment is required for our low-speed models. Prefer a heads-up? Call or WhatsApp 096355 05436 and tell us which scooter you want to try — Activa, Zoom, Double Light, or Single Light. Bring your phone number for EMI follow-up; a driving licence is not required for our low-speed models. Ask about genuine spare parts and battery upgrades after the ride.',
     },
     {
       h2: 'What to Expect at Our Showroom',
       p: 'Expect a friendly walkthrough of no-licence rules in West Bengal, side-by-side comparison of Activa, Zoom, Single Light, and Double Light, and a supervised ride on safe nearby roads around Chunakhali when weather and traffic allow. Address: Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149. After the ride we can discuss EMI, battery upgrades, and today’s on-road price for riders across Murshidabad.',
-    },
-  ],
-  '/exchange-old-scooter-berhampore': [
-    {
-      h2: 'How Exchange Works',
-      p: 'Bring your old petrol or electric scooter to our showroom near Chunakhali Bus Stand in Berhampore. Our team inspects condition, age, and local market demand, then offers a fair exchange price against any of our low-speed electric models — including Single Light from ₹38,999 and Activa for longer range. There is no obligation; you can walk away after the valuation with zero pressure. EMI is available on the balance after exchange credit. Call 096355 05436 with your old model’s year before you arrive.',
-    },
-    {
-      h2: 'Get the Best Value for Your Old Scooter',
-      p: 'Arrive with service history if you have it, a charged battery for e-scooters, and realistic photos of scratches. Clean scooters typically fetch stronger exchange offers. Petrol costs keep rising while home charging stays around ₹0.30–₹0.50 per km — combined with no licence paperwork on eligible models, Berhampore customers often cut monthly running costs dramatically after switching. Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed across Murshidabad visits.',
     },
   ],
   '/reviews': [
@@ -784,7 +750,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Leave Us a Review',
-      p: 'Bought from our Chunakhali showroom? Your Google review helps other Berhampore and Murshidabad riders find Biswajit Power Hub. Search Biswajit Power Hub Berhampore on Google and leave a review after your visit, or write a review on our site. We appreciate honest feedback about models, EMI, exchange, and after-sales support.',
+      p: 'Bought from our Chunakhali showroom? Your Google review helps other Berhampore and Murshidabad riders find Biswajit Power Hub. Search Biswajit Power Hub Berhampore on Google and leave a review after your visit, or write a review on our site. We appreciate honest feedback about models, EMI, and after-sales support.',
     },
   ],
   '/about': [
@@ -800,7 +766,7 @@ const PAGE_H2S = {
   '/contact': [
     {
       h2: 'Visit Our Showroom in Berhampore',
-      p: 'Find Biswajit Power Hub at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal — 742149. Landmark: Near Chunakhali Bus Stand. We do not sell online — visit for free test rides, EMI guidance, and exchange valuations. Get directions on Google Maps or call before you arrive.',
+      p: 'Find Biswajit Power Hub at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal — 742149. Landmark: Near Chunakhali Bus Stand. We do not sell online — visit for free test rides, EMI guidance, and battery upgrades. Get directions on Google Maps or call before you arrive.',
     },
     {
       h2: 'Contact Information',
@@ -822,7 +788,7 @@ const PAGE_H2S = {
 const MODEL_H2S = [
   {
     h2: 'Why riders in Berhampore choose this model',
-    p: 'This low-speed electric scooter at Biswajit Power Hub in Berhampore, Murshidabad needs no driving licence and no RTO registration on eligible units. Charge at home for roughly ₹0.30–₹0.50 per km, with 3 free servicing and 1 year motor and controller warranty. Visit Chunakhali Bus Stand for a free test ride, EMI guidance, and exchange offers.',
+    p: 'This low-speed electric scooter at Biswajit Power Hub in Berhampore, Murshidabad needs no driving licence and no RTO registration on eligible units. Charge at home for roughly ₹0.30–₹0.50 per km, with 3 free servicing and 1 year motor and controller warranty. Visit Chunakhali Bus Stand for a free test ride, EMI guidance, and spare-parts support.',
   },
   {
     h2: 'Price, range & showroom support in Murshidabad',
@@ -844,7 +810,7 @@ function sectionsHtml(route) {
         h2: 'Biswajit Power Hub — Berhampore & Murshidabad',
         p:
           route.crawlText ||
-          'Visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore, Murshidabad for low-speed no-licence electric scooters, EMI, exchange, battery upgrades, and free test rides. Call 096355 05436. Monday–Saturday 9 AM–8 PM · Sunday Closed.',
+          'Visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore, Murshidabad for low-speed no-licence electric scooters, EMI, battery upgrades, and free test rides. Call 096355 05436. Monday–Saturday 9 AM–8 PM · Sunday Closed.',
       },
       {
         h2: 'Visit Our Showroom',
@@ -910,7 +876,7 @@ function crawlableBody(route) {
     </div>
     <div>
       <p style="font-weight:700;letter-spacing:0.08em;font-size:0.75rem;color:#aaa;text-transform:uppercase;">Quick Links</p>
-      <p style="margin:0.5rem 0;"><a href="${BASE}/" style="color:#ddd;">Home</a> · <a href="${BASE}/scooters" style="color:#ddd;">Scooters</a> · <a href="${BASE}/best-electric-scooters-berhampore" style="color:#ddd;">Best in Berhampore</a> · <a href="${BASE}/low-budget-electric-scooters-berhampore" style="color:#ddd;">Low Budget</a> · <a href="${BASE}/battery-upgrade-berhampore" style="color:#ddd;">Battery Upgrade</a> · <a href="${BASE}/reviews" style="color:#ddd;">Reviews</a> · <a href="${BASE}/contact" style="color:#ddd;">Contact</a></p>
+      <p style="margin:0.5rem 0;"><a href="${BASE}/" style="color:#ddd;">Home</a> · <a href="${BASE}/scooters" style="color:#ddd;">Scooters</a> · <a href="${BASE}/best-electric-scooters-berhampore" style="color:#ddd;">Best in Berhampore</a> · <a href="${BASE}/low-budget-electric-scooters-berhampore" style="color:#ddd;">Low Budget</a> · <a href="${BASE}/no-licence-electric-scooters-west-bengal" style="color:#ddd;">No Licence</a> · <a href="${BASE}/battery-upgrade-berhampore" style="color:#ddd;">Battery Upgrade</a> · <a href="${BASE}/test-ride-berhampore" style="color:#ddd;">Test Ride</a> · <a href="${BASE}/accessories" style="color:#ddd;">Accessories</a> · <a href="${BASE}/compare" style="color:#ddd;">Compare</a> · <a href="${BASE}/reviews" style="color:#ddd;">Reviews</a> · <a href="${BASE}/about" style="color:#ddd;">About</a> · <a href="${BASE}/contact" style="color:#ddd;">Contact</a></p>
     </div>
     <div>
       <p style="font-weight:700;letter-spacing:0.08em;font-size:0.75rem;color:#aaa;text-transform:uppercase;">Contact</p>

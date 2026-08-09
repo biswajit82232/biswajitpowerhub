@@ -23,7 +23,6 @@ const LowBudgetElectricScooters = lazy(() => import('@/pages/public/seo/LowBudge
 const NoLicenceElectricScooters = lazy(() => import('@/pages/public/seo/NoLicenceElectricScooters'));
 const BatteryUpgrade = lazy(() => import('@/pages/public/seo/BatteryUpgrade'));
 const TestRide = lazy(() => import('@/pages/public/seo/TestRide'));
-const ExchangeOldScooter = lazy(() => import('@/pages/public/seo/ExchangeOldScooter'));
 const AdLanding = lazy(() => import('@/pages/public/AdLanding'));
 
 // Admin (separate chunk)
@@ -62,7 +61,6 @@ export default function App() {
         <Route path="no-licence-electric-scooters-west-bengal" element={<NoLicenceElectricScooters />} />
         <Route path="battery-upgrade-berhampore" element={<BatteryUpgrade />} />
         <Route path="test-ride-berhampore" element={<TestRide />} />
-        <Route path="exchange-old-scooter-berhampore" element={<ExchangeOldScooter />} />
         <Route path="terms" element={<Terms />} />
         <Route path="privacy" element={<Privacy />} />
         <Route
@@ -72,16 +70,6 @@ export default function App() {
               title="Dealership Inquiry | Biswajit Power Hub"
               heading="Dealership"
               path="/dealership"
-            />
-          }
-        />
-        <Route
-          path="updates"
-          element={
-            <InternalStub
-              title="Updates | Biswajit Power Hub"
-              heading="Updates"
-              path="/updates"
             />
           }
         />

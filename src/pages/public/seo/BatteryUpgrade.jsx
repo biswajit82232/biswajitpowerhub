@@ -69,8 +69,9 @@ export default function BatteryUpgrade() {
         <Link to="/scooters">electric scooters</Link> — including{' '}
         <Link to="/scooters/activa">Activa</Link> and <Link to="/scooters/zoom">Zoom</Link> Lithium Pro
         options — then decide with our team. Pair upgrades with a{' '}
-        <Link to="/test-ride-berhampore">test ride</Link> if you are switching models, or explore{' '}
-        <Link to="/exchange-old-scooter-berhampore">exchange offers</Link> on older petrol scooters.
+        <Link to="/test-ride-berhampore">test ride</Link> if you are switching models, or browse{' '}
+        <Link to="/scooters">all electric scooters</Link> and{' '}
+        <Link to="/accessories">spare parts</Link> at Chunakhali.
       </p>
     </SeoLandingLayout>
   );

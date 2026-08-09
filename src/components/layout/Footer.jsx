@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Phone, MessageCircle, Clock } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import {
-  NAV_LINKS,
+  FOOTER_QUICK_LINKS,
   SITE,
   whatsappUrl,
   telUrl,
@@ -40,7 +40,7 @@ export function Footer() {
               Quick Links
             </h3>
             <ul className="mt-5 space-y-3">
-              {NAV_LINKS.map((l) => (
+              {FOOTER_QUICK_LINKS.map((l) => (
                 <li key={l.to}>
                   <Link
                     to={l.to}

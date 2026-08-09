@@ -1,4 +1,4 @@
-import { MessageCircle, Phone, Navigation, Zap, ShieldCheck, Wrench, Star, RefreshCw } from 'lucide-react';
+import { MessageCircle, Phone, Navigation, Zap, ShieldCheck, Wrench, Star } from 'lucide-react';
 import { SiteImage } from '@/components/common/SiteImage';
 import { SITE, whatsappUrl, telUrl, formatPhoneDisplay, GBP_RATING } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
@@ -10,7 +10,7 @@ const CHIPS = [
   { icon: Star, label: `${GBP_RATING.ratingValue}/5 Customer Rating`, color: 'text-amber-300' },
   { icon: Wrench, label: '3 Free Servicing', color: 'text-orange-300' },
   { icon: ShieldCheck, label: '1 Year Warranty', color: 'text-sky-300' },
-  { icon: RefreshCw, label: 'Exchange Offers', color: 'text-emerald-300' },
+  { icon: Zap, label: 'No Licence Models', color: 'text-emerald-300' },
 ];
 
 const d = (ms) => ({ animationDelay: `${ms}ms` });

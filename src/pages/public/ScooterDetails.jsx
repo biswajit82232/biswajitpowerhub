@@ -220,7 +220,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                   Power Hub in Berhampore, Murshidabad. Eligible units need no driving licence and no RTO
                   registration, charge at home for roughly ₹0.30–₹0.50 per km, and include 3 free servicing
                   plus 1 year motor &amp; controller warranty. Visit Chunakhali Bus Stand for a free test
-                  ride, EMI guidance, and exchange offers on your old petrol or electric scooter.
+                  ride, EMI guidance, and spare-parts support for your scooter.
                 </p>
                 <p className="mt-3">
                   Compare all options on our{' '}
