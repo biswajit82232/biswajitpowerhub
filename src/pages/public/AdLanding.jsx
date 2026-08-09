@@ -2,7 +2,6 @@ import { Phone, MessageCircle, Navigation, Check } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { SITE, whatsappUrl, telUrl, formatPhoneDisplay, SITE_URL } from '@/config/site';
 import { trackEvent, EVENT } from '@/lib/tracking';
-import { trackAdsConversion } from '@/lib/googleAnalytics';
 
 /**
  * Bare Google Ads landing — noindex, no main nav, conversion-first.
@@ -56,10 +55,7 @@ export default function AdLanding() {
         <div className="mt-8 flex flex-col gap-3">
           <a
             href={telUrl(phone)}
-            onClick={() => {
-              trackEvent(EVENT.CALL_CLICK, { from: 'ad-landing' });
-              trackAdsConversion('phone_click');
-            }}
+            onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'ad-landing' })}
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 text-base font-bold text-white transition hover:bg-brand-700"
           >
             <Phone className="h-5 w-5" />
@@ -79,10 +75,7 @@ export default function AdLanding() {
             href={maps}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => {
-              trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'ad-landing' });
-              trackAdsConversion('directions_click');
-            }}
+            onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'ad-landing' })}
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#4285f4] px-4 text-base font-bold text-white"
           >
             <Navigation className="h-5 w-5" />

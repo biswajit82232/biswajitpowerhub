@@ -15,6 +15,7 @@ export const isGoogleAdsConfigured = Boolean(GOOGLE_ADS_ID && /^AW-/.test(GOOGLE
 
 /** Conversion labels created in Google Ads UI (suffix after AW-XXXX/) */
 export const ADS_CONVERSION_LABELS = {
+  call_click: 'phone_call_lead',
   phone_click: 'phone_call_lead',
   directions_click: 'directions_click',
   get_directions: 'directions_click',
@@ -140,6 +141,10 @@ const GA_EVENT_MAP = {
 
 export function trackGAEvent(type, meta = {}) {
   if (!isGoogleAnalyticsConfigured || !window.gtag) return;
+
+  // SPA page views are owned by GoogleAnalytics → trackGAPageView (avoids double-counting).
+  // First load page_view still comes from index.html gtag config.
+  if (type === 'page_view') return;
 
   const name = GA_EVENT_MAP[type] || type;
   const params = { event_category: 'engagement', ...meta };
