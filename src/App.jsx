@@ -73,6 +73,16 @@ export default function App() {
             />
           }
         />
+        <Route
+          path="updates"
+          element={
+            <InternalStub
+              title="Updates | Biswajit Power Hub"
+              heading="Updates"
+              path="/updates"
+            />
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Route>
 

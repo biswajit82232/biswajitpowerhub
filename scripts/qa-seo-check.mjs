@@ -27,6 +27,7 @@ const routes = [
   '/privacy',
   '/ad-landing',
   '/dealership',
+  '/updates',
 ];
 
 function htmlPath(route) {
@@ -48,10 +49,18 @@ for (const route of routes) {
   const issues = [];
   if (!/<title>[^<]+<\/title>/i.test(html)) issues.push('no-title');
   if (!/name=["']description["']/i.test(html)) issues.push('no-description');
-  if (!/rel=["']canonical["']/i.test(html) && route !== '/ad-landing' && route !== '/dealership') {
+  if (
+    !/rel=["']canonical["']/i.test(html) &&
+    route !== '/ad-landing' &&
+    route !== '/dealership' &&
+    route !== '/updates'
+  ) {
     issues.push('no-canonical');
   }
-  if ((route === '/ad-landing' || route === '/dealership') && !/noindex/i.test(html)) {
+  if (
+    (route === '/ad-landing' || route === '/dealership' || route === '/updates') &&
+    !/noindex/i.test(html)
+  ) {
     issues.push('missing-noindex');
   }
   if (route === '/' && !html.includes('24.116865')) issues.push('stale-geo');

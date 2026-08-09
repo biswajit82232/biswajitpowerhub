@@ -244,6 +244,14 @@ const ROUTES = [
     schema: 'none',
     noindex: true,
   },
+  {
+    path: '/updates',
+    title: 'Updates | Biswajit Power Hub',
+    description: 'Internal updates page — not part of the public catalogue.',
+    h1: 'Updates',
+    schema: 'none',
+    noindex: true,
+  },
 
 ];
 
