@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, MessageCircle, Wrench, Tag } from 'lucide-react';
+import { ChevronLeft, MessageCircle, Wrench, Tag, Phone } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
 import { Badge } from '@/components/ui/Badge';
@@ -11,11 +11,46 @@ import { AccessoryImage } from '@/components/common/AccessoryImage';
 import { getAccessoryById } from '@/features/accessories/accessoryService';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
-import { STOCK_LABELS } from '@/data/scooters';
+import { SCOOTERS, STOCK_LABELS } from '@/data/scooters';
 import { buildAccessoryProductSchema } from '@/lib/schemaHelpers';
-import { whatsappUrl } from '@/config/site';
+import { whatsappUrl, telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
+
+function CompatibleScooterLinks({ compatibility }) {
+  if (!compatibility) return null;
+  const parts = compatibility.split(/,\s*/).map((p) => p.trim()).filter(Boolean);
+  const linked = parts.map((part) => {
+    const match = SCOOTERS.find(
+      (s) =>
+        s.name.toLowerCase() === part.toLowerCase() ||
+        part.toLowerCase().includes(s.name.toLowerCase()),
+    );
+    return { label: part, scooter: match || null };
+  });
+
+  return (
+    <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-body">
+      <Wrench className="h-4 w-4 shrink-0 text-brand-500" />
+      <span className="font-medium text-heading">Fits:</span>
+      {linked.map(({ label, scooter }, i) => (
+        <span key={label} className="inline-flex items-center gap-1">
+          {i > 0 && <span className="text-muted">·</span>}
+          {scooter ? (
+            <Link
+              to={`/scooters/${scooter.id}`}
+              className="font-semibold text-brand-600 underline-offset-2 hover:underline"
+            >
+              {scooter.name}
+            </Link>
+          ) : (
+            <span>{label}</span>
+          )}
+        </span>
+      ))}
+    </p>
+  );
+}
 
 export default function AccessoryDetails() {
   const { id } = useParams();
@@ -117,10 +152,7 @@ export default function AccessoryDetails() {
             </h1>
 
             {accessory.compatibility && (
-              <p className="mt-3 flex items-center gap-2 text-sm text-body">
-                <Wrench className="h-4 w-4 text-brand-500" />
-                Fits: {accessory.compatibility}
-              </p>
+              <CompatibleScooterLinks compatibility={accessory.compatibility} />
             )}
 
             <div className="mt-6 rounded-2xl bg-surface p-5 ring-1 ring-line">
@@ -142,6 +174,17 @@ export default function AccessoryDetails() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button
+                href={telUrl(undefined, site)}
+                target="_self"
+                variant="primary"
+                size="lg"
+                icon={Phone}
+                fullWidth
+                onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'accessory-detail', accessoryId: accessory.id })}
+              >
+                Call showroom
+              </Button>
+              <Button
                 href={whatsappUrl(waMessage, site)}
                 variant="whatsapp"
                 size="lg"
@@ -151,10 +194,10 @@ export default function AccessoryDetails() {
               >
                 Enquire on WhatsApp
               </Button>
-              <Button to="/contact" variant="secondary" size="lg" fullWidth>
-                Visit showroom
-              </Button>
             </div>
+            <Button to="/scooters" variant="ghost" size="md" className="mt-3 w-full">
+              Browse compatible scooters
+            </Button>
           </Reveal>
         </div>
       </div>

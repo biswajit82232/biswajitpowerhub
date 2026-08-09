@@ -140,7 +140,7 @@ export default function Accessories() {
 
       <div className="container-px py-6 sm:py-8">
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <ScooterCardSkeleton key={i} />
             ))}
@@ -157,7 +157,7 @@ export default function Accessories() {
             }
           />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((a, i) => (
               <AccessoryCard key={a.id} accessory={a} index={i} />
             ))}
