@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Gauge, BatteryCharging, ArrowRight } from 'lucide-react';
 import { ScooterImage } from '@/components/common/ScooterImage';
 import { Badge } from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
 import { formatINR } from '@/lib/utils';
 import { emiFrom } from '@/lib/finance';
 import { useFinance } from '@/context/FinanceSettingsContext';
@@ -40,11 +41,7 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
           className="aspect-[3/2] w-full max-w-full bg-brand-50 transition-transform duration-500 group-hover:scale-[1.03]"
         />
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-2">
-          {scooter.noLicence && (
-            <span className="inline-flex items-center rounded-full bg-[#25d366] px-2.5 py-1 text-xs font-bold text-white shadow-sm">
-              ✓ No Licence Required
-            </span>
-          )}
+          {scooter.noLicence && <Badge tone="success">No Licence*</Badge>}
           <Badge tone={stock.tone}>{stock.label}</Badge>
           {extraBadges.slice(0, 1).map((b) => (
             <Badge key={b.label} tone={b.tone}>{b.label}</Badge>
@@ -85,14 +82,16 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
                 EMI from {formatINR(emi)}/mo
               </p>
             </div>
-            <Link
+            <Button
               to={`/scooters/${scooter.id}`}
-              className="tap-target inline-flex min-h-11 items-center gap-1 rounded-xl bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 transition-all duration-300 group-hover:bg-brand-600 group-hover:text-white"
+              variant="softBrand"
+              size="sm"
+              iconRight={ArrowRight}
               aria-label={`View details for ${scooter.name}`}
+              className="rounded-xl group-hover:bg-brand-600 group-hover:text-white"
             >
               View Details
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            </Button>
           </div>
         </div>
       </div>

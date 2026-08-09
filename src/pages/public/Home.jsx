@@ -254,25 +254,25 @@ export default function Home() {
             >
               Get Directions
             </Button>
-            <a
-              href={site.maps.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-map-image' })}
-              className="not-prose mt-4 block overflow-hidden rounded-xl ring-1 ring-line"
-            >
-              <img
-                src="https://maps.wikimedia.org/img/osm-intl,15,24.0987,88.2519,800x400.png"
-                alt="Map of Biswajit Power Hub near Chunakhali Bus Stand Berhampore"
-                width={800}
-                height={400}
+            <div className="not-prose mt-4 overflow-hidden rounded-2xl shadow-card ring-1 ring-line">
+              <iframe
+                src={site.maps.embed}
+                title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
                 loading="lazy"
-                className="h-48 w-full max-w-full object-cover sm:h-56"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="h-48 w-full border-0 sm:h-56"
+                allowFullScreen
               />
-              <span className="flex items-center justify-center gap-2 bg-surface-alt px-4 py-3 text-sm font-semibold text-[#4285f4]">
+              <a
+                href={site.maps.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'home-map-image' })}
+                className="flex items-center justify-center gap-2 bg-surface-alt px-4 py-3 text-sm font-semibold text-[#4285f4] transition hover:bg-brand-50"
+              >
                 <MapPin className="h-4 w-4" /> Near Chunakhali Bus Stand — open in Google Maps
-              </span>
-            </a>
+              </a>
+            </div>
           </Reveal>
         </article>
       </Section>
