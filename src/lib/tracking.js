@@ -95,6 +95,11 @@ function writeLocalEvents(events) {
  */
 export async function trackEvent(type, meta = {}) {
   if (typeof window === 'undefined') return;
+
+  // Fire GA/Ads FIRST — tel:/wa.me/maps clicks navigate away and can cancel
+  // any work that awaits Supabase before gtag runs.
+  trackGAEvent(type, meta);
+
   const visitorId = getVisitorId();
   const event = {
     type,
@@ -117,8 +122,6 @@ export async function trackEvent(type, meta = {}) {
       console.warn('[Tracking] lead_events insert failed:', error.message);
     }
   }
-
-  trackGAEvent(type, meta);
 
   if (POPULARITY_EVENTS.has(type)) {
     schedulePopularityCacheBust();

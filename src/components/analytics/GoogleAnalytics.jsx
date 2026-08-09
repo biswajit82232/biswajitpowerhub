@@ -7,6 +7,7 @@ import {
   isGtagLoadedFromHtml,
   trackGAPageView,
 } from '@/lib/googleAnalytics';
+import { initOutboundClickTracking } from '@/lib/outboundClickTracking';
 
 /** GA4 page views on SPA route changes (initial hit comes from index.html gtag). */
 export function GoogleAnalytics() {
@@ -17,6 +18,7 @@ export function GoogleAnalytics() {
     if (isGoogleAnalyticsConfigured) {
       initGoogleAnalytics();
       configureGoogleAds();
+      initOutboundClickTracking();
     }
   }, []);
 

@@ -68,8 +68,8 @@ export async function submitTestRide({ name, phone, date, time, scooter, scooter
   return { ok: true };
 }
 
-export async function submitContact({ name, phone, email, message }) {
-  await trackEvent(EVENT.CONTACT_FORM, {});
+export async function submitContact({ name, phone, email, message, from = 'contact_form' }) {
+  await trackEvent(EVENT.CONTACT_FORM, { from });
   if (isSupabaseConfigured && supabase) {
     const { error } = await supabase.from('contact_messages').insert({
       name,

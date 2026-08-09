@@ -37,7 +37,7 @@ function ContactMessageForm() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await submitContact(form);
+      await submitContact({ ...form, from: 'contact_page' });
       toast('Message sent! We will get back to you soon.', 'success');
       setForm({ name: '', phone: '', email: '', message: '' });
     } catch {

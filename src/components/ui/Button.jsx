@@ -54,6 +54,8 @@ const Button = forwardRef(function Button(
     fullWidth = false,
     icon: Icon,
     iconRight: IconRight,
+    target: targetProp,
+    rel: relProp,
     ...props
   },
   ref
@@ -93,15 +95,12 @@ const Button = forwardRef(function Button(
   }
   // External link
   if (href) {
+    const isTel = /^tel:/i.test(href);
+    const isSms = /^sms:/i.test(href);
+    const target = targetProp ?? (isTel || isSms ? '_self' : '_blank');
+    const rel = relProp ?? (target === '_blank' ? 'noopener noreferrer' : undefined);
     return (
-      <a
-        ref={ref}
-        href={href}
-        target={props.target || '_blank'}
-        rel="noopener noreferrer"
-        className={classes}
-        {...props}
-      >
+      <a ref={ref} href={href} target={target} rel={rel} className={classes} {...props}>
         {content}
       </a>
     );

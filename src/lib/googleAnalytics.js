@@ -139,6 +139,12 @@ const GA_EVENT_MAP = {
   compare_used: 'compare_models',
 };
 
+/** Outbound clicks that must survive page unload / dialer handoff */
+const BEACON_EVENTS = new Set(['call_click', 'whatsapp_click', 'directions_click', 'contact_form']);
+
+let lastGaKey = '';
+let lastGaAt = 0;
+
 export function trackGAEvent(type, meta = {}) {
   if (!isGoogleAnalyticsConfigured || !window.gtag) return;
 
@@ -147,6 +153,12 @@ export function trackGAEvent(type, meta = {}) {
   if (type === 'page_view') return;
 
   const name = GA_EVENT_MAP[type] || type;
+  const dedupeKey = `${name}:${meta.from || meta.event_label || ''}`;
+  const now = Date.now();
+  if (dedupeKey === lastGaKey && now - lastGaAt < 600) return;
+  lastGaKey = dedupeKey;
+  lastGaAt = now;
+
   const params = { event_category: 'engagement', ...meta };
 
   if (type === 'scooter_view' && meta.scooterId) {
@@ -171,6 +183,9 @@ export function trackGAEvent(type, meta = {}) {
   if (type === 'callback_request' || type === 'test_ride_booked') {
     params.lead_source = meta.from || type;
   }
+  if (BEACON_EVENTS.has(type)) {
+    params.transport_type = 'beacon';
+  }
 
   window.gtag('event', name, params);
 
@@ -178,6 +193,7 @@ export function trackGAEvent(type, meta = {}) {
     window.gtag('event', 'generate_lead', {
       event_category: 'lead',
       lead_source: 'contact_form',
+      transport_type: 'beacon',
     });
   }
 
