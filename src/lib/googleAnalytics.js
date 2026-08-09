@@ -1,11 +1,11 @@
 /**
  * Google Analytics 4 + optional Google Ads (gtag).
- * GA: VITE_GA_MEASUREMENT_ID (default G-2971LBJ2NV)
+ * GA: VITE_GA_MEASUREMENT_ID (default G-ZPSM06SEY4)
  * Ads remarketing/conversions: VITE_GOOGLE_ADS_ID (e.g. AW-XXXXXXXXX)
  */
 
 export const GA_MEASUREMENT_ID =
-  import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || 'G-2971LBJ2NV';
+  import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || 'G-ZPSM06SEY4';
 
 /** Google Ads Conversion/Remarketing ID — set in Vercel when Ads account is ready */
 export const GOOGLE_ADS_ID = import.meta.env.VITE_GOOGLE_ADS_ID?.trim() || '';

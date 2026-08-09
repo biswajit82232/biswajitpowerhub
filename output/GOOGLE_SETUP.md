@@ -3,14 +3,14 @@
 Site code is ready. Complete these steps in Google / Vercel (same Google account as GBP when possible).
 
 **Live site:** https://biswajitpowerhub.in  
-**GA4 Measurement ID (already in code):** `G-2971LBJ2NV`  
+**GA4 Measurement ID (already in code):** `G-ZPSM06SEY4`  
 **Sitemap:** https://biswajitpowerhub.in/sitemap.xml
 
 ---
 
 ## A) Google Analytics 4 (mostly done)
 
-1. Open [analytics.google.com](https://analytics.google.com) → property for `G-2971LBJ2NV`.
+1. Open [analytics.google.com](https://analytics.google.com) → property for `G-ZPSM06SEY4`.
 2. Confirm a **Web data stream** points at `https://biswajitpowerhub.in`.
 3. **Realtime check:** open the live site → GA4 → Reports → Realtime → you should appear.
 4. **Mark conversions** (Admin → Events → Mark as conversion):
@@ -22,7 +22,7 @@ Site code is ready. Complete these steps in Google / Vercel (same Google account
 5. **Data retention:** Admin → Data Settings → Data Retention → **14 months**.
 6. **Exclude your IP** (optional): Data stream → Configure tag settings → Define internal traffic.
 7. Vercel env (Production):
-   - `VITE_GA_MEASUREMENT_ID=G-2971LBJ2NV`
+   - `VITE_GA_MEASUREMENT_ID=G-ZPSM06SEY4`
    - `VITE_SITE_URL=https://biswajitpowerhub.in`
 
 Already tracked by the site: page views, call, WhatsApp, directions, forms, scooter views, EMI/simulator/compare.
@@ -74,7 +74,7 @@ Code already fires Ads conversions when `VITE_GOOGLE_ADS_ID` is set (phone, What
 | Variable | Example | Required |
 |---|---|---|
 | `VITE_SITE_URL` | `https://biswajitpowerhub.in` | Yes |
-| `VITE_GA_MEASUREMENT_ID` | `G-2971LBJ2NV` | Yes (already defaulted in code) |
+| `VITE_GA_MEASUREMENT_ID` | `G-ZPSM06SEY4` | Yes (already defaulted in code) |
 | `VITE_GOOGLE_SITE_VERIFICATION` | GSC HTML token | For HTML-tag verify |
 | `VITE_GOOGLE_ADS_ID` | `AW-XXXXXXXXX` | For Ads conversions |
 | `VITE_GOOGLE_PLACE_ID` | `ChIJ...` | Optional (Google review deep link) |

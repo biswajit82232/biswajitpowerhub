@@ -1,5 +1,5 @@
 # GOOGLE ANALYTICS 4 SETUP CHECKLIST
-## Property: G-2971LBJ2NV
+## Property: G-ZPSM06SEY4
 
 ## Step 1: Mark Events as Conversions
 - [ ] Go to https://analytics.google.com
