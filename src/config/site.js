@@ -5,19 +5,19 @@
 
 import { toLegacyHours } from '@/features/site/siteHours';
 
-/** Per-day hours seed — Mon–Sat 9–8, Sunday Closed */
+/** Per-day hours seed — open every day 9:00 AM – 8:30 PM */
 export const INITIAL_HOURS = {
-  mon: { open: '09:00', close: '20:00', closed: false },
-  tue: { open: '09:00', close: '20:00', closed: false },
-  wed: { open: '09:00', close: '20:00', closed: false },
-  thu: { open: '09:00', close: '20:00', closed: false },
-  fri: { open: '09:00', close: '20:00', closed: false },
-  sat: { open: '09:00', close: '20:00', closed: false },
-  sun: { open: '09:00', close: '20:00', closed: true },
+  mon: { open: '09:00', close: '20:30', closed: false },
+  tue: { open: '09:00', close: '20:30', closed: false },
+  wed: { open: '09:00', close: '20:30', closed: false },
+  thu: { open: '09:00', close: '20:30', closed: false },
+  fri: { open: '09:00', close: '20:30', closed: false },
+  sat: { open: '09:00', close: '20:30', closed: false },
+  sun: { open: '09:00', close: '20:30', closed: false },
 };
 
-/** Default time range when resetting a day in admin (9 AM – 8:00 PM) */
-export const DEFAULT_DAY_HOURS = { open: '09:00', close: '20:00', closed: false };
+/** Default time range when resetting a day in admin (9 AM – 8:30 PM) */
+export const DEFAULT_DAY_HOURS = { open: '09:00', close: '20:30', closed: false };
 
 export const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -58,7 +58,11 @@ export const CONTACT_DEFAULTS = {
       'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Bus+Stand+Nimtala+Berhampore+Murshidabad+742149&output=embed',
     staticImage:
       'https://maps.googleapis.com/maps/api/staticmap?center=24.0987,88.2519&zoom=15&size=800x400&markers=color:red%7C24.0987,88.2519&key=',
-    reviewLink: 'https://search.google.com/local/writereview?placeid=',
+    /** Set VITE_GOOGLE_PLACE_ID in env for a working “Write a Google review” link */
+    placeId: (import.meta.env.VITE_GOOGLE_PLACE_ID || '').trim(),
+    reviewLink: (import.meta.env.VITE_GOOGLE_PLACE_ID || '').trim()
+      ? `https://search.google.com/local/writereview?placeid=${String(import.meta.env.VITE_GOOGLE_PLACE_ID).trim()}`
+      : 'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore',
   },
   hours: { ...INITIAL_HOURS },
 };
@@ -107,12 +111,21 @@ export function mergeSiteSettings(partial) {
   const hoursPerDay = partial.hours || CONTACT_DEFAULTS.hours;
   const legacyHours = toLegacyHours(hoursPerDay);
 
+  const maps = { ...CONTACT_DEFAULTS.maps, ...partial.maps };
+  const placeId = (maps.placeId || '').trim();
+  if (placeId) {
+    maps.placeId = placeId;
+    maps.reviewLink = `https://search.google.com/local/writereview?placeid=${placeId}`;
+  } else if (!maps.reviewLink || maps.reviewLink.endsWith('placeid=')) {
+    maps.reviewLink = maps.link || CONTACT_DEFAULTS.maps.link;
+  }
+
   return {
     ...SITE,
     phones: partial.phones?.length ? partial.phones : CONTACT_DEFAULTS.phones,
     whatsapp: partial.whatsapp || CONTACT_DEFAULTS.whatsapp,
     address,
-    maps: { ...CONTACT_DEFAULTS.maps, ...partial.maps },
+    maps,
     hours: legacyHours,
     hoursPerDay,
   };

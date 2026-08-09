@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Puppeteer-free SEO prerender fallback.
  * Copies dist/index.html into route folders and injects unique title/meta/canonical/JSON-LD/noscript.
  * Runs after vite build (+ optional puppeteer prerender). Safe to overwrite route HTML.
@@ -103,7 +103,7 @@ const ROUTES = [
     h1: 'Biswajit Power Hub — Best Electric Scooter Dealer in Berhampore, Murshidabad',
     schema: 'local',
     crawlText:
-      'Best electric scooters in Berhampore under ₹50,000 at Biswajit Power Hub, Chunakhali Bus Stand, Murshidabad. Popular models: Activa, Zoom, Single Light and Double Light — no licence required. Why choose Biswajit Power Hub? Honest pricing, free test rides, EMI, and custom battery upgrades with genuine spare parts. Visit Monday to Saturday 9 AM to 8 PM. Call 096355 05436. Frequently asked questions cover licence rules, prices from ₹38,999, range, EMI.',
+      'Best electric scooters in Berhampore under ₹50,000 at Biswajit Power Hub, Chunakhali Bus Stand, Murshidabad. Popular models: Activa, Zoom, Single Light and Double Light — no licence required. Why choose Biswajit Power Hub? Honest pricing, free test rides, EMI, and custom battery upgrades with genuine spare parts. Visit any day 9 AM to 8:30 PM. Call 096355 05436. Frequently asked questions cover licence rules, prices from ₹38,999, range, EMI.',
   },
   {
     path: '/scooters',
@@ -150,7 +150,7 @@ const ROUTES = [
     h1: 'No Licence Electric Scooters in West Bengal (2026) — Complete Guide',
     schema: 'crumbs',
     crawlText:
-      'Eligible low-speed electric scooters under 25 km/h can be ridden in West Bengal without a driving licence or RTO registration. Biswajit Power Hub in Berhampore stocks Activa, Zoom, Single Light, and Double Light models built for that category. Test ride at Chunakhali, Murshidabad, Monday to Saturday 9 AM to 8 PM.',
+      'Eligible low-speed electric scooters under 25 km/h can be ridden in West Bengal without a driving licence or RTO registration. Biswajit Power Hub in Berhampore stocks Activa, Zoom, Single Light, and Double Light models built for that category. Test ride at Chunakhali, Murshidabad, any day 9 AM to 8:30 PM.',
   },
   {
     path: '/battery-upgrade-berhampore',
@@ -170,7 +170,7 @@ const ROUTES = [
     h1: 'Free Test Ride Electric Scooter in Berhampore — Book Today',
     schema: 'crumbs',
     crawlText:
-      'Free supervised test rides are available at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore. No appointment needed Monday to Saturday 9 AM to 8 PM. A driving licence is not required for our low-speed models. Try Activa, Zoom, Double Light, or Single Light before you buy.',
+      'Free supervised test rides are available at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore. No appointment needed any day 9 AM to 8:30 PM. A driving licence is not required for our low-speed models. Try Activa, Zoom, Double Light, or Single Light before you buy.',
   },
 
   {
@@ -433,9 +433,17 @@ function localBusinessSchema() {
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+        dayOfWeek: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday',
+        ],
         opens: '09:00',
-        closes: '20:00',
+        closes: '20:30',
       },
     ],
     sameAs: [
@@ -589,7 +597,7 @@ function faqSchema() {
         name: 'Do you offer test rides in Berhampore?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes! Free test rides are available at our Chunakhali showroom in Berhampore, Murshidabad. No appointment is needed — visit us Monday to Saturday, 9 AM to 8 PM.',
+          text: 'Yes! Free test rides are available at our Chunakhali showroom in Berhampore, Murshidabad. No appointment is needed — visit us any day, 9 AM to 8:30 PM.',
         },
       },
       {
@@ -674,7 +682,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Visit Our Showroom — Chunakhali Bus Stand, Berhampore',
-      p: 'Visit our showroom at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal — 742149. Landmark: right at the bus stand, easy to find from anywhere in Murshidabad district. Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. We do not sell online — call, WhatsApp, or get directions and meet us in person for a free test ride.',
+      p: 'Visit our showroom at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal — 742149. Landmark: right at the bus stand, easy to find from anywhere in Murshidabad district. Hours: Open all days 9:00 AM – 8:30 PM. We do not sell online — call, WhatsApp, or get directions and meet us in person for a free test ride.',
     },
     {
       h2: 'Frequently Asked Questions',
@@ -692,7 +700,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Why Buy From Biswajit Power Hub?',
-      p: 'Unlike online-only sellers, we run a physical showroom at Chunakhali Bus Stand so you can check battery options, ask about battery upgrades, and leave with clear EMI numbers — not pressure selling. Customers across Berhampore and Murshidabad choose us for honest pricing, genuine spares, walk-in servicing, and plain-language explanations of Central Motor Vehicles rules for low-speed EVs. Ready to compare in person? Call 096355 05436 or visit Monday to Saturday, 9 AM to 8 PM (Sunday closed). Also explore low budget electric scooters in Berhampore and our no licence electric scooters West Bengal guide before you buy, then return to Chunakhali for the final ride and paperwork-free ownership on eligible models.',
+      p: 'Unlike online-only sellers, we run a physical showroom at Chunakhali Bus Stand so you can check battery options, ask about battery upgrades, and leave with clear EMI numbers — not pressure selling. Customers across Berhampore and Murshidabad choose us for honest pricing, genuine spares, walk-in servicing, and plain-language explanations of Central Motor Vehicles rules for low-speed EVs. Ready to compare in person? Call 096355 05436 or visit any day, 9 AM to 8:30 PM. Also explore low budget electric scooters in Berhampore and our no licence electric scooters West Bengal guide before you buy, then return to Chunakhali for the final ride and paperwork-free ownership on eligible models.',
     },
   ],
   '/low-budget-electric-scooters-berhampore': [
@@ -706,7 +714,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'EMI Options Available',
-      p: 'Financing is available on all models — ask at the counter for current EMI slabs. Many Berhampore and Murshidabad families choose a low monthly payment while keeping cash free for accessories or a spare charger. Visit Monday–Saturday 9 AM–8 PM, or call 096355 05436 for today’s stock and EMI options. Free test rides — no appointment needed.',
+      p: 'Financing is available on all models — ask at the counter for current EMI slabs. Many Berhampore and Murshidabad families choose a low monthly payment while keeping cash free for accessories or a spare charger. Visit Open all days 9 AM–8:30 PM, or call 096355 05436 for today’s stock and EMI options. Free test rides — no appointment needed.',
     },
   ],
   '/no-licence-electric-scooters-west-bengal': [
@@ -720,7 +728,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Legal Low-Speed EVs in West Bengal',
-      p: 'Legal low-speed EVs in West Bengal are popular because they remove paperwork friction while cutting running costs. Common myths we hear in Berhampore: any electric scooter is licence-free (false — only low-speed eligible models), and no paperwork means no service (false — we include 3 free servicing and motor/controller warranty). Book a free test ride at Chunakhali Bus Stand — no appointment needed Monday–Saturday 9 AM–8 PM. Call 096355 05436 for stock.',
+      p: 'Legal low-speed EVs in West Bengal are popular because they remove paperwork friction while cutting running costs. Common myths we hear in Berhampore: any electric scooter is licence-free (false — only low-speed eligible models), and no paperwork means no service (false — we include 3 free servicing and motor/controller warranty). Book a free test ride at Chunakhali Bus Stand — no appointment needed Open all days 9 AM–8:30 PM. Call 096355 05436 for stock.',
     },
   ],
   '/battery-upgrade-berhampore': [
@@ -730,13 +738,13 @@ const PAGE_H2S = {
     },
     {
       h2: 'Battery Upgrade Process',
-      p: 'Bring your e-scooter to Biswajit Power Hub near Chunakhali Bus Stand, Berhampore. We inspect the controller, connectors, and chassis, recommend a compatible pack, share clear pricing, and schedule fitment — usually the same visit when parts are in stock. Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. If your scooter is ageing overall, compare Activa and Zoom Lithium Pro options, then decide with our team. Pair upgrades with a free test ride or browse spare parts and accessories at Chunakhali across Murshidabad.',
+      p: 'Bring your e-scooter to Biswajit Power Hub near Chunakhali Bus Stand, Berhampore. We inspect the controller, connectors, and chassis, recommend a compatible pack, share clear pricing, and schedule fitment — usually the same visit when parts are in stock. Hours: Open all days 9:00 AM – 8:30 PM. If your scooter is ageing overall, compare Activa and Zoom Lithium Pro options, then decide with our team. Pair upgrades with a free test ride or browse spare parts and accessories at Chunakhali across Murshidabad.',
     },
   ],
   '/test-ride-berhampore': [
     {
       h2: 'How to Book a Free Test Ride',
-      p: 'How to book a free test ride in Berhampore: simply walk into Biswajit Power Hub at Chunakhali Bus Stand Monday–Saturday between 9:00 AM and 8:00 PM (Sunday closed). No appointment is required for our low-speed models. Prefer a heads-up? Call or WhatsApp 096355 05436 and tell us which scooter you want to try — Activa, Zoom, Double Light, or Single Light. Bring your phone number for EMI follow-up; a driving licence is not required for our low-speed models. Ask about genuine spare parts and battery upgrades after the ride.',
+      p: 'How to book a free test ride in Berhampore: simply walk into Biswajit Power Hub at Chunakhali Bus Stand any day between 9:00 AM and 8:30 PM. No appointment is required for our low-speed models. Prefer a heads-up? Call or WhatsApp 096355 05436 and tell us which scooter you want to try — Activa, Zoom, Double Light, or Single Light. Bring your phone number for EMI follow-up; a driving licence is not required for our low-speed models. Ask about genuine spare parts and battery upgrades after the ride.',
     },
     {
       h2: 'What to Expect at Our Showroom',
@@ -746,7 +754,7 @@ const PAGE_H2S = {
   '/reviews': [
     {
       h2: 'What Our Customers Say',
-      p: 'Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single Light, or Double Light at our Chunakhali showroom — no licence models, honest pricing, and walk-in support. Customers praise free test rides, clear EMI guidance, battery upgrade options, and the convenience of a showroom right at Chunakhali Bus Stand. Star ratings average 4.8 from local reviews. Visit Monday–Saturday 9 AM–8 PM or call 096355 05436 to experience the same service that earned these testimonials across Murshidabad.',
+      p: 'Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single Light, or Double Light at our Chunakhali showroom — no licence models, honest pricing, and walk-in support. Customers praise free test rides, clear EMI guidance, battery upgrade options, and the convenience of a showroom right at Chunakhali Bus Stand. Star ratings average 4.8 from local reviews. Visit Open all days 9 AM–8:30 PM or call 096355 05436 to experience the same service that earned these testimonials across Murshidabad.',
     },
     {
       h2: 'Leave Us a Review',
@@ -770,7 +778,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Contact Information',
-      p: 'Phone +91 96355 05436 · WhatsApp chat available · Hours Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. Reach us from anywhere in Murshidabad district — we are right at the bus stand.',
+      p: 'Phone +91 96355 05436 · WhatsApp chat available · Hours Open all days 9:00 AM – 8:30 PM. Reach us from anywhere in Murshidabad district — we are right at the bus stand.',
     },
   ],
   '/scooters': [
@@ -780,7 +788,7 @@ const PAGE_H2S = {
     },
     {
       h2: 'Compare Prices Starting ₹38,999',
-      p: 'Single Light from ₹38,999, Double Light ~₹40,999, Zoom ~₹42,999, Activa ~₹45,999. Visit our showroom Monday–Saturday 9 AM–8 PM or call 096355 05436 for today’s stock and colours across Murshidabad.',
+      p: 'Single Light from ₹38,999, Double Light ~₹40,999, Zoom ~₹42,999, Activa ~₹45,999. Visit our showroom Open all days 9 AM–8:30 PM or call 096355 05436 for today’s stock and colours across Murshidabad.',
     },
   ],
 };
@@ -792,7 +800,7 @@ const MODEL_H2S = [
   },
   {
     h2: 'Price, range & showroom support in Murshidabad',
-    p: 'On-road pricing depends on variant. Our team explains Standard vs Lithium Pro packs where available, fits genuine spare parts, and never rushes a decision. Monday–Saturday 9 AM–8 PM · Sunday Closed. Call 096355 05436 before you visit to confirm colour and stock across Murshidabad.',
+    p: 'On-road pricing depends on variant. Our team explains Standard vs Lithium Pro packs where available, fits genuine spare parts, and never rushes a decision. Open all days 9 AM–8:30 PM. Call 096355 05436 before you visit to confirm colour and stock across Murshidabad.',
   },
 ];
 
@@ -810,7 +818,7 @@ function sectionsHtml(route) {
         h2: 'Biswajit Power Hub — Berhampore & Murshidabad',
         p:
           route.crawlText ||
-          'Visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore, Murshidabad for low-speed no-licence electric scooters, EMI, battery upgrades, and free test rides. Call 096355 05436. Monday–Saturday 9 AM–8 PM · Sunday Closed.',
+          'Visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore, Murshidabad for low-speed no-licence electric scooters, EMI, battery upgrades, and free test rides. Call 096355 05436. Open all days 9 AM–8:30 PM.',
       },
       {
         h2: 'Visit Our Showroom',
@@ -855,7 +863,7 @@ function crawlableBody(route) {
   // Google and curl verification read this initial HTML without executing JavaScript.
   return `
 <nav aria-label="Showroom CTAs" style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:0.75rem 1rem;background:#0f0f0f;">
-  <a href="tel:+919635505436" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0.75rem 1.25rem;background:#ff6600;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Call: 096355 05436</a>
+  <a href="tel:+919635505436" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0.75rem 1.25rem;background:#2563EB;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Call: 096355 05436</a>
   <a href="https://wa.me/919635505436" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0.75rem 1.25rem;background:#25d366;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">WhatsApp</a>
   <a href="${MAPS_URL}" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0.75rem 1.25rem;background:#4285f4;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Get Directions</a>
 </nav>
@@ -887,7 +895,7 @@ function crawlableBody(route) {
       </address>
       <p style="margin:0.5rem 0;">Phone: <a href="tel:+919635505436" style="color:#fff;">+91 96355 05436</a></p>
       <p style="margin:0.5rem 0;">WhatsApp: <a href="https://wa.me/919635505436" style="color:#fff;">Chat on WhatsApp</a></p>
-      <p style="margin:0.5rem 0;color:#ddd;">Hours: Mon–Sat: 9:00 AM – 8:00 PM | Sunday: Closed</p>
+      <p style="margin:0.5rem 0;color:#ddd;">Hours: Open all days 9:00 AM – 8:30 PM</p>
       <p style="margin:0.75rem 0;"><a href="${MAPS_URL}" style="display:inline-flex;min-height:48px;align-items:center;padding:0.75rem 1.25rem;background:#4285f4;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Get Directions</a></p>
     </div>
   </div>
@@ -896,7 +904,7 @@ function crawlableBody(route) {
   <p style="text-align:center;margin:0.75rem 0 0;font-size:0.875rem;"><a href="${BASE}/terms" style="color:#bbb;">Terms of Service</a> · <a href="${BASE}/privacy" style="color:#bbb;">Privacy Policy</a> · <a href="${BASE}/about" style="color:#bbb;">About</a></p>
 </footer>
 <div role="navigation" aria-label="Call or get directions" style="position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:0.5rem;padding:0.5rem;padding-bottom:calc(0.5rem + env(safe-area-inset-bottom));background:#1a1a1a;">
-  <a href="tel:+919635505436" style="flex:1;display:flex;min-height:48px;align-items:center;justify-content:center;background:#ff6600;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Call</a>
+  <a href="tel:+919635505436" style="flex:1;display:flex;min-height:48px;align-items:center;justify-content:center;background:#2563EB;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Call</a>
   <a href="${MAPS_URL}" style="flex:1;display:flex;min-height:48px;align-items:center;justify-content:center;background:#4285f4;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Directions</a>
 </div>
 <a href="https://wa.me/919635505436" aria-label="Chat on WhatsApp" style="position:fixed;right:1rem;bottom:calc(4.5rem + env(safe-area-inset-bottom));z-index:9998;width:56px;height:56px;border-radius:999px;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,0.25);">WA</a>`;

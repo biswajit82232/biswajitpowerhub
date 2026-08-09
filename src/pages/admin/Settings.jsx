@@ -219,7 +219,7 @@ export default function Settings() {
                 <Clock className="h-4 w-4 text-brand-500" /> Opening hours
               </h3>
               <p className="mt-1 text-xs text-muted">
-                Default for new days: 9:00 AM – 8:30 PM. Current showroom: Mon–Sat 10–8, Sun 11–6.
+                Default for all days: 9:00 AM – 8:30 PM (open every day including Sunday).
               </p>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">

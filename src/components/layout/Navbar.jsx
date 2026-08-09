@@ -47,14 +47,14 @@ export function Navbar() {
         <Logo compact className="min-w-0 max-w-[calc(100%-3rem)] shrink" />
 
         {/* Desktop nav */}
-        <div className="hidden items-center gap-1 lg:flex">
+        <div className="hidden min-w-0 shrink items-center gap-0.5 lg:flex xl:gap-1">
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
                 cn(
-                  'rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 ease-premium',
+                  'whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-semibold transition-all duration-300 ease-premium xl:px-4',
                   isActive
                     ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-100'
                     : 'text-body hover:bg-brand-50/60 hover:text-brand-700'
@@ -66,7 +66,7 @@ export function Navbar() {
           ))}
         </div>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden shrink-0 items-center gap-2 lg:flex">
           <Button
             variant="secondary"
             size="sm"

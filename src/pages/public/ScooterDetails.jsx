@@ -247,7 +247,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                   variant. Typical range is about {display.range} km per charge with a top speed of{' '}
                   {display.topSpeed} km/h — ideal for Berhampore town rides and many Murshidabad daily
                   routes. Our team explains Standard vs Lithium Pro packs where available, fits genuine
-                  spare parts, and never rushes a decision. Monday–Saturday 9 AM–8 PM · Sunday Closed.
+                  spare parts, and never rushes a decision. {site.hours?.summaryShort || 'Open all days 9 AM–8:30 PM'}.
                 </p>
               </div>
             </div>

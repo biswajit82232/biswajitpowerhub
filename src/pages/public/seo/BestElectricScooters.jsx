@@ -4,6 +4,7 @@ import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
 import { COMPARISON_ROWS, SITE_FAQS } from '@/data/seoContent';
 import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
 import { SITE_URL } from '@/config/site';
+import { DEFAULT_HOURS_SUMMARY } from '@/features/site/siteHours';
 
 export default function BestElectricScooters() {
   const path = '/best-electric-scooters-berhampore';
@@ -118,7 +119,7 @@ export default function BestElectricScooters() {
         <Link to="/battery-upgrade-berhampore">battery upgrades</Link>, and leave with clear EMI numbers —
         not pressure selling. Customers across Berhampore and Murshidabad choose us for honest pricing,
         genuine spares, and after-sales service you can walk into. Ready to compare in person? Call
-        096355 05436 or visit Monday to Saturday, 9 AM to 8 PM.
+        096355 05436 or visit — {DEFAULT_HOURS_SUMMARY}.
       </p>
       <p>
         Also explore{' '}

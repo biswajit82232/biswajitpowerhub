@@ -4,6 +4,7 @@ import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
 import { SITE_FAQS } from '@/data/seoContent';
 import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
 import { SITE_URL } from '@/config/site';
+import { DEFAULT_HOURS_SUMMARY_SHORT } from '@/features/site/siteHours';
 
 export default function NoLicenceElectricScooters() {
   const path = '/no-licence-electric-scooters-west-bengal';
@@ -79,7 +80,7 @@ export default function NoLicenceElectricScooters() {
       <p>
         The best way to understand a no-licence electric scooter is to ride one. Book a free{' '}
         <Link to="/test-ride-berhampore">test ride in Berhampore</Link> at Chunakhali Bus Stand — no
-        appointment needed Monday–Saturday 9 AM–8 PM. Compare also our{' '}
+        appointment needed — {DEFAULT_HOURS_SUMMARY_SHORT.toLowerCase()}. Compare also our{' '}
         <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> guide
         and <Link to="/low-budget-electric-scooters-berhampore">low budget options</Link>. Call 096355
         05436 for stock.

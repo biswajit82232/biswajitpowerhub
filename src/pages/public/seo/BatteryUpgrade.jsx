@@ -4,6 +4,7 @@ import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
 import { SITE_FAQS } from '@/data/seoContent';
 import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
 import { SITE_URL } from '@/config/site';
+import { DEFAULT_HOURS_SUMMARY } from '@/features/site/siteHours';
 
 export default function BatteryUpgrade() {
   const path = '/battery-upgrade-berhampore';
@@ -62,7 +63,7 @@ export default function BatteryUpgrade() {
         Our battery upgrade process is straightforward. Bring your e-scooter to Biswajit Power Hub near
         Chunakhali Bus Stand, Berhampore. We inspect the controller, connectors, and chassis, recommend a
         compatible pack, share clear pricing, and schedule fitment — usually the same visit when parts are
-        in stock. Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed.
+        in stock. Hours: {DEFAULT_HOURS_SUMMARY}.
       </p>
       <p>
         If your scooter is ageing overall, compare our{' '}

@@ -195,12 +195,8 @@ export default function Contact() {
                   <table className="w-full text-left">
                     <tbody>
                       <tr>
-                        <td className="py-1 pr-4 font-medium text-heading">Mon–Sat</td>
-                        <td className="py-1">9:00 AM – 8:00 PM</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1 pr-4 font-medium text-heading">Sunday</td>
-                        <td className="py-1">Closed</td>
+                        <td className="py-1 pr-4 font-medium text-heading">Hours</td>
+                        <td className="py-1">{site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}</td>
                       </tr>
                     </tbody>
                   </table>

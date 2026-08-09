@@ -1,5 +1,7 @@
 /** Shared SEO FAQ + landing metadata for Biswajit Power Hub */
 
+import { DEFAULT_HOURS_SUMMARY_SHORT } from '@/features/site/siteHours';
+
 export const SITE_FAQS = [
   {
     question: 'Do I need a licence to ride your electric scooters?',
@@ -19,7 +21,7 @@ export const SITE_FAQS = [
   {
     question: 'Do you offer test rides in Berhampore?',
     answer:
-      'Yes! Free test rides are available at our Chunakhali showroom in Berhampore, Murshidabad. No appointment is needed — visit us Monday to Saturday, 9 AM to 8 PM.',
+      `Yes! Free test rides are available at our Chunakhali showroom in Berhampore, Murshidabad. No appointment is needed — visit us ${DEFAULT_HOURS_SUMMARY_SHORT.toLowerCase()}.`,
   },
   {
     question: 'Do you provide EMI or financing?',

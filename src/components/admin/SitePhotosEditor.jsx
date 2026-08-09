@@ -69,7 +69,7 @@ function SlotEditor({ title, hint, slot, onChange, folder, maxW, maxH }) {
               type="text"
               value={slot.alt || ''}
               onChange={(e) => onChange({ ...slot, alt: e.target.value })}
-              className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2.5 text-base text-heading outline-none focus:ring-2 focus:ring-[#ff6600]/30 sm:text-sm"
+              className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2.5 text-base text-heading outline-none focus:ring-2 focus:ring-brand-400/30 sm:text-sm"
             />
           </label>
           <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
@@ -230,7 +230,7 @@ export function GbpPostGenerator() {
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, 1500))}
         rows={5}
-        className="mt-4 w-full rounded-lg border border-line bg-white px-3 py-2.5 text-base text-heading outline-none focus:ring-2 focus:ring-[#ff6600]/30 sm:text-sm"
+        className="mt-4 w-full rounded-lg border border-line bg-white px-3 py-2.5 text-base text-heading outline-none focus:ring-2 focus:ring-brand-400/30 sm:text-sm"
       />
       <div className="mt-2 flex items-center justify-between gap-3">
         <span className={`text-xs font-semibold ${1500 - text.length < 100 ? 'text-red-600' : 'text-muted'}`}>

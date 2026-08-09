@@ -92,7 +92,7 @@ export function Footer() {
               <p className="flex items-start gap-2 leading-relaxed">
                 <Clock className="mt-0.5 h-4 w-4 shrink-0 text-brand-300/70" aria-hidden />
                 <span>
-                  Hours: Mon–Sat: 9:00 AM – 8:00 PM | Sunday: Closed
+                  Hours: {site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}
                 </span>
               </p>
 

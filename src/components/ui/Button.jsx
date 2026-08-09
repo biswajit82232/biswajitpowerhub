@@ -49,7 +49,7 @@ const Button = forwardRef(function Button(
   ref
 ) {
   const classes = cn(
-    'inline-flex items-center justify-center rounded-full font-semibold tracking-tight',
+    'inline-flex items-center justify-center rounded-full font-semibold tracking-tight whitespace-nowrap',
     'transition-all duration-300 ease-premium tap-target select-none',
     'focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2',
     'disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97]',

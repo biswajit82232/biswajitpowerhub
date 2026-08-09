@@ -4,6 +4,7 @@ import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
 import { SITE_FAQS } from '@/data/seoContent';
 import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
 import { SITE_URL } from '@/config/site';
+import { DEFAULT_HOURS_SUMMARY } from '@/features/site/siteHours';
 
 export default function TestRide() {
   const path = '/test-ride-berhampore';
@@ -39,7 +40,7 @@ export default function TestRide() {
       <h2>How to Book a Free Test Ride</h2>
       <p>
         How to book a free test ride in Berhampore: simply walk into Biswajit Power Hub at Chunakhali Bus
-        Stand Monday–Saturday between 9:00 AM and 8:00 PM (Sunday closed). No appointment is required for
+        Stand ({DEFAULT_HOURS_SUMMARY}). No appointment is required for
         our low-speed models. Prefer a heads-up? Call or WhatsApp 096355 05436 and tell us which scooter
         you want to try — <Link to="/scooters/activa">Activa</Link>,{' '}
         <Link to="/scooters/zoom">Zoom</Link>, <Link to="/scooters/double-light">Double Light</Link>, or{' '}

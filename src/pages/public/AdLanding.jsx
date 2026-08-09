@@ -98,7 +98,7 @@ export default function AdLanding() {
           <br />
           West Bengal — 742149, India
           <br />
-          <span className="mt-2 block">Mon–Sat: 9:00 AM – 8:00 PM · Sunday: Closed</span>
+          <span className="mt-2 block">{SITE.hours?.summary || 'Open all days: 9:00 AM – 8:30 PM'}</span>
         </address>
 
         <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm font-semibold text-slate-800">

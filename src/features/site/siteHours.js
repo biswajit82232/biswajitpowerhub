@@ -42,14 +42,49 @@ export function formatHoursGroups(hours) {
   return groups;
 }
 
+/**
+ * Human-readable hours line for UI/SEO copy.
+ * e.g. "Open all days 9:00 AM – 8:30 PM" or "Mon–Sat 9:00 AM – 8:30 PM · Sun Closed"
+ */
+export function hoursSummary(hours, { short = false } = {}) {
+  const groups = formatHoursGroups(hours);
+  if (!groups.length) return short ? 'Open daily' : 'Open all days 9:00 AM – 8:30 PM';
+
+  const allOpenSame =
+    groups.length === 1 && groups[0].label === 'Mon–Sun' && groups[0].text !== 'Closed';
+  if (allOpenSame) {
+    return short ? `Open all days ${groups[0].text}` : `Open all days ${groups[0].text}`;
+  }
+
+  // Cover Mon–Sun split as "all days" when every day open with same hours but label differs
+  const openGroups = groups.filter((g) => g.text !== 'Closed');
+  const closedGroups = groups.filter((g) => g.text === 'Closed');
+  if (openGroups.length === 1 && closedGroups.length === 0) {
+    const g = openGroups[0];
+    if (g.label.includes('Mon') && g.label.includes('Sun')) {
+      return `Open all days ${g.text}`;
+    }
+  }
+
+  return groups.map((g) => `${g.label} ${g.text}`).join(' · ');
+}
+
+/** Compact default for static seed copy when site context is unavailable */
+export const DEFAULT_HOURS_SUMMARY = 'Open all days 9:00 AM – 8:30 PM';
+export const DEFAULT_HOURS_SUMMARY_SHORT = 'Open all days 9 AM–8:30 PM';
+
 /** Legacy-style hours object for components expecting weekdays/sunday strings */
 export function toLegacyHours(hours) {
   const groups = formatHoursGroups(hours);
+  const summary = hoursSummary(hours);
+  const allWeek = groups.find((g) => g.label === 'Mon–Sun');
   const weekdays = groups.find((g) => g.label.includes('Mon') && !g.label.includes('Sun'));
   const sunday = groups.find((g) => g.label === 'Sun');
   return {
-    weekdays: weekdays?.text || formatHoursGroups(hours)[0]?.text || '',
-    sunday: sunday?.text || '',
+    weekdays: weekdays?.text || allWeek?.text || groups[0]?.text || '',
+    sunday: sunday?.text || (allWeek ? allWeek.text : 'Closed'),
     groups,
+    summary,
+    summaryShort: hoursSummary(hours, { short: true }),
   };
 }

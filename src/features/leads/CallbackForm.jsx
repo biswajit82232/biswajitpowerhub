@@ -42,7 +42,7 @@ export function CallbackForm({ compact = false }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-accent-50 px-6 py-10 text-center"
+        className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-brand-50 px-6 py-10 text-center"
       >
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
         <h3 className="text-lg font-bold text-heading">Request received!</h3>

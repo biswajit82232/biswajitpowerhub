@@ -4,6 +4,7 @@ import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
 import { SITE_FAQS } from '@/data/seoContent';
 import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
 import { SITE_URL } from '@/config/site';
+import { DEFAULT_HOURS_SUMMARY_SHORT } from '@/features/site/siteHours';
 
 export default function LowBudgetElectricScooters() {
   const path = '/low-budget-electric-scooters-berhampore';
@@ -81,7 +82,7 @@ export default function LowBudgetElectricScooters() {
         grows.
       </p>
       <p>
-        Visit Biswajit Power Hub in Berhampore Monday–Saturday 9 AM–8 PM, or call 096355 05436 / WhatsApp
+        Visit Biswajit Power Hub in Berhampore ({DEFAULT_HOURS_SUMMARY_SHORT}), or call 096355 05436 / WhatsApp
         for today’s stock and EMI options. Free{' '}
         <Link to="/test-ride-berhampore">test rides</Link> — no appointment needed. Browse{' '}
         <Link to="/accessories">spare parts &amp; accessories</Link> while you are here.

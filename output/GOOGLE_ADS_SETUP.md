@@ -33,7 +33,7 @@
 | Locations | 15 km radius around Berhampore, Murshidabad |
 | Languages | Bengali, English, Hindi |
 | Budget | ₹300/day |
-| Ad schedule | 9:00 AM – 8:00 PM (Mon-Sat) |
+| Ad schedule | 9:00 AM – 8:30 PM (all days, including Sunday) |
 
 ## Step 6: Keywords
 Add these keyword groups:

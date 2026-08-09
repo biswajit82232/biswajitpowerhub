@@ -102,7 +102,7 @@ export default function About() {
                 <p className="mt-4">
                   <strong className="text-heading">Mission:</strong> Power every ride in Berhampore with
                   affordable, legal, low-running-cost electric scooters — backed by real showroom support in
-                  Murshidabad. NAP: {site.address.full}. Monday–Saturday 9 AM–8 PM · Sunday Closed.
+                  Murshidabad. NAP: {site.address.full}. {site.hours?.summaryShort || 'Open all days 9 AM–8:30 PM'}.
                 </p>
               </div>
             </div>

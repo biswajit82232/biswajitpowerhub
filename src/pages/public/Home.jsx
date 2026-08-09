@@ -240,7 +240,7 @@ export default function Home() {
             <p>
               Visit our showroom at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal —
               742149. Landmark: right at the bus stand, easy to find from anywhere in Murshidabad district.
-              Hours: Monday–Saturday 9:00 AM – 8:00 PM · Sunday Closed. We do not sell online — call, WhatsApp,
+              Hours: {site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}. We do not sell online — call, WhatsApp,
               or get directions and meet us in person for a free test ride.
             </p>
             <a
