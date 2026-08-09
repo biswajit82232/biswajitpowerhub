@@ -12,7 +12,8 @@ export default function AdLanding() {
   const maps = SITE.maps.link;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-sky-fade text-heading">
+      <div className="pointer-events-none fixed inset-0 bg-hero-mesh opacity-50" aria-hidden />
       <SEO
         title="No Licence Electric Scooters in Berhampore — Test Ride Today"
         description="No licence electric scooters in Berhampore. Test ride at Biswajit Power Hub, Chunakhali. Call 096355 05436."
@@ -21,37 +22,16 @@ export default function AdLanding() {
         titleTemplate={false}
       />
 
-      <main className="mx-auto max-w-lg px-4 pb-28 pt-8 sm:pt-12">
-        <p className="text-center text-xs font-bold uppercase tracking-widest text-slate-500">
-          Biswajit Power Hub
+      <main className="relative mx-auto max-w-lg px-4 pb-16 pt-10 sm:pt-14">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-brand-600">
+          Biswajit Power Hub · Chunakhali
         </p>
         <h1 className="mt-3 text-center font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-          No Licence Electric Scooters in Berhampore — Test Ride Today
+          No Licence Electric Scooters — Test Ride Today
         </h1>
-        <p className="mt-3 text-center text-sm leading-relaxed text-slate-600">
-          Low-speed e-scooters from ₹38,999. No RTO registration. 3 free servicing. Visit Chunakhali Bus
-          Stand, Murshidabad.
+        <p className="mt-3 text-center text-sm leading-relaxed text-body">
+          From ₹38,999. No RTO. 3 free servicing. Free test ride at Chunakhali Bus Stand, Berhampore.
         </p>
-
-        <div className="mt-6 grid gap-3">
-          <img
-            src={`${SITE_URL}/og-image.png`}
-            alt="Biswajit Power Hub showroom at Chunakhali Bus Stand Berhampore Murshidabad"
-            width={800}
-            height={420}
-            className="h-44 w-full rounded-2xl object-cover ring-1 ring-slate-200"
-            loading="eager"
-            fetchPriority="high"
-          />
-          <img
-            src={`${SITE_URL}/logo-512.png`}
-            alt="Activa electric scooter test ride at Berhampore showroom"
-            width={512}
-            height={512}
-            className="mx-auto h-28 w-28 rounded-2xl object-contain bg-white p-3 ring-1 ring-slate-200"
-            loading="lazy"
-          />
-        </div>
 
         <div className="mt-8 flex flex-col gap-3">
           <Button
@@ -87,25 +67,32 @@ export default function AdLanding() {
           </Button>
         </div>
 
-        <address className="mt-8 rounded-2xl bg-white p-5 text-sm not-italic leading-relaxed text-slate-700 ring-1 ring-slate-200">
-          <strong className="block text-base text-slate-900">{SITE.name}</strong>
-          Chunakhali Bus Stand, Nimtala
-          <br />
-          Berhampore, Murshidabad
-          <br />
-          West Bengal — 742149, India
-          <br />
-          <span className="mt-2 block">{SITE.hours?.summary || 'Open all days: 9:00 AM – 8:30 PM'}</span>
-        </address>
+        <img
+          src={`${SITE_URL}/og-image.png`}
+          alt="Biswajit Power Hub showroom at Chunakhali Bus Stand Berhampore Murshidabad"
+          width={800}
+          height={420}
+          className="mt-8 h-44 w-full rounded-2xl object-cover shadow-card ring-1 ring-line"
+          loading="lazy"
+        />
 
-        <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm font-semibold text-slate-800">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2 ring-1 ring-slate-200">
+        <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm font-semibold text-heading">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-2 ring-1 ring-line">
             <Check className="h-4 w-4 text-emerald-600" /> 3 Free Servicing
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-2 ring-1 ring-slate-200">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-2 ring-1 ring-line">
             <Check className="h-4 w-4 text-emerald-600" /> 1 Year Warranty
           </span>
         </div>
+
+        <address className="mt-8 rounded-2xl bg-surface p-5 text-sm not-italic leading-relaxed text-body shadow-soft ring-1 ring-line">
+          <strong className="block font-display text-base text-heading">{SITE.name}</strong>
+          Chunakhali Bus Stand, Nimtala
+          <br />
+          Berhampore, Murshidabad — 742149
+          <br />
+          <span className="mt-2 block">{SITE.hours?.summary || 'Open all days: 9:00 AM – 8:30 PM'}</span>
+        </address>
       </main>
     </div>
   );

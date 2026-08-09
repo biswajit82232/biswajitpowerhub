@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { SEO } from '@/components/common/SEO';
 import Button from '@/components/ui/Button';
 
@@ -16,21 +15,28 @@ export default function InternalStub({ title = 'Internal page', heading, path = 
         noindex
         titleTemplate={false}
       />
-      <div className="container-px flex min-h-[50vh] flex-col items-center justify-center py-20 text-center">
-        <h1 className="font-display text-2xl font-extrabold text-heading">{heading || title}</h1>
-        <p className="mt-3 max-w-md text-sm text-muted">
-          This page is for internal use and is not part of our public catalogue.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button to="/" variant="primary">
-            Go home
-          </Button>
-          <Button to="/scooters" variant="secondary">
-            View scooters
-          </Button>
-          <Link to="/contact" className="text-sm font-semibold text-brand-700 underline-offset-2 hover:underline">
-            Contact us
-          </Link>
+      <div className="relative overflow-hidden bg-sky-fade">
+        <div className="pointer-events-none absolute inset-0 bg-hero-mesh opacity-50" aria-hidden />
+        <div className="container-px relative flex min-h-[50vh] flex-col items-center justify-center py-20 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">Coming soon</p>
+          <h1 className="mt-3 font-display text-2xl font-extrabold text-heading sm:text-3xl">
+            {heading || title}
+          </h1>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-body">
+            This page is not part of our public catalogue yet. For dealership or partnership questions,
+            call or visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button to="/" variant="primary">
+              Go home
+            </Button>
+            <Button to="/scooters" variant="secondary">
+              View scooters
+            </Button>
+            <Button to="/contact" variant="ghost">
+              Contact us
+            </Button>
+          </div>
         </div>
       </div>
     </>

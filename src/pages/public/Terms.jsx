@@ -50,7 +50,7 @@ export default function Terms() {
       </section>
 
       <div className="container-px py-12 sm:py-16">
-        <Reveal className="mx-auto max-w-3xl space-y-8 rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-10">
+        <Reveal className="mx-auto max-w-prose space-y-8 rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-10">
           <LegalSection title="1. About us">
             <p>
               These Terms of Service (&quot;Terms&quot;) govern your use of the website and services
