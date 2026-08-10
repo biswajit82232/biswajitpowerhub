@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --header-height: 68px;
+    --header-height: 64px;
     --header-offset: calc(var(--header-height) + env(safe-area-inset-top, 0px));
   }
 
@@ -46,14 +46,13 @@
   }
 
   ::selection {
-    @apply bg-brand-200 text-heading;
+    @apply bg-brand-100 text-heading;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display text-heading;
   }
 
-  /* Respect users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -65,19 +64,18 @@
     }
   }
 
-  /* Premium focus ring */
   :focus-visible {
-    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-bg;
+    @apply outline-none ring-2 ring-brand-500 ring-offset-2 ring-offset-bg;
   }
 
-  /* Custom scrollbar (desktop) */
   @media (pointer: fine) {
     ::-webkit-scrollbar {
       width: 10px;
       height: 10px;
     }
     ::-webkit-scrollbar-thumb {
-      @apply bg-line rounded-full;
+      @apply bg-line;
+      border-radius: 5px;
     }
     ::-webkit-scrollbar-thumb:hover {
       @apply bg-muted/40;
@@ -94,7 +92,28 @@
     @apply bg-brand-gradient bg-clip-text text-transparent;
   }
 
-  /* Range slider — premium thumb */
+  .dealer-section-title {
+    font-family: Montserrat, system-ui, sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    color: #00368F;
+  }
+  @media (min-width: 768px) {
+    .dealer-section-title {
+      font-size: 30px;
+    }
+  }
+
+  .dealer-spec-divider {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+  }
+  .dealer-spec-divider:last-child {
+    border-right: 0;
+  }
+
+  /* Range slider */
   .bph-range {
     -webkit-appearance: none;
     appearance: none;
@@ -109,8 +128,8 @@
     width: 26px;
     border-radius: 9999px;
     background: #ffffff;
-    border: 3px solid #3b82f6;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    border: 3px solid #DE0039;
+    box-shadow: 0 2px 8px rgba(222, 0, 57, 0.35);
     cursor: pointer;
     transition: transform 0.15s ease;
   }
@@ -122,12 +141,11 @@
     width: 26px;
     border-radius: 9999px;
     background: #ffffff;
-    border: 3px solid #3b82f6;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+    border: 3px solid #DE0039;
+    box-shadow: 0 2px 8px rgba(222, 0, 57, 0.35);
     cursor: pointer;
   }
 
-  /* Continuous review marquee */
   .reviews-marquee-wrap {
     overflow: hidden;
   }
@@ -137,7 +155,6 @@
     }
   }
 
-  /* Hide scrollbar utility for horizontal carousels */
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -153,7 +170,6 @@
     min-width: 44px;
   }
 
-  /* Glass cards — no backdrop-blur on touch devices (Android screenshots go black) */
   .glass {
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.6);
@@ -166,61 +182,30 @@
     }
   }
   .glass-dark {
-    background: rgba(15, 23, 42, 0.72);
+    background: rgba(0, 28, 77, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
-  @media (hover: hover) and (pointer: fine) {
-    .glass-dark {
-      background: rgba(15, 23, 42, 0.55);
-      backdrop-filter: blur(16px) saturate(160%);
-      -webkit-backdrop-filter: blur(16px) saturate(160%);
-    }
-  }
 
-  /* Marquee GPU layers — disable will-change on phones to avoid black captures */
   @media (hover: none) and (pointer: coarse) {
     .will-change-transform {
       will-change: auto;
     }
   }
 
-  /* Gradient text — blue sky */
   .text-gradient-bt {
-    background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 50%, #38BDF8 100%);
+    background: linear-gradient(135deg, #A1002A 0%, #DE0039 50%, #F23D66 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
-  /* Animated gradient border */
-  .gradient-border {
-    position: relative;
-    z-index: 0;
-  }
-  .gradient-border::before {
-    content: '';
-    position: absolute;
-    inset: -1.5px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, #1D4ED8, #3B82F6, #38BDF8, #1D4ED8);
-    background-size: 300% 300%;
-    animation: gradient-shift 4s ease infinite;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  .gradient-border:hover::before {
-    opacity: 1;
-  }
-
-  /* Glow shadow utilities */
   .shadow-glow-blue {
-    box-shadow: 0 0 24px rgba(59, 130, 246, 0.35), 0 4px 16px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 24px rgba(0, 54, 143, 0.25), 0 4px 16px rgba(0, 54, 143, 0.15);
   }
   .shadow-glow-teal {
-    box-shadow: 0 0 24px rgba(56, 189, 248, 0.3), 0 4px 16px rgba(14, 165, 233, 0.18);
+    box-shadow: 0 0 24px rgba(0, 54, 143, 0.2), 0 4px 16px rgba(0, 54, 143, 0.12);
   }
   .shadow-glow-brand {
-    box-shadow: 0 0 32px rgba(59, 130, 246, 0.28), 0 0 80px rgba(56, 189, 248, 0.12);
+    box-shadow: 0 0 24px rgba(222, 0, 57, 0.28), 0 0 60px rgba(222, 0, 57, 0.12);
   }
 }

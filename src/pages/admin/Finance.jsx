@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Save, ImagePlus, X, Loader2 } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Field, Input } from '@/components/ui/Input';
@@ -42,6 +42,7 @@ export default function Finance() {
         tenureOptions: form.tenureText.split(',').map((t) => Number(t.trim())).filter(Boolean),
         petrolPricePerLitre: Number(form.petrolPricePerLitre),
         petrolMileageKmPerLitre: Number(form.petrolMileageKmPerLitre),
+        electricityRatePerUnit: Number(form.electricityRatePerUnit),
         fileCharges: Number(form.fileCharges),
       });
       await refreshFinanceSettings();
@@ -108,6 +109,9 @@ export default function Finance() {
             </Field>
             <Field label="Petrol mileage (km per litre)" hint="Typical petrol scooter efficiency">
               <Input type="number" step="1" value={form.petrolMileageKmPerLitre} onChange={(e) => set('petrolMileageKmPerLitre', e.target.value)} />
+            </Field>
+            <Field label="Electricity rate (₹ per unit)" hint="Used by the EV savings simulator" className="sm:col-span-2 sm:max-w-xs">
+              <Input type="number" step="0.5" value={form.electricityRatePerUnit ?? 7} onChange={(e) => set('electricityRatePerUnit', e.target.value)} />
             </Field>
           </div>
         </div>

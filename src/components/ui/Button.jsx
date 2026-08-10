@@ -5,21 +5,21 @@ import { cn } from '@/lib/utils';
 
 const VARIANTS = {
   primary:
-    'bg-brand-700 text-white shadow-glow hover:bg-brand-800 hover:brightness-[1.03]',
+    'bg-brand-500 text-white hover:bg-brand-600 shadow-glow',
   solid:
-    'bg-brand-700 text-white shadow-glow hover:bg-brand-800 hover:brightness-[1.03]',
+    'bg-brand-500 text-white hover:bg-brand-600 shadow-glow',
   secondary:
-    'bg-surface text-heading ring-1 ring-line hover:ring-heading/20 hover:text-heading',
+    'bg-surface text-navy ring-1 ring-line hover:ring-navy/30 hover:bg-surface-alt',
   accent:
-    'bg-brand-600 text-white shadow-soft hover:bg-brand-700',
+    'bg-navy text-white hover:bg-navy-600 shadow-soft',
   ghost:
-    'bg-transparent text-body hover:bg-surface-alt hover:text-heading',
+    'bg-transparent text-body hover:bg-surface-alt hover:text-navy',
   outline:
-    'bg-transparent text-brand-800 ring-1.5 ring-brand-600/35 hover:bg-brand-50',
+    'bg-transparent text-navy ring-1 ring-navy/40 hover:bg-navy-50',
   whatsapp:
     'bg-[#25d366] text-white shadow-soft hover:brightness-105',
   directions:
-    'bg-[#4285f4] text-white shadow-soft hover:bg-[#3367d6]',
+    'bg-navy text-white shadow-soft hover:bg-navy-600',
   danger:
     'bg-red-500 text-white shadow-soft hover:bg-red-600',
   softSuccess:
@@ -30,6 +30,12 @@ const VARIANTS = {
     'bg-slate-100 text-slate-600 hover:bg-slate-200',
   softBrand:
     'bg-brand-50 text-brand-600 hover:bg-brand-100',
+  /** Dealer template — red uppercase CTA */
+  dealerPrimary:
+    'rounded-dealer bg-brand-500 text-white uppercase tracking-wide shadow-none hover:bg-brand-600 border border-brand-500',
+  /** Dealer template — white / outline secondary */
+  dealerSecondary:
+    'rounded-dealer bg-white text-navy uppercase tracking-wide shadow-none hover:bg-surface-alt border border-line',
 };
 
 const SIZES = {
@@ -38,6 +44,7 @@ const SIZES = {
   md: 'h-12 px-5 text-[0.95rem] gap-2',
   lg: 'h-14 px-7 text-base gap-2.5',
   icon: 'h-14 w-14 p-0 text-2xl',
+  dealer: 'h-10 px-4 text-xs font-bold gap-1.5 sm:h-11 sm:px-5 sm:text-sm',
 };
 
 const Button = forwardRef(function Button(
@@ -60,13 +67,15 @@ const Button = forwardRef(function Button(
   },
   ref
 ) {
+  const isDealer = variant === 'dealerPrimary' || variant === 'dealerSecondary';
   const classes = cn(
-    'inline-flex items-center justify-center rounded-full font-semibold tracking-tight whitespace-nowrap',
-    'transition-all duration-300 ease-premium tap-target select-none',
+    'inline-flex items-center justify-center font-semibold tracking-tight whitespace-nowrap',
+    'transition-all duration-200 ease-premium tap-target select-none',
     'focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2',
-    'disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97]',
+    'disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]',
+    isDealer ? 'rounded-dealer' : 'rounded-full',
     VARIANTS[variant],
-    SIZES[size],
+    SIZES[isDealer && size === 'md' ? 'dealer' : size],
     fullWidth && 'w-full whitespace-normal text-center leading-snug',
     className
   );
@@ -85,7 +94,6 @@ const Button = forwardRef(function Button(
     </>
   );
 
-  // Internal route link
   if (to) {
     return (
       <Link ref={ref} to={to} className={classes} {...props}>
@@ -93,7 +101,6 @@ const Button = forwardRef(function Button(
       </Link>
     );
   }
-  // External link
   if (href) {
     const isTel = /^tel:/i.test(href);
     const isSms = /^sms:/i.test(href);

@@ -40,13 +40,13 @@ import { getApprovedReviews } from '@/features/reviews/reviewService';
 
 function Spec({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl bg-surface p-4 ring-1 ring-line">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+    <div className="flex items-start gap-3 border border-line bg-white p-4">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-dealer bg-navy/10 text-navy">
         <Icon className="h-4.5 w-4.5" strokeWidth={2.2} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium text-muted">{label}</p>
-        <p className="break-words text-sm font-bold leading-snug text-heading">{value}</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
+        <p className="break-words text-sm font-bold leading-snug text-navy">{value}</p>
       </div>
     </div>
   );
@@ -126,7 +126,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         <EmptyState
           title="Scooter not found"
           description="This model may have been removed."
-          action={<Button to="/scooters" variant="primary">Back to scooters</Button>}
+          action={<Button to="/scooters" variant="dealerPrimary">Back to Scooters</Button>}
         />
       </div>
     );
@@ -197,7 +197,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 <Badge key={b.id} tone={b.tone}>{b.emoji} {b.label}</Badge>
               ))}
             </div>
-            <h1 className="mt-4 break-words font-display text-display-md font-extrabold text-heading sm:text-3xl">
+            <h1 className="mt-4 break-words font-display text-display-md font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
               {detailSeo.h1 || `${scooter.name} Electric Scooter in Berhampore — Price, Features & Test Ride`}
             </h1>
             <p className="mt-1 break-words text-base text-muted">{scooter.tagline}</p>
@@ -255,13 +255,13 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             <PremiumPerksStrip />
 
             {/* Battery upgrade */}
-            <div className="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-50 via-white to-accent-50 p-5 ring-1 ring-brand-100 sm:p-6">
+            <div className="mt-4 overflow-hidden border border-line bg-surface-alt p-5 sm:p-6">
               <div className="flex items-start gap-3 sm:gap-4">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-card sm:h-11 sm:w-11">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-navy text-navy sm:h-11 sm:w-11">
                   <BatteryCharging className="h-5 w-5" strokeWidth={2.2} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-display text-base font-bold text-heading sm:text-lg">Want more range?</h3>
+                  <h3 className="font-display text-base font-bold uppercase tracking-wide text-navy sm:text-lg">Want More Range?</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-body">
                     Increase mileage with a higher AH battery — custom modifications tailored to your daily riding needs.
                   </p>
@@ -273,7 +273,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                       'Expert fitting at our showroom',
                     ].map((item) => (
                       <li key={item} className="flex items-start gap-2 text-xs text-body sm:text-sm">
-                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" strokeWidth={2.5} />
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-500" strokeWidth={2.5} />
                         {item}
                       </li>
                     ))}
@@ -283,10 +283,10 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                     variant="whatsapp"
                     size="md"
                     icon={MessageCircle}
-                    className="mt-4"
+                    className="mt-4 !rounded-dealer"
                     onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'battery-upgrade', scooterId: scooter.id })}
                   >
-                    Contact us to know more
+                    Contact Us to Know More
                   </Button>
                 </div>
               </div>
@@ -294,26 +294,26 @@ function ScooterDetailsPage({ id, initialVariantId }) {
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Button
-                href={telUrl(undefined, site)}
-                target="_self"
-                variant="primary"
-                size="lg"
-                icon={Phone}
-                fullWidth
-                className="sm:flex-1"
-                onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
-              >
-                Call showroom
-              </Button>
-              <Button
-                variant="secondary"
+                variant="dealerPrimary"
                 size="lg"
                 icon={CalendarCheck}
                 fullWidth
                 className="sm:flex-1"
                 onClick={() => setTestRideOpen(true)}
               >
-                Book test ride
+                Book Test Ride
+              </Button>
+              <Button
+                href={telUrl(undefined, site)}
+                target="_self"
+                variant="dealerSecondary"
+                size="lg"
+                icon={Phone}
+                fullWidth
+                className="sm:flex-1"
+                onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
+              >
+                Call Showroom
               </Button>
               <Button
                 href={whatsappUrl(waMessage, site)}
@@ -321,7 +321,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 size="lg"
                 icon={MessageCircle}
                 fullWidth
-                className="sm:flex-1"
+                className="!rounded-dealer sm:flex-1"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
               >
                 WhatsApp
@@ -341,7 +341,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         {/* Full specs + EMI — EMI first on mobile for visibility */}
         <div className="mt-14 grid min-w-0 gap-8 lg:grid-cols-5 lg:gap-12">
           <div className="order-2 min-w-0 lg:order-1 lg:col-span-3">
-            <h2 className="break-words font-display text-display-md font-bold text-heading">Specifications</h2>
+            <h2 className="break-words font-display text-display-md font-bold uppercase tracking-wide text-navy">Specifications</h2>
             <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               <Spec icon={BatteryCharging} label="Battery type" value={display.batteryType} />
               {display.batteryWarranty && (
@@ -365,7 +365,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 </h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {scooter.colors.map((c) => (
-                    <span key={c} className="break-words rounded-full bg-surface px-3 py-2 text-sm font-medium text-body ring-1 ring-line sm:px-4">
+                    <span key={c} className="break-words border border-line bg-white px-3 py-2 text-sm font-medium text-body sm:px-4">
                       {c}
                     </span>
                   ))}
@@ -381,7 +381,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
               <ul className="mt-4 grid grid-cols-1 gap-3">
                 {scooter.features?.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 break-words text-sm text-body">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-brand-50 text-brand-500">
                       <Check className="h-3.5 w-3.5" strokeWidth={3} />
                     </span>
                     {f}
@@ -392,12 +392,12 @@ function ScooterDetailsPage({ id, initialVariantId }) {
 
             {/* Benefits */}
             {scooter.benefits?.length > 0 && (
-              <div className="mt-8 rounded-2xl bg-surface-alt p-6">
-                <h3 className="font-display text-lg font-bold text-heading">Why riders love it</h3>
+              <div className="mt-8 border border-line bg-surface-alt p-6">
+                <h3 className="font-display text-lg font-bold uppercase tracking-wide text-navy">Why Riders Love It</h3>
                 <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {scooter.benefits.map((b) => (
                     <li key={b} className="flex items-start gap-2.5 break-words text-sm font-medium text-body">
-                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white">
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-brand-500 text-white">
                         <Check className="h-3.5 w-3.5" strokeWidth={3} />
                       </span>
                       {b}
@@ -434,11 +434,11 @@ function ScooterDetailsPage({ id, initialVariantId }) {
           <Button
             href={telUrl(undefined, site)}
             target="_self"
-            variant="primary"
+            variant="dealerPrimary"
             size="sm"
             icon={Phone}
             fullWidth
-            className="min-h-11 rounded-lg"
+            className="min-h-11 !rounded-dealer"
             onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail-sticky', scooterId: scooter.id })}
           >
             Call about {scooter.name}
@@ -449,7 +449,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             size="sm"
             icon={MessageCircle}
             fullWidth
-            className="min-h-11 rounded-lg"
+            className="min-h-11 !rounded-dealer"
             onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail-sticky', scooterId: scooter.id })}
           >
             WhatsApp

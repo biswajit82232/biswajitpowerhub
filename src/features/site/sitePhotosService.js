@@ -40,8 +40,13 @@ function deepMergePhotos(raw) {
     base.gallery = base.gallery.map((g, i) => ({ ...g, ...(raw.gallery[i] || {}) }));
   }
   if (raw.models) {
-    for (const id of Object.keys(base.models)) {
-      if (raw.models[id]) base.models[id] = { ...base.models[id], ...raw.models[id] };
+    for (const id of Object.keys(raw.models)) {
+      base.models[id] = {
+        url: null,
+        alt: `${id} electric scooter at Biswajit Power Hub Berhampore`,
+        ...base.models[id],
+        ...raw.models[id],
+      };
     }
   }
   if (raw.about) base.about = { ...base.about, ...raw.about };

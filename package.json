@@ -16,7 +16,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "db:check": "node scripts/check-supabase.mjs",
-    "db:migrate": "node scripts/apply-migrations.mjs"
+    "db:migrate": "node scripts/apply-migrations.mjs",
+    "keep-alive": "node scripts/keep-alive.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

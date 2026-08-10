@@ -1,6 +1,7 @@
 import { Wrench, ShieldCheck, BatteryCharging } from 'lucide-react';
 import { Section } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
+import { useSite } from '@/context/SiteSettingsContext';
 import { PREMIUM_PERKS } from '@/config/site';
 
 const ICONS = {
@@ -9,7 +10,13 @@ const ICONS = {
   batteryUpgrade: BatteryCharging,
 };
 
+function usePerks() {
+  const { site } = useSite();
+  return site.perks?.length ? site.perks : PREMIUM_PERKS;
+}
+
 export function PremiumPerks() {
+  const perks = usePerks();
   return (
     <Section id="perks" tight className="py-12 sm:py-14">
       <Reveal className="text-center">
@@ -26,8 +33,8 @@ export function PremiumPerks() {
 
       <Reveal delay={0.05} className="mt-8">
         <div className="grid gap-8 border-t border-line pt-8 sm:grid-cols-3">
-          {PREMIUM_PERKS.map((perk) => {
-            const Icon = ICONS[perk.id];
+          {perks.map((perk) => {
+            const Icon = ICONS[perk.id] || SparklesFallback;
             return (
               <div key={perk.id} className="text-center sm:text-left">
                 <Icon className="mx-auto h-5 w-5 text-brand-600 sm:mx-0" strokeWidth={2.2} />
@@ -42,12 +49,17 @@ export function PremiumPerks() {
   );
 }
 
+function SparklesFallback(props) {
+  return <Wrench {...props} />;
+}
+
 /** Compact perks row for product pages */
 export function PremiumPerksStrip() {
+  const perks = usePerks();
   return (
     <div className="mt-5 grid grid-cols-1 gap-3 border-t border-line pt-5 sm:grid-cols-2">
-      {PREMIUM_PERKS.map((perk) => {
-        const Icon = ICONS[perk.id];
+      {perks.map((perk) => {
+        const Icon = ICONS[perk.id] || Wrench;
         return (
           <div key={perk.id} className="flex items-center gap-2.5">
             <Icon className="h-4 w-4 shrink-0 text-brand-600" strokeWidth={2.2} />

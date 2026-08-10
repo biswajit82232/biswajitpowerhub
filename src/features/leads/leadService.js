@@ -118,6 +118,30 @@ export async function getContactMessages() {
   return data;
 }
 
+export async function updateCallback(id, patch) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { error } = await supabase.from('callbacks').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+export async function updateTestRide(id, patch) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { error } = await supabase.from('test_rides').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+export async function updateContactMessage(id, patch) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { error } = await supabase.from('contact_messages').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteContactMessage(id) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+  if (error) throw error;
+}
+
 export async function getLeads() {
   if (!isSupabaseConfigured || !supabase) return getEnrichedLeadsDemo();
   const { data, error } = await supabase

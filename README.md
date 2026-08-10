@@ -55,6 +55,18 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX   # optional — Google Analytics 4
    - **Manual:** run files in order — see `supabase/migrations/README.md`
 5. **Authentication → Users → Add user** for admin login at `/admin/login`.
 
+### Prevent auto-pause (free tier)
+
+Free Supabase projects pause automatically after **7 days with no API activity**. A GitHub Action (`.github/workflows/supabase-keep-alive.yml`) pings the database every **3 days** so this never happens — it works even if the site itself has no visitors.
+
+Setup (one-time):
+
+1. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**
+2. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (same values as `.env` / Vercel)
+3. Optional: **Actions** tab → select **Supabase keep-alive** → **Run workflow** to test it immediately
+
+Run it locally any time with `npm run keep-alive`.
+
 ---
 
 ## Admin features

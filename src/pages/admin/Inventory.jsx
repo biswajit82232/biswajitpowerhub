@@ -137,6 +137,9 @@ export default function Inventory() {
                   tags={
                     <>
                       {s.featured && <Badge tone="brand" className="shrink-0 px-1.5 py-0 text-[10px]">Featured</Badge>}
+                      {s.isBudget && <Badge tone="success" className="shrink-0 px-1.5 py-0 text-[10px]">Budget</Badge>}
+                      {s.isPremium && <Badge tone="brand" className="shrink-0 px-1.5 py-0 text-[10px]">Premium</Badge>}
+                      {s.noLicence && <Badge tone="success" className="hidden shrink-0 px-1.5 py-0 text-[10px] sm:inline-flex">No Licence</Badge>}
                       <Badge tone={stock.tone} className="shrink-0 px-1.5 py-0 text-[10px] sm:hidden">{stock.label}</Badge>
                     </>
                   }

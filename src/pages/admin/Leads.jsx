@@ -3,7 +3,7 @@ import { Users, Flame, Phone, MessageCircle, Zap, Clock, PhoneForwarded } from '
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Badge } from '@/components/ui/Badge';
-import { Select } from '@/components/ui/Input';
+import { Select, Textarea } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
@@ -47,6 +47,19 @@ export default function Leads() {
       refetch();
     } catch (e) {
       toast(e.message || 'Update failed.', 'error');
+    }
+  };
+
+  const onNotes = async (id, notes) => {
+    if (String(id).startsWith('cb-') || String(id).startsWith('tr-') || String(id).startsWith('demo-')) {
+      return;
+    }
+    try {
+      await updateLead(id, { notes });
+      toast('Notes saved.', 'success');
+      refetch();
+    } catch (e) {
+      toast(e.message || 'Could not save notes.', 'error');
     }
   };
 
@@ -144,6 +157,23 @@ export default function Leads() {
                   ))}
                 </Select>
               </div>
+              {!String(l.id).startsWith('cb-') && !String(l.id).startsWith('tr-') && !String(l.id).startsWith('demo-') && (
+                <div className="w-full border-t border-line pt-3 lg:col-span-full">
+                  <label className="block text-xs font-semibold text-muted">
+                    Notes
+                    <Textarea
+                      rows={2}
+                      className="mt-1"
+                      defaultValue={l.notes || ''}
+                      placeholder="Call notes, follow-up reminders…"
+                      onBlur={(e) => {
+                        const next = e.target.value;
+                        if (next !== (l.notes || '')) onNotes(l.id, next);
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
             </div>
           ))}
         </div>

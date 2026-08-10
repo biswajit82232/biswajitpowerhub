@@ -80,7 +80,7 @@ export default function AccessoryDetails() {
         <EmptyState
           title="Item not found"
           description="This accessory may have been removed."
-          action={<Button to="/accessories" variant="primary">Back to accessories</Button>}
+          action={<Button to="/accessories" variant="dealerPrimary">Back to Accessories</Button>}
         />
       </div>
     );
@@ -113,13 +113,13 @@ export default function AccessoryDetails() {
 
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
           <Reveal>
-            <div className="overflow-hidden rounded-2xl ring-1 ring-line shadow-soft">
+            <div className="overflow-hidden border border-line bg-white shadow-soft">
               <AccessoryImage
                 src={accessory.images?.[0]}
                 alt={accessory.name}
                 hue={accessory.hue}
                 name={accessory.name}
-                className="aspect-square w-full"
+                className="aspect-square w-full bg-white"
                 fit="contain"
               />
               {accessory.images?.length > 1 && (
@@ -133,7 +133,7 @@ export default function AccessoryDetails() {
                       height={64}
                       loading="lazy"
                       decoding="async"
-                      className="h-16 w-16 shrink-0 rounded-lg object-cover ring-1 ring-line"
+                      className="h-16 w-16 shrink-0 border border-line object-cover"
                     />
                   ))}
                 </div>
@@ -147,7 +147,7 @@ export default function AccessoryDetails() {
               <Badge tone={stock.tone}>{stock.label}</Badge>
             </div>
 
-            <h1 className="mt-4 font-display text-display-md font-extrabold text-heading">
+            <h1 className="mt-4 font-display text-display-md font-extrabold uppercase tracking-wide text-navy">
               {accessory.name}
             </h1>
 
@@ -155,18 +155,18 @@ export default function AccessoryDetails() {
               <CompatibleScooterLinks compatibility={accessory.compatibility} />
             )}
 
-            <div className="mt-6 rounded-2xl bg-surface p-5 ring-1 ring-line">
-              <p className="text-xs font-medium text-muted">Price</p>
-              <p className="font-display text-4xl font-extrabold text-heading">
+            <div className="mt-6 border border-line bg-white p-5">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">Price</p>
+              <p className="font-display text-4xl font-extrabold text-navy">
                 {formatINR(accessory.price)}
               </p>
             </div>
 
             {accessory.description && (
               <div className="mt-6">
-                <h2 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
+                <h2 className="flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide text-navy">
                   <Tag className="h-5 w-5 text-brand-500" />
-                  About this item
+                  About This Item
                 </h2>
                 <p className="mt-3 text-body leading-relaxed">{accessory.description}</p>
               </div>
@@ -176,13 +176,13 @@ export default function AccessoryDetails() {
               <Button
                 href={telUrl(undefined, site)}
                 target="_self"
-                variant="primary"
+                variant="dealerPrimary"
                 size="lg"
                 icon={Phone}
                 fullWidth
                 onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'accessory-detail', accessoryId: accessory.id })}
               >
-                Call showroom
+                Call Showroom
               </Button>
               <Button
                 href={whatsappUrl(waMessage, site)}
@@ -190,13 +190,14 @@ export default function AccessoryDetails() {
                 size="lg"
                 icon={MessageCircle}
                 fullWidth
+                className="!rounded-dealer"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'accessory-detail', accessoryId: accessory.id })}
               >
                 Enquire on WhatsApp
               </Button>
             </div>
-            <Button to="/scooters" variant="ghost" size="md" className="mt-3 w-full">
-              Browse compatible scooters
+            <Button to="/scooters" variant="dealerSecondary" size="md" className="mt-3 w-full">
+              Browse Compatible Scooters
             </Button>
           </Reveal>
         </div>

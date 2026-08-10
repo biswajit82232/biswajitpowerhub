@@ -32,6 +32,9 @@ const ORDER = [
   'fix_critical_rls_and_rpc.sql',
   'update_reviews_catalog.sql',
   'update_zoom_max_range.sql',
+  'add_scooter_range_tags.sql',
+  'add_site_content_json.sql',
+  'add_ops_inbox_fields.sql',
 ];
 
 function loadEnv() {

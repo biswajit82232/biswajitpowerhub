@@ -4,6 +4,8 @@ import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { uploadSitePhotoFile } from '@/features/site/sitePhotosService';
+import { getScooters } from '@/features/scooters/scooterService';
+import { useAsync } from '@/hooks/useAsync';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { SiteImage } from '@/components/common/SiteImage';
 
@@ -43,7 +45,7 @@ function SlotEditor({ title, hint, slot, onChange, folder, maxW, maxH }) {
           <h4 className="text-sm font-bold text-heading">{title}</h4>
           <p className="mt-0.5 text-xs text-muted">{hint}</p>
         </div>
-        {slot.url ? (
+        {slot?.url ? (
           <button
             type="button"
             onClick={() => onChange({ ...slot, url: null })}
@@ -55,8 +57,8 @@ function SlotEditor({ title, hint, slot, onChange, folder, maxW, maxH }) {
       </div>
       <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start">
         <SiteImage
-          src={slot.url}
-          alt={slot.alt}
+          src={slot?.url}
+          alt={slot?.alt}
           width={maxW}
           height={maxH}
           className="w-full max-w-xs rounded-lg"
@@ -67,7 +69,7 @@ function SlotEditor({ title, hint, slot, onChange, folder, maxW, maxH }) {
             Alt text
             <input
               type="text"
-              value={slot.alt || ''}
+              value={slot?.alt || ''}
               onChange={(e) => onChange({ ...slot, alt: e.target.value })}
               className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2.5 text-base text-heading outline-none focus:ring-2 focus:ring-brand-400/30 sm:text-sm"
             />
@@ -81,7 +83,7 @@ function SlotEditor({ title, hint, slot, onChange, folder, maxW, maxH }) {
             disabled={uploading}
             onClick={() => inputRef.current?.click()}
           >
-            {uploading ? 'Uploading…' : slot.url ? 'Replace photo' : 'Upload photo'}
+            {uploading ? 'Uploading…' : slot?.url ? 'Replace photo' : 'Upload photo'}
           </Button>
         </div>
       </div>
@@ -91,6 +93,7 @@ function SlotEditor({ title, hint, slot, onChange, folder, maxW, maxH }) {
 
 export function SitePhotosEditor() {
   const { photos, savePhotos } = useSitePhotos();
+  const { data: scooters } = useAsync(() => getScooters(), []);
   const [draft, setDraft] = useState(() => structuredClone(photos));
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -98,6 +101,22 @@ export function SitePhotosEditor() {
   useEffect(() => {
     setDraft(structuredClone(photos));
   }, [photos]);
+
+  useEffect(() => {
+    if (!scooters?.length) return;
+    setDraft((d) => {
+      const models = { ...d.models };
+      for (const s of scooters) {
+        if (!models[s.id]) {
+          models[s.id] = {
+            url: null,
+            alt: `${s.name} electric scooter at Biswajit Power Hub Berhampore`,
+          };
+        }
+      }
+      return { ...d, models };
+    });
+  }, [scooters]);
 
   const onSave = async () => {
     setSaving(true);
@@ -111,13 +130,22 @@ export function SitePhotosEditor() {
     }
   };
 
+  const modelEntries = (() => {
+    const fromCatalog = (scooters || []).map((s) => [
+      s.id,
+      draft.models?.[s.id] || { url: null, alt: s.name },
+    ]);
+    if (fromCatalog.length) return fromCatalog;
+    return Object.entries(draft.models || {});
+  })();
+
   return (
     <section className="max-w-3xl space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="font-display text-lg font-bold text-heading">Site Photos</h3>
           <p className="mt-1 text-sm text-muted">
-            Hero, gallery, model cards, and about page. Images resize to WebP when possible.
+            Hero, gallery, model cards (from inventory), and about page.
             {!isSupabaseConfigured ? ' Demo mode stores local previews until Supabase is connected.' : ''}
           </p>
         </div>
@@ -155,23 +183,26 @@ export function SitePhotosEditor() {
         />
       ))}
 
-      {Object.entries(draft.models).map(([id, slot]) => (
-        <SlotEditor
-          key={id}
-          title={`Model — ${id}`}
-          hint="Recommended 600×400"
-          slot={slot}
-          folder={`model/${id}`}
-          maxW={600}
-          maxH={400}
-          onChange={(next) =>
-            setDraft((d) => ({
-              ...d,
-              models: { ...d.models, [id]: next },
-            }))
-          }
-        />
-      ))}
+      {modelEntries.map(([id, slot]) => {
+        const name = scooters?.find((s) => s.id === id)?.name || id;
+        return (
+          <SlotEditor
+            key={id}
+            title={`Model — ${name}`}
+            hint="Recommended 600×400 · shown on Explore Our Range"
+            slot={slot || { url: null, alt: '' }}
+            folder={`model/${id}`}
+            maxW={600}
+            maxH={400}
+            onChange={(next) =>
+              setDraft((d) => ({
+                ...d,
+                models: { ...d.models, [id]: next },
+              }))
+            }
+          />
+        );
+      })}
 
       <SlotEditor
         title="About page team photo"

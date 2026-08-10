@@ -30,6 +30,9 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 13 | `fix_critical_rls_and_rpc.sql` | Review RLS, upsert_lead + get_analytics_events RPCs |
 | 14 | `update_reviews_catalog.sql` | Seed reviews for current scooter lineup |
 | 15 | `update_zoom_max_range.sql` | Zoom Lithium Pro 120 km max range |
+| 16 | `add_scooter_range_tags.sql` | Budget / Premium Explore Range tags on scooters |
+| 17 | `add_site_content_json.sql` | Admin content JSON (brand, perks, FAQs, tabs) |
+| 18 | `add_ops_inbox_fields.sql` | Electricity rate + contact message is_read |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 

@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Bike, Package, Users, PhoneCall, CalendarCheck, Star,
-  Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag, Settings, Home,
+  Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag, Settings, Home, Mail,
 } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
@@ -13,41 +13,83 @@ import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
-const LINKS = [
-  { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/admin/inventory', label: 'Inventory', icon: Bike },
-  { to: '/admin/accessories', label: 'Spare & Parts', icon: Package },
-  { to: '/admin/leads', label: 'Leads', icon: Users },
-  { to: '/admin/callbacks', label: 'Callbacks', icon: PhoneCall },
-  { to: '/admin/test-rides', label: 'Test Rides', icon: CalendarCheck },
-  { to: '/admin/reviews', label: 'Reviews', icon: Star },
-  { to: '/admin/offers', label: 'Offers', icon: Tag },
-  { to: '/admin/homepage', label: 'Homepage', icon: Home },
-  { to: '/admin/finance', label: 'Finance', icon: Banknote },
-  { to: '/admin/settings', label: 'Settings', icon: Settings },
-  { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+const NAV_GROUPS = [
+  {
+    label: null,
+    links: [{ to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true }],
+  },
+  {
+    label: 'Catalog',
+    links: [
+      { to: '/admin/inventory', label: 'Inventory', icon: Bike },
+      { to: '/admin/accessories', label: 'Spare & Parts', icon: Package },
+    ],
+  },
+  {
+    label: 'Leads',
+    links: [
+      { to: '/admin/leads', label: 'Leads', icon: Users },
+      { to: '/admin/callbacks', label: 'Callbacks', icon: PhoneCall },
+      { to: '/admin/test-rides', label: 'Test Rides', icon: CalendarCheck },
+      { to: '/admin/messages', label: 'Messages', icon: Mail },
+    ],
+  },
+  {
+    label: 'Marketing',
+    links: [
+      { to: '/admin/reviews', label: 'Reviews', icon: Star },
+      { to: '/admin/offers', label: 'Offers', icon: Tag },
+      { to: '/admin/homepage', label: 'Homepage', icon: Home },
+    ],
+  },
+  {
+    label: 'Site',
+    links: [
+      { to: '/admin/finance', label: 'Finance', icon: Banknote },
+      { to: '/admin/settings', label: 'Settings', icon: Settings },
+      { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+    ],
+  },
 ];
 
 function NavItems({ onNavigate, compact }) {
   return (
-    <nav className="flex flex-col gap-0.5">
-      {LINKS.map((l) => (
-        <NavLink
-          key={l.to}
-          to={l.to}
-          end={l.end}
-          onClick={onNavigate}
-          className={({ isActive }) =>
-            cn(
-              'flex items-center gap-2.5 rounded-xl font-semibold transition',
-              compact ? 'px-3 py-2 text-[0.8125rem]' : 'gap-3 px-3.5 py-2.5 text-sm',
-              isActive ? 'bg-brand-gradient text-white shadow-soft' : 'text-body hover:bg-brand-50 hover:text-brand-700'
-            )
-          }
-        >
-          <l.icon className={cn(compact ? 'h-4 w-4' : 'h-4.5 w-4.5')} strokeWidth={2.2} />
-          {l.label}
-        </NavLink>
+    <nav className="flex flex-col gap-3">
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label || 'top'}>
+          {group.label && (
+            <p
+              className={cn(
+                'mb-1 px-3 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-muted',
+                compact ? 'px-3' : 'px-3.5',
+              )}
+            >
+              {group.label}
+            </p>
+          )}
+          <div className="flex flex-col gap-0.5">
+            {group.links.map((l) => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.end}
+                onClick={onNavigate}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-2.5 rounded-xl font-semibold transition',
+                    compact ? 'px-3 py-2 text-[0.8125rem]' : 'gap-3 px-3.5 py-2.5 text-sm',
+                    isActive
+                      ? 'bg-brand-gradient text-white shadow-soft'
+                      : 'text-body hover:bg-brand-50 hover:text-brand-700',
+                  )
+                }
+              >
+                <l.icon className={cn(compact ? 'h-4 w-4' : 'h-4.5 w-4.5')} strokeWidth={2.2} />
+                {l.label}
+              </NavLink>
+            ))}
+          </div>
+        </div>
       ))}
     </nav>
   );
@@ -84,7 +126,6 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-bg pt-[env(safe-area-inset-top)]">
       <AdminPwaSetup />
-      {/* Sidebar (desktop) */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-surface p-5 lg:flex">
         <Logo compact />
         <div className="mt-8 flex-1 overflow-y-auto">
@@ -93,7 +134,6 @@ export default function AdminLayout() {
         <SidebarFooter onSignOut={handleSignOut} />
       </aside>
 
-      {/* Mobile top bar */}
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface px-3 py-2.5 lg:hidden">
         <Logo compact />
         <button onClick={() => setOpen(true)} className="tap-target rounded-xl p-2 text-heading" aria-label="Open menu">
@@ -127,7 +167,6 @@ export default function AdminLayout() {
         )}
       </AnimatePresence>
 
-      {/* Content */}
       <main className="lg:pl-64">
         <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-8">
           <div className="mb-4 hidden items-center justify-between lg:mb-6 lg:flex">

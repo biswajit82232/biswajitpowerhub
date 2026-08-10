@@ -14,6 +14,9 @@ const Compare = lazy(() => import('@/pages/public/Compare'));
 const Reviews = lazy(() => import('@/pages/public/Reviews'));
 const Contact = lazy(() => import('@/pages/public/Contact'));
 const About = lazy(() => import('@/pages/public/About'));
+const Service = lazy(() => import('@/pages/public/Service'));
+const FinancePage = lazy(() => import('@/pages/public/Finance'));
+const OffersPage = lazy(() => import('@/pages/public/Offers'));
 const Terms = lazy(() => import('@/pages/public/Terms'));
 const Privacy = lazy(() => import('@/pages/public/Privacy'));
 const InternalStub = lazy(() => import('@/pages/public/InternalStub'));
@@ -35,6 +38,7 @@ const Leads = lazy(() => import('@/pages/admin/Leads'));
 const Callbacks = lazy(() => import('@/pages/admin/Callbacks'));
 const TestRides = lazy(() => import('@/pages/admin/TestRides'));
 const AdminReviews = lazy(() => import('@/pages/admin/AdminReviews'));
+const Messages = lazy(() => import('@/pages/admin/Messages'));
 const Homepage = lazy(() => import('@/pages/admin/Homepage'));
 const Finance = lazy(() => import('@/pages/admin/Finance'));
 const Offers = lazy(() => import('@/pages/admin/Offers'));
@@ -55,6 +59,9 @@ export default function App() {
         <Route path="compare" element={<Compare />} />
         <Route path="reviews" element={<Reviews />} />
         <Route path="about" element={<About />} />
+        <Route path="service" element={<Service />} />
+        <Route path="finance" element={<FinancePage />} />
+        <Route path="offers" element={<OffersPage />} />
         <Route path="contact" element={<Contact />} />
         <Route path="best-electric-scooters-berhampore" element={<BestElectricScooters />} />
         <Route path="low-budget-electric-scooters-berhampore" element={<LowBudgetElectricScooters />} />
@@ -107,6 +114,7 @@ export default function App() {
         <Route path="leads" element={<Leads />} />
         <Route path="callbacks" element={<Callbacks />} />
         <Route path="test-rides" element={<TestRides />} />
+        <Route path="messages" element={<Messages />} />
         <Route path="reviews" element={<AdminReviews />} />
         <Route path="offers" element={<Offers />} />
         <Route path="homepage" element={<Homepage />} />

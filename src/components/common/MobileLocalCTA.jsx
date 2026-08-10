@@ -1,13 +1,11 @@
-import { Phone, Navigation } from 'lucide-react';
+import { Phone, Navigation, MessageCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { SITE, telUrl } from '@/config/site';
+import { SITE, telUrl, whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 /**
- * Mobile sticky bar — Call + Directions (showroom visits).
- * Call = brand blue; Directions = Maps blue; bar = navy.
- * GA/Ads conversions fire via trackEvent → trackGAEvent.
+ * Mobile sticky bar — Call + Directions + WhatsApp.
  */
 export function MobileLocalCTA() {
   const { site } = useSite();
@@ -17,33 +15,44 @@ export function MobileLocalCTA() {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[9999] flex h-16 items-center bg-brand-900 px-2 pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[9999] flex h-16 items-center bg-navy px-2 pb-[env(safe-area-inset-bottom)] lg:hidden"
       role="navigation"
-      aria-label="Call or get directions"
+      aria-label="Call, WhatsApp, or get directions"
     >
-      <div className="mx-auto grid w-full max-w-lg grid-cols-2 gap-2">
+      <div className="mx-auto grid w-full max-w-lg grid-cols-3 gap-1.5">
         <Button
           href={telUrl(undefined, site)}
           target="_self"
-          variant="primary"
+          variant="dealerPrimary"
           size="sm"
           icon={Phone}
           fullWidth
-          className="min-h-11 rounded-lg"
+          className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'mobile_sticky' })}
         >
           Call
         </Button>
         <Button
+          href={whatsappUrl(undefined, site)}
+          variant="whatsapp"
+          size="sm"
+          icon={MessageCircle}
+          fullWidth
+          className="min-h-11 !rounded-dealer"
+          onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'mobile_sticky' })}
+        >
+          Chat
+        </Button>
+        <Button
           href={mapsHref}
-          variant="directions"
+          variant="dealerSecondary"
           size="sm"
           icon={Navigation}
           fullWidth
-          className="min-h-11 rounded-lg"
+          className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'mobile_sticky' })}
         >
-          Directions
+          Map
         </Button>
       </div>
       <span className="sr-only">{SITE.name}</span>

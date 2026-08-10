@@ -91,7 +91,7 @@ function ContactMessageForm() {
       </Field>
       <Button
         type="submit"
-        variant="primary"
+        variant="dealerPrimary"
         size="lg"
         fullWidth
         loading={loading}
@@ -175,8 +175,8 @@ export default function Contact() {
             className="mb-0 text-white/70 [&_a]:text-white/80 [&_a:hover]:text-white [&_[aria-current]]:text-white"
           />
           <Reveal>
-            <h1 className="mt-4 font-display text-display-lg font-extrabold text-white">
-              Visit our showroom
+            <h1 className="mt-4 font-display text-display-lg font-extrabold uppercase tracking-wide text-white">
+              Visit Our Showroom
             </h1>
             <p className="mt-3 max-w-xl text-base text-white/80 sm:text-lg">
               Near Chunakhali Bus Stand, Nimtala — walk in for a free test ride. We don&apos;t sell online.
@@ -222,7 +222,7 @@ export default function Contact() {
                 <Button
                   href={telUrl(undefined, site)}
                   target="_self"
-                  variant="primary"
+                  variant="dealerPrimary"
                   size="lg"
                   icon={Phone}
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })}
@@ -234,18 +234,19 @@ export default function Contact() {
                   variant="whatsapp"
                   size="lg"
                   icon={MessageCircle}
+                  className="!rounded-dealer"
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}
                 >
                   Chat on WhatsApp
                 </Button>
                 <Button
                   href={site.maps.link}
-                  variant="directions"
+                  variant="dealerSecondary"
                   size="lg"
                   icon={Navigation}
                   onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
                 >
-                  Get Directions
+                  Get Direction
                 </Button>
               </div>
             </Reveal>
@@ -269,8 +270,8 @@ export default function Contact() {
             </Reveal>
 
             <Reveal delay={0.08}>
-              <div className="border-t border-line pt-8">
-                <h3 className="font-display text-xl font-bold text-heading">Prefer a callback?</h3>
+              <div id="callback" className="scroll-mt-24 border-t border-line pt-8">
+                <h3 className="font-display text-xl font-bold uppercase tracking-wide text-navy">Prefer a Callback?</h3>
                 <p className="mt-1 text-sm text-muted">Drop your number and we&apos;ll call you.</p>
                 <div className="mt-5">
                   <CallbackForm compact />

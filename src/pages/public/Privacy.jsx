@@ -8,7 +8,7 @@ import { breadcrumbList } from '@/lib/schemaHelpers';
 function LegalSection({ title, children }) {
   return (
     <section className="border-b border-line pb-8 last:border-0 last:pb-0">
-      <h2 className="font-display text-lg font-bold text-heading">{title}</h2>
+      <h2 className="font-display text-lg font-bold uppercase tracking-wide text-navy">{title}</h2>
       <div className="mt-3 space-y-3 text-sm leading-relaxed text-body">{children}</div>
     </section>
   );
@@ -30,13 +30,11 @@ export default function Privacy() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt/60">
-        <div className="container-px py-12 sm:py-16">
+      <section className="border-b border-line bg-white">
+        <div className="container-px py-10 sm:py-12">
           <Reveal>
-            <span className="inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-600">
-              Legal
-            </span>
-            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-500">Legal</p>
+            <h1 className="mt-2 font-display text-display-lg font-extrabold uppercase tracking-wide text-navy">
               Privacy Policy
             </h1>
             <p className="mt-3 max-w-2xl text-body">
@@ -48,8 +46,8 @@ export default function Privacy() {
         </div>
       </section>
 
-      <div className="container-px py-12 sm:py-16">
-        <Reveal className="mx-auto max-w-prose space-y-8 rounded-2xl bg-surface p-6 ring-1 ring-line shadow-soft sm:p-10">
+      <div className="container-px py-10 sm:py-14">
+        <Reveal className="mx-auto max-w-prose space-y-8 border border-line bg-white p-6 shadow-soft sm:p-10">
           <LegalSection title="1. Who we are">
             <p>
               {SITE.name} (&quot;we&quot;, &quot;us&quot;) operates an electric scooter dealership

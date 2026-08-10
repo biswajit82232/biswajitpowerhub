@@ -4,7 +4,7 @@ import { withTimeout } from '@/lib/utils';
 import { SCOOTERS } from '@/data/scooters';
 import { normalizeScooter } from '@/lib/scooterVariants';
 
-const CACHE_KEY = 'scooters_v6';
+const CACHE_KEY = 'scooters_v7';
 const CACHE_TTL = 60;
 const FETCH_TIMEOUT_MS = 8000;
 const SEED_BY_ID = Object.fromEntries(SCOOTERS.map((s) => [s.id, s]));
@@ -40,6 +40,8 @@ function fromRow(row) {
     colors: row.colors || [],
     noLicence: row.no_licence,
     noRegistration: row.no_registration,
+    isBudget: Boolean(row.is_budget),
+    isPremium: Boolean(row.is_premium),
     stock: row.stock_status,
     featured: row.featured,
     description: row.description || seed?.description || '',
@@ -77,6 +79,8 @@ export function toRow(s) {
     colors: s.colors || [],
     no_licence: s.noLicence,
     no_registration: s.noRegistration,
+    is_budget: !!s.isBudget,
+    is_premium: !!s.isPremium,
     stock_status: s.stock,
     featured: s.featured,
     description: s.description || '',

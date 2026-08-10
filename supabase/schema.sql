@@ -30,6 +30,8 @@ create table if not exists public.scooters (
   colors            jsonb default '[]'::jsonb,
   no_licence        boolean default true,
   no_registration   boolean default true,
+  is_budget         boolean default false,
+  is_premium        boolean default false,
   stock_status      text default 'in_stock',
   featured          boolean default false,
   description       text,
@@ -109,6 +111,7 @@ create table if not exists public.contact_messages (
   email       text,
   message     text not null,
   visitor_id  text,
+  is_read     boolean default false,
   created_at  timestamptz default now()
 );
 
@@ -157,6 +160,7 @@ create table if not exists public.finance_settings (
   file_charges          numeric default 2500,
   petrol_price_per_litre numeric default 110,
   petrol_mileage_km_per_litre numeric default 40,
+  electricity_rate_per_unit numeric default 7,
   promo                 jsonb default '{"active":false,"label":""}'::jsonb,
   updated_at            timestamptz default now()
 );

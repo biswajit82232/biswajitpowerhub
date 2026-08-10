@@ -60,35 +60,75 @@ export default function BestElectricScooters() {
         comparison below to shortlist models before your free test ride at Chunakhali Bus Stand.
       </p>
 
-      <div className="not-prose overflow-x-auto rounded-xl ring-1 ring-line">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-surface-alt text-heading">
-            <tr>
-              <th className="px-4 py-3 font-bold">Model</th>
-              <th className="px-4 py-3 font-bold">Price</th>
-              <th className="px-4 py-3 font-bold">Range</th>
-              <th className="px-4 py-3 font-bold">Top Speed</th>
-              <th className="px-4 py-3 font-bold">Best For</th>
-              <th className="px-4 py-3 font-bold">Link</th>
-            </tr>
-          </thead>
-          <tbody>
-            {COMPARISON_ROWS.map((r) => (
-              <tr key={r.slug} className="border-t border-line">
-                <td className="px-4 py-3 font-semibold text-heading">{r.model}</td>
-                <td className="px-4 py-3">{r.price}</td>
-                <td className="px-4 py-3">{r.range}</td>
-                <td className="px-4 py-3">{r.topSpeed}</td>
-                <td className="px-4 py-3">{r.bestFor}</td>
-                <td className="px-4 py-3">
-                  <Link to={`/scooters/${r.slug}`} className="font-semibold text-brand-600 hover:underline">
-                    {r.model} electric scooter in Berhampore
-                  </Link>
-                </td>
+      <div className="not-prose">
+        {/* Mobile: stacked cards — table overflows break under overflow-x: clip */}
+        <ul className="space-y-3 md:hidden">
+          {COMPARISON_ROWS.map((r) => (
+            <li key={r.slug} className="border border-line bg-white p-4 shadow-soft">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-display text-base font-bold uppercase tracking-wide text-navy">
+                  {r.model}
+                </h3>
+                <p className="shrink-0 font-display text-base font-extrabold text-body">{r.price}</p>
+              </div>
+              <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+                <div>
+                  <dt className="text-[10px] font-bold uppercase tracking-wide text-muted">Range</dt>
+                  <dd className="font-semibold text-body">{r.range}</dd>
+                </div>
+                <div>
+                  <dt className="text-[10px] font-bold uppercase tracking-wide text-muted">Top Speed</dt>
+                  <dd className="font-semibold text-body">{r.topSpeed}</dd>
+                </div>
+                <div className="col-span-2">
+                  <dt className="text-[10px] font-bold uppercase tracking-wide text-muted">Best For</dt>
+                  <dd className="font-semibold text-body">{r.bestFor}</dd>
+                </div>
+              </dl>
+              <Link
+                to={`/scooters/${r.slug}`}
+                className="mt-4 inline-flex min-h-10 items-center justify-center border border-brand-500 bg-brand-500 px-4 text-xs font-bold uppercase tracking-wide text-white"
+              >
+                View {r.model}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {/* Desktop / tablet: compact table */}
+        <div className="hidden overflow-x-auto border border-line md:block">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="bg-surface-alt text-navy">
+              <tr>
+                <th className="px-3 py-3 font-bold uppercase tracking-wide">Model</th>
+                <th className="px-3 py-3 font-bold uppercase tracking-wide">Price</th>
+                <th className="px-3 py-3 font-bold uppercase tracking-wide">Range</th>
+                <th className="px-3 py-3 font-bold uppercase tracking-wide">Top Speed</th>
+                <th className="px-3 py-3 font-bold uppercase tracking-wide">Best For</th>
+                <th className="px-3 py-3 font-bold uppercase tracking-wide">Link</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {COMPARISON_ROWS.map((r) => (
+                <tr key={r.slug} className="border-t border-line">
+                  <td className="px-3 py-3 font-semibold text-navy">{r.model}</td>
+                  <td className="px-3 py-3 whitespace-nowrap">{r.price}</td>
+                  <td className="px-3 py-3 whitespace-nowrap">{r.range}</td>
+                  <td className="px-3 py-3 whitespace-nowrap">{r.topSpeed}</td>
+                  <td className="px-3 py-3">{r.bestFor}</td>
+                  <td className="px-3 py-3">
+                    <Link
+                      to={`/scooters/${r.slug}`}
+                      className="font-semibold text-brand-500 underline-offset-2 hover:underline"
+                    >
+                      View {r.model}
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <h2>Which Model is Best for You?</h2>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SITE } from '@/config/site';
+import { useSite } from '@/context/SiteSettingsContext';
 import { cn } from '@/lib/utils';
 
 const LOGO_SRC = '/logo.png';
@@ -9,15 +9,16 @@ const LOGO_FALLBACK = '/logo-192.png';
  * Brand mark: real BPH logo + full name + optional tagline.
  */
 export function Logo({ to = '/', className, compact = false, light = false }) {
+  const { site } = useSite();
   return (
     <Link
       to={to}
       className={cn('group flex min-w-0 items-center gap-2.5', className)}
-      aria-label={SITE.name}
+      aria-label={site.name}
     >
       <img
         src={LOGO_SRC}
-        alt="Biswajit Power Hub (BPH) — Electric Scooter Dealership"
+        alt={`${site.name} — Electric Scooter Dealership`}
         width={160}
         height={160}
         loading="eager"
@@ -41,7 +42,7 @@ export function Logo({ to = '/', className, compact = false, light = false }) {
           )}
         >
           BISWAJIT{' '}
-          <span className={light ? 'text-accent-300' : 'text-gradient'}>POWER HUB</span>
+          <span className={light ? 'text-brand-200' : 'text-brand-500'}>POWER HUB</span>
         </span>
         {!compact && (
           <span
@@ -50,7 +51,7 @@ export function Logo({ to = '/', className, compact = false, light = false }) {
               light ? 'text-white/70' : 'text-muted',
             )}
           >
-            {SITE.tagline}
+            {site.tagline}
           </span>
         )}
       </span>

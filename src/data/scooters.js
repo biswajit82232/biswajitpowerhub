@@ -43,6 +43,8 @@ const SHARED = {
   noRegistration: true,
   stock: 'in_stock',
   realRangeFactor: 0.82,
+  isBudget: false,
+  isPremium: false,
   colors: ['Pearl White', 'Matte Black', 'Sky Blue'],
   features: [
     'LED headlamp & tail lamp',
@@ -75,6 +77,7 @@ export const SCOOTERS = [
       'The Single Light is our most accessible electric scooter in Berhampore — perfect for short daily hops, school drops, and market runs across Murshidabad. Lightweight and easy to handle in narrow lanes, with no licence or RTO registration required for this low-speed model. Choose Standard or Lithium Pro battery at Biswajit Power Hub, Chunakhali.',
     variants: buildVariants(38999, 49999, 50, 65),
     ...SHARED,
+    isBudget: true,
   },
   {
     id: 'double-light',
@@ -90,6 +93,7 @@ export const SCOOTERS = [
       'The Double Light balances comfort and practicality for daily shop runs and town commutes in Berhampore and Murshidabad. Generous range on both battery options, with a planted ride that replaces petrol scooters effortlessly — no licence needed on this low-speed EV at Biswajit Power Hub.',
     variants: buildVariants(40999, 51999, 60, 75),
     ...SHARED,
+    isBudget: true,
   },
   {
     id: 'activa',
@@ -105,6 +109,7 @@ export const SCOOTERS = [
       'The Activa Electric Scooter is built for riders in Berhampore who need serious range — Murshidabad district trips on a single charge. Spacious, comfortable, and dependable, with Standard or Lithium Pro batteries. No licence, no registration for this low-speed model. Test ride at Chunakhali Bus Stand.',
     variants: buildVariants(45999, 57999, 80, 95),
     ...SHARED,
+    isPremium: true,
     chargingTime: '5–6 hrs',
   },
   {
@@ -121,6 +126,8 @@ export const SCOOTERS = [
       'The Zoom Electric Scooter delivers a premium ride feel with strong pickup and smooth handling for office commutes across Berhampore. Choose Standard for value or Lithium Pro for maximum range. Low-speed, no licence required. Visit Biswajit Power Hub in Murshidabad for a free test ride.',
     variants: buildVariants(42999, 54999, 70, 120),
     ...SHARED,
+    isBudget: true,
+    isPremium: true,
     chargingTime: '5–6 hrs',
   },
 ];

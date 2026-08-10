@@ -1,9 +1,10 @@
 /**
  * Central business configuration for BISWAJIT POWER HUB.
- * Static branding lives here; contact/hours/address are editable in Admin → Settings.
+ * Static branding lives here; contact/hours/address/content are editable in Admin → Settings.
  */
 
 import { toLegacyHours } from '@/features/site/siteHours';
+import { SITE_FAQS as DEFAULT_SITE_FAQS } from '@/data/seoContent';
 
 /** Per-day hours seed — open every day 9:00 AM – 8:30 PM */
 export const INITIAL_HOURS = {
@@ -38,6 +39,44 @@ export const GBP_RATING = {
   bestRating: 5,
   worstRating: 1,
 };
+
+/** Explore Our Range tabs — labels/enabled editable in Admin → Settings */
+export const DEFAULT_RANGE_TABS = [
+  { id: 'all', label: 'ALL', enabled: true },
+  { id: 'budget', label: 'BUDGET', enabled: true },
+  { id: 'no-licence', label: 'NO LICENCE', enabled: true },
+  { id: 'premium', label: 'PREMIUM', enabled: true },
+];
+
+/** Premium showroom perks — shown on homepage, service, product pages */
+export const PREMIUM_PERKS = [
+  {
+    id: 'servicing',
+    title: '3 Free Servicing',
+    desc: 'Complimentary service visits at our showroom.',
+    highlight: '3×',
+  },
+  {
+    id: 'warranty',
+    title: '1 Year Motor & Controller Warranty',
+    desc: 'Full-year motor & controller coverage.',
+    highlight: '1 Yr',
+  },
+  {
+    id: 'batteryUpgrade',
+    title: 'Custom Battery Upgrades',
+    desc: 'Need more range? Higher AH batteries & custom mods — ask us.',
+    highlight: '+ Range',
+  },
+];
+
+/** Short copy for battery upgrade mentions across the site */
+export const BATTERY_UPGRADE_TAGLINE =
+  'Need more mileage? We offer custom higher-AH battery upgrades on eligible models — contact us to know more.';
+
+export function batteryUpgradeWhatsappMessage(scooterName) {
+  return `Hi Biswajit Power Hub, I'm interested in a custom battery upgrade${scooterName ? ` for the ${scooterName}` : ''} to increase mileage. Please share options and pricing.`;
+}
 
 /** Defaults for contact & location — used until admin settings load */
 export const CONTACT_DEFAULTS = {
@@ -101,6 +140,12 @@ export const SITE = {
     longitude: '88.2914134',
   },
 
+  gbp: { ...GBP_RATING },
+  perks: PREMIUM_PERKS,
+  faqs: DEFAULT_SITE_FAQS,
+  rangeTabs: DEFAULT_RANGE_TABS,
+  batteryUpgradeTagline: BATTERY_UPGRADE_TAGLINE,
+
   url: SITE_URL,
 };
 
@@ -121,16 +166,63 @@ function isLegacyMapsEmbed(url) {
   if (!url || typeof url !== 'string') return true;
   if (url.includes('output=embed')) return true;
   if (!url.includes('/maps/embed')) return true;
-  // Bare place_id / minimal mfe embeds show a pin without the shop name card
   if (url.includes('place_id:')) return true;
   if (url.includes('origin=mfe') && /!1m2!2m1!1s/.test(url)) return true;
-  // Full Share→Embed URLs include the business name as !2s…
   if (!url.includes('!2s') && !url.includes('%21%32%73')) return true;
   return false;
 }
 
+function normalizeRangeTabs(raw) {
+  const byId = Object.fromEntries(DEFAULT_RANGE_TABS.map((t) => [t.id, { ...t }]));
+  if (Array.isArray(raw)) {
+    for (const t of raw) {
+      if (t?.id && byId[t.id]) {
+        byId[t.id] = {
+          id: t.id,
+          label: (t.label || byId[t.id].label).toString(),
+          enabled: t.enabled !== false,
+        };
+      }
+    }
+  }
+  return DEFAULT_RANGE_TABS.map((t) => byId[t.id]);
+}
+
+function normalizePerks(raw) {
+  if (!Array.isArray(raw) || !raw.length) return PREMIUM_PERKS.map((p) => ({ ...p }));
+  return raw
+    .filter((p) => p && (p.title || p.desc))
+    .map((p, i) => ({
+      id: p.id || `perk-${i + 1}`,
+      title: p.title || '',
+      desc: p.desc || '',
+      highlight: p.highlight || '',
+    }));
+}
+
+function normalizeFaqs(raw) {
+  if (!Array.isArray(raw) || !raw.length) return DEFAULT_SITE_FAQS.map((f) => ({ ...f }));
+  return raw
+    .filter((f) => f && (f.question || f.answer))
+    .map((f) => ({
+      question: f.question || '',
+      answer: f.answer || '',
+    }));
+}
+
 /** Merge admin-editable fields into a full site object */
-export function mergeSiteSettings(partial) {
+export function mergeSiteSettings(partial = {}) {
+  const content = partial.content && typeof partial.content === 'object' ? partial.content : {};
+  const branding = { ...(content.branding || partial.branding || {}) };
+  const social = { ...SITE.social, ...(content.social || partial.social || {}) };
+  const geoIn = { ...SITE.geo, ...(content.geo || partial.geo || {}) };
+  const gbp = {
+    ...GBP_RATING,
+    ...(content.gbp || partial.gbp || {}),
+  };
+  gbp.ratingValue = Number(gbp.ratingValue) || GBP_RATING.ratingValue;
+  gbp.reviewCount = Number(gbp.reviewCount) || GBP_RATING.reviewCount;
+
   const address = {
     ...CONTACT_DEFAULTS.address,
     ...partial.address,
@@ -141,6 +233,8 @@ export function mergeSiteSettings(partial) {
   const legacyHours = toLegacyHours(hoursPerDay);
 
   const maps = { ...CONTACT_DEFAULTS.maps, ...partial.maps };
+  const placeFromContent = (content.geo?.placeId || geoIn.placeId || '').trim();
+  if (placeFromContent && !maps.placeId) maps.placeId = placeFromContent;
   if (!maps.embed?.trim()) {
     maps.embed = CONTACT_DEFAULTS.maps.embed;
   }
@@ -158,68 +252,80 @@ export function mergeSiteSettings(partial) {
     maps.embed = CONTACT_DEFAULTS.maps.embed;
   }
 
+  const name = (branding.name || SITE.name).trim() || SITE.name;
+  const tagline = (branding.tagline || SITE.tagline).trim() || SITE.tagline;
+  const description = (branding.description || SITE.description).trim() || SITE.description;
+
   return {
     ...SITE,
+    name,
+    tagline,
+    description,
+    shortName: branding.shortName || SITE.shortName,
     phones: partial.phones?.length ? partial.phones : CONTACT_DEFAULTS.phones,
     whatsapp: partial.whatsapp || CONTACT_DEFAULTS.whatsapp,
     address,
     maps,
     hours: legacyHours,
     hoursPerDay,
+    social,
+    geo: {
+      latitude: String(geoIn.latitude || SITE.geo.latitude),
+      longitude: String(geoIn.longitude || SITE.geo.longitude),
+      placeId: placeId || SITE.maps.placeId,
+    },
+    gbp,
+    perks: normalizePerks(content.perks || partial.perks),
+    faqs: normalizeFaqs(content.faqs || partial.faqs),
+    rangeTabs: normalizeRangeTabs(content.rangeTabs || partial.rangeTabs),
+    batteryUpgradeTagline:
+      (content.batteryUpgradeTagline || partial.batteryUpgradeTagline || BATTERY_UPGRADE_TAGLINE).trim()
+      || BATTERY_UPGRADE_TAGLINE,
   };
 }
 
-/** Premium showroom perks — shown on homepage, footer, and product pages */
-export const PREMIUM_PERKS = [
+/** Top nav — dealer IA (ALL CAPS labels rendered in Navbar) */
+export const NAV_LINKS = [
   {
-    id: 'servicing',
-    title: '3 Free Servicing',
-    desc: 'Complimentary service visits at our showroom.',
-    highlight: '3×',
+    label: 'PRODUCT',
+    to: '/scooters',
+    children: [
+      { label: 'Scooters', to: '/scooters' },
+      { label: 'Accessories', to: '/accessories' },
+      { label: 'Compare', to: '/compare' },
+    ],
   },
-  {
-    id: 'warranty',
-    title: '1 Year Motor & Controller Warranty',
-    desc: 'Full-year motor & controller coverage.',
-    highlight: '1 Yr',
-  },
-  {
-    id: 'batteryUpgrade',
-    title: 'Custom Battery Upgrades',
-    desc: 'Need more range? Higher AH batteries & custom mods — ask us.',
-    highlight: '+ Range',
-  },
+  { label: 'ABOUT US', to: '/about' },
+  { label: 'SERVICE', to: '/service' },
+  { label: 'FINANCE', to: '/finance' },
+  { label: 'CONTACT US', to: '/contact' },
 ];
 
-/** Short copy for battery upgrade mentions across the site */
-export const BATTERY_UPGRADE_TAGLINE =
-  'Need more mileage? We offer custom higher-AH battery upgrades on eligible models — contact us to know more.';
+/** Footer — Models column (populated from catalog on Footer; static seeds here) */
+export const FOOTER_MODEL_LINKS = [
+  { label: 'Activa', to: '/scooters/activa' },
+  { label: 'Zoom', to: '/scooters/zoom' },
+  { label: 'Single Light', to: '/scooters/single-light' },
+  { label: 'Double Light', to: '/scooters/double-light' },
+];
 
-export function batteryUpgradeWhatsappMessage(scooterName) {
-  return `Hi Biswajit Power Hub, I'm interested in a custom battery upgrade${scooterName ? ` for the ${scooterName}` : ''} to increase mileage. Please share options and pricing.`;
-}
-
-export const NAV_LINKS = [
-  { label: 'Home', to: '/' },
-  { label: 'Scooters', to: '/scooters' },
+export const FOOTER_MORE_LINKS = [
+  { label: 'Finance', to: '/finance' },
+  { label: 'Service', to: '/service' },
   { label: 'Reviews', to: '/reviews' },
-  { label: 'Contact', to: '/contact' },
+  { label: 'Accessories', to: '/accessories' },
 ];
 
 /** Full footer Quick Links — every remaining indexable page (no exchange/updates) */
 export const FOOTER_QUICK_LINKS = [
-  { label: 'Home', to: '/' },
-  { label: 'Scooters', to: '/scooters' },
-  { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
-  { label: 'Low Budget', to: '/low-budget-electric-scooters-berhampore' },
-  { label: 'No Licence', to: '/no-licence-electric-scooters-west-bengal' },
-  { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
+  { label: 'Our Community', to: '/reviews' },
+  { label: 'About Us', to: '/about' },
+  { label: 'Contact Us', to: '/contact' },
+  { label: 'Privacy Policy', to: '/privacy' },
+  { label: 'Offers', to: '/offers' },
   { label: 'Test Ride', to: '/test-ride-berhampore' },
-  { label: 'Accessories', to: '/accessories' },
-  { label: 'Compare', to: '/compare' },
-  { label: 'Reviews', to: '/reviews' },
-  { label: 'About', to: '/about' },
-  { label: 'Contact', to: '/contact' },
+  { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
+  { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
 ];
 
 /** @deprecated use FOOTER_QUICK_LINKS */

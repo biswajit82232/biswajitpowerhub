@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
-import { Reveal } from '@/components/common/Reveal';
+import { DealerPageHero } from '@/components/common/DealerPageHero';
 import { CatalogToolbar, CatalogSelect } from '@/components/catalog/CatalogToolbar';
 import { AccessoryCard } from '@/features/accessories/AccessoryCard';
 import { ScooterCardSkeleton } from '@/components/ui/Skeleton';
@@ -11,7 +11,7 @@ import { useAsync } from '@/hooks/useAsync';
 import { getAccessories } from '@/features/accessories/accessoryService';
 import { ACCESSORY_CATEGORIES, PART_SECTIONS } from '@/data/accessories';
 import { breadcrumbList } from '@/lib/schemaHelpers';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { cn } from '@/lib/utils';
 
 const SORTS = {
   'price-asc': (a, b) => a.price - b.price,
@@ -78,22 +78,12 @@ export default function Accessories() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt/50">
-        <div className="container-px py-6 sm:py-8">
-          <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Parts & Accessories' }]} />
-          <Reveal>
-            <span className="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-600 sm:text-xs">
-              Spare & Body Parts
-            </span>
-            <h1 className="mt-2 font-display text-2xl font-extrabold text-heading sm:text-display-lg">
-              Parts for every repair
-            </h1>
-            <p className="mt-2 max-w-xl text-sm text-body sm:text-base">
-              Genuine spare parts and body panels — batteries, brake pads, panels, mirrors, and more.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <DealerPageHero
+        eyebrow="Accessories"
+        title="Parts & Accessories"
+        subtitle="Genuine spare parts and body panels — batteries, brake pads, panels, mirrors, and more."
+        breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Parts & Accessories' }]}
+      />
 
       <CatalogToolbar
         leading={
@@ -103,11 +93,12 @@ export default function Accessories() {
                 key={s.id}
                 type="button"
                 onClick={() => { setSection(s.id); setCategory('all'); }}
-                className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition ${
+                className={cn(
+                  'shrink-0 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wide transition',
                   section === s.id
-                    ? 'bg-brand-gradient text-white shadow-soft'
-                    : 'bg-surface-alt text-body ring-1 ring-line hover:bg-brand-50 hover:text-brand-700'
-                }`}
+                    ? 'border-navy bg-navy text-white'
+                    : 'border-navy/40 bg-white text-navy hover:border-navy',
+                )}
               >
                 {s.label}
               </button>
@@ -151,8 +142,8 @@ export default function Accessories() {
             title="No parts found"
             description="Try adjusting your search or filters."
             action={
-              <Button variant="secondary" onClick={() => { setQuery(''); setSection('all'); setCategory('all'); setStockOnly(false); }}>
-                Clear filters
+              <Button variant="dealerSecondary" onClick={() => { setQuery(''); setSection('all'); setCategory('all'); setStockOnly(false); }}>
+                Clear Filters
               </Button>
             }
           />

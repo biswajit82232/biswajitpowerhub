@@ -7,7 +7,7 @@ function scrollToTop() {
   document.body.scrollTop = 0;
 }
 
-/** Scroll to top on every route change (skips hash navigation). */
+/** Scroll to top on every route change; honour hash anchors (e.g. #callback). */
 export function ScrollToTop() {
   const { pathname, hash } = useLocation();
 
@@ -18,8 +18,17 @@ export function ScrollToTop() {
   }, []);
 
   useEffect(() => {
-    if (hash) return;
+    if (hash) {
+      const id = hash.replace(/^#/, '');
+      // Wait a tick for lazy page content
+      const t = window.setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+      return () => window.clearTimeout(t);
+    }
     scrollToTop();
+    return undefined;
   }, [pathname, hash]);
 
   return null;

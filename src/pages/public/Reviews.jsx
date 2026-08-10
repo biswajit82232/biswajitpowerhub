@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react';
-import { Star, PenLine, ChevronDown } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Reveal, RevealGroup, RevealItem } from '@/components/common/Reveal';
+import { DealerPageHero } from '@/components/common/DealerPageHero';
 import { Stars } from '@/components/ui/StarRating';
 import Button from '@/components/ui/Button';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
@@ -12,10 +11,11 @@ import { useAsync } from '@/hooks/useAsync';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { getScooters } from '@/features/scooters/scooterService';
 import { breadcrumbList, buildReviewedProductRef } from '@/lib/schemaHelpers';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { SITE_URL, GBP_RATING } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { REVIEWS as SEED_REVIEWS } from '@/data/reviews';
+import { Star, PenLine, ChevronDown } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const PAGE_SIZE = 10;
 
@@ -110,43 +110,29 @@ export default function Reviews() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt">
-        <div className="container-px py-12 sm:py-16">
-          <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Reviews' }]} />
-          <Reveal>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700 ring-1 ring-brand-100">
-              <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" /> Reviews
-            </span>
-            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">
-              Customer Reviews — Biswajit Power Hub, Berhampore
-            </h1>
-            <p className="mt-3 max-w-2xl text-body">
-              Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single
-              Light, or Double Light at our Chunakhali showroom — no licence models, honest pricing, and
-              walk-in support.
-            </p>
-            <div className="mt-4 flex items-center gap-3">
-              <Stars value={Number(avg)} size={22} />
-              <span className="font-display text-xl font-extrabold text-heading">
-                {Number(avg).toFixed(1)}
-              </span>
-              <span className="text-sm text-muted">
-                from {displayReviews?.length || GBP_RATING.reviewCount} reviews
-              </span>
-            </div>
-          </Reveal>
+      <DealerPageHero
+        eyebrow="Reviews"
+        title="Customer Reviews"
+        subtitle="Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single Light, or Double Light at our Chunakhali showroom."
+        breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Reviews' }]}
+      >
+        <div className="mt-4 flex items-center gap-3">
+          <Stars value={Number(avg)} size={20} />
+          <span className="font-display text-xl font-extrabold text-navy">
+            {Number(avg).toFixed(1)}
+          </span>
+          <span className="text-sm text-muted">
+            from {displayReviews?.length || GBP_RATING.reviewCount} reviews
+          </span>
         </div>
-      </section>
+      </DealerPageHero>
 
-      <div className="container-px py-12">
-        <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
-          What Our Customers Say
-        </h2>
-        <p className="mt-4 max-w-3xl text-body">
+      <div className="container-px py-10 sm:py-12">
+        <h2 className="dealer-section-title !text-left">What Our Customers Say</h2>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-body sm:text-base">
           From first-time EV buyers in Berhampore town to longer Murshidabad commuters, customers praise
           free test rides, clear EMI guidance, battery upgrade options, and the convenience of a showroom
-          right at Chunakhali Bus Stand. Below are detailed testimonials — star ratings, model purchased,
-          and neighbourhood — so you can decide with confidence before your visit.
+          right at Chunakhali Bus Stand.
         </p>
 
         <div className="mt-8">
@@ -163,7 +149,7 @@ export default function Reviews() {
               <RevealGroup className="grid gap-6 sm:grid-cols-2">
                 {visibleReviews.map((r) => (
                   <RevealItem key={r.id}>
-                    <ReviewCard review={r} className="h-full rounded-xl shadow-soft" />
+                    <ReviewCard review={r} className="h-full" />
                   </RevealItem>
                 ))}
               </RevealGroup>
@@ -171,13 +157,13 @@ export default function Reviews() {
               {hasMore && (
                 <div className="mt-10 flex justify-center">
                   <Button
-                    variant="secondary"
+                    variant="dealerSecondary"
                     size="md"
                     icon={ChevronDown}
                     className="min-h-12"
                     onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
                   >
-                    Load more reviews ({remaining} left)
+                    Load More Reviews ({remaining} left)
                   </Button>
                 </div>
               )}
@@ -186,30 +172,29 @@ export default function Reviews() {
         </div>
 
         <Reveal className="mx-auto mt-14 max-w-xl">
-          <h2 className="border-b border-line pb-3 font-display text-2xl font-extrabold text-heading">
-            Leave Us a Review
-          </h2>
-          <div className="mt-6 rounded-xl bg-brand-50 p-5 ring-1 ring-brand-100 sm:p-6">
-            <p className="text-sm font-semibold text-heading">Leave a Google review</p>
+          <h2 className="dealer-section-title !text-left">Leave Us a Review</h2>
+          <div className="mt-6 border border-line bg-surface-alt p-5 sm:p-6">
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">Leave a Google Review</p>
             <p className="mt-1 text-sm text-body">
               Bought from our Chunakhali showroom? Your Google review helps other Berhampore and
-              Murshidabad riders find Biswajit Power Hub — and boosts local search ranking.
+              Murshidabad riders find Biswajit Power Hub.
             </p>
             <Button
               href={site.maps.reviewLink}
-              variant="primary"
+              variant="dealerPrimary"
               className="mt-4 min-h-12"
               icon={Star}
             >
               Leave a Review on Google
             </Button>
           </div>
-          <div className="mt-6 rounded-xl bg-white p-6 shadow-soft ring-1 ring-line sm:p-7">
-            <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-              <PenLine className="h-5 w-5 text-brand-600" /> Write a review on our site
+          <div className="mt-6 border border-line bg-white p-6 shadow-soft sm:p-7">
+            <h3 className="flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide text-navy">
+              <PenLine className="h-5 w-5 text-brand-500" /> Write a Review on Our Site
             </h3>
             <p className="mt-1 text-sm text-muted">
-              Share your experience here too. Site reviews are held as <strong className="font-semibold text-heading">pending</strong> until our team approves them — they will not appear publicly until then.
+              Share your experience here too. Site reviews are held as{' '}
+              <strong className="font-semibold text-navy">pending</strong> until our team approves them.
             </p>
             <div className="mt-5">
               <ReviewForm scooters={scooters || []} />

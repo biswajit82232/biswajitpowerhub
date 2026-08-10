@@ -12,16 +12,13 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { useMemo } from 'react';
 
-const PERKS = [
-  { icon: Wrench, title: '3 Free Servicing', desc: 'Complimentary service visits at our showroom.' },
-  { icon: ShieldCheck, title: 'Warranty Coverage', desc: '1 year motor & controller warranty on every scooter.' },
-  { icon: BatteryCharging, title: 'Battery Upgrades', desc: 'Custom higher-AH options for extra range.' },
-];
+const PERK_ICONS = [Wrench, ShieldCheck, BatteryCharging];
 
 export default function About() {
   const { site } = useSite();
   const { photos } = useSitePhotos();
   const aboutPhoto = photos?.about?.url || photos?.gallery?.[0]?.url || photos?.hero?.url || null;
+  const perks = site.perks?.length ? site.perks : [];
 
   const jsonLd = useMemo(
     () => [
@@ -33,21 +30,21 @@ export default function About() {
         '@context': 'https://schema.org',
         '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store'],
         '@id': `${SITE_URL}/#dealership`,
-        name: SITE.name,
+        name: site.name,
         url: `${SITE_URL}/about`,
         logo: `${SITE_URL}/logo-512.png`,
         image: `${SITE_URL}/logo-512.png`,
-        description: SITE.description,
+        description: site.description,
         telephone: `+91${site.phones[0]}`,
         address: postalAddressSchema(site.address),
         geo: {
           '@type': 'GeoCoordinates',
-          latitude: SITE.geo.latitude,
-          longitude: SITE.geo.longitude,
+          latitude: site.geo.latitude,
+          longitude: site.geo.longitude,
         },
         hasMap: site.maps?.link || SITE.maps.link,
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
-        sameAs: [SITE.social.instagram, SITE.social.facebook].filter(Boolean),
+        sameAs: [site.social?.instagram, site.social?.facebook].filter(Boolean),
       },
     ],
     [site],
@@ -87,9 +84,9 @@ export default function About() {
             className="mb-0 text-white/70 [&_a]:text-white/80 [&_a:hover]:text-white [&_[aria-current]]:text-white"
           />
           <Reveal>
-            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-sky-200/90">About us</p>
-            <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              A local showroom you can trust
+            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-200">About Us</p>
+            <h1 className="mt-2 font-display text-3xl font-extrabold uppercase tracking-wide text-white sm:text-4xl">
+              A Local Showroom You Can Trust
             </h1>
             <p className="mt-3 max-w-xl text-base text-white/80">
               Biswajit Power Hub at Chunakhali — premium low-speed EVs for Berhampore and Murshidabad.
@@ -156,13 +153,16 @@ export default function About() {
             </div>
 
             <div className="mt-12 grid gap-8 border-t border-line pt-10 sm:grid-cols-3">
-              {PERKS.map(({ icon: Icon, title, desc }) => (
-                <div key={title}>
-                  <Icon className="h-5 w-5 text-brand-600" />
-                  <h3 className="mt-3 font-display text-lg font-bold text-heading">{title}</h3>
-                  <p className="mt-1 text-sm text-muted">{desc}</p>
-                </div>
-              ))}
+              {perks.map((perk, i) => {
+                const Icon = PERK_ICONS[i % PERK_ICONS.length];
+                return (
+                  <div key={perk.id || perk.title}>
+                    <Icon className="h-5 w-5 text-brand-600" />
+                    <h3 className="mt-3 font-display text-lg font-bold text-heading">{perk.title}</h3>
+                    <p className="mt-1 text-sm text-muted">{perk.desc}</p>
+                  </div>
+                );
+              })}
             </div>
 
             <ul className="mt-10 space-y-3 border-t border-line pt-8 text-sm text-muted">
@@ -183,20 +183,20 @@ export default function About() {
             </ul>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button to="/scooters" variant="primary" className="min-h-12">
-                View scooters
+              <Button to="/scooters" variant="dealerPrimary" className="min-h-12">
+                View Scooters
               </Button>
               <Button
                 href={whatsappUrl(undefined, site)}
                 variant="whatsapp"
                 icon={MessageCircle}
-                className="min-h-12"
+                className="min-h-12 !rounded-dealer"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'about' })}
               >
-                WhatsApp us
+                WhatsApp Us
               </Button>
-              <Button to="/contact" variant="secondary" className="min-h-12">
-                Contact &amp; map
+              <Button to="/contact" variant="dealerSecondary" className="min-h-12">
+                Contact &amp; Map
               </Button>
             </div>
           </Reveal>

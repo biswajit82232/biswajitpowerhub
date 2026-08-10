@@ -31,7 +31,7 @@ export async function uploadHeroImage(file) {
 }
 
 const ROW_ID = 1;
-const CACHE_KEY = 'finance_settings_v2';
+const CACHE_KEY = 'finance_settings_v3';
 const CACHE_TTL = 60;
 
 function bustFinanceCache() {
@@ -62,6 +62,7 @@ export async function getFinanceSettings({ bypassCache = false } = {}) {
           promo: data.promo || FINANCE_DEFAULTS.promo,
           petrolPricePerLitre: Number(data.petrol_price_per_litre ?? FINANCE_DEFAULTS.petrolPricePerLitre),
           petrolMileageKmPerLitre: Number(data.petrol_mileage_km_per_litre ?? FINANCE_DEFAULTS.petrolMileageKmPerLitre),
+          electricityRatePerUnit: Number(data.electricity_rate_per_unit ?? FINANCE_DEFAULTS.electricityRatePerUnit),
           heroImageUrl: data.hero_image_url || null,
         };
       }
@@ -89,6 +90,7 @@ export async function saveFinanceSettings(settings) {
     file_charges: settings.fileCharges,
     petrol_price_per_litre: settings.petrolPricePerLitre,
     petrol_mileage_km_per_litre: settings.petrolMileageKmPerLitre,
+    electricity_rate_per_unit: settings.electricityRatePerUnit,
     updated_at: new Date().toISOString(),
   };
   if (settings.promo !== undefined) row.promo = settings.promo;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Field, Input, Textarea, Select, Label } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import { AdminToggle } from '@/components/admin/AdminToggle';
 import { slugify } from '@/lib/utils';
 import { ScooterImageUpload } from './ScooterImageUpload';
 
@@ -15,7 +16,8 @@ const EMPTY = {
   id: '', name: '', brand: 'PowerHub', tagline: '', price: 0, hue: 'blue',
   batteryType: '', batteryCapacity: '', range: 0, realRangeFactor: 0.83, topSpeed: 25,
   chargingTime: '', warranty: '', motor: '', weight: '', loadCapacity: '',
-  colors: [], noLicence: true, noRegistration: true, stock: 'in_stock', featured: false,
+  colors: [], noLicence: true, noRegistration: true, isBudget: false, isPremium: false,
+  stock: 'in_stock', featured: false,
   description: '', features: [], benefits: [], images: [], variants: [],
 };
 
@@ -165,6 +167,39 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
             <option value="yes">Yes</option>
           </Select>
         </Field>
+      </div>
+
+      <div>
+        <Label>Explore Range tags</Label>
+        <p className="mt-1 text-[11px] text-muted">
+          Budget / Premium / No Licence control which Explore Our Range tabs show this model.
+        </p>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <AdminToggle
+            checked={form.isBudget}
+            onChange={(v) => set('isBudget', v)}
+            label="Budget"
+            hint="Shows under the BUDGET tab"
+          />
+          <AdminToggle
+            checked={form.isPremium}
+            onChange={(v) => set('isPremium', v)}
+            label="Premium"
+            hint="Shows under the PREMIUM tab"
+          />
+          <AdminToggle
+            checked={form.noLicence}
+            onChange={(v) => set('noLicence', v)}
+            label="No Licence"
+            hint="Shows under NO LICENCE + badge on cards"
+          />
+          <AdminToggle
+            checked={form.noRegistration}
+            onChange={(v) => set('noRegistration', v)}
+            label="No Registration"
+            hint="Low-speed / no RTO paperwork"
+          />
+        </div>
       </div>
 
       <Field label="Description">

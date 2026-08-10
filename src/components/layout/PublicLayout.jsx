@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
-import { FloatingWhatsApp } from '@/components/common/FloatingWhatsApp';
+import { FloatingDealerRail } from '@/components/common/FloatingDealerRail';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { RouteLoader } from '@/components/ui/Loading';
@@ -58,7 +58,7 @@ export function PublicLayout() {
       </main>
       <Footer />
       <MobileLocalCTA />
-      <FloatingWhatsApp />
+      <FloatingDealerRail />
     </div>
   );
 }

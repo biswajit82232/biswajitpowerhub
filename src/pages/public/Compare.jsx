@@ -21,6 +21,7 @@ import {
   getStartingPrice,
 } from '@/lib/scooterVariants';
 import { ShowroomCtaRow } from '@/components/seo/SeoLandingLayout';
+import { DealerPageHero } from '@/components/common/DealerPageHero';
 
 const MAX_SLOTS = 3;
 const LABEL_W = '8.75rem';
@@ -80,7 +81,7 @@ function CompactSlot({ scooter, options, onChange, onRemove, canRemove }) {
         <button
           type="button"
           onClick={onRemove}
-          className="shrink-0 rounded-full p-1 text-muted ring-1 ring-line transition hover:bg-surface-alt hover:text-heading"
+          className="shrink-0 rounded-dealer p-1 text-muted ring-1 ring-line transition hover:bg-surface-alt hover:text-navy"
           aria-label={`Remove ${scooter.name}`}
         >
           <X className="h-3.5 w-3.5" />
@@ -116,8 +117,8 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
   const gridCols = `${LABEL_W} repeat(${colCount}, minmax(9.5rem, 1fr))`;
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-surface ring-1 ring-line shadow-soft">
-      <p className="border-b border-line bg-surface-alt px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-muted sm:hidden">
+    <div className="overflow-hidden border border-line bg-white shadow-soft">
+      <p className="border-b border-line bg-surface-alt px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-muted sm:hidden">
         Swipe to compare →
       </p>
 
@@ -271,19 +272,12 @@ export default function Compare() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line bg-surface-alt/50">
-        <div className="container-px py-8 sm:py-10">
-          <Reveal>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-600">
-              <GitCompare className="h-3.5 w-3.5" /> Compare
-            </span>
-            <h1 className="mt-3 font-display text-display-lg font-extrabold text-heading">Compare models</h1>
-            <p className="mt-2 max-w-xl text-sm text-body sm:mt-3">
-              Pick up to three scooters — compact view below, swipe on mobile to read specs.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <DealerPageHero
+        eyebrow="Compare"
+        title="Compare Models"
+        subtitle="Pick up to three scooters — compact view below, swipe on mobile to read specs."
+        breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Compare' }]}
+      />
 
       <div className="container-px py-6 sm:py-8">
         {loading ? (
@@ -300,7 +294,7 @@ export default function Compare() {
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
               {chosen.map((s) => (
-                <div key={s.id} className="rounded-xl ring-1 ring-line">
+                <div key={s.id} className="border border-line">
                   <CompactSlot
                     scooter={s}
                     options={optionsFor(s.id)}
@@ -311,12 +305,12 @@ export default function Compare() {
                 </div>
               ))}
               {available.length > 0 && (
-                <div className="rounded-xl ring-1 ring-dashed ring-line">
+                <div className="border border-dashed border-line">
                   <CompactAddSlot options={available} onAdd={addSlot} />
                 </div>
               )}
             </div>
-            <p className="rounded-xl bg-brand-50 px-4 py-3 text-center text-sm text-brand-800 ring-1 ring-brand-100">
+            <p className="border border-line bg-surface-alt px-4 py-3 text-center text-sm text-navy">
               Add one more model to compare specs side by side.
             </p>
           </div>
@@ -337,8 +331,8 @@ export default function Compare() {
           </Reveal>
         )}
 
-        <div className="mt-10 rounded-2xl bg-surface-alt p-5 ring-1 ring-brand-100 sm:mt-12 sm:p-8">
-          <p className="font-display text-lg font-bold text-heading">Ready to decide?</p>
+        <div className="mt-10 border border-line bg-surface-alt p-5 sm:mt-12 sm:p-8">
+          <p className="font-display text-lg font-bold uppercase tracking-wide text-navy">Ready to Decide?</p>
           <p className="mt-1 text-sm text-muted">
             Call or WhatsApp for today&apos;s stock, EMI, and a free test ride at Chunakhali.
           </p>

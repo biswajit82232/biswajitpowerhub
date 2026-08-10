@@ -4,14 +4,34 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/Badge';
+import { Select } from '@/components/ui/Input';
+import { useToast } from '@/components/ui/Toast';
 import { useAsync } from '@/hooks/useAsync';
-import { getTestRides } from '@/features/leads/leadService';
+import { getTestRides, updateTestRide } from '@/features/leads/leadService';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
 import { telUrl, whatsappCustomerUrl } from '@/config/site';
 
+const STATUSES = [
+  { v: 'requested', l: 'Requested' },
+  { v: 'confirmed', l: 'Confirmed' },
+  { v: 'done', l: 'Done' },
+  { v: 'cancelled', l: 'Cancelled' },
+];
+
 export default function TestRides() {
-  const { data, loading } = useAsync(() => getTestRides(), []);
+  const { toast } = useToast();
+  const { data, loading, refetch } = useAsync(() => getTestRides(), []);
+
+  const onStatus = async (id, status) => {
+    try {
+      await updateTestRide(id, { status });
+      toast('Status updated.', 'success');
+      refetch();
+    } catch (e) {
+      toast(e.message || 'Update failed.', 'error');
+    }
+  };
 
   return (
     <>
@@ -45,9 +65,18 @@ export default function TestRides() {
                 {t.scooter && <Badge tone="brand" icon={Bike}>{t.scooter}</Badge>}
                 <Badge tone="neutral">{t.preferred_date} · {t.preferred_time}</Badge>
               </div>
-              <div className="flex items-center gap-2 border-t border-line pt-3 sm:border-0 sm:pt-0">
+              <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3 sm:border-0 sm:pt-0">
                 <a href={telUrl(t.phone)} className="tap-target rounded-xl bg-brand-50 p-2.5 text-brand-600" aria-label="Call"><Phone className="h-4.5 w-4.5" /></a>
                 <a href={whatsappCustomerUrl(t.phone, `Hi ${t.name}, this is BISWAJIT POWER HUB regarding your test ride request.`)} target="_blank" rel="noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer"><MessageCircle className="h-4.5 w-4.5" /></a>
+                <Select
+                  value={t.status || 'requested'}
+                  onChange={(e) => onStatus(t.id, e.target.value)}
+                  className="h-10 min-w-0 flex-1 text-sm sm:w-36 sm:flex-none"
+                >
+                  {STATUSES.map((s) => (
+                    <option key={s.v} value={s.v}>{s.l}</option>
+                  ))}
+                </Select>
               </div>
             </div>
           ))}

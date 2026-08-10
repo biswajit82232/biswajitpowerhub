@@ -1,0 +1,32 @@
+name: Supabase keep-alive
+
+# Supabase free-tier projects auto-pause after 7 days of zero API activity.
+# This workflow pings the database every 3 days (well inside that window),
+# independent of real site traffic, so the project never gets paused.
+
+on:
+  schedule:
+    # 03:17 UTC every 3rd day — off-the-hour to avoid GitHub's busy cron minute.
+    - cron: '17 3 */3 * *'
+  workflow_dispatch: {} # allows manual "Run workflow" from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Ping Supabase
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: node scripts/keep-alive.mjs

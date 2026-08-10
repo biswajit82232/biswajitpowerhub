@@ -1,57 +1,16 @@
-import { useMemo, useState } from 'react';
-import { Search, GitCompare, ChevronDown } from 'lucide-react';
+import { useMemo } from 'react';
 import { SEO } from '@/components/common/SEO';
-import { Reveal } from '@/components/common/Reveal';
-import { CatalogToolbar } from '@/components/catalog/CatalogToolbar';
-import { ScooterCardWithInsights } from '@/features/scooters/ScooterCardWithInsights';
-import { getScooterInsights } from '@/features/analytics/popularityService';
-import { ScooterCardSkeleton } from '@/components/ui/Skeleton';
-import { EmptyState } from '@/components/ui/EmptyState';
-import Button from '@/components/ui/Button';
+import { ExploreRange } from '@/components/sections/ExploreRange';
+import { DealerFaq } from '@/components/sections/DealerFaq';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
-import { BATTERY_UPGRADE_TAGLINE } from '@/config/site';
 import { breadcrumbList, faqPageSchema, SCOOTER_FAQS } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-
-const SORTS = {
-  'price-asc': (a, b) => a.price - b.price,
-  'price-desc': (a, b) => b.price - a.price,
-  'range-desc': (a, b) => b.range - a.range,
-};
-
-const SORT_OPTIONS = [
-  { value: 'price-asc', label: 'Price ↑' },
-  { value: 'price-desc', label: 'Price ↓' },
-  { value: 'range-desc', label: 'Range ↓' },
-];
+import { SCOOTERS } from '@/data/scooters';
 
 export default function Scooters() {
   const { data: scooters, loading } = useAsync(() => getScooters(), []);
-  const { data: insights } = useAsync(
-    () => (scooters?.length ? getScooterInsights(scooters) : Promise.resolve(null)),
-    [scooters?.length],
-  );
-  const [query, setQuery] = useState('');
-  const [sort, setSort] = useState('price-asc');
-  const [stockOnly, setStockOnly] = useState(false);
-
-  const filtered = useMemo(() => {
-    let list = [...(scooters || [])];
-    if (query) {
-      const q = query.toLowerCase();
-      list = list.filter(
-        (s) => s.name.toLowerCase().includes(q) || s.brand.toLowerCase().includes(q)
-      );
-    }
-    if (stockOnly) list = list.filter((s) => s.stock !== 'out_of_stock');
-    list.sort(SORTS[sort]);
-    return list;
-  }, [scooters, query, sort, stockOnly]);
-
-  const countLabel = loading
-    ? 'Loading…'
-    : `${filtered.length} model${filtered.length !== 1 ? 's' : ''}`;
+  const list = scooters?.length ? scooters : SCOOTERS;
 
   const scootersJsonLd = useMemo(() => {
     const SEO_MODELS = [
@@ -90,90 +49,22 @@ export default function Scooters() {
         titleTemplate={false}
       />
 
-      <section className="border-b border-line">
+      <section className="border-b border-line bg-white">
         <div className="container-px py-8 sm:py-10">
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Scooters' }]} />
-          <Reveal>
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-700">Our Range</p>
-            <h1 className="mt-2 font-display text-2xl font-extrabold text-heading sm:text-display-lg">
-              Find your perfect ride
-            </h1>
-            <p className="mt-2 max-w-xl text-sm text-body sm:text-base">
-              Premium electric scooters for every budget. Compare specs, calculate EMI, and book a test ride.
-            </p>
-            <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted sm:text-sm">
-              {BATTERY_UPGRADE_TAGLINE}
-            </p>
-          </Reveal>
+          <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">Product</p>
+          <h1 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
+            Explore Our Range
+          </h1>
+          <p className="mt-2 max-w-xl text-sm text-body sm:text-base">
+            Premium electric scooters for every budget. Compare specs and book a free test ride at
+            Chunakhali, Berhampore.
+          </p>
         </div>
       </section>
 
-      <CatalogToolbar
-        searchPlaceholder="Search scooters…"
-        query={query}
-        onQueryChange={setQuery}
-        searchAriaLabel="Search scooters"
-        sort={sort}
-        onSortChange={setSort}
-        sortOptions={SORT_OPTIONS}
-        stockOnly={stockOnly}
-        onStockOnlyChange={setStockOnly}
-        countLabel={countLabel}
-        actions={
-          <Button to="/compare" variant="ghost" size="sm" icon={GitCompare} className="h-7 px-2 text-xs">
-            Compare
-          </Button>
-        }
-      />
-
-      <div className="container-px py-6 sm:py-8">
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <ScooterCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            icon={Search}
-            title="No scooters found"
-            description="Try adjusting your search or filters."
-            action={
-              <Button variant="secondary" onClick={() => { setQuery(''); setStockOnly(false); }}>
-                Clear filters
-              </Button>
-            }
-          />
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-            {filtered.map((s, i) => (
-              <ScooterCardWithInsights key={s.id} scooter={s} index={i} insights={insights} />
-            ))}
-          </div>
-        )}
-
-        <section className="mt-12 border-t border-line pt-10 sm:mt-16 sm:pt-14" aria-labelledby="scooter-faq-heading">
-          <Reveal>
-            <h2 id="scooter-faq-heading" className="font-display text-xl font-extrabold text-heading sm:text-2xl">
-              Frequently asked questions
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm text-muted">
-              Quick answers about licences, range, warranty, and our Berhampore showroom.
-            </p>
-            <div className="mt-6 divide-y divide-line border-t border-line">
-              {SCOOTER_FAQS.map((faq) => (
-                <details key={faq.question} className="group py-3.5">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-heading marker:content-none [&::-webkit-details-marker]:hidden">
-                    {faq.question}
-                    <ChevronDown className="h-4 w-4 shrink-0 text-muted transition group-open:rotate-180" />
-                  </summary>
-                  <p className="mt-2 pb-1 text-sm leading-relaxed text-body">{faq.answer}</p>
-                </details>
-              ))}
-            </div>
-          </Reveal>
-        </section>
-      </div>
+      <ExploreRange scooters={list} loading={loading} title="All Models" />
+      <DealerFaq faqs={SCOOTER_FAQS} title="Frequently Asked Questions" />
     </>
   );
 }
