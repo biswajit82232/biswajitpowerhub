@@ -49,7 +49,6 @@ const SIZES = {
 
 const Button = forwardRef(function Button(
   {
-    as,
     to,
     href,
     variant = 'primary',

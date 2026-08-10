@@ -299,6 +299,50 @@ export function buildReviewedProductRef(scooter) {
 
 
 /**
+ * Site-wide AggregateRating from all approved on-site reviews, regardless of
+ * which scooter they mention. Use for the homepage/Reviews-page LocalBusiness
+ * schema instead of a hand-typed rating — returns null when there are no
+ * real reviews yet so callers omit aggregateRating rather than fabricate
+ * rich-result eligibility with content that isn't actually on the page.
+ */
+export function siteAggregateRating(reviews) {
+  if (!Array.isArray(reviews) || !reviews.length) return null;
+  const valid = reviews.filter((r) => Number(r?.rating) > 0);
+  if (!valid.length) return null;
+  const sum = valid.reduce((a, r) => a + Number(r.rating), 0);
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: (sum / valid.length).toFixed(1),
+    bestRating: '5',
+    worstRating: '1',
+    reviewCount: String(valid.length),
+  };
+}
+
+/**
+ * Review[] for schema.org, built from real approved on-site reviews (not
+ * scoped to a single product). Mirrors the shape Google expects for
+ * LocalBusiness.review — pairs with `siteAggregateRating`.
+ */
+export function siteReviewsSchema(reviews, limit = 5) {
+  if (!Array.isArray(reviews) || !reviews.length) return undefined;
+  const valid = reviews.filter((r) => Number(r?.rating) > 0).slice(0, limit);
+  if (!valid.length) return undefined;
+  return valid.map((r) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.name },
+    ...(r.created_at ? { datePublished: r.created_at } : {}),
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: String(r.rating),
+      bestRating: '5',
+      worstRating: '1',
+    },
+    reviewBody: r.review,
+  }));
+}
+
+/**
  * AggregateRating from approved reviews for a scooter display name.
  * Returns null when there are fewer than 1 matching reviews (omit from schema).
  */

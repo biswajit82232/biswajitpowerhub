@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -71,7 +71,7 @@ export default function Finance() {
 
       {!isSupabaseConfigured && (
         <div className="mb-5 max-w-2xl rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          Demo mode — changes won't persist. Connect Supabase to save.
+          Demo mode — changes won&apos;t persist. Connect Supabase to save.
         </div>
       )}
 

@@ -92,7 +92,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         : variants[0]?.id;
       setVariantId(preferred ?? null);
     }
-  }, [scooter?.id, initialVariantId]);
+  }, [scooter, initialVariantId]);
 
   const display = scooter ? withVariant(scooter, variantId) : null;
 

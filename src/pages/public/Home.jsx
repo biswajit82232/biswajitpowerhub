@@ -19,6 +19,8 @@ import {
   breadcrumbList,
   buildScooterOfferCatalogItems,
   faqPageSchema,
+  siteAggregateRating,
+  siteReviewsSchema,
 } from '@/lib/schemaHelpers';
 import { SCOOTERS } from '@/data/scooters';
 
@@ -27,11 +29,16 @@ export default function Home() {
   const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
   const { settings: financeSettings } = useFinance();
   const { data: reviews, loading: reviewsLoading } = useAsync(() => getApprovedReviews(), []);
-  const faqs = site.faqs?.length ? site.faqs : [];
+  const faqs = useMemo(() => (site.faqs?.length ? site.faqs : []), [site.faqs]);
   const gbp = site.gbp || {};
 
   const homeSchemas = useMemo(() => {
     const catalogScooters = allScooters?.length ? allScooters : SCOOTERS;
+    // Rating must come from real on-site reviews (rendered below in
+    // DealerReviews) — never a hand-typed number. Omit entirely until there
+    // are genuine reviews to back it, per Google's rich-result guidelines.
+    const aggregateRating = siteAggregateRating(reviews);
+    const review = siteReviewsSchema(reviews);
     return [
       breadcrumbList([{ name: 'Home', path: '/' }]),
       {
@@ -56,13 +63,8 @@ export default function Home() {
         sameAs: [site.social?.instagram, site.social?.facebook].filter(Boolean),
         slogan: site.tagline,
         areaServed: ['Berhampore', 'Murshidabad', 'West Bengal'],
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: gbp.ratingValue,
-          reviewCount: gbp.reviewCount,
-          bestRating: gbp.bestRating || 5,
-          worstRating: gbp.worstRating || 1,
-        },
+        ...(aggregateRating ? { aggregateRating } : {}),
+        ...(review ? { review } : {}),
         ...(catalogScooters.length
           ? {
               hasOfferCatalog: {
@@ -89,7 +91,7 @@ export default function Home() {
       },
       faqPageSchema(faqs),
     ];
-  }, [site, allScooters, faqs, gbp]);
+  }, [site, allScooters, faqs, reviews]);
 
   const modelGrid = useMemo(() => {
     const list = allScooters?.length ? allScooters : SCOOTERS;

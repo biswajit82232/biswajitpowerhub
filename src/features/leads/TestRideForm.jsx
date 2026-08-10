@@ -58,7 +58,7 @@ export function TestRideForm({ scooter, onSuccess }) {
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
         <h3 className="text-lg font-bold text-heading">Test ride requested!</h3>
         <p className="max-w-xs text-sm text-body">
-          We'll confirm your {scooter?.name} test ride on {form.date} at {form.time}.
+          We&apos;ll confirm your {scooter?.name} test ride on {form.date} at {form.time}.
         </p>
       </motion.div>
     );

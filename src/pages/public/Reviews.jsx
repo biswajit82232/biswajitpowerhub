@@ -10,7 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useAsync } from '@/hooks/useAsync';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { getScooters } from '@/features/scooters/scooterService';
-import { breadcrumbList, buildReviewedProductRef } from '@/lib/schemaHelpers';
+import { breadcrumbList, buildReviewedProductRef, siteAggregateRating } from '@/lib/schemaHelpers';
 import { SITE_URL, GBP_RATING } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { REVIEWS as SEED_REVIEWS } from '@/data/reviews';
@@ -52,8 +52,10 @@ export default function Reviews() {
       (scooters || []).map((s) => [String(s.name).toLowerCase(), s]),
     );
     const list = displayReviews || [];
-    const ratingValue = list.length ? avg.toFixed(1) : String(GBP_RATING.ratingValue);
-    const reviewCount = list.length ? String(list.length) : String(GBP_RATING.reviewCount);
+    // Derived from the same reviews rendered on this page — never a
+    // hand-typed number. Omitted from the schema entirely when there are no
+    // real reviews yet (see siteAggregateRating).
+    const aggregateRating = siteAggregateRating(list);
 
     return [
       crumbs,
@@ -65,13 +67,7 @@ export default function Reviews() {
         logo: `${SITE_URL}/logo-512.png`,
         image: `${SITE_URL}/logo-512.png`,
         description: 'Electric scooter dealership in Berhampore, Murshidabad, West Bengal',
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue,
-          bestRating: '5',
-          worstRating: '1',
-          reviewCount,
-        },
+        ...(aggregateRating ? { aggregateRating } : {}),
         ...(list.length
           ? {
               review: list.slice(0, 5).map((r) => ({
@@ -98,7 +94,7 @@ export default function Reviews() {
           : {}),
       },
     ];
-  }, [displayReviews, avg, scooters]);
+  }, [displayReviews, scooters]);
 
   return (
     <>

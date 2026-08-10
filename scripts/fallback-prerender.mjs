@@ -60,9 +60,9 @@ function skuFor(id) {
   return `BPH-${String(id).toUpperCase().replace(/-/g, '_')}`;
 }
 
-function ratingForScooter(displayName) {
-  const matched = REVIEWS.filter(
-    (r) => r.status === 'approved' && r.scooter?.toLowerCase() === displayName.toLowerCase(),
+function ratingForScooter(reviews, displayName) {
+  const matched = (reviews || []).filter(
+    (r) => Number(r.rating) > 0 && r.scooter?.toLowerCase() === displayName.toLowerCase(),
   );
   if (!matched.length) return null;
   const sum = matched.reduce((a, r) => a + Number(r.rating || 0), 0);
@@ -75,12 +75,45 @@ function ratingForScooter(displayName) {
   };
 }
 
-function reviewsForScooter(displayName, limit = 5) {
-  const matched = REVIEWS.filter(
-    (r) => r.status === 'approved' && r.scooter?.toLowerCase() === displayName.toLowerCase(),
-  ).slice(0, limit);
+function reviewsForScooter(reviews, displayName, limit = 5) {
+  const matched = (reviews || [])
+    .filter((r) => Number(r.rating) > 0 && r.scooter?.toLowerCase() === displayName.toLowerCase())
+    .slice(0, limit);
   if (!matched.length) return null;
   return matched.map((r) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.name },
+    ...(r.created_at ? { datePublished: r.created_at } : {}),
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: String(r.rating),
+      bestRating: '5',
+      worstRating: '1',
+    },
+    reviewBody: r.review,
+  }));
+}
+
+/** Site-wide AggregateRating from real approved reviews — mirrors src/lib/schemaHelpers.js
+ *  siteAggregateRating(). Returns null (omit from schema) when there are none yet. */
+function siteAggregateRatingForBuild(reviews) {
+  const valid = (reviews || []).filter((r) => Number(r?.rating) > 0);
+  if (!valid.length) return null;
+  const sum = valid.reduce((a, r) => a + Number(r.rating), 0);
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: (sum / valid.length).toFixed(1),
+    bestRating: '5',
+    worstRating: '1',
+    reviewCount: String(valid.length),
+  };
+}
+
+/** Review[] from real approved reviews — mirrors siteReviewsSchema(). */
+function siteReviewsSchemaForBuild(reviews, limit = 5) {
+  const valid = (reviews || []).filter((r) => Number(r?.rating) > 0).slice(0, limit);
+  if (!valid.length) return undefined;
+  return valid.map((r) => ({
     '@type': 'Review',
     author: { '@type': 'Person', name: r.name },
     ...(r.created_at ? { datePublished: r.created_at } : {}),
@@ -206,6 +239,30 @@ const ROUTES = [
     schema: 'crumbs',
   },
   {
+    path: '/service',
+    title: 'Service & Battery Upgrades | Biswajit Power Hub Berhampore',
+    description:
+      '3 free servicing, warranty support, and custom battery upgrades at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore.',
+    h1: 'Care, Servicing & Upgrades',
+    schema: 'crumbs',
+  },
+  {
+    path: '/finance',
+    title: 'Finance & EMI | Biswajit Power Hub Berhampore',
+    description:
+      'Easy EMI and finance options for electric scooters at Biswajit Power Hub, Berhampore. Calculate savings vs petrol.',
+    h1: 'Easy EMI Options',
+    schema: 'crumbs',
+  },
+  {
+    path: '/offers',
+    title: 'Offers & Promotions | Biswajit Power Hub Berhampore',
+    description:
+      'Current offers and deals on electric scooters at Biswajit Power Hub, Chunakhali, Berhampore.',
+    h1: 'Current Offers',
+    schema: 'crumbs',
+  },
+  {
     path: '/accessories',
     title: 'Spare Parts & Accessories | Biswajit Power Hub, Berhampore',
     description:
@@ -288,6 +345,37 @@ async function fetchScooterEnrichment() {
     map[row.id] = row;
   }
   return map;
+}
+
+/** Live approved reviews (Supabase) — same source of truth as getApprovedReviews()
+ *  on the client. Falls back to the local seed file only when Supabase env vars
+ *  are missing or the request fails, so the build never crashes. */
+async function fetchApprovedReviewsForBuild() {
+  const url = process.env.VITE_SUPABASE_URL;
+  const key = process.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) return REVIEWS.filter((r) => r.status === 'approved');
+
+  try {
+    const res = await fetch(
+      `${url}/rest/v1/reviews?select=*&status=eq.approved&order=created_at.desc`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    return Array.isArray(rows)
+      ? rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          rating: Number(row.rating),
+          review: row.review,
+          scooter: row.scooter,
+          created_at: row.created_at,
+        }))
+      : [];
+  } catch (e) {
+    console.warn('[fallback-prerender] Supabase reviews fetch failed, using seed data:', e.message);
+    return REVIEWS.filter((r) => r.status === 'approved');
+  }
 }
 
 async function buildNoindexCatalogRoutes() {
@@ -416,7 +504,9 @@ function offerCatalogItems() {
   });
 }
 
-function localBusinessSchema() {
+function localBusinessSchema(reviews) {
+  const aggregateRating = siteAggregateRatingForBuild(reviews);
+  const review = siteReviewsSchemaForBuild(reviews);
   return {
     '@context': 'https://schema.org',
     '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store', 'AutoDealer'],
@@ -459,13 +549,8 @@ function localBusinessSchema() {
       'https://www.instagram.com/biswajitpowerhub',
       'https://www.facebook.com/BiswajitPowerHub',
     ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '12',
-      bestRating: '5',
-      worstRating: '1',
-    },
+    ...(aggregateRating ? { aggregateRating } : {}),
+    ...(review ? { review } : {}),
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: 'Electric Scooters',
@@ -511,7 +596,7 @@ function itemListSchema() {
   };
 }
 
-function productSchema(route, enrichment = {}) {
+function productSchema(route, enrichment = {}, reviews = []) {
   const id = route.productId;
   const seed = CATALOG[id] || {};
   const live = enrichment[id] || {};
@@ -528,8 +613,8 @@ function productSchema(route, enrichment = {}) {
     : Number(live.price || seed.price || 0);
   const high = prices.length ? Math.max(...prices) : low;
   const images = (Array.isArray(live.images) ? live.images : seed.images || []).filter(Boolean);
-  const rating = ratingForScooter(shortName);
-  const review = reviewsForScooter(shortName);
+  const rating = ratingForScooter(reviews, shortName);
+  const review = reviewsForScooter(reviews, shortName);
   const seller = sellerRef();
 
   const offers =
@@ -636,17 +721,19 @@ function faqSchema() {
   };
 }
 
-function schemasFor(route, enrichment = {}) {
+function schemasFor(route, enrichment = {}, reviews = []) {
   if (route.schema === 'none' || route.noindex) return [];
   const crumbs = breadcrumbSchema(route.path, route.h1 || route.title);
   if (route.schema === 'local') {
-    return [crumbs, localBusinessSchema(), organizationSchema(), websiteSchema(), faqSchema()];
+    return [crumbs, localBusinessSchema(reviews), organizationSchema(), websiteSchema(), faqSchema()];
   }
   if (route.schema === 'faq') {
     return [crumbs, itemListSchema(), faqSchema()];
   }
-  if (route.schema === 'product') return [crumbs, productSchema(route, enrichment)];
+  if (route.schema === 'product') return [crumbs, productSchema(route, enrichment, reviews)];
   if (route.path === '/reviews') {
+    const aggregateRating = siteAggregateRatingForBuild(reviews);
+    const reviewList = siteReviewsSchemaForBuild(reviews);
     return [
       crumbs,
       {
@@ -654,13 +741,8 @@ function schemasFor(route, enrichment = {}) {
         '@type': 'LocalBusiness',
         name: 'Biswajit Power Hub',
         url: BASE,
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: '4.8',
-          reviewCount: '12',
-          bestRating: '5',
-          worstRating: '1',
-        },
+        ...(aggregateRating ? { aggregateRating } : {}),
+        ...(reviewList ? { review: reviewList } : {}),
       },
     ];
   }
@@ -969,7 +1051,7 @@ function injectMeta(html, route) {
   // Strip previous injected ld+json from fallback runs; keep GA scripts
   out = out.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/gi, '');
 
-  const scripts = schemasFor(route, route._enrichment || {})
+  const scripts = schemasFor(route, route._enrichment || {}, route._reviews || [])
     .map((s) => `    <script type="application/ld+json">${JSON.stringify(s)}</script>`)
     .join('\n');
   if (scripts) out = out.replace('</head>', `${scripts}\n  </head>`);
@@ -997,9 +1079,15 @@ if (!existsSync(shellPath)) {
 
 const shell = readFileSync(shellPath, 'utf8');
 const enrichment = await fetchScooterEnrichment();
+const liveReviews = await fetchApprovedReviewsForBuild();
+console.log(`[fallback-prerender] using ${liveReviews.length} approved review(s) for rating schema`);
 const catalogNoindex = await buildNoindexCatalogRoutes();
 const allRoutes = [
-  ...ROUTES.map((r) => (r.schema === 'product' ? { ...r, _enrichment: enrichment } : r)),
+  ...ROUTES.map((r) => ({
+    ...r,
+    ...(r.schema === 'product' ? { _enrichment: enrichment } : {}),
+    _reviews: liveReviews,
+  })),
   ...catalogNoindex,
 ];
 

@@ -21,7 +21,6 @@ export const supabase = isSupabaseConfigured
   : null;
 
 if (!isSupabaseConfigured && import.meta.env.DEV) {
-  // eslint-disable-next-line no-console
   console.warn(
     '[Supabase] Not configured. Running in demo mode with local seed data. ' +
       'Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env to enable persistence.'
