@@ -35,6 +35,7 @@ const ORDER = [
   'add_scooter_range_tags.sql',
   'add_site_content_json.sql',
   'add_ops_inbox_fields.sql',
+  'add_vyapar_sync.sql',
 ];
 
 function loadEnv() {

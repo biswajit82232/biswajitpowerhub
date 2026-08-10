@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Bike, Package, Users, PhoneCall, CalendarCheck, Star,
   Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag, Settings, Home, Mail,
+  RefreshCw,
 } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
@@ -23,6 +24,7 @@ const NAV_GROUPS = [
     links: [
       { to: '/admin/inventory', label: 'Inventory', icon: Bike },
       { to: '/admin/accessories', label: 'Spare & Parts', icon: Package },
+      { to: '/admin/vyapar', label: 'Vyapar Sync', icon: RefreshCw },
     ],
   },
   {

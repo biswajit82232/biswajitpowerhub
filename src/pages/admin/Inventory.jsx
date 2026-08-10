@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Bike } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Pencil, Trash2, Bike, RefreshCw } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import Button from '@/components/ui/Button';
@@ -95,6 +96,18 @@ export default function Inventory() {
           Demo mode — showing seed data. Connect Supabase to add, edit, or delete scooters.
         </div>
       )}
+
+      <div className="mb-5 flex flex-col gap-2 rounded-xl border border-brand-100 bg-brand-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-brand-800">
+          Pull prices & stock from your Vyapar online store, then keep full control here (rename, photos, variants, tags).
+        </p>
+        <Link
+          to="/admin/vyapar"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-bold text-brand-700 ring-1 ring-brand-200 transition hover:bg-brand-50"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> Vyapar Sync
+        </Link>
+      </div>
 
       {loading ? (
         <div className="space-y-2">

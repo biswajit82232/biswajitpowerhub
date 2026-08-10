@@ -33,6 +33,7 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 16 | `add_scooter_range_tags.sql` | Budget / Premium Explore Range tags on scooters |
 | 17 | `add_site_content_json.sql` | Admin content JSON (brand, perks, FAQs, tabs) |
 | 18 | `add_ops_inbox_fields.sql` | Electricity rate + contact message is_read |
+| 19 | `add_vyapar_sync.sql` | Vyapar online-store sync settings + item cache/mapping |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 

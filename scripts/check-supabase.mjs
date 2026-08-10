@@ -51,6 +51,8 @@ const checks = [
   { name: 'site_settings', path: 'site_settings?select=id&limit=1' },
   { name: 'promotional_offers', path: 'promotional_offers?select=id&limit=1' },
   { name: 'accessories', path: 'accessories?select=id&limit=1' },
+  { name: 'vyapar_settings', path: 'vyapar_settings?select=id&limit=1' },
+  { name: 'vyapar_items', path: 'vyapar_items?select=id&limit=1' },
 ];
 
 const missing = [];
@@ -67,12 +69,21 @@ for (const check of checks) {
   } else if (status === 400 && body.includes('file_charges')) {
     console.log(`⚠  finance_settings — missing column: file_charges`);
     missing.push('add_file_charges.sql');
-  } else if (status === 404 || body.includes('Could not find the table')) {
+  } else if (status === 404 || body.includes('Could not find the table') || body.includes('schema cache')) {
     console.log(`❌ ${check.name} — table missing`);
     if (check.name === 'promotional_offers') missing.push('add_promotional_offers.sql');
     if (check.name === 'accessories') {
       missing.push('add_accessories.sql', 'create_accessory_images_bucket.sql');
     }
+    if (check.name === 'vyapar_settings' || check.name === 'vyapar_items') {
+      missing.push('add_vyapar_sync.sql');
+    }
+  } else if (
+    (check.name === 'vyapar_settings' || check.name === 'vyapar_items')
+    && (status === 401 || status === 403 || body.includes('JWT') || body.includes('permission'))
+  ) {
+    // Auth-only RLS — anon probe cannot read; table may still exist
+    console.log(`✓  ${check.name} (auth-only — expected for anon key)`);
   } else {
     console.log(`?  ${check.name} — HTTP ${status}: ${body.slice(0, 120)}`);
   }

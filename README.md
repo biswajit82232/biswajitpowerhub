@@ -75,6 +75,8 @@ Run it locally any time with `npm run keep-alive`.
 |---|---|
 | `/admin` | Dashboard — call queue, popularity, best-value badges |
 | `/admin/inventory` | Scooter CRUD + images |
+| `/admin/accessories` | Spare & parts CRUD + images |
+| `/admin/vyapar` | Vyapar online-store sync (on/off, map, rename, photos) |
 | `/admin/leads` | Purchase intent % + follow-up priority |
 | `/admin/offers` | Homepage promotional offers |
 | `/admin/settings` | Phone, address, opening hours |

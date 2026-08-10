@@ -34,6 +34,7 @@ const AdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const Inventory = lazy(() => import('@/pages/admin/Inventory'));
 const AccessoryInventory = lazy(() => import('@/pages/admin/AccessoryInventory'));
+const VyaparSync = lazy(() => import('@/pages/admin/VyaparSync'));
 const Leads = lazy(() => import('@/pages/admin/Leads'));
 const Callbacks = lazy(() => import('@/pages/admin/Callbacks'));
 const TestRides = lazy(() => import('@/pages/admin/TestRides'));
@@ -112,6 +113,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="inventory" element={<Inventory />} />
         <Route path="accessories" element={<AccessoryInventory />} />
+        <Route path="vyapar" element={<VyaparSync />} />
         <Route path="leads" element={<Leads />} />
         <Route path="callbacks" element={<Callbacks />} />
         <Route path="test-rides" element={<TestRides />} />
