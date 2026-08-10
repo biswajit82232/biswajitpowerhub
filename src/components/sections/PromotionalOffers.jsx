@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Section } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
 import Button from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
 import { whatsappUrl } from '@/config/site';
@@ -28,9 +29,9 @@ function OfferStrip({ offer, site }) {
     : `Hi ${site.name}, I'd like to know more about the offer "${offer.title}" — ${offer.discountText}.`;
 
   return (
-    <div className="flex flex-col gap-4 border-y border-line py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-4">
+    <div className="flex flex-col gap-4 border border-line bg-white p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-6">
       <div className="min-w-0">
-        <p className="font-display text-xl font-extrabold text-heading sm:text-2xl">
+        <p className="font-display text-xl font-extrabold text-navy sm:text-2xl">
           {offer.discountText}
           <span className="ml-2 text-base font-semibold text-body sm:text-lg">{offer.title}</span>
         </p>
@@ -63,15 +64,35 @@ function OfferStrip({ offer, site }) {
   );
 }
 
-export function PromotionalOffers() {
+/**
+ * @param {{ compact?: boolean; showEmpty?: boolean }} props
+ * compact — tighter spacing for Home; showEmpty — message when no active offers (/offers page)
+ */
+export function PromotionalOffers({ compact = false, showEmpty = false }) {
   const { site } = useSite();
   const { data: offers, loading } = useAsync(() => getActiveOffers(), []);
 
-  if (loading || !offers?.length) return null;
+  if (loading) return null;
+
+  if (!offers?.length) {
+    if (!showEmpty) return null;
+    return (
+      <Section id="offers" className={compact ? 'py-6 sm:py-8' : undefined}>
+        <EmptyState
+          icon={Tag}
+          title="No active offers right now"
+          description="Call or WhatsApp the showroom — seasonal deals change often at Chunakhali."
+        />
+      </Section>
+    );
+  }
 
   return (
-    <Section id="offers" tight className="py-2 sm:py-3">
-      <div className="space-y-0">
+    <Section id="offers" tight={compact} className={compact ? 'py-6 sm:py-8' : 'py-8 sm:py-10'}>
+      {!compact ? (
+        <h2 className="dealer-section-title mb-6 !text-left sm:mb-8">Active Offers</h2>
+      ) : null}
+      <div className="space-y-4">
         {offers.map((offer, i) => (
           <Reveal key={offer.id} delay={i * 0.04}>
             <OfferStrip offer={offer} site={site} />

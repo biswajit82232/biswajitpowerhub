@@ -27,7 +27,7 @@ const ROUTES = [
   '/finance',
   '/offers',
   '/contact',
-  '/reviews',
+  '/community',
   '/about',
   '/compare',
   '/terms',

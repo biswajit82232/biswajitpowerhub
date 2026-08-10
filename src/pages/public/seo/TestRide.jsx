@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
+import { TestRideForm } from '@/features/leads/TestRideForm';
 import { SITE_FAQS } from '@/data/seoContent';
 import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
 import { SITE_URL } from '@/config/site';
 import { DEFAULT_HOURS_SUMMARY } from '@/features/site/siteHours';
+import { useAsync } from '@/hooks/useAsync';
+import { getScooters } from '@/features/scooters/scooterService';
 
 export default function TestRide() {
   const path = '/test-ride-berhampore';
+  const { data: scooters } = useAsync(() => getScooters(), []);
   const jsonLd = useMemo(
     () => [
       breadcrumbList([
@@ -49,13 +53,28 @@ export default function TestRide() {
       </p>
       <ul>
         <li>Bring your phone number for EMI follow-up if you like the ride</li>
-        <li>A driving licence is <strong>not</strong> required for our low-speed models</li>
+        <li>
+          A driving licence is <strong>not</strong> required for our low-speed models
+        </li>
         <li>Wear closed footwear; rides are short and supervised near the showroom</li>
         <li>
           Ask about <Link to="/accessories">genuine spare parts</Link> and{' '}
           <Link to="/battery-upgrade-berhampore">battery upgrades</Link> after the ride
         </li>
       </ul>
+
+      <div className="my-10 max-w-xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <h2 className="!mt-0 font-display text-lg font-bold uppercase tracking-wide text-navy">
+          Book Online
+        </h2>
+        <p className="mt-1 text-sm text-body">
+          Prefer to schedule ahead? Send a request and we&apos;ll confirm by phone or WhatsApp.
+        </p>
+        <div className="mt-5">
+          <TestRideForm scooters={scooters || []} />
+        </div>
+      </div>
+
       <p>
         Customers across Murshidabad appreciate that we never rush the decision — sit on multiple models,
         ask battery questions, and leave with clear numbers.
@@ -63,11 +82,11 @@ export default function TestRide() {
 
       <h2>What to Expect at Our Showroom</h2>
       <p>
-        What to expect at our showroom: a friendly walkthrough of no-licence rules in West Bengal, side-by-side
-        comparison of Activa, Zoom, Single Light, and Double Light, and a supervised ride on safe nearby
-        roads around Chunakhali when weather and traffic allow. Address: Chunakhali Bus Stand, Nimtala,
-        Berhampore, Murshidabad, West Bengal 742149 — easy landmark for anyone travelling across the
-        district.
+        What to expect at our showroom: a friendly walkthrough of no-licence rules in West Bengal,
+        side-by-side comparison of Activa, Zoom, Single Light, and Double Light, and a supervised ride on
+        safe nearby roads around Chunakhali when weather and traffic allow. Address: Chunakhali Bus Stand,
+        Nimtala, Berhampore, Murshidabad, West Bengal 742149 — easy landmark for anyone travelling across
+        the district.
       </p>
       <p>
         After the ride we can discuss EMI,{' '}

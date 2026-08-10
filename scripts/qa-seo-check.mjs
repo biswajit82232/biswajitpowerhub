@@ -19,8 +19,11 @@ const routes = [
   '/battery-upgrade-berhampore',
   '/test-ride-berhampore',
   '/contact',
-  '/reviews',
+  '/community',
   '/about',
+  '/service',
+  '/finance',
+  '/offers',
   '/compare',
   '/accessories',
   '/terms',
@@ -66,6 +69,11 @@ for (const route of routes) {
   if (route === '/' && !html.includes('24.116865')) issues.push('stale-geo');
   if (route === '/' && !html.includes('LocalBusiness')) issues.push('missing-localbusiness');
   if (route === '/' && !html.includes('hasMap')) issues.push('missing-hasMap');
+  if (route === '/' && !html.includes('openingHoursSpecification') && !html.includes('OpeningHoursSpecification')) {
+    issues.push('missing-hours');
+  }
+  if (route === '/community' && !/Our Community/i.test(html)) issues.push('missing-community-copy');
+  if (route === '/contact' && !html.includes('LocalBusiness')) issues.push('missing-localbusiness');
   if (issues.length) {
     log(`FAIL ${route}: ${issues.join(', ')}`);
     fail += 1;

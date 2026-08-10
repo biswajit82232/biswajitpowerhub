@@ -215,11 +215,11 @@ const ROUTES = [
     schema: 'contact',
   },
   {
-    path: '/reviews',
-    title: 'Customer Reviews — Biswajit Power Hub, Berhampore',
+    path: '/community',
+    title: 'Our Community — Biswajit Power Hub, Berhampore',
     description:
-      'Customer reviews of Biswajit Power Hub electric scooters in Berhampore, Murshidabad. Leave a Google review after your visit.',
-    h1: 'Customer Reviews — Biswajit Power Hub, Berhampore',
+      'Join the Biswajit Power Hub community in Berhampore, Murshidabad. Rider stories, showroom tips, and experiences from Chunakhali customers.',
+    h1: 'Our Community — Biswajit Power Hub, Berhampore',
     schema: 'crumbs',
   },
   {
@@ -731,7 +731,7 @@ function schemasFor(route, enrichment = {}, reviews = []) {
     return [crumbs, itemListSchema(), faqSchema()];
   }
   if (route.schema === 'product') return [crumbs, productSchema(route, enrichment, reviews)];
-  if (route.path === '/reviews') {
+  if (route.path === '/community') {
     const aggregateRating = siteAggregateRatingForBuild(reviews);
     const reviewList = siteReviewsSchemaForBuild(reviews);
     return [
@@ -745,6 +745,9 @@ function schemasFor(route, enrichment = {}, reviews = []) {
         ...(reviewList ? { review: reviewList } : {}),
       },
     ];
+  }
+  if (route.schema === 'contact' || route.path === '/contact' || route.path === '/about') {
+    return [crumbs, localBusinessSchema(reviews)];
   }
   return [crumbs];
 }
@@ -841,14 +844,14 @@ const PAGE_H2S = {
       p: 'Expect a friendly walkthrough of no-licence rules in West Bengal, side-by-side comparison of Activa, Zoom, Single Light, and Double Light, and a supervised ride on safe nearby roads around Chunakhali when weather and traffic allow. Address: Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149. After the ride we can discuss EMI, battery upgrades, and today’s on-road price for riders across Murshidabad.',
     },
   ],
-  '/reviews': [
+  '/community': [
     {
-      h2: 'What Our Customers Say',
-      p: 'Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single Light, or Double Light at our Chunakhali showroom — no licence models, honest pricing, and walk-in support. Customers praise free test rides, clear EMI guidance, battery upgrade options, and the convenience of a showroom right at Chunakhali Bus Stand. Star ratings average 4.8 from local reviews. Visit Open all days 9 AM–8:30 PM or call 096355 05436 to experience the same service that earned these testimonials across Murshidabad.',
+      h2: 'What Our Community Says',
+      p: 'Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single Light, or Double Light at our Chunakhali showroom — no licence models, honest pricing, and walk-in support. Customers praise free test rides, clear EMI guidance, battery upgrade options, and the convenience of a showroom right at Chunakhali Bus Stand. Star ratings average 4.8 from local community stories. Visit Open all days 9 AM–8:30 PM or call 096355 05436 to experience the same service that earned these testimonials across Murshidabad.',
     },
     {
-      h2: 'Leave Us a Review',
-      p: 'Bought from our Chunakhali showroom? Your Google review helps other Berhampore and Murshidabad riders find Biswajit Power Hub. Search Biswajit Power Hub Berhampore on Google and leave a review after your visit, or write a review on our site. We appreciate honest feedback about models, EMI, and after-sales support.',
+      h2: 'Join Our Community',
+      p: 'Bought from our Chunakhali showroom? Your Google review helps other Berhampore and Murshidabad riders find Biswajit Power Hub. Search Biswajit Power Hub Berhampore on Google and leave a review after your visit, or share your story with Our Community on this page. We appreciate honest feedback about models, EMI, and after-sales support.',
     },
   ],
   '/about': [
@@ -974,7 +977,7 @@ function crawlableBody(route) {
     </div>
     <div>
       <p style="font-weight:700;letter-spacing:0.08em;font-size:0.75rem;color:#aaa;text-transform:uppercase;">Quick Links</p>
-      <p style="margin:0.5rem 0;"><a href="${BASE}/" style="color:#ddd;">Home</a> · <a href="${BASE}/scooters" style="color:#ddd;">Scooters</a> · <a href="${BASE}/best-electric-scooters-berhampore" style="color:#ddd;">Best in Berhampore</a> · <a href="${BASE}/low-budget-electric-scooters-berhampore" style="color:#ddd;">Low Budget</a> · <a href="${BASE}/no-licence-electric-scooters-west-bengal" style="color:#ddd;">No Licence</a> · <a href="${BASE}/battery-upgrade-berhampore" style="color:#ddd;">Battery Upgrade</a> · <a href="${BASE}/test-ride-berhampore" style="color:#ddd;">Test Ride</a> · <a href="${BASE}/accessories" style="color:#ddd;">Accessories</a> · <a href="${BASE}/compare" style="color:#ddd;">Compare</a> · <a href="${BASE}/reviews" style="color:#ddd;">Reviews</a> · <a href="${BASE}/about" style="color:#ddd;">About</a> · <a href="${BASE}/contact" style="color:#ddd;">Contact</a></p>
+      <p style="margin:0.5rem 0;"><a href="${BASE}/" style="color:#ddd;">Home</a> · <a href="${BASE}/scooters" style="color:#ddd;">Scooters</a> · <a href="${BASE}/best-electric-scooters-berhampore" style="color:#ddd;">Best in Berhampore</a> · <a href="${BASE}/low-budget-electric-scooters-berhampore" style="color:#ddd;">Low Budget</a> · <a href="${BASE}/no-licence-electric-scooters-west-bengal" style="color:#ddd;">No Licence</a> · <a href="${BASE}/battery-upgrade-berhampore" style="color:#ddd;">Battery Upgrade</a> · <a href="${BASE}/test-ride-berhampore" style="color:#ddd;">Test Ride</a> · <a href="${BASE}/accessories" style="color:#ddd;">Accessories</a> · <a href="${BASE}/compare" style="color:#ddd;">Compare</a> · <a href="${BASE}/community" style="color:#ddd;">Our Community</a> · <a href="${BASE}/offers" style="color:#ddd;">Offers</a> · <a href="${BASE}/finance" style="color:#ddd;">Finance</a> · <a href="${BASE}/service" style="color:#ddd;">Service</a> · <a href="${BASE}/about" style="color:#ddd;">About</a> · <a href="${BASE}/contact" style="color:#ddd;">Contact</a></p>
     </div>
     <div>
       <p style="font-weight:700;letter-spacing:0.08em;font-size:0.75rem;color:#aaa;text-transform:uppercase;">Contact</p>

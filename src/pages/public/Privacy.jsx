@@ -74,7 +74,7 @@ export default function Privacy() {
               <li>Respond to enquiries, callback requests, and test ride bookings</li>
               <li>Process and validate promotional offer claims</li>
               <li>Provide quotes, EMI guidance, warranty support, and after-sales service</li>
-              <li>Moderate and publish customer reviews you submit</li>
+              <li>Moderate and publish community stories you submit</li>
               <li>Follow up on leads and improve customer experience</li>
               <li>Understand website performance and popular products</li>
             </ul>

@@ -11,10 +11,10 @@ const ITEMS = [
   },
   {
     id: 'community',
-    label: 'COMMUNITY',
-    to: '/reviews',
+    label: 'OUR COMMUNITY',
+    to: '/community',
     icon: Users,
-    desc: 'Customer stories',
+    desc: 'Rider stories & tips',
   },
   {
     id: 'service',

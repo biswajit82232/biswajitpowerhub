@@ -85,29 +85,39 @@ async function legacyOffersFromFinance() {
   return [];
 }
 
+function isMissingTable(error) {
+  return (
+    error?.code === '42P01' ||
+    error?.code === 'PGRST205' ||
+    /does not exist|schema cache/i.test(error?.message || '')
+  );
+}
+
 export async function getActiveOffers() {
   return fetchWithCache(`${CACHE_KEY}_active`, async () => {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase
         .from('promotional_offers')
         .select('*')
+        .eq('active', true)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: false });
 
       if (!error) {
-        const mapped = (data || []).map(mapRow);
-        writeLocal(mapped);
-        return mapped
+        return (data || [])
+          .map(mapRow)
           .filter((o) => o.active)
           .sort((a, b) => a.sortOrder - b.sortOrder);
       }
 
-      if (error?.code === '42P01') {
+      if (isMissingTable(error)) {
         return legacyOffersFromFinance();
       }
 
       console.warn('[Offers] Supabase fetch failed:', error.message);
-      return [];
+      const local = readLocal().filter((o) => o.active).sort((a, b) => a.sortOrder - b.sortOrder);
+      if (local.length) return local;
+      return legacyOffersFromFinance();
     }
 
     const local = readLocal();
@@ -132,7 +142,7 @@ export async function getAllOffers() {
       return mapped;
     }
 
-    if (error?.code === '42P01') {
+    if (isMissingTable(error)) {
       return legacyOffersFromFinance();
     }
 

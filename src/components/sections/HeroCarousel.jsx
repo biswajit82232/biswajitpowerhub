@@ -1,15 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Tag } from 'lucide-react';
 import { SiteImage } from '@/components/common/SiteImage';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useAsync } from '@/hooks/useAsync';
+import { getActiveOffers } from '@/features/offers/offerService';
 import { cn } from '@/lib/utils';
 
 /**
- * Full-bleed dealer hero carousel — showroom / campaign slides, dots only.
+ * Full-bleed dealer hero carousel — showroom slides + active offer bar.
  */
 export function HeroCarousel({ heroImageUrl }) {
   const { site } = useSite();
   const { photos } = useSitePhotos();
+  const { data: offers } = useAsync(() => getActiveOffers(), []);
+  const activeOffers = offers?.length ? offers : [];
+
   const slides = [];
 
   if (photos?.hero?.url || heroImageUrl) {
@@ -30,7 +37,9 @@ export function HeroCarousel({ heroImageUrl }) {
   }
 
   const [index, setIndex] = useState(0);
+  const [offerIndex, setOfferIndex] = useState(0);
   const count = slides.length;
+  const offerCount = activeOffers.length;
 
   const next = useCallback(() => {
     setIndex((i) => (i + 1) % count);
@@ -42,7 +51,20 @@ export function HeroCarousel({ heroImageUrl }) {
     return () => clearInterval(id);
   }, [count, next]);
 
+  useEffect(() => {
+    if (offerCount < 2) return undefined;
+    const id = setInterval(() => {
+      setOfferIndex((i) => (i + 1) % offerCount);
+    }, 4500);
+    return () => clearInterval(id);
+  }, [offerCount]);
+
+  useEffect(() => {
+    setOfferIndex(0);
+  }, [offerCount]);
+
   const slide = slides[index];
+  const offer = activeOffers[offerIndex] || activeOffers[0];
 
   return (
     <section className="relative isolate w-full overflow-hidden bg-surface-alt" aria-label="Hero">
@@ -70,7 +92,6 @@ export function HeroCarousel({ heroImageUrl }) {
           </div>
         ))}
 
-        {/* Soft readability gradient — no badges/chips */}
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent"
           aria-hidden
@@ -99,6 +120,39 @@ export function HeroCarousel({ heroImageUrl }) {
           </div>
         )}
       </div>
+
+      {offer ? (
+        <div className="border-t border-brand-600 bg-brand-500 text-white">
+          <div className="container-px flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3.5">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/80">
+                Current offer{offerCount > 1 ? ` · ${offerIndex + 1}/${offerCount}` : ''}
+              </p>
+              <p className="mt-0.5 truncate font-display text-base font-extrabold uppercase tracking-wide sm:text-lg">
+                {offer.discountText}
+                {offer.title ? (
+                  <span className="ml-2 font-semibold normal-case tracking-normal text-white/95">
+                    {offer.title}
+                  </span>
+                ) : null}
+              </p>
+              {offer.promoCode ? (
+                <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-semibold text-white/90">
+                  <Tag className="h-3.5 w-3.5" />
+                  Code {offer.promoCode}
+                </p>
+              ) : null}
+            </div>
+            <Link
+              to="/offers"
+              className="inline-flex h-10 shrink-0 items-center justify-center rounded-dealer border border-white bg-white px-4 text-xs font-bold uppercase tracking-wide text-brand-600 transition hover:bg-brand-50"
+            >
+              View Offers
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
       <span className="sr-only">
         Slide {index + 1} of {count}: {slide.alt}
       </span>

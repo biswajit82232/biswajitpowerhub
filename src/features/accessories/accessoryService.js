@@ -48,13 +48,17 @@ export async function getAccessories() {
         return (data || []).map(fromRow);
       }
 
-      // Table missing — demo seed for pre-migration installs
-      if (error?.code === '42P01') {
+      // Missing table or schema cache miss — keep storefront usable
+      if (
+        error?.code === '42P01' ||
+        error?.code === 'PGRST205' ||
+        /does not exist|schema cache/i.test(error?.message || '')
+      ) {
         return ACCESSORIES;
       }
 
       console.warn('[Accessories] Supabase fetch failed:', error.message);
-      return [];
+      return ACCESSORIES;
     }
 
     return ACCESSORIES;

@@ -312,13 +312,12 @@ export const FOOTER_MODEL_LINKS = [
 export const FOOTER_MORE_LINKS = [
   { label: 'Finance', to: '/finance' },
   { label: 'Service', to: '/service' },
-  { label: 'Reviews', to: '/reviews' },
+  { label: 'Our Community', to: '/community' },
   { label: 'Accessories', to: '/accessories' },
 ];
 
 /** Full footer Quick Links — every remaining indexable page (no exchange/updates) */
 export const FOOTER_QUICK_LINKS = [
-  { label: 'Our Community', to: '/reviews' },
   { label: 'About Us', to: '/about' },
   { label: 'Contact Us', to: '/contact' },
   { label: 'Privacy Policy', to: '/privacy' },

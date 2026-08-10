@@ -75,8 +75,8 @@ export function DealerReviews({ reviews = [], loading = false, avg }) {
         </div>
 
         <div className="mt-8 text-center">
-          <Button to="/reviews" variant="dealerSecondary">
-            Read All Reviews
+          <Button to="/community" variant="dealerSecondary">
+            Our Community
           </Button>
         </div>
       </div>

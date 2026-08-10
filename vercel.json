@@ -22,6 +22,11 @@
       "source": "/exchange-old-scooter-berhampore",
       "destination": "/scooters",
       "permanent": true
+    },
+    {
+      "source": "/reviews",
+      "destination": "/community",
+      "permanent": true
     }
   ],
   "rewrites": [

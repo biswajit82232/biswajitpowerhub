@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { BareAdsLayout } from '@/components/layout/BareAdsLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
@@ -57,7 +57,8 @@ export default function App() {
         <Route path="accessories" element={<Accessories />} />
         <Route path="accessories/:id" element={<AccessoryDetails />} />
         <Route path="compare" element={<Compare />} />
-        <Route path="reviews" element={<Reviews />} />
+        <Route path="community" element={<Reviews />} />
+        <Route path="reviews" element={<Navigate to="/community" replace />} />
         <Route path="about" element={<About />} />
         <Route path="service" element={<Service />} />
         <Route path="finance" element={<FinancePage />} />

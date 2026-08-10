@@ -47,7 +47,7 @@ export default function Offers() {
         </div>
       </section>
 
-      <PromotionalOffers />
+      <PromotionalOffers showEmpty />
       <LocateUs />
     </>
   );

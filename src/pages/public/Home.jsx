@@ -6,7 +6,8 @@ import { MoreFromUs } from '@/components/sections/MoreFromUs';
 import { LocateUs } from '@/components/sections/LocateUs';
 import { SeoAboutBlock } from '@/components/sections/SeoAboutBlock';
 import { DealerFaq } from '@/components/sections/DealerFaq';
-import { DealerReviews } from '@/components/sections/DealerReviews';
+import { GoogleReviewsWidget } from '@/components/sections/GoogleReviewsWidget';
+import { PromotionalOffers } from '@/components/sections/PromotionalOffers';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
@@ -28,14 +29,15 @@ export default function Home() {
   const { site } = useSite();
   const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
   const { settings: financeSettings } = useFinance();
-  const { data: reviews, loading: reviewsLoading } = useAsync(() => getApprovedReviews(), []);
+  // On-site reviews still feed JSON-LD only; the visible Home block is GoogleReviewsWidget.
+  const { data: reviews } = useAsync(() => getApprovedReviews(), []);
   const faqs = useMemo(() => (site.faqs?.length ? site.faqs : []), [site.faqs]);
 
   const homeSchemas = useMemo(() => {
     const catalogScooters = allScooters?.length ? allScooters : SCOOTERS;
-    // Rating must come from real on-site reviews (rendered below in
-    // DealerReviews) — never a hand-typed number. Omit entirely until there
-    // are genuine reviews to back it, per Google's rich-result guidelines.
+    // Rating must come from real on-site reviews — never a hand-typed number.
+    // Omit entirely until there are genuine reviews to back it, per Google's
+    // rich-result guidelines. Visible Google reviews use a separate widget.
     const aggregateRating = siteAggregateRating(reviews);
     const review = siteReviewsSchema(reviews);
     return [
@@ -97,12 +99,6 @@ export default function Home() {
     return list;
   }, [allScooters]);
 
-  // Only show a rating when there are real reviews to back it — while
-  // loading (or with zero reviews) the "4.8 · 0 reviews" combination looks broken.
-  const reviewAvg = reviews?.length
-    ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)
-    : null;
-
   return (
     <>
       <SEO
@@ -114,16 +110,13 @@ export default function Home() {
       />
 
       <HeroCarousel heroImageUrl={financeSettings?.heroImageUrl} />
+      <PromotionalOffers compact />
       <ExploreRange scooters={modelGrid} loading={scootersLoading} />
       <MoreFromUs />
       <LocateUs />
       <SeoAboutBlock />
       <DealerFaq faqs={faqs} />
-      <DealerReviews
-        reviews={reviews || []}
-        loading={reviewsLoading}
-        avg={reviewAvg}
-      />
+      <GoogleReviewsWidget />
     </>
   );
 }

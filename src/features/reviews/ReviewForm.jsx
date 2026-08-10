@@ -42,9 +42,9 @@ export function ReviewForm({ scooters = [] }) {
     try {
       await submitReview({ ...form, photoFile });
       setDone(true);
-      toast('Thank you! Your review is awaiting approval.', 'success');
+      toast('Thank you! Your story is awaiting approval for Our Community.', 'success');
     } catch {
-      toast('Could not submit review. Please try again.', 'error');
+      toast('Could not share right now. Please try again.', 'error');
     } finally {
       setLoading(false);
     }
@@ -58,9 +58,9 @@ export function ReviewForm({ scooters = [] }) {
         className="flex flex-col items-center gap-3 py-8 text-center"
       >
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
-        <h3 className="text-lg font-bold text-heading">Review submitted!</h3>
+        <h3 className="text-lg font-bold text-heading">Thanks for sharing!</h3>
         <p className="max-w-xs text-sm text-body">
-          Thanks for sharing, {form.name}. Your review is <strong className="font-semibold text-heading">pending</strong> and will appear on this page after our team approves it.
+          Thanks, {form.name}. Your story is <strong className="font-semibold text-heading">pending</strong> and will appear in Our Community after our team approves it.
         </p>
       </motion.div>
     );
@@ -99,11 +99,11 @@ export function ReviewForm({ scooters = [] }) {
         </Select>
       </Field>
 
-      <Field label="Your Review" htmlFor="rv-text" required error={errors.review}>
+      <Field label="Your Story" htmlFor="rv-text" required error={errors.review}>
         <Textarea
           id="rv-text"
           rows={4}
-          placeholder="Share your experience…"
+          placeholder="Share your experience with Our Community…"
           value={form.review}
           error={errors.review}
           onChange={(e) => setForm({ ...form, review: e.target.value })}
@@ -122,7 +122,7 @@ export function ReviewForm({ scooters = [] }) {
       </div>
 
       <Button type="submit" variant="primary" fullWidth size="lg" loading={loading} icon={Send}>
-        Submit Review
+        Share with Our Community
       </Button>
     </form>
   );

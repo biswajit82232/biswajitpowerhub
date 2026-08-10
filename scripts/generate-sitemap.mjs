@@ -18,7 +18,7 @@ const STATIC_PAGES = [
   { path: '/battery-upgrade-berhampore', priority: '0.8', changefreq: 'monthly' },
   { path: '/test-ride-berhampore', priority: '0.8', changefreq: 'monthly' },
   { path: '/accessories', priority: '0.6', changefreq: 'weekly' },
-  { path: '/reviews', priority: '0.7', changefreq: 'weekly' },
+  { path: '/community', priority: '0.7', changefreq: 'weekly' },
   { path: '/compare', priority: '0.5', changefreq: 'monthly' },
   { path: '/about', priority: '0.6', changefreq: 'monthly' },
   { path: '/service', priority: '0.7', changefreq: 'monthly' },
