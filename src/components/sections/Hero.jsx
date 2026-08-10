@@ -29,7 +29,7 @@ export function Hero({ heroImageUrl }) {
           fetchPriority="high"
           className="h-full min-h-[min(88vh,820px)] w-full !aspect-auto bg-heading"
           imgClassName="object-cover object-center"
-          placeholderLabel="Upload showroom photo here"
+          placeholderLabel="Showroom photos coming soon — visit us at Chunakhali Bus Stand"
         />
       </div>
 

@@ -65,7 +65,7 @@ export function HeroCarousel({ heroImageUrl }) {
               fetchPriority={i === 0 ? 'high' : undefined}
               className="h-full w-full !aspect-auto bg-surface-alt"
               imgClassName="object-cover object-center"
-              placeholderLabel="Upload showroom / banner photo"
+              placeholderLabel="Showroom photos coming soon — visit us at Chunakhali Bus Stand"
             />
           </div>
         ))}

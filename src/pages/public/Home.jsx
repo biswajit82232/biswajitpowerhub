@@ -30,7 +30,6 @@ export default function Home() {
   const { settings: financeSettings } = useFinance();
   const { data: reviews, loading: reviewsLoading } = useAsync(() => getApprovedReviews(), []);
   const faqs = useMemo(() => (site.faqs?.length ? site.faqs : []), [site.faqs]);
-  const gbp = site.gbp || {};
 
   const homeSchemas = useMemo(() => {
     const catalogScooters = allScooters?.length ? allScooters : SCOOTERS;
@@ -98,9 +97,11 @@ export default function Home() {
     return list;
   }, [allScooters]);
 
+  // Only show a rating when there are real reviews to back it — while
+  // loading (or with zero reviews) the "4.8 · 0 reviews" combination looks broken.
   const reviewAvg = reviews?.length
     ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)
-    : String(gbp.ratingValue ?? 4.8);
+    : null;
 
   return (
     <>

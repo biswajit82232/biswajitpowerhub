@@ -163,7 +163,7 @@ export default function Contact() {
           loading="eager"
           className="absolute inset-0 h-full w-full !aspect-auto bg-heading"
           imgClassName="object-cover object-center"
-          placeholderLabel="Upload showroom entrance photo"
+          placeholderLabel="Find us at Chunakhali Bus Stand, Nimtala"
         />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-heading via-heading/55 to-heading/25"

@@ -72,7 +72,7 @@ export default function About() {
           loading="eager"
           className="absolute inset-0 h-full w-full !aspect-auto bg-heading"
           imgClassName="object-cover object-center"
-          placeholderLabel="Upload team / showroom photo"
+          placeholderLabel="Team photo coming soon — meet us at the showroom"
         />
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-heading via-heading/60 to-heading/30"
