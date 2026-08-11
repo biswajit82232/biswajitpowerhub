@@ -1,25 +1,29 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ScooterImage } from '@/components/common/ScooterImage';
+import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import {
   formatBatteryCapacityRange,
   formatRangeRange,
 } from '@/lib/scooterVariants';
+import { STOCK_LABELS } from '@/data/scooters';
 import { cn } from '@/lib/utils';
 
 /**
- * Dealer-style product card: light bg, uppercase name, 3-spec row, BOOK TEST RIDE + VIEW MORE.
+ * Dealer-style product card with smart discovery badges (trending / value).
  */
-export function DealerProductCard({ scooter, imageOverride, className }) {
+export function DealerProductCard({ scooter, imageOverride, tags = [], className }) {
   if (!scooter) return null;
   const battery = formatBatteryCapacityRange(scooter);
   const range = formatRangeRange(scooter);
   const topSpeed = scooter.topSpeed ?? '—';
   const imgSrc = imageOverride || scooter.images?.[0];
+  const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
 
   return (
     <article className={cn('flex h-full flex-col bg-white text-center', className)}>
-      <Link to={`/scooters/${scooter.id}`} className="block bg-white px-2 pt-2">
+      <Link to={`/scooters/${scooter.id}`} className="relative block bg-white px-2 pt-2">
         <ScooterImage
           src={imgSrc}
           alt={`${scooter.name} electric scooter at Biswajit Power Hub Berhampore`}
@@ -31,6 +35,15 @@ export function DealerProductCard({ scooter, imageOverride, className }) {
           className="mx-auto aspect-[3/2] w-full max-w-full bg-white"
           fit="contain"
         />
+        {(tags.length > 0 || scooter.noLicence || scooter.stock === 'out_of_stock') && (
+          <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-start gap-1.5">
+            {scooter.noLicence && <Badge tone="success">No Licence</Badge>}
+            {scooter.stock === 'out_of_stock' && <Badge tone={stock.tone}>{stock.label}</Badge>}
+            {tags.map((t) => (
+              <Badge key={t.id || t.label} tone={t.tone || 'brand'}>{t.label}</Badge>
+            ))}
+          </div>
+        )}
       </Link>
 
       <div className="flex flex-1 flex-col px-2 pb-5 pt-3">

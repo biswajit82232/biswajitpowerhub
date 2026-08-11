@@ -7,10 +7,10 @@ export function ScooterCardWithInsights({ scooter, index, insights }) {
   const valueBadges = getAllValueBadges(scooter.id, insights?.valueBadges);
   const popularityTags = [];
   if (insights?.popularWeekIds?.has?.(scooter.id)) {
-    popularityTags.push({ label: '🔥 Trending', tone: 'hot' });
+    popularityTags.push({ label: 'Trending', tone: 'hot' });
   }
   if (insights?.topIntentMonthIds?.has?.(scooter.id)) {
-    popularityTags.push({ label: '⭐ Hot pick', tone: 'warm' });
+    popularityTags.push({ label: 'Hot pick', tone: 'warm' });
   }
   const imageOverride = photos?.models?.[scooter.id]?.url || undefined;
 

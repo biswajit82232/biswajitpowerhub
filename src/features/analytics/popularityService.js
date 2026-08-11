@@ -62,54 +62,84 @@ function inWindow(at, ms) {
   return Date.now() - new Date(at).getTime() <= ms;
 }
 
+function bump(map, key, n = 1) {
+  if (!key) return;
+  map[key] = (map[key] || 0) + n;
+}
+
+function toRanked(obj, labelKey) {
+  return Object.entries(obj)
+    .map(([id, value]) => ({ id, label: id, [labelKey]: value, value }))
+    .sort((a, b) => b.value - a.value);
+}
+
+function toCountMap(obj) {
+  return new Map(Object.entries(obj));
+}
+
 /**
- * Popularity engine — real website behaviour.
- * mostViewedWeek: SCOOTER_VIEW in last 7 days
- * topIntentMonth: test rides + EMI + callbacks per scooter in last 30 days (purchase proxy)
+ * Popularity engine — real website behaviour + catalog fame inputs.
  */
 export async function getPopularityEngine() {
   return fetchWithCache('popularity_engine', async () => {
     const events = await fetchRawEvents();
     const viewsWeek = {};
+    const viewsMonth = {};
+    const viewsAllTime = {};
     const intentMonth = {};
 
     for (const e of events) {
       const key = scooterKey(e.meta);
       if (!key) continue;
 
-      if (e.type === EVENT.SCOOTER_VIEW && inWindow(e.at, MS_WEEK)) {
-        viewsWeek[key] = (viewsWeek[key] || 0) + 1;
+      if (e.type === EVENT.SCOOTER_VIEW) {
+        bump(viewsAllTime, key);
+        if (inWindow(e.at, MS_WEEK)) bump(viewsWeek, key);
+        if (inWindow(e.at, MS_MONTH)) bump(viewsMonth, key);
       }
 
       if (inWindow(e.at, MS_MONTH)) {
-        if (e.type === EVENT.TEST_RIDE_BOOKED) {
-          intentMonth[key] = (intentMonth[key] || 0) + 10;
-        } else if (e.type === EVENT.CALLBACK_REQUEST && e.meta?.scooterId) {
-          intentMonth[key] = (intentMonth[key] || 0) + 8;
-        } else if (e.type === EVENT.EMI_USED && e.meta?.scooterId) {
-          intentMonth[key] = (intentMonth[key] || 0) + 5;
-        } else if (e.type === EVENT.SCOOTER_VIEW) {
-          intentMonth[key] = (intentMonth[key] || 0) + 1;
-        }
+        if (e.type === EVENT.TEST_RIDE_BOOKED) bump(intentMonth, key, 10);
+        else if (e.type === EVENT.CALLBACK_REQUEST && (e.meta?.scooterId || e.meta?.interest)) {
+          bump(intentMonth, key, 8);
+        } else if (e.type === EVENT.EMI_USED && e.meta?.scooterId) bump(intentMonth, key, 5);
+        else if (e.type === EVENT.SIMULATOR_USED && e.meta?.scooterId) bump(intentMonth, key, 4);
+        else if (e.type === EVENT.SCOOTER_VIEW) bump(intentMonth, key, 1);
       }
     }
 
-    const toRanked = (obj, labelKey) =>
-      Object.entries(obj)
-        .map(([id, value]) => ({ id, label: id, [labelKey]: value, value }))
-        .sort((a, b) => b.value - a.value);
-
     const mostViewedWeek = toRanked(viewsWeek, 'views').slice(0, 5);
+    const mostViewedMonth = toRanked(viewsMonth, 'views').slice(0, 5);
+    const mostViewedAllTime = toRanked(viewsAllTime, 'views').slice(0, 5);
     const mostIntentMonth = toRanked(intentMonth, 'intentScore').slice(0, 5);
 
     const popularWeekIds = new Set(mostViewedWeek.slice(0, 3).map((x) => x.id));
     const topIntentMonthIds = new Set(mostIntentMonth.slice(0, 3).map((x) => x.id));
+    const famousIds = new Set([
+      ...mostViewedWeek.slice(0, 2).map((x) => x.id),
+      ...mostIntentMonth.slice(0, 2).map((x) => x.id),
+      ...mostViewedMonth.slice(0, 2).map((x) => x.id),
+    ]);
+
+    const totalViewsWeek = Object.values(viewsWeek).reduce((a, b) => a + b, 0);
+    const totalViewsMonth = Object.values(viewsMonth).reduce((a, b) => a + b, 0);
+    const totalViewsAllTime = Object.values(viewsAllTime).reduce((a, b) => a + b, 0);
 
     return {
       mostViewedWeek,
+      mostViewedMonth,
+      mostViewedAllTime,
       mostIntentMonth,
       popularWeekIds,
       topIntentMonthIds,
+      famousIds,
+      viewsWeekMap: toCountMap(viewsWeek),
+      viewsMonthMap: toCountMap(viewsMonth),
+      viewsAllTimeMap: toCountMap(viewsAllTime),
+      intentMonthMap: toCountMap(intentMonth),
+      totalViewsWeek,
+      totalViewsMonth,
+      totalViewsAllTime,
     };
   }, 5 * 60);
 }
@@ -127,11 +157,34 @@ export async function getScooterInsights(scooters = []) {
       return { ...row, label: match?.name || row.id, scooter: match || null };
     });
 
+  // Normalize id sets to include both id and name for matching
+  const expandSet = (set) => {
+    const out = new Set(set);
+    for (const key of set) {
+      const match = scooters.find((s) => s.id === key || s.name === key);
+      if (match) {
+        out.add(match.id);
+        out.add(match.name);
+      }
+    }
+    return out;
+  };
+
   return {
     valueBadges: badgeMap,
     mostViewedWeek: resolveNames(popularity.mostViewedWeek),
+    mostViewedMonth: resolveNames(popularity.mostViewedMonth),
+    mostViewedAllTime: resolveNames(popularity.mostViewedAllTime),
     mostIntentMonth: resolveNames(popularity.mostIntentMonth),
-    popularWeekIds: popularity.popularWeekIds,
-    topIntentMonthIds: popularity.topIntentMonthIds,
+    popularWeekIds: expandSet(popularity.popularWeekIds),
+    topIntentMonthIds: expandSet(popularity.topIntentMonthIds),
+    famousIds: expandSet(popularity.famousIds),
+    viewsWeekMap: popularity.viewsWeekMap,
+    viewsMonthMap: popularity.viewsMonthMap,
+    viewsAllTimeMap: popularity.viewsAllTimeMap,
+    intentMonthMap: popularity.intentMonthMap,
+    totalViewsWeek: popularity.totalViewsWeek,
+    totalViewsMonth: popularity.totalViewsMonth,
+    totalViewsAllTime: popularity.totalViewsAllTime,
   };
 }

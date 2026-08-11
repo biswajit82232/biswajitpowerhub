@@ -47,7 +47,7 @@ async function countUniqueVisitors() {
 }
 
 /**
- * High-level dashboard metrics — open work + unique visits.
+ * High-level dashboard metrics — open work + unique visits + view KPIs.
  */
 export async function getOverview() {
   if (isSupabaseConfigured && supabase) {
@@ -77,6 +77,26 @@ export async function getOverview() {
       countUniqueVisitors(),
     ]);
 
+    // Scooter view windows for smart KPIs
+    const { data: viewRows } = await supabase
+      .from('lead_events')
+      .select('created_at')
+      .eq('event_type', EVENT.SCOOTER_VIEW)
+      .limit(8000);
+
+    const now = Date.now();
+    const monthMs = 30 * 86400000;
+    const weekMs = 7 * 86400000;
+    let viewsWeek = 0;
+    let viewsMonth = 0;
+    const viewsAllTime = (viewRows || []).length;
+    for (const row of viewRows || []) {
+      const t = new Date(row.created_at).getTime();
+      if (Number.isNaN(t)) continue;
+      if (now - t <= weekMs) viewsWeek += 1;
+      if (now - t <= monthMs) viewsMonth += 1;
+    }
+
     return {
       totalLeads,
       hotLeads,
@@ -89,6 +109,9 @@ export async function getOverview() {
       unreadMessages,
       pendingReviews,
       visits,
+      viewsWeek,
+      viewsMonth,
+      viewsAllTime,
       needsAction:
         callbacksOpen + testRidesOpen + serviceOpen + unreadMessages + pendingReviews,
     };
@@ -96,6 +119,10 @@ export async function getOverview() {
 
   const ev = localEvents();
   const by = (t) => ev.filter((e) => e.type === t).length;
+  const now = Date.now();
+  const scooterViews = ev.filter((e) => e.type === EVENT.SCOOTER_VIEW);
+  const viewsWeek = scooterViews.filter((e) => now - new Date(e.at).getTime() <= 7 * 86400000).length;
+  const viewsMonth = scooterViews.filter((e) => now - new Date(e.at).getTime() <= 30 * 86400000).length;
   const calculatorUsage = by(EVENT.EMI_USED) + by(EVENT.SIMULATOR_USED);
   return {
     totalLeads: new Set(ev.map((e) => e.visitorId)).size,
@@ -109,6 +136,9 @@ export async function getOverview() {
     unreadMessages: 0,
     pendingReviews: 0,
     visits: new Set(ev.filter((e) => e.type === EVENT.PAGE_VIEW).map((e) => e.visitorId)).size,
+    viewsWeek,
+    viewsMonth,
+    viewsAllTime: scooterViews.length,
     needsAction: by(EVENT.CALLBACK_REQUEST) + by(EVENT.TEST_RIDE_BOOKED),
     calculatorUsage,
     whatsappClicks: by(EVENT.WHATSAPP_CLICK),

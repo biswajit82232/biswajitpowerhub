@@ -75,6 +75,9 @@ export default function Dashboard() {
           <StatCard icon={Star} label="Pending reviews" value={o.pendingReviews || 0} tone="amber" />
           <StatCard icon={Users} label="Total leads" value={o.totalLeads || 0} tone="slate" />
           <StatCard icon={Eye} label="Unique visitors" value={o.visits || 0} tone="slate" />
+          <StatCard icon={Eye} label="Views this week" value={o.viewsWeek || 0} tone="brand" />
+          <StatCard icon={Eye} label="Views this month" value={o.viewsMonth || 0} tone="accent" />
+          <StatCard icon={Eye} label="Views all time" value={o.viewsAllTime || 0} tone="slate" />
           <StatCard icon={Flame} label="Hot leads" value={o.hotLeads || 0} tone="red" />
           <StatCard icon={Zap} label="High intent (60%+)" value={highIntent} tone="amber" />
           <StatCard icon={Calculator} label="Calculator usage" value={(agg?.emiUsage || 0) + (agg?.simulatorUsage || 0)} tone="brand" />
@@ -200,11 +203,26 @@ export default function Dashboard() {
               )}
             </div>
             <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">Most viewed this month</p>
+              {popularity?.mostViewedMonth?.length ? (
+                <ul className="mt-2 space-y-2">
+                  {popularity.mostViewedMonth.map((row, i) => (
+                    <li key={`m-${row.id}`} className="flex justify-between text-sm">
+                      <span className="font-medium text-heading">{i + 1}. {resolveName(row.id)}</span>
+                      <span className="text-muted">{row.views || row.value} views</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm text-muted">No monthly view data yet.</p>
+              )}
+            </div>
+            <div>
               <p className="text-xs font-bold uppercase tracking-wide text-muted">Top purchase intent this month</p>
               {popularity?.mostIntentMonth?.length ? (
                 <ul className="mt-2 space-y-2">
                   {popularity.mostIntentMonth.map((row, i) => (
-                    <li key={row.id} className="flex justify-between text-sm">
+                    <li key={`i-${row.id}`} className="flex justify-between text-sm">
                       <span className="font-medium text-heading">{i + 1}. {resolveName(row.id)}</span>
                       <span className="text-muted">High interest</span>
                     </li>
@@ -221,7 +239,7 @@ export default function Dashboard() {
           <h2 className="flex items-center gap-2 font-display text-base font-bold text-heading sm:text-lg">
             <Star className="h-5 w-5 text-amber-500" /> Best value badges
           </h2>
-          <p className="mt-1 text-xs text-muted sm:text-sm">Auto-assigned from specs — shown on scooter cards.</p>
+          <p className="mt-1 text-xs text-muted sm:text-sm">Auto-assigned from specs — shown on website model cards.</p>
           <ul className="mt-4 space-y-2 sm:mt-5 sm:space-y-3">
             {Object.values(VALUE_BADGE_DEFS).map((def) => {
               const winnerId = [...badgeMap.entries()].find(([, badges]) =>
@@ -242,10 +260,15 @@ export default function Dashboard() {
 
       <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-2">
         <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
-          <h2 className="font-display text-base font-bold text-heading sm:text-lg">Most viewed scooters</h2>
+          <h2 className="font-display text-base font-bold text-heading sm:text-lg">Most viewed (all time)</h2>
           <div className="mt-4 sm:mt-6">
-            {agg?.mostViewed?.length ? (
-              <BarChart data={agg.mostViewed} />
+            {(popularity?.mostViewedAllTime?.length || agg?.mostViewed?.length) ? (
+              <BarChart
+                data={(popularity?.mostViewedAllTime || agg.mostViewed).map((row) => ({
+                  label: resolveName(row.id || row.label),
+                  value: row.views || row.value,
+                }))}
+              />
             ) : (
               <EmptyState title="No view data yet" description="Scooter views will appear here as visitors browse." className="border-0 bg-transparent py-8" />
             )}
@@ -253,25 +276,44 @@ export default function Dashboard() {
         </div>
 
         <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
-          <h2 className="font-display text-base font-bold text-heading sm:text-lg">Engagement</h2>
-          <div className="mt-4 space-y-2 sm:mt-5 sm:space-y-3">
-            {[
-              { label: 'Unique visitors', value: agg?.uniqueVisitors || o.visits || 0 },
-              { label: 'WhatsApp clicks', value: agg?.whatsappClicks || 0 },
-              { label: 'Call clicks', value: agg?.callClicks || 0 },
-              { label: 'EMI calculator used', value: agg?.emiUsage || 0 },
-              { label: 'EV simulator used', value: agg?.simulatorUsage || 0 },
-            ].map((row) => (
-              <div key={row.label} className="flex items-center justify-between rounded-xl bg-surface-alt px-3 py-2.5 sm:px-4 sm:py-3">
-                <span className="text-xs font-medium text-body sm:text-sm">{row.label}</span>
-                <span className="font-display text-lg font-extrabold text-heading">{row.value}</span>
-              </div>
-            ))}
+          <h2 className="font-display text-base font-bold text-heading sm:text-lg">Most viewed (this month)</h2>
+          <div className="mt-4 sm:mt-6">
+            {popularity?.mostViewedMonth?.length ? (
+              <BarChart
+                data={popularity.mostViewedMonth.map((row) => ({
+                  label: resolveName(row.id),
+                  value: row.views || row.value,
+                }))}
+              />
+            ) : (
+              <EmptyState title="No monthly views yet" description="Views from the last 30 days show here." className="border-0 bg-transparent py-8" />
+            )}
           </div>
-          <Button to="/admin/analytics" variant="ghost" className="mt-4 w-full">
-            View full analytics
-          </Button>
         </div>
+      </div>
+
+      <div className="mt-6 rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:mt-8 sm:rounded-2xl sm:p-6">
+        <h2 className="font-display text-base font-bold text-heading sm:text-lg">Engagement</h2>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 sm:gap-3">
+          {[
+            { label: 'Unique visitors', value: agg?.uniqueVisitors || o.visits || 0 },
+            { label: 'Scooter views (week)', value: o.viewsWeek || popularity?.totalViewsWeek || 0 },
+            { label: 'Scooter views (month)', value: o.viewsMonth || popularity?.totalViewsMonth || 0 },
+            { label: 'Scooter views (all time)', value: o.viewsAllTime || popularity?.totalViewsAllTime || 0 },
+            { label: 'WhatsApp clicks', value: agg?.whatsappClicks || 0 },
+            { label: 'Call clicks', value: agg?.callClicks || 0 },
+            { label: 'EMI calculator used', value: agg?.emiUsage || 0 },
+            { label: 'EV simulator used', value: agg?.simulatorUsage || 0 },
+          ].map((row) => (
+            <div key={row.label} className="flex items-center justify-between rounded-xl bg-surface-alt px-3 py-2.5 sm:px-4 sm:py-3">
+              <span className="text-xs font-medium text-body sm:text-sm">{row.label}</span>
+              <span className="font-display text-lg font-extrabold text-heading">{row.value}</span>
+            </div>
+          ))}
+        </div>
+        <Button to="/admin/analytics" variant="ghost" className="mt-4 w-full">
+          View full analytics
+        </Button>
       </div>
 
       <div className="mt-8 flex justify-center border-t border-line pt-6 sm:mt-10">

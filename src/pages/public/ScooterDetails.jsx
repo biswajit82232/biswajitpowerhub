@@ -136,8 +136,8 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
   const valueBadges = getAllValueBadges(scooter.id, insights?.valueBadges);
   const popularityTags = [];
-  if (insights?.popularWeekIds?.has?.(scooter.id)) popularityTags.push({ label: '🔥 Trending this week', tone: 'hot' });
-  if (insights?.topIntentMonthIds?.has?.(scooter.id)) popularityTags.push({ label: '⭐ Top pick this month', tone: 'warm' });
+  if (insights?.popularWeekIds?.has?.(scooter.id)) popularityTags.push({ label: 'Trending this week', tone: 'hot' });
+  if (insights?.topIntentMonthIds?.has?.(scooter.id)) popularityTags.push({ label: 'Top pick this month', tone: 'warm' });
   const waMessage = display.selectedVariant
     ? `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} — ${display.selectedVariant.name} (${formatINR(display.price)}). Please share more details.`
     : `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${formatINR(display.price)}). Please share more details.`;

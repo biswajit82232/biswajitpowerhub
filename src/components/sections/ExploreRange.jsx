@@ -3,6 +3,9 @@ import { DealerProductCard } from '@/features/scooters/DealerProductCard';
 import { ScooterCardSkeleton } from '@/components/ui/Skeleton';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useAsync } from '@/hooks/useAsync';
+import { getScooterInsights } from '@/features/analytics/popularityService';
+import { getScooterDiscoveryTags, sortScootersByFame } from '@/lib/catalogRank';
 import { DEFAULT_RANGE_TABS } from '@/config/site';
 import { cn } from '@/lib/utils';
 
@@ -15,8 +18,7 @@ function matchesTab(scooter, tabId) {
 }
 
 /**
- * Explore Our Range — dealer tabs + product grid on white background.
- * Tabs/labels come from admin Settings; membership from scooter tags.
+ * Explore Our Range — smart-sorted famous models first, with discovery badges.
  */
 export function ExploreRange({ scooters = [], loading = false, title = 'Explore Our Range' }) {
   const { site } = useSite();
@@ -29,12 +31,23 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
 
   const [tab, setTab] = useState('all');
   const { photos } = useSitePhotos();
+  const scooterKey = (scooters || []).map((s) => s.id).join('|');
+  const { data: insights } = useAsync(
+    () => getScooterInsights(scooters || []),
+    [scooterKey],
+  );
 
   const activeTab = tabs.some((t) => t.id === tab) ? tab : (tabs[0]?.id || 'all');
 
+  const ranked = useMemo(() => {
+    const list = scooters || [];
+    if (!insights) return list;
+    return sortScootersByFame(list, insights);
+  }, [scooters, insights]);
+
   const filtered = useMemo(
-    () => (scooters || []).filter((s) => matchesTab(s, activeTab)),
-    [scooters, activeTab],
+    () => ranked.filter((s) => matchesTab(s, activeTab)),
+    [ranked, activeTab],
   );
 
   return (
@@ -43,6 +56,9 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
         <h2 id="explore-heading" className="dealer-section-title text-center">
           {title}
         </h2>
+        <p className="mx-auto mt-2 max-w-lg text-center text-xs text-muted sm:text-sm">
+          Popular and best-value models shown first — based on real visitor interest.
+        </p>
 
         {tabs.length > 0 && (
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:mt-8 sm:gap-3">
@@ -74,6 +90,7 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
                   key={s.id}
                   scooter={s}
                   imageOverride={photos?.models?.[s.id]?.url}
+                  tags={getScooterDiscoveryTags(s, insights)}
                 />
               ))}
         </div>
