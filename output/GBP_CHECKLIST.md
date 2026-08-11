@@ -66,10 +66,12 @@ For each, add photo + price range + description:
 - [ ] Send them this link: [Get from GBP Dashboard → Home → Get more reviews]
 - [ ] Respond to ALL reviews within 24 hours
 
-## Step 12: Note Baseline
-Write down current numbers from GBP Insights:
-- Searches: ___
-- Views: ___
-- Calls: ___
-- Direction requests: ___
-- Website clicks: ___
+## Step 13: Service areas (website synergy)
+After deploy, ensure GBP categories/services mention Murshidabad coverage. Website location pages live at:
+- /electric-scooters-kandi
+- /electric-scooters-jiaganj
+- /electric-scooters-beldanga
+- /electric-scooters-lalbagh
+- /electric-scooters-domkal
+
+Link 1–2 of these from a GBP post when relevant (e.g. “Serving Kandi riders — free test ride in Berhampore”).

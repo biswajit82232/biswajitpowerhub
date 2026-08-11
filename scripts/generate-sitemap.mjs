@@ -1,10 +1,13 @@
 /**
  * Build-time sitemap + robots.txt generator.
- * Only SEO-ready scooter product URLs are included (see src/data/seoReady.js).
- * Accessory detail pages and extra catalog scooters stay out of the sitemap.
+ * Includes static pages, SEO landings, location pages, guides, and SEO-ready scooters.
+ * Accessory detail URLs with substantive seed copy are included; thin stubs stay out.
  */
 import { writeFileSync } from 'fs';
 import { SEO_READY_SCOOTER_IDS } from '../src/data/seoReady.js';
+import { SERVICE_LOCATIONS } from '../src/data/locations.js';
+import { BLOG_POSTS } from '../src/data/blogPosts.js';
+import { ACCESSORIES } from '../src/data/accessories.js';
 
 const BASE = (process.env.VITE_SITE_URL || 'https://biswajitpowerhub.in').replace(/\/$/, '');
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -17,7 +20,10 @@ const STATIC_PAGES = [
   { path: '/no-licence-electric-scooters-west-bengal', priority: '0.85', changefreq: 'weekly' },
   { path: '/battery-upgrade-berhampore', priority: '0.8', changefreq: 'monthly' },
   { path: '/test-ride-berhampore', priority: '0.8', changefreq: 'monthly' },
-  { path: '/accessories', priority: '0.6', changefreq: 'weekly' },
+  ...SERVICE_LOCATIONS.map((l) => ({ path: l.path, priority: '0.85', changefreq: 'weekly' })),
+  { path: '/guides', priority: '0.8', changefreq: 'weekly' },
+  ...BLOG_POSTS.map((p) => ({ path: p.path, priority: '0.75', changefreq: 'monthly' })),
+  { path: '/accessories', priority: '0.65', changefreq: 'weekly' },
   { path: '/community', priority: '0.7', changefreq: 'weekly' },
   { path: '/compare', priority: '0.5', changefreq: 'monthly' },
   { path: '/about', priority: '0.6', changefreq: 'monthly' },
@@ -39,10 +45,14 @@ function urlEntry(loc, priority, changefreq) {
 }
 
 const scooterIds = [...SEO_READY_SCOOTER_IDS];
+const indexableAccessories = ACCESSORIES.filter(
+  (a) => a?.id && String(a.description || '').trim().length >= 40,
+);
 
 const urls = [
   ...STATIC_PAGES.map((p) => urlEntry(`${BASE}${p.path === '/' ? '/' : p.path}`, p.priority, p.changefreq)),
   ...scooterIds.map((id) => urlEntry(`${BASE}/scooters/${id}`, '0.85', 'weekly')),
+  ...indexableAccessories.map((a) => urlEntry(`${BASE}/accessories/${a.id}`, '0.5', 'monthly')),
 ];
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -64,5 +74,5 @@ Sitemap: ${BASE}/sitemap.xml
 writeFileSync('public/sitemap.xml', sitemap);
 writeFileSync('public/robots.txt', robots);
 console.log(
-  `[sitemap] Generated ${urls.length} URLs for ${BASE} (${scooterIds.length} SEO-ready scooters, SEO landings included)`,
+  `[sitemap] Generated ${urls.length} URLs for ${BASE} (${scooterIds.length} scooters, ${SERVICE_LOCATIONS.length} locations, ${BLOG_POSTS.length} guides, ${indexableAccessories.length} accessories)`,
 );

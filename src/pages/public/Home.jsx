@@ -63,7 +63,16 @@ export default function Home() {
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
         sameAs: [site.social?.instagram, site.social?.facebook].filter(Boolean),
         slogan: site.tagline,
-        areaServed: ['Berhampore', 'Murshidabad', 'West Bengal'],
+        areaServed: [
+          'Berhampore',
+          'Murshidabad',
+          'Kandi',
+          'Jiaganj',
+          'Beldanga',
+          'Lalbagh',
+          'Domkal',
+          'West Bengal',
+        ],
         ...(aggregateRating ? { aggregateRating } : {}),
         ...(review ? { review } : {}),
         ...(catalogScooters.length

@@ -313,6 +313,7 @@ export const FOOTER_MORE_LINKS = [
   { label: 'Finance', to: '/finance' },
   { label: 'Service', to: '/service' },
   { label: 'Our Community', to: '/community' },
+  { label: 'Guides', to: '/guides' },
   { label: 'Accessories', to: '/accessories' },
 ];
 
@@ -325,6 +326,9 @@ export const FOOTER_QUICK_LINKS = [
   { label: 'Test Ride', to: '/test-ride-berhampore' },
   { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
   { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
+  { label: 'Kandi', to: '/electric-scooters-kandi' },
+  { label: 'Jiaganj', to: '/electric-scooters-jiaganj' },
+  { label: 'Beldanga', to: '/electric-scooters-beldanga' },
 ];
 
 /** @deprecated use FOOTER_QUICK_LINKS */

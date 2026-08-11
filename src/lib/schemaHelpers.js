@@ -27,12 +27,13 @@ export function openingHoursSchema(hoursPerDay) {
   }).filter(Boolean);
 }
 
-/** PostalAddress from site settings */
+/** PostalAddress from site settings — includes district in street when present */
 export function postalAddressSchema(address) {
   const a = address || SITE.address;
+  const street = [a.line, a.district].filter(Boolean).join(', ');
   return {
     '@type': 'PostalAddress',
-    streetAddress: a.line,
+    streetAddress: street || a.line,
     addressLocality: a.city,
     addressRegion: a.state,
     postalCode: a.pincode,

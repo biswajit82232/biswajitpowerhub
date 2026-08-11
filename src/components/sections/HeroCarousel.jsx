@@ -100,6 +100,9 @@ export function HeroCarousel({ heroImageUrl }) {
           <p className="font-display text-lg font-extrabold uppercase tracking-wide text-white drop-shadow sm:text-2xl lg:text-3xl">
             {site.name}
           </p>
+          <h1 className="mt-1 font-display text-base font-bold uppercase leading-snug tracking-wide text-white drop-shadow sm:text-xl lg:text-2xl">
+            Best Electric Scooter Dealer in Berhampore, Murshidabad
+          </h1>
           <p className="mt-1 text-sm font-medium text-white/90 sm:text-base">{site.tagline}</p>
         </div>
 

@@ -1,5 +1,9 @@
 # Production deployment — Biswajit Power Hub
 
+## Soft 404s
+
+Unknown public URLs must return **HTTP 404** via `dist/404.html`. Do **not** re-add a catch-all rewrite to `/index.html` for all paths — that creates soft 404s. Only `/admin` (and `/admin/*`) rewrite to the SPA shell.
+
 ## Why live still shows old SEO
 
 Production was verified serving the **old SPA shell** on `www.biswajitpowerhub.in` with:

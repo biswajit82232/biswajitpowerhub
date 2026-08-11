@@ -30,7 +30,7 @@ export default function Offers() {
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Offers' }]} />
           <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">Offers</p>
           <h1 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
-            Current Offers
+            Offers &amp; Promotions
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-body sm:text-base">
             Seasonal deals and showroom promotions. Call to confirm what&apos;s available today.

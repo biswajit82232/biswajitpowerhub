@@ -18,6 +18,17 @@ const routes = [
   '/no-licence-electric-scooters-west-bengal',
   '/battery-upgrade-berhampore',
   '/test-ride-berhampore',
+  '/electric-scooters-kandi',
+  '/electric-scooters-jiaganj',
+  '/electric-scooters-beldanga',
+  '/electric-scooters-lalbagh',
+  '/electric-scooters-domkal',
+  '/guides',
+  '/guides/no-licence-electric-scooter-rules-west-bengal',
+  '/guides/electric-vs-petrol-cost-berhampore',
+  '/guides/battery-upgrade-guide-berhampore',
+  '/guides/first-time-buyer-guide-murshidabad',
+  '/guides/emi-finance-tips-electric-scooter',
   '/contact',
   '/community',
   '/about',
@@ -85,9 +96,25 @@ for (const route of routes) {
 const sm = readFileSync('public/sitemap.xml', 'utf8');
 const locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 log(`sitemap urls: ${locs.length}`);
-if (locs.length < 18) {
+if (locs.length < 30) {
   log('FAIL sitemap too small');
   fail += 1;
+}
+if (!locs.some((u) => u.includes('/guides'))) {
+  log('FAIL sitemap missing guides');
+  fail += 1;
+}
+if (!locs.some((u) => u.includes('electric-scooters-kandi'))) {
+  log('FAIL sitemap missing location pages');
+  fail += 1;
+}
+
+const notFound = join(DIST, '404.html');
+if (!existsSync(notFound) || !/noindex/i.test(readFileSync(notFound, 'utf8'))) {
+  log('FAIL missing 404.html with noindex');
+  fail += 1;
+} else {
+  log('OK 404.html');
 }
 
 const robots = readFileSync('public/robots.txt', 'utf8');

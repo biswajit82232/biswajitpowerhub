@@ -64,7 +64,7 @@ export function ScooterGallery({ scooter }) {
             >
               <ScooterImage
                 src={img}
-                alt=""
+                alt={`${scooter.name} photo ${i + 1}`}
                 hue={scooter.hue}
                 className="h-16 w-20 sm:h-20 sm:w-24"
               />

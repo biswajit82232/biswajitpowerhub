@@ -12,6 +12,9 @@ import { fileURLToPath } from 'url';
 import { SEO_READY_SCOOTER_IDS } from '../src/data/seoReady.js';
 import { SCOOTERS } from '../src/data/scooters.js';
 import { REVIEWS } from '../src/data/reviews.js';
+import { SERVICE_LOCATIONS } from '../src/data/locations.js';
+import { BLOG_POSTS } from '../src/data/blogPosts.js';
+import { ACCESSORIES } from '../src/data/accessories.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -243,7 +246,7 @@ const ROUTES = [
     title: 'Service & Battery Upgrades | Biswajit Power Hub Berhampore',
     description:
       '3 free servicing, warranty support, and custom battery upgrades at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore.',
-    h1: 'Care, Servicing & Upgrades',
+    h1: 'Service & Battery Upgrades',
     schema: 'crumbs',
   },
   {
@@ -251,7 +254,7 @@ const ROUTES = [
     title: 'Finance & EMI | Biswajit Power Hub Berhampore',
     description:
       'Easy EMI and finance options for electric scooters at Biswajit Power Hub, Berhampore. Calculate savings vs petrol.',
-    h1: 'Easy EMI Options',
+    h1: 'Finance & EMI Options',
     schema: 'crumbs',
   },
   {
@@ -259,7 +262,7 @@ const ROUTES = [
     title: 'Offers & Promotions | Biswajit Power Hub Berhampore',
     description:
       'Current offers and deals on electric scooters at Biswajit Power Hub, Chunakhali, Berhampore.',
-    h1: 'Current Offers',
+    h1: 'Offers & Promotions',
     schema: 'crumbs',
   },
   {
@@ -284,6 +287,32 @@ const ROUTES = [
     h1: 'Privacy Policy',
     schema: 'crumbs',
   },
+  ...SERVICE_LOCATIONS.map((loc) => ({
+    path: loc.path,
+    title: loc.title,
+    description: loc.description,
+    h1: loc.h1,
+    schema: 'crumbs',
+    crawlText: `${loc.intro} ${loc.highlights.join(' ')} Showroom: Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad. Call 096355 05436.`,
+  })),
+  {
+    path: '/guides',
+    title: 'Electric Scooter Guides — Berhampore & Murshidabad | Biswajit Power Hub',
+    description:
+      'Guides for Murshidabad EV buyers: no-licence rules, electric vs petrol cost, battery upgrades, EMI tips, and first-time buyer checklist.',
+    h1: 'Electric Scooter Guides — Berhampore & Murshidabad',
+    schema: 'crumbs',
+    crawlText:
+      'Practical electric scooter guides for Berhampore and Murshidabad riders from Biswajit Power Hub — no-licence rules, running cost, battery upgrades, EMI, and first-time buyer tips.',
+  },
+  ...BLOG_POSTS.map((post) => ({
+    path: post.path,
+    title: `${post.title} | Biswajit Power Hub`,
+    description: post.description,
+    h1: post.h1,
+    schema: 'crumbs',
+    crawlText: `${post.intro} ${post.sections.map((s) => `${s.h2}. ${s.p}`).join(' ')}`,
+  })),
   {
     path: '/ad-landing',
     title: 'No Licence Electric Scooters in Berhampore — Test Ride Today',
@@ -382,6 +411,9 @@ async function buildNoindexCatalogRoutes() {
   const scooters = await fetchCatalogRows('scooters');
   const accessories = await fetchCatalogRows('accessories');
   const routes = [];
+  const seedAccessoryIds = new Set(
+    ACCESSORIES.filter((a) => String(a.description || '').trim().length >= 40).map((a) => a.id),
+  );
 
   for (const row of scooters) {
     if (!row?.id || SEO_READY.has(row.id)) continue;
@@ -396,16 +428,27 @@ async function buildNoindexCatalogRoutes() {
     });
   }
 
-  for (const row of accessories) {
+  const accessoryRows = accessories.length
+    ? accessories
+    : ACCESSORIES.map((a) => ({ id: a.id, name: a.name, description: a.description }));
+
+  for (const row of accessoryRows) {
     if (!row?.id) continue;
     const name = row.name || humanizeId(row.id);
+    const desc = String(row.description || '').trim();
+    const indexable = desc.length >= 40 || seedAccessoryIds.has(row.id);
     routes.push({
       path: `/accessories/${row.id}`,
-      title: `${name} | Biswajit Power Hub`,
-      description: `${name} spare parts and accessories at Biswajit Power Hub, Berhampore.`,
+      title: `${name} | Biswajit Power Hub, Berhampore`,
+      description:
+        desc ||
+        `${name} spare parts and accessories at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.`,
       h1: name,
-      schema: 'none',
-      noindex: true,
+      schema: indexable ? 'crumbs' : 'none',
+      noindex: !indexable,
+      crawlText: indexable
+        ? `${name}. ${desc} Genuine EV spare parts at Biswajit Power Hub, Berhampore, Murshidabad.`
+        : undefined,
     });
   }
 
@@ -449,7 +492,7 @@ function sellerRef() {
     logo: `${BASE}/logo-512.png`,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Chunakhali Bus Stand, Nimtala',
+      streetAddress: 'Chunakhali Bus Stand, Nimtala, Murshidabad',
       addressLocality: 'Berhampore',
       addressRegion: 'West Bengal',
       postalCode: '742149',
@@ -521,7 +564,7 @@ function localBusinessSchema(reviews) {
     priceRange: '₹₹',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Chunakhali Bus Stand, Nimtala',
+      streetAddress: 'Chunakhali Bus Stand, Nimtala, Murshidabad',
       addressLocality: 'Berhampore',
       addressRegion: 'West Bengal',
       postalCode: '742149',
@@ -548,6 +591,16 @@ function localBusinessSchema(reviews) {
     sameAs: [
       'https://www.instagram.com/biswajitpowerhub',
       'https://www.facebook.com/BiswajitPowerHub',
+    ],
+    areaServed: [
+      'Berhampore',
+      'Murshidabad',
+      'Kandi',
+      'Jiaganj',
+      'Beldanga',
+      'Lalbagh',
+      'Domkal',
+      'West Bengal',
     ],
     ...(aggregateRating ? { aggregateRating } : {}),
     ...(review ? { review } : {}),
@@ -1028,6 +1081,18 @@ function injectMeta(html, route) {
   out = out.replace(/name="twitter:description"\s+content="[^"]*"/i, `name="twitter:description" content="${desc}"`);
   out = out.replace(/name="twitter:image"\s+content="[^"]*"/i, `name="twitter:image" content="${og}"`);
 
+  // Local geo meta (reinforces Murshidabad targeting for crawlers reading static HTML)
+  out = out.replace(/<meta\s+name="geo\.(region|placename|position)"\s+content="[^"]*"\s*\/?>\s*/gi, '');
+  out = out.replace(/<meta\s+name="ICBM"\s+content="[^"]*"\s*\/?>\s*/gi, '');
+  out = out.replace(
+    '</head>',
+    `    <meta name="geo.region" content="IN-WB" />
+    <meta name="geo.placename" content="Berhampore, Murshidabad" />
+    <meta name="geo.position" content="24.116865;88.2914134" />
+    <meta name="ICBM" content="24.116865, 88.2914134" />
+  </head>`,
+  );
+
   // Robots: replace existing or inject
   out = out.replace(/<meta\s+name="robots"\s+content="[^"]*"\s*\/?>\s*/gi, '');
   const robots = route.noindex
@@ -1105,6 +1170,20 @@ for (const route of allRoutes) {
   if (route.noindex) noindexCount += 1;
   console.log(`[fallback-prerender] ${route.path}${route.noindex ? ' (noindex)' : ''}`);
 }
+
+/** True HTTP 404 document for unknown URLs (Vercel serves with 404 when no SPA catch-all). */
+const notFoundRoute = {
+  path: '/404',
+  title: 'Page Not Found | Biswajit Power Hub',
+  description: 'This page does not exist. Browse electric scooters or visit our Berhampore showroom.',
+  h1: 'Page Not Found',
+  schema: 'none',
+  noindex: true,
+  crawlText:
+    'Page not found. Browse electric scooters at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore, or contact the showroom on 096355 05436.',
+};
+writeFileSync(join(DIST, '404.html'), injectMeta(shell, notFoundRoute), 'utf8');
+console.log('[fallback-prerender] wrote /404.html');
 
 console.log(
   `[fallback-prerender] wrote ${count} routes for ${BASE} (${noindexCount} noindex stubs)`,

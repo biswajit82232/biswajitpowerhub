@@ -88,18 +88,22 @@ export default function AccessoryDetails() {
 
   const stock = STOCK_LABELS[accessory.stock] || STOCK_LABELS.in_stock;
   const waMessage = `Hi BISWAJIT POWER HUB, I'm interested in ${accessory.name} (${formatINR(accessory.price)}). Is it available?`;
+  const indexable = String(accessory.description || '').trim().length >= 40;
 
   const productSchema = buildAccessoryProductSchema(accessory, { site });
 
   return (
     <>
       <SEO
-        title={`${accessory.name} | Biswajit Power Hub`}
-        description={accessory.description || `${accessory.name} — ${accessory.category} for electric scooters.`}
+        title={`${accessory.name} | Biswajit Power Hub, Berhampore`}
+        description={
+          accessory.description ||
+          `${accessory.name} — ${accessory.category} for electric scooters at Biswajit Power Hub, Berhampore.`
+        }
         path={`/accessories/${accessory.id}`}
         jsonLd={productSchema}
         titleTemplate={false}
-        noindex
+        noindex={!indexable}
       />
 
       <div className="container-px py-6 sm:py-10">

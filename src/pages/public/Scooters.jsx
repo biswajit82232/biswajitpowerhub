@@ -54,11 +54,11 @@ export default function Scooters() {
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Scooters' }]} />
           <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">Product</p>
           <h1 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
-            Explore Our Range
+            Electric Scooters in Berhampore
           </h1>
           <p className="mt-2 max-w-xl text-sm text-body sm:text-base">
-            Premium electric scooters for every budget. Compare specs and book a free test ride at
-            Chunakhali, Berhampore.
+            Explore our full range — Activa, Zoom, Single Light &amp; Double Light. Compare specs and book a
+            free test ride at Chunakhali, Berhampore.
           </p>
         </div>
       </section>

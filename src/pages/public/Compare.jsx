@@ -57,7 +57,7 @@ function CompactSlot({ scooter, options, onChange, onRemove, canRemove }) {
         src={scooter.images?.[0]}
         hue={scooter.hue}
         name={scooter.name}
-        alt=""
+        alt={`${scooter.name} electric scooter`}
         className="h-11 w-14 shrink-0 rounded-lg sm:h-12 sm:w-[3.25rem]"
       />
       <div className="min-w-0 flex-1">

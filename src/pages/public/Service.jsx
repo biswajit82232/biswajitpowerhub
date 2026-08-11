@@ -38,7 +38,7 @@ export default function Service() {
           <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Service' }]} />
           <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">Service</p>
           <h1 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
-            Care, Servicing & Upgrades
+            Service &amp; Battery Upgrades
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-body sm:text-base">
             Authorised showroom support for your electric scooter — free servicing visits, genuine

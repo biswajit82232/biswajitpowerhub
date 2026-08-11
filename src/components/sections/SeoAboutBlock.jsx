@@ -7,12 +7,12 @@ export function SeoAboutBlock() {
   return (
     <section className="bg-white py-10 sm:py-14" aria-labelledby="seo-about-heading">
       <div className="container-px max-w-4xl">
-        <h1
+        <h2
           id="seo-about-heading"
           className="font-display text-xl font-bold uppercase leading-snug tracking-wide text-navy sm:text-2xl md:text-[28px]"
         >
           Electric Scooters — {SITE.name}, Chunakhali Bus Stand, Berhampore
-        </h1>
+        </h2>
         <div className="mt-5 space-y-4 text-sm leading-relaxed text-body sm:text-base">
           <p>
             At {SITE.name}, Chunakhali Bus Stand, Nimtala, Berhampore, you can get a quote for the

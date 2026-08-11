@@ -176,7 +176,7 @@ export default function Contact() {
           />
           <Reveal>
             <h1 className="mt-4 font-display text-display-lg font-extrabold uppercase tracking-wide text-white">
-              Visit Our Showroom
+              Visit Our Showroom — Chunakhali, Berhampore
             </h1>
             <p className="mt-3 max-w-xl text-base text-white/80 sm:text-lg">
               Near Chunakhali Bus Stand, Nimtala — walk in for a free test ride. We don&apos;t sell online.

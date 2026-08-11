@@ -8,6 +8,7 @@
     "dev": "vite",
     "dev:http": "vite --mode http",
     "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/fallback-prerender.mjs",
+    "qa:seo": "node scripts/qa-seo-check.mjs",
     "prerender": "node scripts/prerender.mjs",
     "prerender:browser": "node scripts/prerender.mjs && node scripts/fallback-prerender.mjs",
     "prerender:fallback": "node scripts/fallback-prerender.mjs",

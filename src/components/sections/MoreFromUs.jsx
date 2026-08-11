@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Percent, Users, Wrench, Package } from 'lucide-react';
+import { Percent, BookOpen, Wrench, Package } from 'lucide-react';
 
 const ITEMS = [
   {
@@ -10,11 +10,11 @@ const ITEMS = [
     desc: 'Easy EMI options',
   },
   {
-    id: 'community',
-    label: 'OUR COMMUNITY',
-    to: '/community',
-    icon: Users,
-    desc: 'Rider stories & tips',
+    id: 'guides',
+    label: 'GUIDES',
+    to: '/guides',
+    icon: BookOpen,
+    desc: 'Local EV buying tips',
   },
   {
     id: 'service',

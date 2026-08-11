@@ -60,6 +60,11 @@ export function SEO({
       <meta name="twitter:description" content={desc} />
       <meta name="twitter:image" content={ogImage} />
 
+      <meta name="geo.region" content="IN-WB" />
+      <meta name="geo.placename" content="Berhampore, Murshidabad" />
+      <meta name="geo.position" content={`${SITE.geo.latitude};${SITE.geo.longitude}`} />
+      <meta name="ICBM" content={`${SITE.geo.latitude}, ${SITE.geo.longitude}`} />
+
       {schemas.map((schema, i) => (
         <script key={i} type="application/ld+json">
           {JSON.stringify(schema)}
