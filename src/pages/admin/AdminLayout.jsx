@@ -10,10 +10,22 @@ import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
-import { AdminPushBanner } from '@/components/admin/AdminPushBanner';
 import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+
+function AdminMark({ onNavigate }) {
+  return (
+    <NavLink
+      to="/admin"
+      end
+      onClick={onNavigate}
+      className="font-display text-base font-extrabold tracking-tight text-heading"
+    >
+      Admin
+    </NavLink>
+  );
+}
 
 const NAV_GROUPS = [
   {
@@ -118,7 +130,7 @@ function SidebarFooter({ onSignOut }) {
 }
 
 export default function AdminLayout() {
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -131,7 +143,7 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-bg pt-[env(safe-area-inset-top)]">
       <AdminPwaSetup />
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-surface p-5 lg:flex">
-        <Logo compact />
+        <AdminMark />
         <div className="mt-8 flex-1 overflow-y-auto">
           <NavItems />
         </div>
@@ -139,7 +151,7 @@ export default function AdminLayout() {
       </aside>
 
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface px-3 py-2.5 lg:hidden">
-        <Logo compact />
+        <AdminMark />
         <button onClick={() => setOpen(true)} className="tap-target rounded-xl p-2 text-heading" aria-label="Open menu">
           <Menu className="h-5 w-5" />
         </button>
@@ -157,7 +169,7 @@ export default function AdminLayout() {
               className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
             >
               <div className="flex shrink-0 items-center justify-between">
-                <Logo compact />
+                <AdminMark onNavigate={() => setOpen(false)} />
                 <button onClick={() => setOpen(false)} className="tap-target rounded-xl p-2 text-muted" aria-label="Close">
                   <X className="h-5 w-5" />
                 </button>
@@ -173,14 +185,8 @@ export default function AdminLayout() {
 
       <main className="lg:pl-64">
         <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-8">
-          <div className="mb-4 hidden items-center justify-between lg:mb-6 lg:flex">
-            <p className="text-sm text-muted">
-              Signed in{user?.email ? ` as ${user.email}` : ''}
-            </p>
-          </div>
           <Suspense fallback={<PageLoader />}>
             <AdminInstallBanner />
-            <AdminPushBanner />
             <Outlet />
           </Suspense>
         </div>

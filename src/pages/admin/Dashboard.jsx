@@ -8,7 +8,6 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { ResetAllCountsButton } from '@/components/admin/ResetAllCountsButton';
-import { AdminPushCard } from '@/components/admin/AdminPushCard';
 import { useAsync } from '@/hooks/useAsync';
 import { getOverview, getEventAggregates } from '@/features/analytics/analyticsService';
 import { getPopularityEngine } from '@/features/analytics/popularityService';
@@ -52,10 +51,6 @@ export default function Dashboard() {
         title="Dashboard"
         subtitle="Smart insights — who to call, what's trending, best value picks."
       />
-
-      <div className="mb-4 sm:mb-6">
-        <AdminPushCard />
-      </div>
 
       {loading ? (
         <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">

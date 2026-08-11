@@ -5,6 +5,7 @@ import {
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
+import { AdminPushCard } from '@/components/admin/AdminPushCard';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -187,8 +188,12 @@ export default function Settings() {
       <SEO title="Site Settings" noindex />
       <AdminHeader
         title="Site Control"
-        subtitle="Contact, branding, perks, FAQs, and Explore Range tabs shown on the website."
+        subtitle="Contact, branding, notifications, perks, FAQs, and Explore Range tabs."
       />
+
+      <div className="mb-5 max-w-3xl sm:mb-6">
+        <AdminPushCard />
+      </div>
 
       {!isSupabaseConfigured && (
         <div className="mb-5 max-w-3xl rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">

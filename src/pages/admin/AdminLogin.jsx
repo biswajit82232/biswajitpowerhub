@@ -2,21 +2,18 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { LogIn, Lock, Mail, ArrowLeft } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
-import { Logo } from '@/components/common/Logo';
 import { Field, Input } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
-import { adminAccessHint, getAdminEmails } from '@/lib/adminAccess';
+import { adminAccessHint } from '@/lib/adminAccess';
 
 export default function AdminLogin() {
   const { signIn, session } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const adminEmails = getAdminEmails();
-  const emailPlaceholder = adminEmails[0] || 'admin@biswajitpowerhub.com';
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,12 +45,12 @@ export default function AdminLogin() {
       <div className="flex min-h-screen items-center justify-center bg-sky-fade px-3 py-8 pt-[max(2rem,env(safe-area-inset-top))] sm:px-4 sm:py-12 sm:pt-[max(3rem,env(safe-area-inset-top))]">
         <div className="w-full max-w-md">
           <AdminInstallBanner />
-          <div className="mb-5 flex justify-center sm:mb-6">
-            <Logo />
+          <div className="mb-5 text-center sm:mb-6">
+            <p className="font-display text-xl font-extrabold tracking-tight text-heading">Admin</p>
           </div>
           <div className="rounded-2xl bg-surface p-5 shadow-card ring-1 ring-line sm:rounded-3xl sm:p-8">
-            <h1 className="font-display text-xl font-extrabold text-heading sm:text-2xl">Admin Login</h1>
-            <p className="mt-1 text-sm text-muted">Sign in to manage your dealership.</p>
+            <h1 className="font-display text-xl font-extrabold text-heading sm:text-2xl">Sign in</h1>
+            <p className="mt-1 text-sm text-muted">Manage your dealership panel.</p>
 
             {!isSupabaseConfigured && (
               <div className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
@@ -68,25 +65,9 @@ export default function AdminLogin() {
                   <>
                     {' '}In Vercel → Project → Settings → Environment Variables, add{' '}
                     <code className="font-mono">VITE_SUPABASE_URL</code> and{' '}
-                    <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> (same values as your{' '}
-                    <code className="font-mono">.env</code>), then redeploy.
+                    <code className="font-mono">VITE_SUPABASE_ANON_KEY</code>, then redeploy.
                   </>
                 )}
-                {' '}Create an admin user in Supabase → Authentication → Users.
-              </div>
-            )}
-
-            {adminEmails.length > 0 && (
-              <div className="mt-5 rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-800">
-                Sign in with your allowed admin email
-                {adminEmails.length === 1 ? (
-                  <>
-                    : <span className="font-semibold">{adminEmails[0]}</span>
-                  </>
-                ) : (
-                  ' (must match the allowlist).'
-                )}
-                {' '}Password is the one set in Supabase → Authentication → Users.
               </div>
             )}
 
@@ -100,13 +81,31 @@ export default function AdminLogin() {
               <Field label="Email" htmlFor="email" required>
                 <div className="relative">
                   <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted" />
-                  <Input id="email" type="email" autoComplete="email" placeholder={emailPlaceholder} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="pl-11" required />
+                  <Input
+                    id="email"
+                    type="email"
+                    autoComplete="username"
+                    placeholder="Email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="pl-11"
+                    required
+                  />
                 </div>
               </Field>
               <Field label="Password" htmlFor="password" required>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted" />
-                  <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="pl-11" required />
+                  <Input
+                    id="password"
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="Password"
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    className="pl-11"
+                    required
+                  />
                 </div>
               </Field>
 
