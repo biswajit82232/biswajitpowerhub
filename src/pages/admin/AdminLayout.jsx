@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Bike, Package, Users, PhoneCall, CalendarCheck, Star,
-  Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag, Settings, Home, Mail,
+  Banknote, BarChart3, LogOut, Menu, X, Tag, Settings, Home, Mail,
   RefreshCw, Wrench,
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/Loading';
@@ -124,9 +124,6 @@ function SidebarFooter({ onSignOut }) {
           Demo mode — connect Supabase to enable data & login.
         </p>
       )}
-      <a href="/" target="_blank" rel="noreferrer" className="mb-0.5 flex items-center gap-2.5 rounded-xl px-3 py-2 text-[0.8125rem] font-semibold text-body transition hover:bg-slate-50 sm:gap-3 sm:px-3.5 sm:py-2.5 sm:text-sm">
-        <ExternalLink className="h-4 w-4 sm:h-4.5 sm:w-4.5" /> View site
-      </a>
       <button onClick={onSignOut} className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[0.8125rem] font-semibold text-red-500 transition hover:bg-red-50 sm:gap-3 sm:px-3.5 sm:py-2.5 sm:text-sm">
         <LogOut className="h-4 w-4 sm:h-4.5 sm:w-4.5" /> Sign out
       </button>
