@@ -42,7 +42,7 @@ export default function Scooters() {
   return (
     <>
       <SEO
-        title="Electric Scooters in Berhampore | Activa, Zoom, Single & Double Light | BPH"
+        title="Electric Scooters in Berhampore | Activa, Zoom & More"
         description="Compare all low-speed electric scooters at Biswajit Power Hub. No licence required. Test rides available at Chunakhali, Berhampore."
         path="/scooters"
         jsonLd={scootersJsonLd}

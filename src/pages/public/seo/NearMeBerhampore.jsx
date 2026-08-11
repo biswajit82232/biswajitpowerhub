@@ -46,6 +46,7 @@ export default function NearMeBerhampore() {
           '@id': `${SITE_URL}/#dealership`,
           name: SITE.name,
           telephone: `+91${SITE.phones[0]}`,
+          image: `${SITE_URL}/logo-512.png`,
           address: postalAddressSchema(SITE.address),
           geo: {
             '@type': 'GeoCoordinates',

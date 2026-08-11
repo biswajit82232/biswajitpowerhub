@@ -42,25 +42,25 @@ export const SITE_FAQS = [
 
 export const MODEL_SEO_META = {
   activa: {
-    title: 'Activa Electric Scooter in Berhampore — Price, Features & Test Ride',
+    title: 'Activa Electric Scooter Berhampore — Price & Test Ride',
     description:
       'Buy Activa electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹45,999. Book test ride. Call 096355 05436.',
     h1: 'Activa Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   zoom: {
-    title: 'Zoom Electric Scooter in Berhampore — Price, Features & Test Ride',
+    title: 'Zoom Electric Scooter Berhampore — Price & Test Ride',
     description:
       'Buy Zoom electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹42,999. Book test ride. Call 096355 05436.',
     h1: 'Zoom Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'single-light': {
-    title: 'Single Light Electric Scooter in Berhampore — Price & Test Ride',
+    title: 'Single Light Electric Scooter Berhampore — Price',
     description:
       'Buy Single Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹38,999. Book test ride. Call 096355 05436.',
     h1: 'Single Light Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'double-light': {
-    title: 'Double Light Electric Scooter in Berhampore — Price & Test Ride',
+    title: 'Double Light Electric Scooter Berhampore — Price',
     description:
       'Buy Double Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹40,999. Book test ride. Call 096355 05436.',
     h1: 'Double Light Electric Scooter in Berhampore — Price, Features & Test Ride',

@@ -10,8 +10,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useAsync } from '@/hooks/useAsync';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { getScooters } from '@/features/scooters/scooterService';
-import { breadcrumbList, buildReviewedProductRef, siteAggregateRating } from '@/lib/schemaHelpers';
-import { SITE_URL, GBP_RATING } from '@/config/site';
+import { breadcrumbList, postalAddressSchema, siteAggregateRating } from '@/lib/schemaHelpers';
+import { SITE_URL, GBP_RATING, siteSameAs } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { REVIEWS as SEED_REVIEWS } from '@/data/reviews';
 import { Star, PenLine, ChevronDown, Users } from 'lucide-react';
@@ -48,9 +48,6 @@ export default function Reviews() {
       { name: 'Home', path: '/' },
       { name: 'Our Community', path: '/community' },
     ]);
-    const scooterByName = new Map(
-      (scooters || []).map((s) => [String(s.name).toLowerCase(), s]),
-    );
     const list = displayReviews || [];
     // Derived from the same reviews rendered on this page — never a
     // hand-typed number. Omitted from the schema entirely when there are no
@@ -61,13 +58,25 @@ export default function Reviews() {
       crumbs,
       {
         '@context': 'https://schema.org',
-        '@type': 'LocalBusiness',
-        name: 'Biswajit Power Hub',
+        '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store'],
+        '@id': `${SITE_URL}/#dealership`,
+        name: site.name,
         url: SITE_URL,
         logo: `${SITE_URL}/logo-512.png`,
         image: `${SITE_URL}/logo-512.png`,
-        description: 'Electric scooter dealership in Berhampore, Murshidabad, West Bengal',
+        description: site.description,
+        telephone: `+91${site.phones[0]}`,
+        address: postalAddressSchema(site.address),
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: site.geo.latitude,
+          longitude: site.geo.longitude,
+        },
+        hasMap: site.maps?.link,
+        sameAs: siteSameAs(site),
         ...(aggregateRating ? { aggregateRating } : {}),
+        // Nested reviews must describe the LocalBusiness — do not point
+        // itemReviewed at a Product (GSC Review mismatch errors).
         ...(list.length
           ? {
               review: list.slice(0, 5).map((r) => ({
@@ -81,20 +90,12 @@ export default function Reviews() {
                   worstRating: '1',
                 },
                 reviewBody: r.review,
-                ...(r.scooter
-                  ? (() => {
-                      const reviewed = buildReviewedProductRef(
-                        scooterByName.get(String(r.scooter).toLowerCase()),
-                      );
-                      return reviewed ? { itemReviewed: reviewed } : {};
-                    })()
-                  : {}),
               })),
             }
           : {}),
       },
     ];
-  }, [displayReviews, scooters]);
+  }, [displayReviews, site]);
 
   return (
     <>

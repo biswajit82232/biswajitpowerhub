@@ -7,7 +7,7 @@ export const BLOG_POSTS = [
   {
     slug: 'no-licence-electric-scooter-rules-west-bengal',
     path: '/guides/no-licence-electric-scooter-rules-west-bengal',
-    title: 'No Licence Electric Scooter Rules in West Bengal (2026)',
+    title: 'No Licence EV Rules in West Bengal (2026)',
     description:
       'Clear guide to no licence, no registration electric scooters in West Bengal. Low-speed EV rules explained for Berhampore & Murshidabad buyers.',
     h1: 'No Licence Electric Scooter Rules in West Bengal (2026)',
@@ -77,7 +77,7 @@ export const BLOG_POSTS = [
   {
     slug: 'battery-upgrade-guide-berhampore',
     path: '/guides/battery-upgrade-guide-berhampore',
-    title: 'Electric Scooter Battery Upgrade Guide — Berhampore',
+    title: 'Battery Upgrade Guide — Berhampore',
     description:
       'When to upgrade your e-scooter battery in Berhampore. AH packs, Lithium Pro, range tips for Murshidabad riders at Biswajit Power Hub.',
     h1: 'Battery Upgrade Guide for Electric Scooters in Berhampore',
@@ -112,7 +112,7 @@ export const BLOG_POSTS = [
   {
     slug: 'first-time-buyer-guide-murshidabad',
     path: '/guides/first-time-buyer-guide-murshidabad',
-    title: 'First-Time Electric Scooter Buyer Guide — Murshidabad',
+    title: 'First-Time EV Buyer Guide — Murshidabad',
     description:
       'First electric scooter in Murshidabad? Checklist for budget, licence rules, test rides, EMI, and which model to pick at Biswajit Power Hub Berhampore.',
     h1: 'First-Time Electric Scooter Buyer Guide for Murshidabad',
@@ -147,7 +147,7 @@ export const BLOG_POSTS = [
   {
     slug: 'emi-finance-tips-electric-scooter',
     path: '/guides/emi-finance-tips-electric-scooter',
-    title: 'EMI & Finance Tips for Electric Scooters in Berhampore',
+    title: 'EMI Tips for Electric Scooters in Berhampore',
     description:
       'How EMI works for electric scooters in Berhampore. Documents, budget tips, and how to ask for clear slabs at Biswajit Power Hub.',
     h1: 'EMI & Finance Tips for Electric Scooters in Berhampore',

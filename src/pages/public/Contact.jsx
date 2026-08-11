@@ -126,7 +126,8 @@ export default function Contact() {
         '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store'],
         '@id': `${SITE_URL}/#dealership`,
         name: SITE.name,
-        url: `${SITE_URL}/contact`,
+        // Keep canonical business URL identical to Home for the same @id
+        url: SITE_URL,
         logo: `${SITE_URL}/logo-512.png`,
         image: `${SITE_URL}/logo-512.png`,
         description: SITE.description,
@@ -151,7 +152,7 @@ export default function Contact() {
   return (
     <>
       <SEO
-        title="Electric Scooter Showroom Near Chunakhali, Berhampore | Biswajit Power Hub"
+        title="Showroom Near Chunakhali, Berhampore | Biswajit Power Hub"
         description="Electric scooter showroom near Chunakhali Bus Stand, Berhampore. Serving Murshidabad towns — free test ride. Call 096355 05436 or WhatsApp us."
         path="/contact"
         jsonLd={contactJsonLd}

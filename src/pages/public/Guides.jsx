@@ -36,7 +36,7 @@ export default function Guides() {
   return (
     <>
       <SEO
-        title="Electric Scooter Guides — Berhampore & Murshidabad | Biswajit Power Hub"
+        title="EV Guides for Berhampore & Murshidabad | Power Hub"
         description="Guides for Murshidabad EV buyers: no-licence rules, electric vs petrol cost, battery upgrades, EMI tips, and first-time buyer checklist."
         path={path}
         jsonLd={jsonLd}

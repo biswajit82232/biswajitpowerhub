@@ -60,6 +60,23 @@ Ensure production has:
 
 Redeploy after changing env.
 
+## 5. Keep GSC Enhancements clean
+
+After each deploy, in Search Console check:
+
+- **Pages** → no spike in “Not found (404)”, “Redirect”, or “Excluded by ‘noindex’” for public URLs
+- **Sitemaps** → 0 errors; ~59 discovered URLs
+- **Enhancements / Experience** → Local business / FAQ / Product (no invalid items)
+
+Site safeguards already in place:
+
+- Canonical host `biswajitpowerhub.in` (www → apex, http → https)
+- Trailing-slash URLs 308 to non-slash
+- `/admin`, `/ad-landing`, `/dealership`, `/updates` blocked or noindex
+- Soft-unknown URLs return real **404** (not soft-404 homepage)
+- LocalBusiness always includes NAP + shared `@id` `#dealership`
+- Sitemap only lists indexable prerendered URLs
+
 ## Success signals (2–6 weeks)
 
 - GSC: new URLs discovered / indexed (not “Crawled – currently not indexed” forever).

@@ -30,28 +30,28 @@ const CATALOG = Object.fromEntries(SCOOTERS.map((s) => [s.id, s]));
 
 const SCOOTER_SEO = {
   activa: {
-    title: 'Activa Electric Scooter in Berhampore — Price, Features & Test Ride',
+    title: 'Activa Electric Scooter Berhampore — Price & Test Ride',
     description:
       'Buy Activa electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹45,999. Book test ride. Call 096355 05436.',
     name: 'Activa Electric Scooter',
     h1: 'Activa Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'single-light': {
-    title: 'Single Light Electric Scooter in Berhampore — Price & Test Ride',
+    title: 'Single Light Electric Scooter Berhampore — Price',
     description:
       'Buy Single Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹38,999. Book test ride. Call 096355 05436.',
     name: 'Single Light Electric Scooter',
     h1: 'Single Light Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'double-light': {
-    title: 'Double Light Electric Scooter in Berhampore — Price & Test Ride',
+    title: 'Double Light Electric Scooter Berhampore — Price',
     description:
       'Buy Double Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹40,999. Book test ride. Call 096355 05436.',
     name: 'Double Light Electric Scooter',
     h1: 'Double Light Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   zoom: {
-    title: 'Zoom Electric Scooter in Berhampore — Price, Features & Test Ride',
+    title: 'Zoom Electric Scooter Berhampore — Price & Test Ride',
     description:
       'Buy Zoom electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹42,999. Book test ride. Call 096355 05436.',
     name: 'Zoom Electric Scooter',
@@ -143,7 +143,7 @@ const ROUTES = [
   },
   {
     path: '/scooters',
-    title: 'Electric Scooters in Berhampore | Activa, Zoom, Single & Double Light | BPH',
+    title: 'Electric Scooters in Berhampore | Activa, Zoom & More',
     description:
       'Compare all low-speed electric scooters at Biswajit Power Hub. No licence required. Test rides available at Chunakhali, Berhampore.',
     h1: 'Electric Scooters in Berhampore',
@@ -214,7 +214,7 @@ const ROUTES = [
     description:
       'Electric scooter near me in Berhampore? Visit Biswajit Power Hub at Chunakhali Bus Stand — no licence models, free test ride, EMI. Call 096355 05436.',
     h1: 'Electric Scooter Near Me in Berhampore — Local Dealer at Chunakhali',
-    schema: 'crumbs',
+    schema: 'near-me',
     crawlText:
       'Looking for an electric scooter near me in Berhampore? Biswajit Power Hub is at Chunakhali Bus Stand, Nimtala. Free test rides, no licence on eligible models, EMI guidance. Call 096355 05436. Serving Murshidabad towns including Kandi, Jiaganj, Beldanga, Domkal and more.',
   },
@@ -224,14 +224,14 @@ const ROUTES = [
     description:
       'Biswajit Power Hub serves Berhampore, Cossimbazar, Lalbagh, Jiaganj, Kandi, Domkal, Lalgola and more. Visit Chunakhali showroom. Call 096355 05436.',
     h1: 'Areas We Serve — Murshidabad',
-    schema: 'crumbs',
+    schema: 'areas',
     crawlText:
       'One showroom in Berhampore serving Murshidabad: Berhampore, Cossimbazar, Murshidabad Lalbagh, Jiaganj, Azimganj, Raninagar, Beldanga, Nabagram, Hariharpara, Chaltia Gora Bazar, Daulatabad, Domkal, Lalgola, Kandi, Bhagawangola.',
   },
 
   {
     path: '/contact',
-    title: 'Electric Scooter Showroom Near Chunakhali, Berhampore | Biswajit Power Hub',
+    title: 'Showroom Near Chunakhali, Berhampore | Biswajit Power Hub',
     description:
       'Electric scooter showroom near Chunakhali Bus Stand, Berhampore. Serving Murshidabad towns — free test ride. Call 096355 05436 or WhatsApp us.',
     h1: 'Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub',
@@ -243,7 +243,7 @@ const ROUTES = [
     description:
       'Join the Biswajit Power Hub community in Berhampore, Murshidabad. Rider stories, showroom tips, and experiences from Chunakhali customers.',
     h1: 'Our Community — Biswajit Power Hub, Berhampore',
-    schema: 'crumbs',
+    schema: 'community',
   },
   {
     path: '/about',
@@ -263,7 +263,7 @@ const ROUTES = [
   },
   {
     path: '/service',
-    title: 'Service & Battery Upgrades | Biswajit Power Hub Berhampore',
+    title: 'Service & Battery Upgrades | Biswajit Power Hub',
     description:
       '3 free servicing, warranty support, and custom battery upgrades at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore.',
     h1: 'Service & Battery Upgrades',
@@ -312,12 +312,14 @@ const ROUTES = [
     title: loc.title,
     description: loc.description,
     h1: loc.h1,
-    schema: 'crumbs',
+    schema: 'location',
+    locationName: loc.name,
+    locationFaqs: loc.faqs || [],
     crawlText: `${loc.intro} ${loc.highlights.join(' ')} Showroom: Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad. Call 096355 05436.`,
   })),
   {
     path: '/guides',
-    title: 'Electric Scooter Guides — Berhampore & Murshidabad | Biswajit Power Hub',
+    title: 'EV Guides for Berhampore & Murshidabad | Power Hub',
     description:
       'Guides for Murshidabad EV buyers: no-licence rules, electric vs petrol cost, battery upgrades, EMI tips, and first-time buyer checklist.',
     h1: 'Electric Scooter Guides — Berhampore & Murshidabad',
@@ -345,7 +347,7 @@ const ROUTES = [
   {
     path: '/dealership',
     title: 'Dealership Inquiry | Biswajit Power Hub',
-    description: 'Internal dealership inquiry page — not part of the public catalogue.',
+    description: 'Internal dealership inquiry page for Biswajit Power Hub staff — not indexed.',
     h1: 'Dealership',
     schema: 'none',
     noindex: true,
@@ -353,7 +355,7 @@ const ROUTES = [
   {
     path: '/updates',
     title: 'Updates | Biswajit Power Hub',
-    description: 'Internal updates page — not part of the public catalogue.',
+    description: 'Internal updates page for Biswajit Power Hub staff — not part of the public catalogue.',
     h1: 'Updates',
     schema: 'none',
     noindex: true,
@@ -633,12 +635,22 @@ function localBusinessSchema(reviews) {
     ],
     areaServed: [
       'Berhampore',
+      'Cossimbazar',
       'Murshidabad',
-      'Kandi',
-      'Jiaganj',
-      'Beldanga',
       'Lalbagh',
+      'Jiaganj',
+      'Azimganj',
+      'Raninagar',
+      'Beldanga',
+      'Nabagram',
+      'Hariharpara',
+      'Chaltia',
+      'Gora Bazar',
+      'Daulatabad',
       'Domkal',
+      'Lalgola',
+      'Kandi',
+      'Bhagawangola',
       'West Bengal',
     ],
     ...(aggregateRating ? { aggregateRating } : {}),
@@ -647,6 +659,48 @@ function localBusinessSchema(reviews) {
       '@type': 'OfferCatalog',
       name: 'Electric Scooters',
       itemListElement: offerCatalogItems(),
+    },
+  };
+}
+
+function faqFromItems(faqs) {
+  if (!faqs?.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  };
+}
+
+function webPageAboutDealership({ name, url, description, areaServed }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name,
+    url,
+    description,
+    about: {
+      '@type': 'LocalBusiness',
+      '@id': `${BASE}/#dealership`,
+      name: 'Biswajit Power Hub',
+      url: BASE,
+      telephone: '+919635505436',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Chunakhali Bus Stand, Nimtala, Murshidabad',
+        addressLocality: 'Berhampore',
+        addressRegion: 'West Bengal',
+        postalCode: '742149',
+        addressCountry: 'IN',
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: '24.116865', longitude: '88.2914134' },
+      hasMap: 'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
+      image: `${BASE}/logo-512.png`,
+      areaServed: areaServed || ['Berhampore', 'Murshidabad', 'West Bengal'],
     },
   };
 }
@@ -824,18 +878,110 @@ function schemasFor(route, enrichment = {}, reviews = []) {
     return [crumbs, itemListSchema(), faqSchema()];
   }
   if (route.schema === 'product') return [crumbs, productSchema(route, enrichment, reviews)];
-  if (route.path === '/community') {
+  if (route.schema === 'community' || route.path === '/community') {
     const aggregateRating = siteAggregateRatingForBuild(reviews);
     const reviewList = siteReviewsSchemaForBuild(reviews);
     return [
       crumbs,
       {
         '@context': 'https://schema.org',
-        '@type': 'LocalBusiness',
+        '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store'],
+        '@id': `${BASE}/#dealership`,
         name: 'Biswajit Power Hub',
         url: BASE,
+        logo: `${BASE}/logo-512.png`,
+        image: `${BASE}/logo-512.png`,
+        description:
+          'Premium low-speed electric scooter dealer in Berhampore, West Bengal. No licence, no registration on eligible models.',
+        telephone: '+919635505436',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Chunakhali Bus Stand, Nimtala, Murshidabad',
+          addressLocality: 'Berhampore',
+          addressRegion: 'West Bengal',
+          postalCode: '742149',
+          addressCountry: 'IN',
+        },
+        geo: { '@type': 'GeoCoordinates', latitude: '24.116865', longitude: '88.2914134' },
+        hasMap: 'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
         ...(aggregateRating ? { aggregateRating } : {}),
         ...(reviewList ? { review: reviewList } : {}),
+      },
+    ];
+  }
+  if (route.schema === 'near-me') {
+    const faq = faqFromItems([
+      {
+        question: 'Where is an electric scooter showroom near me in Berhampore?',
+        answer:
+          'Biswajit Power Hub is at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149. Search BISWAJIT POWER HUB on Google Maps or call 096355 05436.',
+      },
+      {
+        question: 'Do I need a licence for electric scooters near Berhampore?',
+        answer:
+          'Eligible low-speed models (≤25 km/h) generally need no driving licence and no RTO registration in West Bengal. Confirm the class for your model at our Chunakhali showroom.',
+      },
+      {
+        question: 'Can I test ride today near Chunakhali?',
+        answer:
+          'Yes — free supervised test rides during showroom hours (open all days 9:00 AM – 8:30 PM). No appointment required.',
+      },
+    ]);
+    return [
+      crumbs,
+      ...(faq ? [faq] : []),
+      webPageAboutDealership({
+        name: 'Electric Scooter Near Me in Berhampore',
+        url: canonicalFor(route.path),
+        description: route.description,
+        areaServed: SERVICE_LOCATIONS.map((l) => l.name),
+      }),
+    ];
+  }
+  if (route.schema === 'areas') {
+    return [
+      crumbs,
+      {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'Areas served by Biswajit Power Hub in Murshidabad',
+        itemListElement: SERVICE_LOCATIONS.map((l, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: `Electric scooters for ${l.name}`,
+          url: `${BASE}${l.path}`,
+        })),
+      },
+      webPageAboutDealership({
+        name: route.h1 || route.title,
+        url: canonicalFor(route.path),
+        description: route.description,
+        areaServed: SERVICE_LOCATIONS.map((l) => l.name),
+      }),
+    ];
+  }
+  if (route.schema === 'location') {
+    const faq = faqFromItems(route.locationFaqs);
+    return [
+      crumbs,
+      ...(faq ? [faq] : []),
+      webPageAboutDealership({
+        name: route.h1 || route.title,
+        url: canonicalFor(route.path),
+        description: route.description,
+        areaServed: [route.locationName, 'Murshidabad', 'West Bengal', 'Berhampore'],
+      }),
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        name: `Electric scooter sales for ${route.locationName || 'Murshidabad'}`,
+        provider: { '@id': `${BASE}/#dealership` },
+        areaServed: {
+          '@type': 'City',
+          name: route.locationName || 'Murshidabad',
+          containedInPlace: { '@type': 'AdministrativeArea', name: 'Murshidabad' },
+        },
+        serviceType: 'Electric scooter sales, test rides, battery upgrades',
       },
     ];
   }

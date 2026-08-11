@@ -168,7 +168,7 @@ export const ACCESSORIES = [
     price: 199,
     hue: 'blue',
     images: [],
-    description: 'Soft rubber grips with ergonomic texture. Easy slip-on installation.',
+    description: 'Soft rubber grips with ergonomic texture. Easy slip-on install at our Berhampore showroom.',
     compatibility: 'Universal',
     stock: 'in_stock',
     featured: false,

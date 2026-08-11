@@ -30,7 +30,7 @@ export default function Service() {
   return (
     <>
       <SEO
-        title="Book Service & Battery Upgrades | Biswajit Power Hub Berhampore"
+        title="Service & Battery Upgrades | Biswajit Power Hub"
         description="Book free 1st, 2nd or 3rd scooter servicing, or paid repairs at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore. Battery upgrades available."
         path="/service"
         jsonLd={[jsonLd]}

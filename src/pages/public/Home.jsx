@@ -109,7 +109,7 @@ export default function Home() {
         name: site.name,
         url: SITE_URL,
       },
-      faqPageSchema(faqs),
+      ...(faqs.length ? [faqPageSchema(faqs)] : []),
     ];
   }, [site, allScooters, faqs, reviews]);
 

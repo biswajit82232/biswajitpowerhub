@@ -61,12 +61,12 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'berhampore',
     name: 'Berhampore',
-    title: 'Electric Scooter Near Me Berhampore | Dealer at Chunakhali',
+    title: 'Electric Scooters in Berhampore | Biswajit Power Hub Showroom',
     description:
-      'Looking for an electric scooter near me in Berhampore? Biswajit Power Hub at Chunakhali Bus Stand — no licence models from ₹38,999, free test ride. Call 096355 05436.',
-    h1: 'Electric Scooter Dealer Near Me in Berhampore — Chunakhali Showroom',
+      'Buy electric scooters in Berhampore at Biswajit Power Hub, Chunakhali Bus Stand — no licence models from ₹38,999, free test ride, EMI. Call 096355 05436.',
+    h1: 'Electric Scooters in Berhampore — Chunakhali Showroom',
     intro:
-      'Searching for an electric scooter near me in Berhampore? Biswajit Power Hub is your local dealer at Chunakhali Bus Stand, Nimtala — Activa, Zoom, Single Light, and Double Light with free test rides, EMI, and walk-in service.',
+      'Biswajit Power Hub is the Berhampore electric scooter showroom at Chunakhali Bus Stand, Nimtala — Activa, Zoom, Single Light, and Double Light with free test rides, EMI, and walk-in service. For “near me” searches, also see our dedicated near-me hub.',
     localNote:
       'Our Berhampore showroom is open all days 9:00 AM – 8:30 PM. Walk in for a supervised test ride, compare battery packs, and get clear on-road pricing — we are a physical dealership, not an online-only seller.',
     distanceHint: 'Showroom at Chunakhali Bus Stand, Nimtala — central for Berhampore town',
@@ -336,6 +336,9 @@ export const SERVICE_LOCATIONS = [
     slug: 'chaltia-gora-bazar',
     name: 'Chaltia / Gora Bazar',
     titleName: 'Chaltia / Gora Bazar',
+    title: 'Electric Scooters in Chaltia & Gora Bazar | Power Hub',
+    description:
+      'Electric scooters for Chaltia and Gora Bazar riders. No licence models from ₹38,999 at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.',
     distanceHint: 'Very close to Berhampore town — quick visit to Chunakhali Bus Stand',
     nearby: ['berhampore', 'cossimbazar', 'lalbagh', 'daulatabad'],
     intro:
