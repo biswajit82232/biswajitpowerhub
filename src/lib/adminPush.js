@@ -21,6 +21,29 @@ export function getNotificationPermission() {
   return Notification.permission;
 }
 
+export function explainPushFailure(reason) {
+  switch (reason) {
+    case 'unsupported':
+      return 'Use Chrome on Android (or installed admin app). This browser cannot receive push.';
+    case 'not_configured':
+      return 'Push keys are missing on the server build.';
+    case 'denied':
+      return 'Notifications are blocked. In Chrome: site lock icon → Permissions → Notifications → Allow.';
+    case 'no_sw':
+      return 'Service worker failed to register. Open https://biswajitpowerhub.in/admin and retry.';
+    case 'no_supabase':
+      return 'Supabase is not configured.';
+    case 'not_signed_in':
+      return 'Sign in again, then enable alerts.';
+    case 'invalid_subscription':
+      return 'Browser returned an incomplete push subscription.';
+    case 'subscribe_failed':
+      return 'Chrome could not create a push subscription. Try installing the admin app, then Enable again.';
+    default:
+      return reason || 'Could not enable notifications.';
+  }
+}
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -32,9 +55,16 @@ function urlBase64ToUint8Array(base64String) {
 
 async function getAdminRegistration() {
   if (!('serviceWorker' in navigator)) return null;
-  const existing = await navigator.serviceWorker.getRegistration('/admin/');
-  if (existing) return existing;
-  return navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
+  let reg = await navigator.serviceWorker.getRegistration('/admin/');
+  if (!reg) {
+    reg = await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
+  }
+  // Ensure active worker before PushManager.subscribe
+  if (reg.installing || reg.waiting || !reg.active) {
+    await navigator.serviceWorker.ready;
+    reg = await navigator.serviceWorker.getRegistration('/admin/') || reg;
+  }
+  return reg;
 }
 
 async function upsertSubscription(sub) {
@@ -78,21 +108,38 @@ export async function enableAdminPush() {
   if (permission !== 'granted') return { ok: false, reason: 'denied' };
 
   const reg = await getAdminRegistration();
-  if (!reg) return { ok: false, reason: 'no_sw' };
+  if (!reg?.pushManager) return { ok: false, reason: 'no_sw' };
 
   let sub = await reg.pushManager.getSubscription();
+  // Re-subscribe if missing — avoids stale empty state after SW updates
   if (!sub) {
-    sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
-    });
+    try {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
+      });
+    } catch (err) {
+      return { ok: false, reason: err?.message || 'subscribe_failed' };
+    }
   }
+
+  if (!sub) return { ok: false, reason: 'subscribe_failed' };
 
   const saved = await upsertSubscription(sub);
   if (!saved.ok) return saved;
 
   try {
     localStorage.setItem('bph_admin_push', '1');
+    localStorage.removeItem('bph_admin_push_dismiss');
+  } catch (_) { /* ignore */ }
+
+  // Local proof that OS permission works (even before a lead arrives)
+  try {
+    await reg.showNotification('BPH Admin alerts on', {
+      body: 'You will get notified for new callbacks, test rides, and messages.',
+      icon: '/admin/icon-192.png',
+      tag: 'bph-admin-enabled',
+    });
   } catch (_) { /* ignore */ }
 
   return { ok: true };
@@ -120,6 +167,26 @@ export async function syncAdminPushSubscription() {
   const sub = await reg?.pushManager?.getSubscription();
   if (!sub) return { ok: false, reason: 'no_subscription' };
   return upsertSubscription(sub);
+}
+
+export async function getAdminPushStatus() {
+  const supported = isAdminPushSupported();
+  const configured = isAdminPushConfigured();
+  const permission = getNotificationPermission();
+  let subscribed = false;
+  if (supported && permission === 'granted') {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration('/admin/');
+      subscribed = Boolean(await reg?.pushManager?.getSubscription());
+    } catch (_) { /* ignore */ }
+  }
+  return {
+    supported,
+    configured,
+    permission,
+    subscribed,
+    preferred: isAdminPushPreferred(),
+  };
 }
 
 export function isAdminPushPreferred() {

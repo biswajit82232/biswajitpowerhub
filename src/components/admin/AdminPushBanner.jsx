@@ -3,6 +3,7 @@ import { Bell, BellOff, X } from 'lucide-react';
 import {
   dismissAdminPushBanner,
   enableAdminPush,
+  explainPushFailure,
   getNotificationPermission,
   isAdminPushBannerDismissed,
   isAdminPushConfigured,
@@ -51,17 +52,12 @@ export function AdminPushBanner() {
     }
 
     if (result.reason === 'denied') {
-      toast('Notifications are blocked. Allow them in browser settings, then try again.', 'error');
-      setShow(false);
+      toast(explainPushFailure('denied'), 'error');
+      setPermission(getNotificationPermission());
       return;
     }
 
-    if (result.reason === 'not_configured') {
-      toast('Push keys are missing on the server.', 'error');
-      return;
-    }
-
-    toast(result.reason || 'Could not enable notifications. Try again after installing the admin app.', 'error');
+    toast(explainPushFailure(result.reason), 'error');
   };
 
   const onDismiss = () => {
