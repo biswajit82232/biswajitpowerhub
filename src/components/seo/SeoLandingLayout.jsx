@@ -115,7 +115,7 @@ export function SeoLandingLayout({
 
         <div className="container-px py-12 sm:py-16">
           <Reveal>
-            <div className="prose-seo mx-auto max-w-[800px] space-y-6 px-0 text-body [&_a]:font-semibold [&_a]:text-brand-600 [&_a]:underline-offset-2 hover:[&_a]:underline [&_h2]:mt-10 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:text-navy [&_h2]:sm:text-3xl [&_li]:leading-relaxed [&_p]:leading-relaxed [&_strong]:text-navy [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
+            <div className="prose-seo mx-auto max-w-[800px] space-y-6 px-0 text-body [&_p_a]:font-semibold [&_p_a]:text-brand-600 [&_p_a]:underline-offset-2 hover:[&_p_a]:underline [&_li_a]:font-semibold [&_li_a]:text-brand-600 [&_li_a]:underline-offset-2 hover:[&_li_a]:underline [&_h2]:mt-10 [&_h2]:border-b [&_h2]:border-line [&_h2]:pb-3 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:text-navy [&_h2]:sm:text-3xl [&_li]:leading-relaxed [&_p]:leading-relaxed [&_strong]:text-navy [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5">
               {children}
             </div>
           </Reveal>
