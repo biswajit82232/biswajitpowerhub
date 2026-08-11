@@ -1,53 +1,28 @@
-# GOOGLE SEARCH CONSOLE CHECKLIST
+# GOOGLE SEARCH CONSOLE — SHORT CHECKLIST
 
-## Step 1: Verify Property (if not already done)
-- [ ] Go to https://search.google.com/search-console
-- [ ] Add Property → Domain → `biswajitpowerhub.in`
-- [ ] Verify via DNS record or HTML tag
-- [ ] Optional: set `VITE_GOOGLE_SITE_VERIFICATION` in Vercel Production and redeploy
+Full walkthrough: **[`GSC_COMPLETE_GUIDE.md`](./GSC_COMPLETE_GUIDE.md)**
 
-## Step 2: Submit Sitemap
-- [ ] GSC → Sitemaps
-- [ ] Enter: `https://biswajitpowerhub.in/sitemap.xml`
-- [ ] Click Submit
-- [ ] Wait 1–2 minutes, refresh, confirm status = Success
+## Crawl status (code / live site)
+- [x] HTTPS, apex canonical, www → apex
+- [x] robots.txt + sitemap (~47 URLs)
+- [x] Prerendered titles / canonicals / index,follow
+- [x] True HTTP 404 for unknown URLs
+- [x] Admin / ads / stubs blocked or noindex
 
-## Step 3: Request Indexing (priority URLs)
-Go to URL Inspection → enter each URL → **Request Indexing**:
+## Your GSC tasks
+- [ ] Step 1: Verify property → Domain `biswajitpowerhub.in` (or URL-prefix `https://biswajitpowerhub.in`)
+- [ ] Step 2: Optional `VITE_GOOGLE_SITE_VERIFICATION` in Vercel if using HTML tag
+- [ ] Step 3: Submit sitemap `https://biswajitpowerhub.in/sitemap.xml` → Success
+- [ ] Step 4: Request indexing for priority URLs (see guide §2 A–D)
+- [ ] Step 5: After 3–7 days check Pages → Indexed rising
+- [ ] Step 6: Monitor Performance for Berhampore / Murshidabad / no-licence queries
 
-### Core
-1. `https://biswajitpowerhub.in/`
-2. `https://biswajitpowerhub.in/scooters`
-3. `https://biswajitpowerhub.in/scooters/activa`
-4. `https://biswajitpowerhub.in/scooters/single-light`
-5. `https://biswajitpowerhub.in/scooters/double-light`
-6. `https://biswajitpowerhub.in/scooters/zoom`
-7. `https://biswajitpowerhub.in/contact`
-8. `https://biswajitpowerhub.in/community`
-9. `https://biswajitpowerhub.in/about`
-10. `https://biswajitpowerhub.in/service`
-11. `https://biswajitpowerhub.in/finance`
-12. `https://biswajitpowerhub.in/guides`
+## Index these (priority)
+Homepage, `/scooters` + 4 models, `/contact`, `/service`, `/finance`, `/about`, 5 SEO landings, 5 town pages, `/guides` + 5 articles, `/community`, `/offers`, `/compare`, `/accessories` (+ accessory URLs already in sitemap).
 
-### Intent landings
-13. `https://biswajitpowerhub.in/best-electric-scooters-berhampore`
-14. `https://biswajitpowerhub.in/low-budget-electric-scooters-berhampore`
-15. `https://biswajitpowerhub.in/no-licence-electric-scooters-west-bengal`
-16. `https://biswajitpowerhub.in/battery-upgrade-berhampore`
-17. `https://biswajitpowerhub.in/test-ride-berhampore`
-
-### Satellite towns
-18. `https://biswajitpowerhub.in/electric-scooters-kandi`
-19. `https://biswajitpowerhub.in/electric-scooters-jiaganj`
-20. `https://biswajitpowerhub.in/electric-scooters-beldanga`
-21. `https://biswajitpowerhub.in/electric-scooters-lalbagh`
-22. `https://biswajitpowerhub.in/electric-scooters-domkal`
-
-## Step 4: Monitor
-- [ ] Coverage / Pages → Indexed should rise after 3–7 days
-- [ ] Performance → local queries (Berhampore / Murshidabad / no licence)
-- [ ] Confirm unknown junk URLs return **HTTP 404** (not soft 200 homepage)
+## Never request indexing
+`/admin/*`, `/ad-landing`, `/dealership`, `/updates`, junk 404s, `www` URLs, `/reviews` (use `/community`).
 
 ## Notes
-- `/reviews` permanently redirects to `/community` — request `/community`, not `/reviews`
-- Preview / non-apex hosts send `X-Robots-Tag: noindex`
+- Brand is **Biswajit Power Hub** only — not “Biswajit Enterprise”
+- Full URL lists + troubleshooting → `GSC_COMPLETE_GUIDE.md`
