@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
   PhoneCall, CalendarCheck, Eye, Star, Flame, TrendingUp,
-  PhoneForwarded, Wrench, Mail, MessageCircle, Phone, Inbox, Users,
+  PhoneForwarded, Wrench, Mail, MessageCircle, Phone, Inbox, Users, RefreshCw,
 } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { useAsync } from '@/hooks/useAsync';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { getOverview, getEventAggregates } from '@/features/analytics/analyticsService';
 import { getPopularityEngine } from '@/features/analytics/popularityService';
 import { getScooters } from '@/features/scooters/scooterService';
@@ -75,6 +76,10 @@ export default function Dashboard() {
   const { data: leads } = useAsync(() => getLeads(), []);
   const { data: todayQueue } = useAsync(() => getTodayQueue(8), []);
 
+  const { pullPx, pulling, refreshing } = usePullToRefresh(() => {
+    window.location.reload();
+  });
+
   const o = overview || {};
   const callQueue = (leads || []).filter((l) => l.priority !== FOLLOW_UP.LATER).slice(0, 5);
   const highIntent = (leads || []).filter((l) => l.readinessPercent >= 60).length;
@@ -97,9 +102,26 @@ export default function Dashboard() {
   }));
 
   return (
-    <>
+    <div className="relative">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-center"
+        style={{ height: Math.max(pullPx, refreshing ? 44 : 0) }}
+        aria-hidden
+      >
+        <div
+          className={cn(
+            'mt-1 flex items-center gap-2 rounded-full bg-surface px-3 py-1.5 text-xs font-semibold text-heading shadow-soft ring-1 ring-line transition-opacity',
+            pulling || refreshing ? 'opacity-100' : 'opacity-0',
+          )}
+        >
+          <RefreshCw className={cn('h-3.5 w-3.5 text-brand-600', refreshing && 'animate-spin')} />
+          {refreshing ? 'Refreshing app…' : pullPx >= 72 ? 'Release to refresh' : 'Pull to refresh'}
+        </div>
+      </div>
+
+      <div style={{ transform: pullPx ? `translateY(${Math.min(pullPx, 56)}px)` : undefined }}>
       <AdminSEO title="Dashboard" />
-      <AdminHeader title="Dashboard" subtitle="Open work · who to call · what’s trending." />
+      <AdminHeader title="Dashboard" subtitle="Pull down to refresh the whole app." />
 
       {/* Ops KPIs — tappable */}
       {loading ? (
@@ -243,6 +265,7 @@ export default function Dashboard() {
           ))}
         </div>
       </section>
-    </>
+      </div>
+    </div>
   );
 }
