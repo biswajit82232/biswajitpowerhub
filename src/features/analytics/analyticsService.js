@@ -25,11 +25,12 @@ async function countRows(table, filter) {
  */
 export async function getOverview() {
   if (isSupabaseConfigured && supabase) {
-    const [totalLeads, hotLeads, callbacks, testRides, reviews] = await Promise.all([
+    const [totalLeads, hotLeads, callbacks, testRides, serviceBookings, reviews] = await Promise.all([
       countRows('leads'),
       countRows('leads', (q) => q.eq('classification', 'hot')),
       countRows('callbacks'),
       countRows('test_rides'),
+      countRows('service_bookings'),
       countRows('reviews', (q) => q.eq('status', 'pending')),
     ]);
     const { count: visitCount } = await supabase
@@ -41,6 +42,7 @@ export async function getOverview() {
       hotLeads,
       callbacks,
       testRides,
+      serviceBookings,
       pendingReviews: reviews,
       visits: visitCount || 0,
     };
@@ -55,6 +57,7 @@ export async function getOverview() {
     hotLeads: calculatorUsage > 0 ? 1 : 0,
     callbacks: by(EVENT.CALLBACK_REQUEST),
     testRides: by(EVENT.TEST_RIDE_BOOKED),
+    serviceBookings: by(EVENT.SERVICE_BOOKED),
     pendingReviews: 0,
     visits: by(EVENT.PAGE_VIEW),
     calculatorUsage,

@@ -16,7 +16,7 @@ const RAIL = [
   {
     id: 'service',
     label: 'Book Service',
-    to: '/service',
+    to: '/service#book',
     icon: Wrench,
     event: null,
   },

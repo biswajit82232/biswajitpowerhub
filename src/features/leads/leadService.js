@@ -68,6 +68,37 @@ export async function submitTestRide({ name, phone, date, time, scooter, scooter
   return { ok: true };
 }
 
+export async function submitServiceBooking({
+  name,
+  phone,
+  serviceKind,
+  details,
+  date,
+  time,
+  scooter,
+  scooterId,
+}) {
+  await trackEvent(EVENT.SERVICE_BOOKED, { serviceKind, scooter, scooterId });
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.from('service_bookings').insert({
+      name,
+      phone,
+      service_kind: serviceKind,
+      details: details || null,
+      preferred_date: date,
+      preferred_time: time,
+      scooter: scooter || null,
+      scooter_id: scooterId || null,
+      visitor_id: getVisitorId(),
+    });
+    if (error) throw error;
+  } else {
+    await new Promise((r) => setTimeout(r, 600));
+  }
+  await upsertLead({ name, phone, source: 'service', scooter });
+  return { ok: true };
+}
+
 export async function submitContact({ name, phone, email, message, from = 'contact_form' }) {
   await trackEvent(EVENT.CONTACT_FORM, { from });
   if (isSupabaseConfigured && supabase) {
@@ -108,6 +139,16 @@ export async function getTestRides() {
   return data;
 }
 
+export async function getServiceBookings() {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase
+    .from('service_bookings')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 export async function getContactMessages() {
   if (!isSupabaseConfigured || !supabase) return [];
   const { data, error } = await supabase
@@ -127,6 +168,12 @@ export async function updateCallback(id, patch) {
 export async function updateTestRide(id, patch) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const { error } = await supabase.from('test_rides').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+export async function updateServiceBooking(id, patch) {
+  if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
+  const { error } = await supabase.from('service_bookings').update(patch).eq('id', id);
   if (error) throw error;
 }
 
@@ -171,7 +218,11 @@ async function enrichLeads(leads) {
   const visitorMap = await getVisitorEventsMap();
   const enriched = leads.map((l) => enrichLeadRow(l, visitorMap[l.visitor_id] || []));
 
-  const [callbacks, testRides] = await Promise.all([getCallbacks(), getTestRides()]);
+  const [callbacks, testRides, serviceBookings] = await Promise.all([
+    getCallbacks(),
+    getTestRides(),
+    getServiceBookings(),
+  ]);
   const knownVisitors = new Set(leads.map((l) => l.visitor_id).filter(Boolean));
   const knownPhones = new Set(leads.map((l) => l.phone).filter(Boolean));
 
@@ -218,6 +269,31 @@ async function enrichLeads(leads) {
     }, events));
     if (tr.visitor_id) knownVisitors.add(tr.visitor_id);
     if (tr.phone) knownPhones.add(tr.phone);
+  }
+
+  for (const sb of serviceBookings) {
+    if (sb.visitor_id && knownVisitors.has(sb.visitor_id)) continue;
+    if (sb.phone && knownPhones.has(sb.phone)) continue;
+    const events = visitorMap[sb.visitor_id] || [{
+      type: EVENT.SERVICE_BOOKED,
+      at: sb.created_at,
+      meta: { serviceKind: sb.service_kind, scooterId: sb.scooter_id, name: sb.scooter },
+    }];
+    enriched.push(enrichLeadRow({
+      id: `sb-${sb.id}`,
+      visitor_id: sb.visitor_id,
+      name: sb.name,
+      phone: sb.phone,
+      last_source: 'service',
+      interested_scooter: sb.scooter,
+      classification: 'hot',
+      status: 'new',
+      score: 32,
+      updated_at: sb.created_at,
+      created_at: sb.created_at,
+    }, events));
+    if (sb.visitor_id) knownVisitors.add(sb.visitor_id);
+    if (sb.phone) knownPhones.add(sb.phone);
   }
 
   return enriched.sort(sortByFollowUpPriority);

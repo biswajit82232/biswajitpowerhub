@@ -63,6 +63,7 @@ const VyaparSync = lazy(() => import('@/pages/admin/VyaparSync'));
 const Leads = lazy(() => import('@/pages/admin/Leads'));
 const Callbacks = lazy(() => import('@/pages/admin/Callbacks'));
 const TestRides = lazy(() => import('@/pages/admin/TestRides'));
+const ServiceBookings = lazy(() => import('@/pages/admin/ServiceBookings'));
 const AdminReviews = lazy(() => import('@/pages/admin/AdminReviews'));
 const Messages = lazy(() => import('@/pages/admin/Messages'));
 const Homepage = lazy(() => import('@/pages/admin/Homepage'));
@@ -149,6 +150,7 @@ export default function App() {
         <Route path="leads" element={<Leads />} />
         <Route path="callbacks" element={<Callbacks />} />
         <Route path="test-rides" element={<TestRides />} />
+        <Route path="service-bookings" element={<ServiceBookings />} />
         <Route path="messages" element={<Messages />} />
         <Route path="reviews" element={<AdminReviews />} />
         <Route path="offers" element={<Offers />} />

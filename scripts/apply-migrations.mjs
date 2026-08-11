@@ -36,6 +36,7 @@ const ORDER = [
   'add_site_content_json.sql',
   'add_ops_inbox_fields.sql',
   'add_vyapar_sync.sql',
+  'add_service_bookings.sql',
 ];
 
 function loadEnv() {

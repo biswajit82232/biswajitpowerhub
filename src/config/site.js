@@ -345,6 +345,7 @@ export const FOOTER_QUICK_LINKS = [
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Offers', to: '/offers' },
   { label: 'Test Ride', to: '/test-ride-berhampore' },
+  { label: 'Book Service', to: '/service#book' },
   { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
   { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
   { label: 'Kandi', to: '/electric-scooters-kandi' },

@@ -23,6 +23,7 @@ export const EVENT = {
   DIRECTIONS_CLICK: 'directions_click',
   CALLBACK_REQUEST: 'callback_request',
   TEST_RIDE_BOOKED: 'test_ride_booked',
+  SERVICE_BOOKED: 'service_booked',
   CONTACT_FORM: 'contact_form',
   COMPARE_USED: 'compare_used',
 };
@@ -39,6 +40,7 @@ const SCORE_WEIGHTS = {
   [EVENT.DIRECTIONS_CLICK]: 22,
   [EVENT.CALLBACK_REQUEST]: 30,
   [EVENT.TEST_RIDE_BOOKED]: 35,
+  [EVENT.SERVICE_BOOKED]: 32,
   [EVENT.CONTACT_FORM]: 25,
 };
 
@@ -157,6 +159,7 @@ export function classifyLead(events = []) {
     (counts[EVENT.SIMULATOR_USED] || 0) > 0 ||
     (counts[EVENT.CALLBACK_REQUEST] || 0) > 0 ||
     (counts[EVENT.TEST_RIDE_BOOKED] || 0) > 0 ||
+    (counts[EVENT.SERVICE_BOOKED] || 0) > 0 ||
     (counts[EVENT.WHATSAPP_CLICK] || 0) > 0 ||
     (counts[EVENT.CONTACT_FORM] || 0) > 0 ||
     repeatedSameScooter;

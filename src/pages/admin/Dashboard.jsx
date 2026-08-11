@@ -1,4 +1,4 @@
-import { Users, Flame, PhoneCall, CalendarCheck, Eye, Calculator, Bike, Star, Zap, TrendingUp, PhoneForwarded } from 'lucide-react';
+import { Users, Flame, PhoneCall, CalendarCheck, Eye, Calculator, Bike, Star, Zap, TrendingUp, PhoneForwarded, Wrench } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { StatCard } from '@/components/admin/StatCard';
@@ -65,6 +65,7 @@ export default function Dashboard() {
           <StatCard icon={Zap} label="High Intent (60%+)" value={highIntent} tone="amber" />
           <StatCard icon={PhoneCall} label="Callback Requests" value={o.callbacks || 0} tone="accent" />
           <StatCard icon={CalendarCheck} label="Test Ride Requests" value={o.testRides || 0} tone="amber" />
+          <StatCard icon={Wrench} label="Service Bookings" value={o.serviceBookings || 0} tone="brand" />
           <StatCard icon={Eye} label="Website Visits" value={o.visits || 0} tone="slate" />
           <StatCard icon={Calculator} label="Calculator Usage" value={(agg?.emiUsage || 0) + (agg?.simulatorUsage || 0)} tone="brand" />
           <StatCard icon={Bike} label="Models Listed" value={scooters?.length || 0} tone="accent" />

@@ -10,6 +10,7 @@ const READINESS_WEIGHTS = {
   [EVENT.CALL_CLICK]: 14,
   [EVENT.CALLBACK_REQUEST]: 22,
   [EVENT.TEST_RIDE_BOOKED]: 28,
+  [EVENT.SERVICE_BOOKED]: 26,
   [EVENT.CONTACT_FORM]: 18,
 };
 
@@ -22,6 +23,7 @@ const SIGNAL_LABELS = {
   [EVENT.CALL_CLICK]: 'Call click',
   [EVENT.CALLBACK_REQUEST]: 'Callback request',
   [EVENT.TEST_RIDE_BOOKED]: 'Test ride booked',
+  [EVENT.SERVICE_BOOKED]: 'Service booked',
   [EVENT.CONTACT_FORM]: 'Contact form',
 };
 

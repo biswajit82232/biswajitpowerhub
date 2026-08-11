@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Bike, Package, Users, PhoneCall, CalendarCheck, Star,
   Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag, Settings, Home, Mail,
-  RefreshCw,
+  RefreshCw, Wrench,
 } from 'lucide-react';
 import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
@@ -33,6 +33,7 @@ const NAV_GROUPS = [
       { to: '/admin/leads', label: 'Leads', icon: Users },
       { to: '/admin/callbacks', label: 'Callbacks', icon: PhoneCall },
       { to: '/admin/test-rides', label: 'Test Rides', icon: CalendarCheck },
+      { to: '/admin/service-bookings', label: 'Service', icon: Wrench },
       { to: '/admin/messages', label: 'Messages', icon: Mail },
     ],
   },

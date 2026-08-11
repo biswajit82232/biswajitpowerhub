@@ -102,6 +102,24 @@ create table if not exists public.test_rides (
 );
 
 -- ---------------------------------------------------------------------------
+-- SERVICE BOOKINGS (free 1st/2nd/3rd + paid)
+-- ---------------------------------------------------------------------------
+create table if not exists public.service_bookings (
+  id              uuid primary key default gen_random_uuid(),
+  name            text not null,
+  phone           text not null,
+  service_kind    text not null check (service_kind in ('free_1', 'free_2', 'free_3', 'paid')),
+  details         text,
+  scooter         text,
+  scooter_id      text,
+  preferred_date  date,
+  preferred_time  text,
+  visitor_id      text,
+  status          text default 'requested',
+  created_at      timestamptz default now()
+);
+
+-- ---------------------------------------------------------------------------
 -- CONTACT MESSAGES
 -- ---------------------------------------------------------------------------
 create table if not exists public.contact_messages (
@@ -174,6 +192,7 @@ alter table public.accessories      enable row level security;
 alter table public.reviews          enable row level security;
 alter table public.callbacks        enable row level security;
 alter table public.test_rides       enable row level security;
+alter table public.service_bookings enable row level security;
 alter table public.contact_messages enable row level security;
 alter table public.lead_events      enable row level security;
 alter table public.leads            enable row level security;
@@ -198,6 +217,7 @@ create policy "anon insert reviews" on public.reviews
   with check (status = 'pending' and featured = false and rating between 1 and 5);
 create policy "anon insert callbacks" on public.callbacks       for insert with check (true);
 create policy "anon insert testrides" on public.test_rides      for insert with check (true);
+create policy "anon insert service_bookings" on public.service_bookings for insert with check (true);
 create policy "anon insert contact"   on public.contact_messages for insert with check (true);
 create policy "anon insert events"    on public.lead_events     for insert with check (true);
 -- Leads: anon upsert via upsert_lead() RPC only (see functions below)
@@ -208,6 +228,7 @@ create policy "auth all accessories" on public.accessories     for all to authen
 create policy "auth all reviews"   on public.reviews           for all to authenticated using (true) with check (true);
 create policy "auth all callbacks" on public.callbacks         for all to authenticated using (true) with check (true);
 create policy "auth all testrides" on public.test_rides        for all to authenticated using (true) with check (true);
+create policy "auth all service_bookings" on public.service_bookings for all to authenticated using (true) with check (true);
 create policy "auth all contact"   on public.contact_messages  for all to authenticated using (true) with check (true);
 create policy "auth all events"    on public.lead_events       for all to authenticated using (true) with check (true);
 create policy "auth all leads"     on public.leads             for all to authenticated using (true) with check (true);

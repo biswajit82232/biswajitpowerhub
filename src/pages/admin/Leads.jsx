@@ -37,8 +37,8 @@ export default function Leads() {
   }, [leads, filter, priorityFilter]);
 
   const onStatus = async (id, status) => {
-    if (String(id).startsWith('cb-') || String(id).startsWith('tr-')) {
-      toast('Open Callbacks or Test Rides to manage this request.', 'error');
+    if (String(id).startsWith('cb-') || String(id).startsWith('tr-') || String(id).startsWith('sb-')) {
+      toast('Open Callbacks, Test Rides, or Service to manage this request.', 'error');
       return;
     }
     try {
@@ -51,7 +51,7 @@ export default function Leads() {
   };
 
   const onNotes = async (id, notes) => {
-    if (String(id).startsWith('cb-') || String(id).startsWith('tr-') || String(id).startsWith('demo-')) {
+    if (String(id).startsWith('cb-') || String(id).startsWith('tr-') || String(id).startsWith('sb-') || String(id).startsWith('demo-')) {
       return;
     }
     try {
@@ -148,7 +148,7 @@ export default function Leads() {
                   value={l.status || 'new'}
                   onChange={(e) => onStatus(l.id, e.target.value)}
                   className="h-10 min-w-0 flex-1 text-sm sm:w-36 sm:flex-none"
-                  disabled={String(l.id).startsWith('cb-') || String(l.id).startsWith('tr-')}
+                  disabled={String(l.id).startsWith('cb-') || String(l.id).startsWith('tr-') || String(l.id).startsWith('sb-')}
                 >
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>
@@ -157,7 +157,7 @@ export default function Leads() {
                   ))}
                 </Select>
               </div>
-              {!String(l.id).startsWith('cb-') && !String(l.id).startsWith('tr-') && !String(l.id).startsWith('demo-') && (
+              {!String(l.id).startsWith('cb-') && !String(l.id).startsWith('tr-') && !String(l.id).startsWith('sb-') && !String(l.id).startsWith('demo-') && (
                 <div className="w-full border-t border-line pt-3 lg:col-span-full">
                   <label className="block text-xs font-semibold text-muted">
                     Notes
