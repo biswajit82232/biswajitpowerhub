@@ -1,11 +1,12 @@
-import { Phone, Navigation, MessageCircle } from 'lucide-react';
+import { Phone, Navigation, MessageCircle, Wrench } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { SITE, telUrl, whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 /**
- * Mobile sticky bar — Call + Directions + WhatsApp.
+ * Mobile sticky bar — Call + Book Service + WhatsApp + Directions.
+ * Mirrors the desktop dealer rail’s Book Service entry point.
  */
 export function MobileLocalCTA() {
   const { site } = useSite();
@@ -15,11 +16,11 @@ export function MobileLocalCTA() {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-[9999] flex h-16 items-center bg-navy px-2 pb-[env(safe-area-inset-bottom)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[9999] flex h-16 items-center bg-navy px-1.5 pb-[env(safe-area-inset-bottom)] sm:px-2 lg:hidden"
       role="navigation"
-      aria-label="Call, WhatsApp, or get directions"
+      aria-label="Call, book service, WhatsApp, or get directions"
     >
-      <div className="mx-auto grid w-full max-w-lg grid-cols-3 gap-1.5">
+      <div className="mx-auto grid w-full max-w-lg grid-cols-4 gap-1 sm:gap-1.5">
         <Button
           href={telUrl(undefined, site)}
           target="_self"
@@ -27,10 +28,20 @@ export function MobileLocalCTA() {
           size="sm"
           icon={Phone}
           fullWidth
-          className="min-h-11 !rounded-dealer"
+          className="min-h-11 !rounded-dealer !px-1 !text-[10px] sm:!px-2 sm:!text-xs"
           onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'mobile_sticky' })}
         >
           Call
+        </Button>
+        <Button
+          to="/service#book"
+          variant="dealerSecondary"
+          size="sm"
+          icon={Wrench}
+          fullWidth
+          className="min-h-11 !rounded-dealer !px-1 !text-[10px] sm:!px-2 sm:!text-xs"
+        >
+          Service
         </Button>
         <Button
           href={whatsappUrl(undefined, site)}
@@ -38,7 +49,7 @@ export function MobileLocalCTA() {
           size="sm"
           icon={MessageCircle}
           fullWidth
-          className="min-h-11 !rounded-dealer"
+          className="min-h-11 !rounded-dealer !px-1 !text-[10px] sm:!px-2 sm:!text-xs"
           onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'mobile_sticky' })}
         >
           Chat
@@ -49,7 +60,7 @@ export function MobileLocalCTA() {
           size="sm"
           icon={Navigation}
           fullWidth
-          className="min-h-11 !rounded-dealer"
+          className="min-h-11 !rounded-dealer !px-1 !text-[10px] sm:!px-2 sm:!text-xs"
           onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'mobile_sticky' })}
         >
           Map

@@ -332,7 +332,8 @@ export const FOOTER_MODEL_LINKS = [
 
 export const FOOTER_MORE_LINKS = [
   { label: 'Finance', to: '/finance' },
-  { label: 'Service', to: '/service' },
+  { label: 'Simulator', to: '/finance#simulator' },
+  { label: 'Service', to: '/service#book' },
   { label: 'Our Community', to: '/community' },
   { label: 'Guides', to: '/guides' },
   { label: 'Accessories', to: '/accessories' },
