@@ -12,10 +12,13 @@ where schemaname = 'public'
     'auth read vyapar_items'
   );
 
-select policyname
+select policyname, cmd, roles
 from pg_policies
 where schemaname = 'storage'
   and tablename = 'objects'
-  and policyname like '%scooter images%'
-     or policyname like '%accessory images%'
-     or policyname like '%review photos%';
+  and (
+    policyname like '%scooter images%'
+    or policyname like '%accessory images%'
+    or policyname like '%review photos%'
+  )
+order by policyname;
