@@ -68,17 +68,27 @@ function schedulePopularityCacheBust() {
   popularityBustTimer = setTimeout(() => clearCache('popularity_engine'), 3000);
 }
 
+let fallbackVisitorId = null;
+
+function newVisitorId() {
+  return 'v_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+}
+
 export function getVisitorId() {
   if (typeof window === 'undefined') return null;
-  let id = localStorage.getItem(VISITOR_KEY);
-  if (!id) {
-    id =
-      'v_' +
-      Date.now().toString(36) +
-      Math.random().toString(36).slice(2, 10);
-    localStorage.setItem(VISITOR_KEY, id);
+  try {
+    let id = localStorage.getItem(VISITOR_KEY);
+    if (!id) {
+      id = newVisitorId();
+      localStorage.setItem(VISITOR_KEY, id);
+    }
+    return id;
+  } catch {
+    // Private mode / blocked storage throws here. Lead submits call this first,
+    // so fall back to a session-lived id rather than failing the form.
+    fallbackVisitorId = fallbackVisitorId || newVisitorId();
+    return fallbackVisitorId;
   }
-  return id;
 }
 
 function readLocalEvents() {
