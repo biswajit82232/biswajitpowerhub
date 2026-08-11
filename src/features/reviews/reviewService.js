@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { REVIEWS } from '@/data/reviews';
+import { compressForUpload } from '@/lib/resizeImage';
 
 const CACHE_KEY = 'reviews_approved_v3';
 const CACHE_TTL = 60;
@@ -26,13 +27,14 @@ function bustReviewCache() {
 
 /** Upload a customer review photo to Supabase Storage. Falls back to base64 in demo mode. */
 export async function uploadReviewPhoto(file) {
+  const upload = await compressForUpload(file, 1000, 1000);
   if (isSupabaseConfigured && supabase) {
     try {
-      const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
       const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const { error } = await supabase.storage
         .from('review-photos')
-        .upload(path, file, { upsert: false, contentType: file.type });
+        .upload(path, upload, { upsert: false, contentType: upload.type });
       if (!error) {
         const { data } = supabase.storage.from('review-photos').getPublicUrl(path);
         return data.publicUrl;
@@ -48,7 +50,7 @@ export async function uploadReviewPhoto(file) {
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target.result);
     reader.onerror = reject;
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(upload);
   });
 }
 

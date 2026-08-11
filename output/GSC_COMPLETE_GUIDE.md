@@ -18,7 +18,7 @@ Live checks confirm Googlebot-friendly setup:
 | HTTPS + HSTS | Pass |
 | `www` → apex `biswajitpowerhub.in` (308) | Pass |
 | `robots.txt` Allow `/` + Sitemap link | Pass |
-| Sitemap = **47** URLs | Pass |
+| Sitemap = **59** URLs | Pass |
 | Unique `<title>` + `canonical` on public pages | Pass |
 | `meta robots: index, follow` on indexable pages | Pass |
 | Prerendered HTML (titles, JSON-LD, text) for bots | Pass |
@@ -33,7 +33,7 @@ Live checks confirm Googlebot-friendly setup:
 
 ## 2. What SHOULD be indexed (target list)
 
-Google should eventually index **everything in the sitemap** (~47 URLs). Prioritize in this order when using **URL Inspection → Request indexing**.
+Google should eventually index **everything in the sitemap** (~59 URLs). Prioritize in this order when using **URL Inspection → Request indexing**.
 
 ### A. Must-index first (brand + money pages)
 
@@ -176,7 +176,7 @@ These are in `sitemap.xml` and return `index, follow` live:
 3. Click **Submit**  
 4. Refresh after 1–5 minutes  
 5. Status should become **Success**  
-6. “Discovered URLs” should approach **~47**
+6. “Discovered URLs” should approach **~59**
 
 If it fails:
 
@@ -202,7 +202,7 @@ For each URL in **Section 2A–2D**:
 | Report | What you want |
 |--------|----------------|
 | **Pages** (Indexing) | Indexed count rising; few “Crawled – currently not indexed” is normal at first |
-| **Sitemaps** | Success, ~47 discovered |
+| **Sitemaps** | Success, ~59 discovered |
 | **Page indexing → Excluded** | Admin/ads should be excluded / blocked by robots — good |
 | **Experience / Core Web Vitals** | Improve over time; not a blocker for first indexing |
 | **Performance** | Impressions for Berhampore / Murshidabad / no licence queries |
@@ -226,7 +226,7 @@ For each URL in **Section 2A–2D**:
 ## 5. How Googlebot sees your pages (technical)
 
 1. Fetches `robots.txt` → allowed to crawl public site  
-2. Reads `sitemap.xml` → discovers the 47 URLs  
+2. Reads `sitemap.xml` → discovers the 59 URLs  
 3. Requests each URL over HTTPS  
 4. Receives **prerendered HTML** with unique title, description, canonical, robots, and JSON-LD (not an empty SPA shell)  
 5. Indexes if quality/signals are enough (not every submitted URL is indexed instantly)
@@ -289,7 +289,7 @@ View source (Ctrl+U) on homepage and Activa:
 - Don’t request indexing for `/admin`, `/ad-landing`, `/dealership`, `/updates`  
 - Don’t use `/reviews` (use `/community`)  
 - Don’t submit a second sitemap with www URLs  
-- Don’t expect all 47 URLs indexed overnight  
+- Don’t expect all 59 URLs indexed overnight  
 - Don’t confuse Justdial “Biswajit Enterprise” with your brand  
 
 ---
@@ -302,7 +302,7 @@ View source (Ctrl+U) on homepage and Activa:
 4. Wait 3–7 days → Pages report → Indexed rising  
 5. Weekly → Performance + fix real errors only  
 
-**Expected indexable set:** all **47** sitemap URLs.  
+**Expected indexable set:** all **59** sitemap URLs.  
 **Expected excluded:** admin, ads, stubs, junk 404s, non-SEO scooters.
 
 ---

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 
 /**
  * Showroom/model image with gray "Upload Photo" placeholder when src is missing/broken.
@@ -16,8 +17,13 @@ export function SiteImage({
   imgClassName,
   placeholderLabel = 'Upload Photo',
 }) {
-  const [errored, setErrored] = useState(false);
-  const show = Boolean(src) && !errored;
+  // Fallback chain: optimized CDN variant -> original URL -> placeholder.
+  const [failStage, setFailStage] = useState(0);
+  const canOptimize = isSupabaseStorageUrl(src);
+  const exhausted = failStage >= (canOptimize ? 2 : 1);
+  const resolvedSrc =
+    failStage === 0 && canOptimize ? optimizedImageUrl(src, Math.min(width || 800, 1600)) : src;
+  const show = Boolean(src) && !exhausted;
 
   return (
     <div
@@ -26,14 +32,14 @@ export function SiteImage({
     >
       {show ? (
         <img
-          src={src}
+          src={resolvedSrc}
           alt={alt}
           width={width}
           height={height}
           loading={loading}
           decoding="async"
           fetchPriority={fetchPriority}
-          onError={() => setErrored(true)}
+          onError={() => setFailStage((s) => s + 1)}
           className={cn('h-full w-full max-w-full object-cover', imgClassName)}
         />
       ) : (

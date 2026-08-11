@@ -82,8 +82,10 @@ function loadGtagScript() {
     window.dataLayer.push(arguments);
   };
   window.gtag('js', new Date());
+  // send_page_view: true — this loader owns the first page_view (index.html no
+  // longer loads gtag eagerly). SPA route changes are sent by trackGAPageView.
   window.gtag('config', GA_MEASUREMENT_ID, {
-    send_page_view: false,
+    send_page_view: true,
     anonymize_ip: true,
   });
   configureGoogleAds();

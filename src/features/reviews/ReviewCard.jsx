@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Stars } from '@/components/ui/StarRating';
 import { SCOOTERS } from '@/data/scooters';
 import { cn } from '@/lib/utils';
+import { optimizedImageUrl } from '@/lib/imageCdn';
 
 export function ReviewCard({ review, className }) {
   const scooterMatch = review.scooter
@@ -14,7 +15,7 @@ export function ReviewCard({ review, className }) {
       {review.photo && (
         <div className="mt-3 overflow-hidden border border-line">
           <img
-            src={review.photo}
+            src={optimizedImageUrl(review.photo, 800)}
             alt={`Photo from ${review.name}`}
             width={800}
             height={600}

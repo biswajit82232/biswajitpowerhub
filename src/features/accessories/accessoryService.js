@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { ACCESSORIES } from '@/data/accessories';
+import { compressForUpload } from '@/lib/resizeImage';
 
 const CACHE_KEY = 'accessories_v2';
 const CACHE_TTL = 60;
@@ -112,13 +113,14 @@ export async function updateAccessoryStock(id, stock_status) {
 }
 
 export async function uploadAccessoryImage(file, accessoryId) {
+  const upload = await compressForUpload(file, 1200, 900);
   if (isSupabaseConfigured && supabase) {
     try {
-      const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
       const path = `${accessoryId || 'new'}/${Date.now()}.${ext}`;
       const { error } = await supabase.storage
         .from('accessory-images')
-        .upload(path, file, { upsert: false, contentType: file.type });
+        .upload(path, upload, { upsert: false, contentType: upload.type });
       if (!error) {
         const { data } = supabase.storage.from('accessory-images').getPublicUrl(path);
         return data.publicUrl;
@@ -134,6 +136,6 @@ export async function uploadAccessoryImage(file, accessoryId) {
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target.result);
     reader.onerror = reject;
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(upload);
   });
 }

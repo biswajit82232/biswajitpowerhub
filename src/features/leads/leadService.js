@@ -125,12 +125,17 @@ export async function submitContact({ name, phone, email, message, from = 'conta
 
 /* ---------- Admin reads ---------- */
 
+// Cap admin list fetches so the panel stays fast as tables grow.
+// Newest rows first, so the cap only trims very old history.
+const ADMIN_LIST_LIMIT = 1000;
+
 export async function getCallbacks() {
   if (!isSupabaseConfigured || !supabase) return [];
   const { data, error } = await supabase
     .from('callbacks')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(ADMIN_LIST_LIMIT);
   if (error) throw error;
   return data;
 }
@@ -140,7 +145,8 @@ export async function getTestRides() {
   const { data, error } = await supabase
     .from('test_rides')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(ADMIN_LIST_LIMIT);
   if (error) throw error;
   return data;
 }
@@ -150,7 +156,8 @@ export async function getServiceBookings() {
   const { data, error } = await supabase
     .from('service_bookings')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(ADMIN_LIST_LIMIT);
   if (error) throw error;
   return data;
 }
@@ -160,7 +167,8 @@ export async function getContactMessages() {
   const { data, error } = await supabase
     .from('contact_messages')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(ADMIN_LIST_LIMIT);
   if (error) throw error;
   return data;
 }
@@ -200,7 +208,8 @@ export async function getLeads() {
   const { data, error } = await supabase
     .from('leads')
     .select('*')
-    .order('score', { ascending: false });
+    .order('score', { ascending: false })
+    .limit(ADMIN_LIST_LIMIT);
   if (error) throw error;
   return enrichLeads(data || []);
 }

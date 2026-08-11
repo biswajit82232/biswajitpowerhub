@@ -6,6 +6,10 @@
 
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { saveHeroImage } from '@/features/finance/financeService';
+import { resizeImageFile } from '@/lib/resizeImage';
+
+// Re-export for existing importers.
+export { resizeImageFile } from '@/lib/resizeImage';
 
 const LOCAL_KEY = 'bph_site_photos_v1';
 const SETTINGS_ROW_ID = 1;
@@ -102,24 +106,6 @@ export async function loadSitePhotos() {
   return local;
 }
 
-/** Client-side resize via canvas; returns Blob (webp preferred). */
-export async function resizeImageFile(file, maxW, maxH) {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxW / bitmap.width, maxH / bitmap.height);
-  const w = Math.max(1, Math.round(bitmap.width * scale));
-  const h = Math.max(1, Math.round(bitmap.height * scale));
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(bitmap, 0, 0, w, h);
-  bitmap.close();
-  const blob = await new Promise((resolve) => {
-    canvas.toBlob((b) => resolve(b), 'image/webp', 0.85);
-  });
-  if (blob) return new File([blob], `${file.name.replace(/\.\w+$/, '')}.webp`, { type: 'image/webp' });
-  return file;
-}
 
 export async function uploadSitePhotoFile(file, folder = 'site') {
   let uploadFile = file;

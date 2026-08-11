@@ -84,7 +84,7 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
 
         <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
           {loading
-            ? Array.from({ length: 3 }).map((_, i) => <ScooterCardSkeleton key={i} />)
+            ? Array.from({ length: 6 }).map((_, i) => <ScooterCardSkeleton key={i} />)
             : filtered.map((s) => (
                 <DealerProductCard
                   key={s.id}

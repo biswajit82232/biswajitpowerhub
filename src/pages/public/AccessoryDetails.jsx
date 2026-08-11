@@ -8,6 +8,7 @@ import { RouteLoader } from '@/components/ui/Loading';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { AccessoryImage } from '@/components/common/AccessoryImage';
+import { optimizedImageUrl } from '@/lib/imageCdn';
 import { getAccessoryById } from '@/features/accessories/accessoryService';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
@@ -131,7 +132,7 @@ export default function AccessoryDetails() {
                   {accessory.images.map((url, i) => (
                     <img
                       key={url + i}
-                      src={url}
+                      src={optimizedImageUrl(url, 128)}
                       alt={`${accessory.name} photo ${i + 1}`}
                       width={64}
                       height={64}

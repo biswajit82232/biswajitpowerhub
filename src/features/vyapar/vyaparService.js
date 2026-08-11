@@ -215,9 +215,18 @@ export async function saveVyaparItem(item) {
 /**
  * Parse catalogue id from the public store HTML (__NEXT_DATA__).
  */
+const VYAPAR_FETCH_TIMEOUT_MS = 15000;
+
+function fetchTimeoutSignal() {
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), VYAPAR_FETCH_TIMEOUT_MS);
+  return controller.signal;
+}
+
 async function catalogueIdFromStorePage(storeAlias) {
   const res = await fetch(VYAPAR_STORE_URL(storeAlias), {
     headers: { Accept: 'text/html' },
+    signal: fetchTimeoutSignal(),
   });
   if (!res.ok) throw new Error(`Store page returned ${res.status}`);
   const html = await res.text();
@@ -283,6 +292,7 @@ export async function fetchVyaparCatalogue(catalogueId) {
         Accept: 'application/json',
       },
       body: JSON.stringify({ catalogueId, pageNo }),
+      signal: fetchTimeoutSignal(),
     });
     if (!res.ok) {
       const text = await res.text().catch(() => '');

@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 export function HeroCarousel({ heroImageUrl }) {
   const { site } = useSite();
   const { photos } = useSitePhotos();
-  const { data: offers } = useAsync(() => getActiveOffers(), []);
+  const { data: offers, loading: offersLoading } = useAsync(() => getActiveOffers(), []);
   const activeOffers = offers?.length ? offers : [];
 
   const slides = [];
@@ -124,7 +124,21 @@ export function HeroCarousel({ heroImageUrl }) {
         )}
       </div>
 
-      {offer ? (
+      {offersLoading ? (
+        // Reserve the offer-bar space while offers load to avoid layout shift.
+        <div className="border-t border-brand-600 bg-brand-500 text-white" aria-hidden>
+          <div className="container-px flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3.5">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/80">
+                Current offer
+              </p>
+              <p className="mt-0.5 h-6 w-56 max-w-full animate-pulse rounded bg-white/25 sm:h-7" />
+              <p className="mt-0.5 h-4 w-32 max-w-full animate-pulse rounded bg-white/20" />
+            </div>
+            <span className="inline-flex h-10 w-full shrink-0 animate-pulse rounded-dealer bg-white/30 sm:w-28" />
+          </div>
+        </div>
+      ) : offer ? (
         <div className="border-t border-brand-600 bg-brand-500 text-white">
           <div className="container-px flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3.5">
             <div className="min-w-0">

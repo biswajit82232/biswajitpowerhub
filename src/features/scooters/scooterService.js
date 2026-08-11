@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { withTimeout } from '@/lib/utils';
+import { compressForUpload } from '@/lib/resizeImage';
 import { SCOOTERS } from '@/data/scooters';
 import { normalizeScooter } from '@/lib/scooterVariants';
 
@@ -180,13 +181,14 @@ export async function updateStock(id, stock_status) {
  * - Otherwise: converts to a base64 data URL (demo mode).
  */
 export async function uploadScooterImage(file, scooterId) {
+  const upload = await compressForUpload(file, 1600, 1200);
   if (isSupabaseConfigured && supabase) {
     try {
-      const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
       const path = `${scooterId || 'new'}/${Date.now()}.${ext}`;
       const { error } = await supabase.storage
         .from('scooter-images')
-        .upload(path, file, { upsert: false, contentType: file.type });
+        .upload(path, upload, { upsert: false, contentType: upload.type });
       if (!error) {
         const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
         return data.publicUrl;
@@ -202,6 +204,6 @@ export async function uploadScooterImage(file, scooterId) {
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target.result);
     reader.onerror = reject;
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(upload);
   });
 }

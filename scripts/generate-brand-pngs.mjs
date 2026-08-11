@@ -71,8 +71,12 @@ async function main() {
   const trimmed = await sharp(SOURCE).trim({ threshold: 20 }).png().toBuffer();
   const transparent = await makeTransparent(trimmed);
 
-  // Master logo used in UI (transparent)
-  await sharp(transparent).png().toFile(join(PUBLIC, 'logo.png'));
+  // Master logo used in UI (transparent). Displayed at <=160px, so 384px
+  // (2.4x retina) is plenty — keeps the file ~40KB instead of ~85KB.
+  await sharp(transparent)
+    .resize(384, 384, { fit: 'inside', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toFile(join(PUBLIC, 'logo.png'));
   console.log('[brand-pngs] wrote public/logo.png');
 
   // Header / preload sized copy

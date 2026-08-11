@@ -3,14 +3,8 @@
   <head>
     <meta charset="UTF-8" />
 
-    <!-- Google tag (gtag.js) — GA4. Google Ads (AW-…) via VITE_GOOGLE_ADS_ID in src/lib/googleAnalytics.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZPSM06SEY4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-ZPSM06SEY4', { anonymize_ip: true });
-    </script>
+    <!-- GA4 + Google Ads load on idle via src/lib/googleAnalytics.js (keeps ~310KB of
+         third-party JS off the critical path; first page_view sent when gtag.js loads) -->
 
     <!-- Search Console: set VITE_GOOGLE_SITE_VERIFICATION in Vercel (injected via SEO.jsx when present) -->
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png" />
@@ -50,8 +44,6 @@
       content="Buy premium low-speed electric scooters in Berhampore, West Bengal. No licence, no registration."
     />
     <meta name="twitter:image" content="https://biswajitpowerhub.in/og-image.png" />
-
-    <link rel="preload" as="image" href="/logo.png" />
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />

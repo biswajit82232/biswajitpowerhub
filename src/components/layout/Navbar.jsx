@@ -37,8 +37,8 @@ function DesktopNavItem({ link }) {
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      <button
-        type="button"
+      <Link
+        to={link.to}
         className={cn(
           'relative inline-flex items-center gap-1 whitespace-nowrap px-3 py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors xl:px-3.5 xl:text-sm',
           isActive ? 'text-navy' : 'text-body hover:text-navy',
@@ -47,12 +47,11 @@ function DesktopNavItem({ link }) {
         )}
         aria-expanded={open}
         aria-haspopup="true"
+        onFocus={() => setOpen(true)}
       >
-        <Link to={link.to} className="hover:text-navy">
-          {link.label}
-        </Link>
+        {link.label}
         <ChevronDown className={cn('h-3.5 w-3.5 transition', open && 'rotate-180')} />
-      </button>
+      </Link>
       <AnimatePresence>
         {open && (
           <motion.div

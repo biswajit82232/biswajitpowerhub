@@ -201,7 +201,7 @@ for (const f of files) {
 for (const [t, rs] of titles) {
   if (rs.length > 1) push('error', rs.join(', '), `duplicate title: ${t}`);
 }
-for (const [d, rs] of descs) {
+for (const [, rs] of descs) {
   if (rs.length > 1) push('warn', rs.join(', '), `duplicate description (${rs.length} pages)`);
 }
 for (const [c, rs] of canons) {

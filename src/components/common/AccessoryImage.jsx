@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 
 const HUES = {
   blue: 'from-brand-100 via-brand-50 to-white text-brand-400',
@@ -22,20 +23,25 @@ export function AccessoryImage({
   width,
   height,
 }) {
-  const [errored, setErrored] = useState(false);
-  const showImage = src && !errored;
+  // Fallback chain: optimized CDN variant -> original URL -> placeholder.
+  const [failStage, setFailStage] = useState(0);
+  const canOptimize = isSupabaseStorageUrl(src);
+  const exhausted = failStage >= (canOptimize ? 2 : 1);
+  const resolvedSrc =
+    failStage === 0 && canOptimize ? optimizedImageUrl(src, width || 800) : src;
+  const showImage = Boolean(src) && !exhausted;
 
   return (
     <div className={cn('relative isolate overflow-hidden', className)}>
       {showImage ? (
         <img
-          src={src}
+          src={resolvedSrc}
           alt={alt}
           width={width || 800}
           height={height || 600}
           loading={loading}
           decoding="async"
-          onError={() => setErrored(true)}
+          onError={() => setFailStage((s) => s + 1)}
           className={cn(
             'h-full w-full',
             fit === 'contain' ? 'object-contain object-center' : 'object-cover',

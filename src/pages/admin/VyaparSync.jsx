@@ -66,7 +66,7 @@ export default function VyaparSync() {
   }, []);
 
   const settings = data?.settings;
-  const items = data?.items || [];
+  const items = useMemo(() => data?.items || [], [data]);
   const scooters = data?.scooters || [];
   const accessories = data?.accessories || [];
 

@@ -15,7 +15,11 @@ async function countRows(table, filter) {
   if (!isSupabaseConfigured || !supabase) return 0;
   let q = supabase.from(table).select('*', { count: 'exact', head: true });
   if (filter) q = filter(q);
-  const { count } = await q;
+  const { count, error } = await q;
+  if (error) {
+    console.warn(`[Analytics] count(${table}) failed:`, error.message);
+    return 0;
+  }
   return count || 0;
 }
 
@@ -78,11 +82,14 @@ export async function getOverview() {
     ]);
 
     // Scooter view windows for smart KPIs
-    const { data: viewRows } = await supabase
+    const { data: viewRows, error: viewError } = await supabase
       .from('lead_events')
       .select('created_at')
       .eq('event_type', EVENT.SCOOTER_VIEW)
       .limit(8000);
+    if (viewError) {
+      console.warn('[Analytics] scooter view fetch failed:', viewError.message);
+    }
 
     const now = Date.now();
     const monthMs = 30 * 86400000;
@@ -171,7 +178,10 @@ export async function getInboxBadges() {
 export async function getEventAggregates() {
   let events = [];
   if (isSupabaseConfigured && supabase) {
-    const { data } = await supabase.from('lead_events').select('event_type, meta, visitor_id').limit(8000);
+    const { data, error } = await supabase.from('lead_events').select('event_type, meta, visitor_id').limit(8000);
+    if (error) {
+      console.warn('[Analytics] event aggregate fetch failed:', error.message);
+    }
     events = (data || []).map((r) => ({
       type: r.event_type,
       meta: r.meta,

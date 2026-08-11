@@ -9,7 +9,7 @@ import {
 } from '@/lib/googleAnalytics';
 import { initOutboundClickTracking } from '@/lib/outboundClickTracking';
 
-/** GA4 page views on SPA route changes (initial hit comes from index.html gtag). */
+/** GA4 page views on SPA route changes (initial hit sent by the idle gtag loader's config). */
 export function GoogleAnalytics() {
   const location = useLocation();
   const isFirstRoute = useRef(true);

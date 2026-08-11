@@ -10,7 +10,7 @@ import { SITE_URL, SITE } from '@/config/site';
  */
 export default function LocationLanding({ location }) {
   const path = location.path;
-  const faqs = location.faqs || [];
+  const faqs = useMemo(() => location.faqs || [], [location]);
   const nearbyTowns = getNearbyLocations(location, 5);
 
   const jsonLd = useMemo(

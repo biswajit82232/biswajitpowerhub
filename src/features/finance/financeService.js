@@ -1,16 +1,18 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { FINANCE_DEFAULTS } from '@/config/finance';
+import { compressForUpload } from '@/lib/resizeImage';
 
 /** Upload a hero image to Supabase Storage (or base64 fallback). */
 export async function uploadHeroImage(file) {
+  const upload = await compressForUpload(file, 1600, 900);
   if (isSupabaseConfigured && supabase) {
     try {
-      const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+      const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
       const path = `hero/${Date.now()}.${ext}`;
       const { error } = await supabase.storage
         .from('scooter-images')
-        .upload(path, file, { upsert: true, contentType: file.type });
+        .upload(path, upload, { upsert: true, contentType: upload.type });
       if (!error) {
         const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
         return data.publicUrl;
@@ -26,7 +28,7 @@ export async function uploadHeroImage(file) {
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target.result);
     reader.onerror = reject;
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(upload);
   });
 }
 

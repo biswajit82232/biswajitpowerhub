@@ -4,6 +4,7 @@ import { Section } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
 import Button from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
 import { whatsappUrl } from '@/config/site';
@@ -72,7 +73,17 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
   const { site } = useSite();
   const { data: offers, loading } = useAsync(() => getActiveOffers(), []);
 
-  if (loading) return null;
+  if (loading) {
+    // Reserve space while offers load so content below doesn't shift.
+    return (
+      <Section id="offers" tight={compact} className={compact ? 'py-6 sm:py-8' : 'py-8 sm:py-10'}>
+        <div className="space-y-4">
+          <Skeleton className="h-28 w-full sm:h-24" />
+          {showEmpty ? <Skeleton className="h-28 w-full sm:h-24" /> : null}
+        </div>
+      </Section>
+    );
+  }
 
   if (!offers?.length) {
     if (!showEmpty) return null;
