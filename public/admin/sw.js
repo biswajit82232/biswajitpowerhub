@@ -1,5 +1,5 @@
-/* BPH Admin PWA v6 — network-first shell + Web Push */
-const CACHE = 'bph-admin-v6';
+/* BPH Admin PWA v7 — scope covers /admin (no trailing slash) + Web Push */
+const CACHE = 'bph-admin-v7';
 const PRECACHE = [
   '/admin/manifest.webmanifest',
   '/admin/icon-192.png',
@@ -52,10 +52,10 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put('/admin/', copy)).catch(() => {});
+          caches.open(CACHE).then((cache) => cache.put('/admin', copy)).catch(() => {});
           return res;
         })
-        .catch(() => caches.match('/admin/') || caches.match('/') || caches.match('/index.html'))
+        .catch(() => caches.match('/admin') || caches.match('/') || caches.match('/index.html'))
     );
     return;
   }

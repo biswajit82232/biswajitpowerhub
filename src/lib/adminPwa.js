@@ -2,7 +2,8 @@
 
 const MANIFEST = '/admin/manifest.webmanifest';
 const SW_URL = '/admin/sw.js';
-const SW_SCOPE = '/admin/';
+// Must cover /admin AND /admin/* (Vercel trailingSlash:false keeps Dashboard at /admin)
+const SW_SCOPE = '/admin';
 const MARKER = 'data-admin-pwa';
 
 let deferredPrompt = null;

@@ -84,7 +84,7 @@
         icon.href = '/admin/apple-touch-icon.png';
         document.head.appendChild(icon);
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' })
+          navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin' })
             .then(function (reg) { reg.update(); })
             .catch(function () {});
         }

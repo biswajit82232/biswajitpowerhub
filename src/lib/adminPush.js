@@ -55,14 +55,14 @@ function urlBase64ToUint8Array(base64String) {
 
 async function getAdminRegistration() {
   if (!('serviceWorker' in navigator)) return null;
-  let reg = await navigator.serviceWorker.getRegistration('/admin/');
+  let reg = await navigator.serviceWorker.getRegistration('/admin');
   if (!reg) {
-    reg = await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
+    reg = await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin' });
   }
   // Ensure active worker before PushManager.subscribe
   if (reg.installing || reg.waiting || !reg.active) {
     await navigator.serviceWorker.ready;
-    reg = await navigator.serviceWorker.getRegistration('/admin/') || reg;
+    reg = await navigator.serviceWorker.getRegistration('/admin') || reg;
   }
   return reg;
 }
@@ -146,7 +146,7 @@ export async function enableAdminPush() {
 }
 
 export async function disableAdminPush() {
-  const reg = await navigator.serviceWorker.getRegistration('/admin/');
+  const reg = await navigator.serviceWorker.getRegistration('/admin');
   const sub = await reg?.pushManager?.getSubscription();
   if (sub) {
     const endpoint = sub.endpoint;
@@ -176,7 +176,7 @@ export async function getAdminPushStatus() {
   let subscribed = false;
   if (supported && permission === 'granted') {
     try {
-      const reg = await navigator.serviceWorker.getRegistration('/admin/');
+      const reg = await navigator.serviceWorker.getRegistration('/admin');
       subscribed = Boolean(await reg?.pushManager?.getSubscription());
     } catch (_) { /* ignore */ }
   }
