@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  RefreshCw, Settings2, Pencil, Bike, Package, Link2, AlertTriangle, CloudDownload,
+  RefreshCw, Settings2, Bike, Package, Link2, AlertTriangle, CloudDownload,
 } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
+import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
@@ -358,9 +359,9 @@ export default function VyaparSync() {
                 key={item.id}
                 image={
                   cover ? (
-                    <img src={cover} alt="" className="h-10 w-12 rounded-lg object-cover sm:h-11 sm:w-14" />
+                    <img src={cover} alt="" className="h-12 w-14 rounded-xl object-cover sm:h-14 sm:w-16" />
                   ) : (
-                    <span className="flex h-10 w-12 items-center justify-center rounded-lg bg-slate-100 text-muted sm:h-11 sm:w-14">
+                    <span className="flex h-12 w-14 items-center justify-center rounded-xl bg-slate-100 text-muted sm:h-14 sm:w-16">
                       {item.mappedType === 'scooter' ? <Bike className="h-4 w-4" /> : <Package className="h-4 w-4" />}
                     </span>
                   )
@@ -370,35 +371,30 @@ export default function VyaparSync() {
                 tags={
                   <>
                     {brokenLink ? (
-                      <Badge tone="danger" className="shrink-0 px-1.5 py-0 text-[10px]">Broken link</Badge>
+                      <Badge tone="danger" className="px-1.5 py-0 text-[10px]">Broken link</Badge>
                     ) : item.linked ? (
-                      <Badge tone="success" className="shrink-0 px-1.5 py-0 text-[10px]">
-                        <Link2 className="mr-0.5 h-3 w-3" /> Linked
+                      <Badge tone="success" className="px-1.5 py-0 text-[10px]">
+                        <Link2 className="mr-0.5 inline h-3 w-3" /> Linked
                       </Badge>
                     ) : (
-                      <Badge tone="warning" className="shrink-0 px-1.5 py-0 text-[10px]">Unlinked</Badge>
+                      <Badge tone="warning" className="px-1.5 py-0 text-[10px]">Unlinked</Badge>
                     )}
                     {removed && (
-                      <Badge tone="danger" className="shrink-0 px-1.5 py-0 text-[10px]">Off store</Badge>
+                      <Badge tone="danger" className="px-1.5 py-0 text-[10px]">Off store</Badge>
                     )}
-                    <Badge tone="neutral" className="shrink-0 px-1.5 py-0 text-[10px]">
+                    <Badge tone="neutral" className="px-1.5 py-0 text-[10px]">
                       {item.mappedType === 'scooter' ? 'Scooter' : 'Part'}
                     </Badge>
-                    <Badge tone={stock.tone} className="shrink-0 px-1.5 py-0 text-[10px]">{stock.label}</Badge>
+                    <Badge tone={stock.tone} className="px-1.5 py-0 text-[10px]">{stock.label}</Badge>
                     {item.displayName?.trim() && item.displayName.trim() !== item.name && (
-                      <Badge tone="brand" className="hidden shrink-0 px-1.5 py-0 text-[10px] sm:inline-flex">Renamed</Badge>
+                      <Badge tone="brand" className="hidden px-1.5 py-0 text-[10px] sm:inline-flex">Renamed</Badge>
                     )}
                   </>
                 }
                 actions={
-                  <button
-                    type="button"
-                    onClick={() => { if (guard()) setEditing(item); }}
-                    className="tap-target rounded-lg p-1.5 text-brand-600 transition hover:bg-brand-50"
-                    aria-label="Edit"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
+                  <InventoryRowActions
+                    onEdit={() => { if (guard()) setEditing(item); }}
+                  />
                 }
               />
             );

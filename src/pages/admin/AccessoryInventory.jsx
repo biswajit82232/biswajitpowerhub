@@ -1,15 +1,20 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Package, RefreshCw } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Plus, Package, RefreshCw } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { CompactInventoryList, CompactInventoryItem } from '@/components/admin/CompactInventoryList';
+import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
+import {
+  InventoryToolbar,
+  InventoryStockSelect,
+} from '@/components/admin/InventoryToolbar';
+import { filterInventoryItems, countByStock } from '@/lib/inventoryList';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { Select } from '@/components/ui/Input';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { CompactInventoryList, CompactInventoryItem, CompactInventoryMobileStock } from '@/components/admin/CompactInventoryList';
 import { AccessoryImage } from '@/components/common/AccessoryImage';
 import { AccessoryForm } from '@/features/accessories/AccessoryForm';
 import { useToast } from '@/components/ui/Toast';
@@ -22,7 +27,6 @@ import {
 } from '@/features/accessories/accessoryService';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { formatINR } from '@/lib/utils';
-import { STOCK_LABELS } from '@/data/scooters';
 
 export default function AccessoryInventory() {
   const { toast } = useToast();
@@ -31,6 +35,30 @@ export default function AccessoryInventory() {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [search, setSearch] = useState('');
+  const [stockFilter, setStockFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+
+  const categories = useMemo(() => {
+    const set = new Set();
+    (accessories || []).forEach((a) => {
+      if (a.category) set.add(a.category);
+    });
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [accessories]);
+
+  const counts = useMemo(() => countByStock(accessories), [accessories]);
+
+  const filtered = useMemo(() => {
+    const byStock = filterInventoryItems(accessories, {
+      search,
+      stockFilter,
+      getSearchText: (a) =>
+        [a.name, a.category, a.compatibility, a.brand].filter(Boolean).join(' '),
+    });
+    if (categoryFilter === 'all') return byStock;
+    return byStock.filter((a) => a.category === categoryFilter);
+  }, [accessories, search, stockFilter, categoryFilter]);
 
   const guard = () => {
     if (!isSupabaseConfigured) {
@@ -88,95 +116,150 @@ export default function AccessoryInventory() {
     }
   };
 
+  const hasItems = (accessories?.length || 0) > 0;
+  const emptyFiltered = hasItems && filtered.length === 0;
+
   return (
     <>
       <SEO title="Accessories" noindex />
       <AdminHeader
         title="Spare & Body Parts"
-        subtitle={`${accessories?.length || 0} items`}
-        action={<Button variant="primary" icon={Plus} onClick={openNew} className="w-full sm:w-auto">Add Accessory</Button>}
+        subtitle={`${counts.all} items · manage parts, photos & stock`}
+        action={
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button to="/admin/vyapar" variant="secondary" icon={RefreshCw} className="w-full sm:w-auto">
+              Vyapar Sync
+            </Button>
+            <Button variant="primary" icon={Plus} onClick={openNew} className="w-full sm:w-auto">
+              Add Accessory
+            </Button>
+          </div>
+        }
       />
 
       {!isSupabaseConfigured && (
-        <div className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+        <div className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
           Demo mode — showing seed data. Connect Supabase to add, edit, or delete accessories.
         </div>
       )}
 
-      <div className="mb-5 flex flex-col gap-2 rounded-xl border border-brand-100 bg-brand-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-brand-800">
-          Sync parts & accessories from Vyapar, then edit names, categories, and photos here anytime.
-        </p>
-        <Link
-          to="/admin/vyapar"
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-bold text-brand-700 ring-1 ring-brand-200 transition hover:bg-brand-50"
-        >
-          <RefreshCw className="h-3.5 w-3.5" /> Vyapar Sync
-        </Link>
-      </div>
-
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-14" />
+            <Skeleton key={i} className="h-20 rounded-2xl" />
           ))}
         </div>
-      ) : !accessories?.length ? (
-        <EmptyState icon={Package} title="No accessories yet" description="Add spare parts and body parts to your catalog." action={<Button variant="primary" icon={Plus} onClick={openNew}>Add Accessory</Button>} />
+      ) : !hasItems ? (
+        <EmptyState
+          icon={Package}
+          title="No accessories yet"
+          description="Add spare parts and body parts, or sync from Vyapar."
+          action={
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button variant="primary" icon={Plus} onClick={openNew}>
+                Add Accessory
+              </Button>
+              <Button to="/admin/vyapar" variant="secondary" icon={RefreshCw}>
+                Vyapar Sync
+              </Button>
+            </div>
+          }
+        />
       ) : (
-        <CompactInventoryList>
-          {accessories.map((a) => {
-            const stock = STOCK_LABELS[a.stock] || STOCK_LABELS.in_stock;
-            const stockSelect = (
-              <Select
-                value={a.stock}
-                onChange={(e) => handleStock(a.id, e.target.value)}
-                className="h-8 w-[6.75rem] rounded-lg px-2 text-xs"
-                aria-label="Update stock"
-              >
-                <option value="in_stock">In Stock</option>
-                <option value="low_stock">Few Left</option>
-                <option value="out_of_stock">Out of Stock</option>
-              </Select>
-            );
-            return (
-              <div key={a.id}>
+        <>
+          <InventoryToolbar
+            search={search}
+            onSearchChange={setSearch}
+            stockFilter={stockFilter}
+            onStockFilterChange={setStockFilter}
+            searchPlaceholder="Search by name, category, or compatibility…"
+            counts={counts}
+            extraFilter={
+              categories.length > 0 ? (
+                <Select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="h-10 w-full shrink-0 rounded-xl px-3 text-sm sm:w-[11rem]"
+                  aria-label="Filter by category"
+                >
+                  <option value="all">All categories</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </Select>
+              ) : null
+            }
+          />
+
+          {emptyFiltered ? (
+            <EmptyState
+              icon={Package}
+              title="No matches"
+              description="Try a different search, stock, or category filter."
+              action={
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setSearch('');
+                    setStockFilter('all');
+                    setCategoryFilter('all');
+                  }}
+                >
+                  Clear filters
+                </Button>
+              }
+            />
+          ) : (
+            <CompactInventoryList>
+              {filtered.map((a) => (
                 <CompactInventoryItem
+                  key={a.id}
                   image={
                     <AccessoryImage
                       src={a.images?.[0]}
                       hue={a.hue}
                       name={a.name}
                       alt={a.name}
-                      className="h-10 w-12 rounded-lg object-cover sm:h-11 sm:w-14"
+                      className="h-12 w-14 rounded-xl object-cover sm:h-14 sm:w-16"
                     />
                   }
                   title={a.name}
-                  meta={`${formatINR(a.price)}${a.compatibility ? ` · ${a.compatibility}` : ''}`}
+                  meta={[formatINR(a.price), a.compatibility].filter(Boolean).join(' · ')}
                   tags={
                     <>
-                      <Badge tone="brand" className="shrink-0 px-1.5 py-0 text-[10px]">{a.category}</Badge>
-                      {a.featured && <Badge tone="warm" className="shrink-0 px-1.5 py-0 text-[10px]">Featured</Badge>}
-                      <Badge tone={stock.tone} className="shrink-0 px-1.5 py-0 text-[10px] sm:hidden">{stock.label}</Badge>
+                      {a.category && (
+                        <Badge tone="brand" className="px-1.5 py-0 text-[10px]">
+                          {a.category}
+                        </Badge>
+                      )}
+                      {a.featured && (
+                        <Badge tone="warm" className="px-1.5 py-0 text-[10px]">
+                          Featured
+                        </Badge>
+                      )}
                     </>
                   }
-                  stockSelect={stockSelect}
+                  stockSelect={
+                    <InventoryStockSelect
+                      value={a.stock}
+                      onChange={(e) => handleStock(a.id, e.target.value)}
+                    />
+                  }
                   actions={
-                    <>
-                      <button onClick={() => openEdit(a)} className="tap-target rounded-lg p-1.5 text-brand-600 transition hover:bg-brand-50" aria-label="Edit">
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button onClick={() => { if (guard()) setConfirmDelete(a); }} className="tap-target rounded-lg p-1.5 text-red-500 transition hover:bg-red-50" aria-label="Delete">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </>
+                    <InventoryRowActions
+                      onEdit={() => openEdit(a)}
+                      onDelete={() => {
+                        if (guard()) setConfirmDelete(a);
+                      }}
+                    />
                   }
                 />
-                <CompactInventoryMobileStock>{stockSelect}</CompactInventoryMobileStock>
-              </div>
-            );
-          })}
-        </CompactInventoryList>
+              ))}
+            </CompactInventoryList>
+          )}
+        </>
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={editing ? `Edit ${editing.name}` : 'Add Accessory'} size="xl">

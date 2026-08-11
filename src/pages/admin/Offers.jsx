@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Tag, Save, X } from 'lucide-react';
+import { Plus, Tag, Save, X } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -120,26 +121,14 @@ export default function Offers() {
                         <p className="mt-1 font-mono text-xs text-muted">Code: {offer.promoCode}</p>
                       )}
                     </div>
-                    <div className="flex shrink-0 gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setEditing(offer)}
-                        className="rounded-lg p-2 text-muted transition hover:bg-brand-50 hover:text-brand-700"
-                        aria-label="Edit"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      {!String(offer.id).startsWith('legacy') && (
-                        <button
-                          type="button"
-                          onClick={() => setConfirmDelete(offer.id)}
-                          className="rounded-lg p-2 text-muted transition hover:bg-red-50 hover:text-red-600"
-                          aria-label="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
+                    <InventoryRowActions
+                      onEdit={() => setEditing(offer)}
+                      onDelete={
+                        String(offer.id).startsWith('legacy')
+                          ? undefined
+                          : () => setConfirmDelete(offer.id)
+                      }
+                    />
                   </div>
                 </li>
               ))}

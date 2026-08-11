@@ -1,15 +1,19 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Bike, RefreshCw } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Plus, Bike, RefreshCw } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { CompactInventoryList, CompactInventoryItem } from '@/components/admin/CompactInventoryList';
+import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
+import {
+  InventoryToolbar,
+  InventoryStockSelect,
+} from '@/components/admin/InventoryToolbar';
+import { filterInventoryItems, countByStock } from '@/lib/inventoryList';
 import Button from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-import { Select } from '@/components/ui/Input';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { CompactInventoryList, CompactInventoryItem, CompactInventoryMobileStock } from '@/components/admin/CompactInventoryList';
 import { ScooterImage } from '@/components/common/ScooterImage';
 import { ScooterForm } from '@/features/scooters/ScooterForm';
 import { useToast } from '@/components/ui/Toast';
@@ -17,7 +21,11 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters, upsertScooter, deleteScooter, updateStock } from '@/features/scooters/scooterService';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { formatINR } from '@/lib/utils';
-import { STOCK_LABELS } from '@/data/scooters';
+import {
+  formatRangeRange,
+  formatVariantNames,
+  getStartingPrice,
+} from '@/lib/scooterVariants';
 
 export default function Inventory() {
   const { toast } = useToast();
@@ -26,6 +34,20 @@ export default function Inventory() {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [search, setSearch] = useState('');
+  const [stockFilter, setStockFilter] = useState('all');
+
+  const counts = useMemo(() => countByStock(scooters), [scooters]);
+  const filtered = useMemo(
+    () =>
+      filterInventoryItems(scooters, {
+        search,
+        stockFilter,
+        getSearchText: (s) =>
+          [s.name, s.brand, s.tagline, formatVariantNames(s)].filter(Boolean).join(' '),
+      }),
+    [scooters, search, stockFilter],
+  );
 
   const guard = () => {
     if (!isSupabaseConfigured) {
@@ -82,97 +104,154 @@ export default function Inventory() {
     }
   };
 
+  const hasItems = (scooters?.length || 0) > 0;
+  const emptyFiltered = hasItems && filtered.length === 0;
+
   return (
     <>
       <SEO title="Inventory" noindex />
       <AdminHeader
         title="Inventory"
-        subtitle={`${scooters?.length || 0} models`}
-        action={<Button variant="primary" icon={Plus} onClick={openNew} className="w-full sm:w-auto">Add Scooter</Button>}
+        subtitle={`${counts.all} models · manage scooters, battery packs & stock`}
+        action={
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button to="/admin/vyapar" variant="secondary" icon={RefreshCw} className="w-full sm:w-auto">
+              Vyapar Sync
+            </Button>
+            <Button variant="primary" icon={Plus} onClick={openNew} className="w-full sm:w-auto">
+              Add Scooter
+            </Button>
+          </div>
+        }
       />
 
       {!isSupabaseConfigured && (
-        <div className="mb-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+        <div className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
           Demo mode — showing seed data. Connect Supabase to add, edit, or delete scooters.
         </div>
       )}
 
-      <div className="mb-5 flex flex-col gap-2 rounded-xl border border-brand-100 bg-brand-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-brand-800">
-          Pull prices & stock from your Vyapar online store, then keep full control here (rename, photos, variants, tags).
-        </p>
-        <Link
-          to="/admin/vyapar"
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-bold text-brand-700 ring-1 ring-brand-200 transition hover:bg-brand-50"
-        >
-          <RefreshCw className="h-3.5 w-3.5" /> Vyapar Sync
-        </Link>
-      </div>
-
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-14" />
+            <Skeleton key={i} className="h-20 rounded-2xl" />
           ))}
         </div>
-      ) : !scooters?.length ? (
-        <EmptyState icon={Bike} title="No scooters yet" description="Add your first scooter model to get started." action={<Button variant="primary" icon={Plus} onClick={openNew}>Add Scooter</Button>} />
+      ) : !hasItems ? (
+        <EmptyState
+          icon={Bike}
+          title="No scooters yet"
+          description="Add your first scooter model, or sync from Vyapar."
+          action={
+            <div className="flex flex-wrap justify-center gap-2">
+              <Button variant="primary" icon={Plus} onClick={openNew}>
+                Add Scooter
+              </Button>
+              <Button to="/admin/vyapar" variant="secondary" icon={RefreshCw}>
+                Vyapar Sync
+              </Button>
+            </div>
+          }
+        />
       ) : (
-        <CompactInventoryList>
-          {scooters.map((s) => {
-            const stock = STOCK_LABELS[s.stock] || STOCK_LABELS.in_stock;
-            const stockSelect = (
-              <Select
-                value={s.stock}
-                onChange={(e) => handleStock(s.id, e.target.value)}
-                className="h-8 w-[6.75rem] rounded-lg px-2 text-xs"
-                aria-label="Update stock"
-              >
-                <option value="in_stock">In Stock</option>
-                <option value="low_stock">Few Left</option>
-                <option value="out_of_stock">Out of Stock</option>
-              </Select>
-            );
-            return (
-              <div key={s.id}>
-                <CompactInventoryItem
-                  image={
-                    <ScooterImage
-                      src={s.images?.[0]}
-                      hue={s.hue}
-                      name={s.name}
-                      alt={s.name}
-                      className="h-10 w-12 rounded-lg object-cover sm:h-11 sm:w-14"
-                    />
-                  }
-                  title={s.name}
-                  meta={`${formatINR(s.price)} · ${s.range} km · ${s.topSpeed} km/h`}
-                  tags={
-                    <>
-                      {s.featured && <Badge tone="brand" className="shrink-0 px-1.5 py-0 text-[10px]">Featured</Badge>}
-                      {s.isBudget && <Badge tone="success" className="shrink-0 px-1.5 py-0 text-[10px]">Budget</Badge>}
-                      {s.isPremium && <Badge tone="brand" className="shrink-0 px-1.5 py-0 text-[10px]">Premium</Badge>}
-                      {s.noLicence && <Badge tone="success" className="hidden shrink-0 px-1.5 py-0 text-[10px] sm:inline-flex">No Licence</Badge>}
-                      <Badge tone={stock.tone} className="shrink-0 px-1.5 py-0 text-[10px] sm:hidden">{stock.label}</Badge>
-                    </>
-                  }
-                  stockSelect={stockSelect}
-                  actions={
-                    <>
-                      <button onClick={() => openEdit(s)} className="tap-target rounded-lg p-1.5 text-brand-600 transition hover:bg-brand-50" aria-label="Edit">
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button onClick={() => { if (guard()) setConfirmDelete(s); }} className="tap-target rounded-lg p-1.5 text-red-500 transition hover:bg-red-50" aria-label="Delete">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </>
-                  }
-                />
-                <CompactInventoryMobileStock>{stockSelect}</CompactInventoryMobileStock>
-              </div>
-            );
-          })}
-        </CompactInventoryList>
+        <>
+          <InventoryToolbar
+            search={search}
+            onSearchChange={setSearch}
+            stockFilter={stockFilter}
+            onStockFilterChange={setStockFilter}
+            searchPlaceholder="Search by name, brand, or battery pack…"
+            counts={counts}
+          />
+
+          {emptyFiltered ? (
+            <EmptyState
+              icon={Bike}
+              title="No matches"
+              description="Try a different search or stock filter."
+              action={
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setSearch('');
+                    setStockFilter('all');
+                  }}
+                >
+                  Clear filters
+                </Button>
+              }
+            />
+          ) : (
+            <CompactInventoryList>
+              {filtered.map((s) => {
+                const packs = formatVariantNames(s, ' · ');
+                const meta = [
+                  formatINR(getStartingPrice(s)),
+                  formatRangeRange(s),
+                  s.topSpeed != null ? `${s.topSpeed} km/h` : null,
+                  packs,
+                ]
+                  .filter(Boolean)
+                  .join(' · ');
+
+                return (
+                  <CompactInventoryItem
+                    key={s.id}
+                    image={
+                      <ScooterImage
+                        src={s.images?.[0]}
+                        hue={s.hue}
+                        name={s.name}
+                        alt={s.name}
+                        className="h-12 w-14 rounded-xl object-cover sm:h-14 sm:w-16"
+                      />
+                    }
+                    title={s.name}
+                    meta={meta}
+                    tags={
+                      <>
+                        {s.featured && (
+                          <Badge tone="brand" className="px-1.5 py-0 text-[10px]">
+                            Featured
+                          </Badge>
+                        )}
+                        {s.isBudget && (
+                          <Badge tone="success" className="px-1.5 py-0 text-[10px]">
+                            Budget
+                          </Badge>
+                        )}
+                        {s.isPremium && (
+                          <Badge tone="brand" className="px-1.5 py-0 text-[10px]">
+                            Premium
+                          </Badge>
+                        )}
+                        {s.noLicence && (
+                          <Badge tone="success" className="px-1.5 py-0 text-[10px]">
+                            No Licence
+                          </Badge>
+                        )}
+                      </>
+                    }
+                    stockSelect={
+                      <InventoryStockSelect
+                        value={s.stock}
+                        onChange={(e) => handleStock(s.id, e.target.value)}
+                      />
+                    }
+                    actions={
+                      <InventoryRowActions
+                        onEdit={() => openEdit(s)}
+                        onDelete={() => {
+                          if (guard()) setConfirmDelete(s);
+                        }}
+                      />
+                    }
+                  />
+                );
+              })}
+            </CompactInventoryList>
+          )}
+        </>
       )}
 
       <Modal open={open} onClose={() => setOpen(false)} title={editing ? `Edit ${editing.name}` : 'Add Scooter'} size="xl">
