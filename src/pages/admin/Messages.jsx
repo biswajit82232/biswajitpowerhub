@@ -101,7 +101,7 @@ export default function Messages() {
                   <a
                     href={whatsappCustomerUrl(m.phone, `Hi ${m.name}, this is BISWAJIT POWER HUB regarding your message.`)}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     onClick={() => { if (!m.is_read) markRead(m.id, true); }}
                     className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]"
                     aria-label="WhatsApp"

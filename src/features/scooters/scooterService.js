@@ -4,6 +4,7 @@ import { withTimeout } from '@/lib/utils';
 import { compressForUpload } from '@/lib/resizeImage';
 import { SCOOTERS } from '@/data/scooters';
 import { normalizeScooter } from '@/lib/scooterVariants';
+import { DEFAULT_REAL_RANGE_FACTOR } from '@/lib/rangeDefaults';
 
 const CACHE_KEY = 'scooters_v7';
 const CACHE_TTL = 60;
@@ -30,7 +31,7 @@ function fromRow(row) {
     batteryType: row.battery_type,
     batteryCapacity: row.battery_capacity,
     range: Number(row.range_km),
-    realRangeFactor: Number(row.real_range_factor) || 0.83,
+    realRangeFactor: Number(row.real_range_factor) || DEFAULT_REAL_RANGE_FACTOR,
     topSpeed: Number(row.top_speed),
     chargingTime: row.charging_time,
     warranty: row.warranty,

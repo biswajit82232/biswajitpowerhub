@@ -1,11 +1,17 @@
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useParams } from 'react-router-dom';
 import LocationLanding from './LocationLanding';
-import { getLocationBySlug } from '@/data/locations';
+import { getLocationBySlug, getLocationByPath } from '@/data/locations';
 
-/** Dynamic service-area page — /electric-scooters-:slug */
-export default function LocationPage() {
-  const { slug } = useParams();
-  const location = getLocationBySlug(slug);
+/**
+ * Service-area page for /electric-scooters-<town>.
+ * Routes are registered one-per-town with a literal path, so `slug` arrives as a
+ * prop; the param/pathname lookups are fallbacks for any other mount point.
+ */
+export default function LocationPage({ slug: slugProp }) {
+  const params = useParams();
+  const { pathname } = useLocation();
+  const location =
+    getLocationBySlug(slugProp ?? params.slug) || getLocationByPath(pathname);
   if (!location) return <Navigate to="/" replace />;
   return <LocationLanding location={location} />;
 }

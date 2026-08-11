@@ -140,6 +140,9 @@ export default function AccessoryDetails() {
                       height={64}
                       loading="lazy"
                       decoding="async"
+                      onError={(e) => {
+                        if (e.currentTarget.src !== url) e.currentTarget.src = url;
+                      }}
                       className="h-16 w-16 shrink-0 border border-line object-cover"
                     />
                   ))}

@@ -46,7 +46,7 @@ export async function getTodayQueue(limit = 12) {
       .limit(20),
     supabase
       .from('reviews')
-      .select('id, name, rating, product, created_at, status')
+      .select('id, name, rating, scooter, created_at, status')
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
       .limit(10),
@@ -128,7 +128,7 @@ export async function getTodayQueue(limit = 12) {
       id: `review:${r.id}`,
       kind: 'review',
       title: r.name,
-      subtitle: `${r.rating || '?'}★ · ${r.product || 'Review'}`,
+      subtitle: `${r.rating || '?'}★ · ${r.scooter || 'Review'}`,
       phone: null,
       href: '/admin/reviews',
       created_at: r.created_at,

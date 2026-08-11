@@ -20,12 +20,19 @@ The SEO overhaul in this repo is correct for **non-www** (`https://biswajitpower
 3. Set **`www.biswajitpowerhub.in` to Redirect to apex** (`biswajitpowerhub.in`) — not the other way around
 4. Environment variables (Production) — see `output/VERCEL_ENV.md`:
    - `VITE_SITE_URL=https://biswajitpowerhub.in`
-   - `VITE_GA_MEASUREMENT_ID=G-ZPSM06SEY4`
-   - `VITE_GOOGLE_ADS_ID=AW-17924759668`
-   - `VITE_ADMIN_EMAILS=biswajitpowerhub@gmail.com`
+   - `VITE_GA_MEASUREMENT_ID` (GA4 measurement ID)
+   - `VITE_GOOGLE_ADS_ID` (optional `AW-…` conversion ID)
+   - `VITE_ADMIN_EMAILS` — **must match** every email in Supabase `admin_allowlist` (comma-separated). UI gate and RLS both depend on this sync.
    - `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` (from Supabase API settings)
    - Optional: `VITE_GOOGLE_SITE_VERIFICATION` when Search Console HTML verify is ready
 5. Deploy **this branch to Production** (not only a Preview deployment)
+
+## Admin allowlist (security)
+
+- **DB:** `public.admin_allowlist` (enforced by RLS `is_admin()`)
+- **Client:** `VITE_ADMIN_EMAILS` (UI gate only — not a secret)
+- Keep both identical. After changing emails, update Vercel env **and** insert/delete rows in `admin_allowlist`.
+- Apply migration `harden_rls_storage_and_rpc.sql` (order 23) so leftover site/offers policies and Storage writes are admin-only.
 
 ## Build / deploy commands
 

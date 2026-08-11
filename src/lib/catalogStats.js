@@ -4,6 +4,7 @@ import { FINANCE_DEFAULTS } from '@/config/finance';
 import { CHARGE_EFFICIENCY } from '@/lib/simulator';
 import { parseBatteryKwh } from '@/lib/battery';
 import { getScooterVariants, getStartingPrice } from '@/lib/scooterVariants';
+import { DEFAULT_REAL_RANGE_FACTOR } from '@/lib/rangeDefaults';
 
 function variantEntries(scooter) {
   const variants = getScooterVariants(scooter);
@@ -11,7 +12,7 @@ function variantEntries(scooter) {
   return variants.map((v) => ({
     range: v.range ?? scooter.range,
     batteryCapacity: v.batteryCapacity ?? scooter.batteryCapacity,
-    realRangeFactor: v.realRangeFactor ?? scooter.realRangeFactor ?? 0.82,
+    realRangeFactor: v.realRangeFactor ?? scooter.realRangeFactor ?? DEFAULT_REAL_RANGE_FACTOR,
   }));
 }
 
@@ -40,7 +41,7 @@ export function computeCatalogStats(scooters = []) {
       const range = Number(entry.range) || 0;
       if (range > maxRangeKm) maxRangeKm = range;
 
-      const realRange = range * (entry.realRangeFactor ?? 0.82);
+      const realRange = range * (entry.realRangeFactor ?? DEFAULT_REAL_RANGE_FACTOR);
       const kwh = parseBatteryKwh(entry.batteryCapacity);
       if (realRange > 0 && kwh > 0) {
         const energyPerCharge = kwh / CHARGE_EFFICIENCY;

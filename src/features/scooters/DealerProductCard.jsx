@@ -34,10 +34,12 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
           className="mx-auto aspect-[4/3] w-full max-w-full bg-surface-alt"
           fit="cover"
         />
-        {(tags.length > 0 || scooter.noLicence || scooter.stock === 'out_of_stock') && (
+        {(tags.length > 0 || scooter.noLicence || scooter.stock === 'out_of_stock' || scooter.stock === 'low_stock') && (
           <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-start gap-1.5">
             {scooter.noLicence && <Badge tone="success">No Licence</Badge>}
-            {scooter.stock === 'out_of_stock' && <Badge tone={stock.tone}>{stock.label}</Badge>}
+            {(scooter.stock === 'out_of_stock' || scooter.stock === 'low_stock') && (
+              <Badge tone={stock.tone}>{stock.label}</Badge>
+            )}
             {tags.map((t) => (
               <Badge key={t.id || t.label} tone={t.tone || 'brand'}>{t.label}</Badge>
             ))}

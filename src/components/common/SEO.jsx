@@ -20,6 +20,8 @@ export function SEO({
   jsonLd,
   noindex = false,
   titleTemplate = true,
+  /** Optional LCP / hero image URL to preload */
+  preloadImage,
 }) {
   const fullTitle = title
     ? titleTemplate && !title.includes(SITE.name) && !title.includes('Biswajit Power Hub')
@@ -40,6 +42,9 @@ export function SEO({
       <link rel="canonical" href={canonical} />
       <link rel="alternate" hrefLang="en-IN" href={canonical} />
       <link rel="alternate" hrefLang="x-default" href={canonical} />
+      {preloadImage ? (
+        <link rel="preload" as="image" href={preloadImage} fetchPriority="high" />
+      ) : null}
       {!noindex && <meta name="robots" content="index, follow, max-image-preview:large" />}
       {noindex && <meta name="robots" content="noindex, nofollow" />}
       {GSC_VERIFICATION ? (

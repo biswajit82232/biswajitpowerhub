@@ -37,6 +37,7 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 20 | `add_service_bookings.sql` | Service booking requests inbox |
 | 21 | `add_admin_push_subscriptions.sql` | Admin PWA Web Push subscriptions (Android background alerts) |
 | 22 | `lock_admin_rls_allowlist.sql` | Admin email allowlist + RLS lock; tighten analytics RPC |
+| 23 | `harden_rls_storage_and_rpc.sql` | Drop leftover site/offers policies; Storage `is_admin`; anon insert CHECKs; redact analytics meta PII |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 

@@ -1,5 +1,6 @@
 import { ACCESSORY_CATEGORIES } from '@/data/accessories';
 import { slugify } from '@/lib/utils';
+import { DEFAULT_REAL_RANGE_FACTOR } from '@/lib/rangeDefaults';
 
 /** Vyapar online-store category → local accessory category (or scooter). */
 export const VYAPAR_CATEGORY_MAP = {
@@ -137,7 +138,7 @@ export function defaultScooterFromVyapar(item, id) {
     batteryType: '',
     batteryCapacity: '',
     range: 0,
-    realRangeFactor: 0.83,
+    realRangeFactor: DEFAULT_REAL_RANGE_FACTOR,
     topSpeed: 25,
     chargingTime: '',
     warranty: '',

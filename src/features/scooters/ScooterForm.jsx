@@ -3,6 +3,7 @@ import { Field, Input, Textarea, Select, Label } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { AdminToggle } from '@/components/admin/AdminToggle';
 import { slugify } from '@/lib/utils';
+import { DEFAULT_REAL_RANGE_FACTOR } from '@/lib/rangeDefaults';
 import { ScooterImageUpload } from './ScooterImageUpload';
 
 const HUES = ['blue', 'teal', 'sky', 'green', 'indigo', 'cyan'];
@@ -14,7 +15,7 @@ const STOCKS = [
 
 const EMPTY = {
   id: '', name: '', brand: 'PowerHub', tagline: '', price: 0, hue: 'blue',
-  batteryType: '', batteryCapacity: '', range: 0, realRangeFactor: 0.83, topSpeed: 25,
+  batteryType: '', batteryCapacity: '', range: 0, realRangeFactor: DEFAULT_REAL_RANGE_FACTOR, topSpeed: 25,
   chargingTime: '', warranty: '', motor: '', weight: '', loadCapacity: '',
   colors: [], noLicence: true, noRegistration: true, isBudget: false, isPremium: false,
   stock: 'in_stock', featured: false,

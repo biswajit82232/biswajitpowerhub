@@ -81,11 +81,12 @@ export function HeroCarousel({ heroImageUrl }) {
             <SiteImage
               src={s.url}
               alt={s.alt}
-              width={1920}
-              height={840}
+              width={1280}
+              height={560}
               loading={i === 0 ? 'eager' : 'lazy'}
               fetchPriority={i === 0 ? 'high' : undefined}
-              optimize={false}
+              optimize
+              quality={78}
               className="h-full w-full !aspect-auto bg-surface-alt"
               imgClassName="object-cover object-center"
               placeholderLabel="Showroom photos coming soon — visit us at Chunakhali Bus Stand"
@@ -98,10 +99,10 @@ export function HeroCarousel({ heroImageUrl }) {
           aria-hidden
         />
         <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-6 sm:px-8 sm:pb-8">
-          <p className="font-display text-lg font-extrabold uppercase tracking-wide text-white drop-shadow sm:text-2xl lg:text-3xl">
+          <p className="font-display text-xl font-extrabold uppercase tracking-wide text-white drop-shadow sm:text-2xl lg:text-3xl">
             {site.name}
           </p>
-          <h1 className="mt-1 font-display text-base font-bold uppercase leading-snug tracking-wide text-white drop-shadow sm:text-xl lg:text-2xl">
+          <h1 className="mt-1 font-display text-xs font-bold uppercase leading-snug tracking-wide text-white drop-shadow sm:text-xl lg:text-2xl">
             Best Electric Scooter Dealer in Berhampore, Murshidabad
           </h1>
           <p className="mt-1 text-sm font-medium text-white/90 sm:text-base">{site.tagline}</p>

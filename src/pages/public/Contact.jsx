@@ -9,7 +9,14 @@ import Button from '@/components/ui/Button';
 import { CallbackForm } from '@/features/leads/CallbackForm';
 import { useToast } from '@/components/ui/Toast';
 import { submitContact } from '@/features/leads/leadService';
-import { isValidName, isValidPhone, isValidEmail } from '@/features/leads/validation';
+import {
+  isValidName,
+  isValidPhone,
+  isValidEmail,
+  isHoneypotFilled,
+  normalizeIndianMobile,
+} from '@/features/leads/validation';
+import { HoneypotField } from '@/features/leads/HoneypotField';
 import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay, siteSameAs } from '@/config/site';
 import { getPriorityLocations, getServiceAreaNames } from '@/data/locations';
 import { useSite } from '@/context/SiteSettingsContext';
@@ -20,14 +27,14 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 
 function ContactMessageForm() {
   const { toast } = useToast();
-  const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
+  const [form, setForm] = useState({ name: '', phone: '', email: '', message: '', website: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const e = {};
     if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit number';
+    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
     if (!isValidEmail(form.email)) e.email = 'Enter a valid email';
     if (!form.message || form.message.trim().length < 5) e.message = 'Add a short message';
     setErrors(e);
@@ -36,12 +43,23 @@ function ContactMessageForm() {
 
   const onSubmit = async (ev) => {
     ev.preventDefault();
+    if (isHoneypotFilled(form.website)) {
+      toast('Message sent! We will get back to you soon.', 'success');
+      setForm({ name: '', phone: '', email: '', message: '', website: '' });
+      return;
+    }
     if (!validate()) return;
     setLoading(true);
     try {
-      await submitContact({ ...form, from: 'contact_page' });
+      await submitContact({
+        name: form.name.trim(),
+        phone: normalizeIndianMobile(form.phone),
+        email: form.email.trim(),
+        message: form.message.trim(),
+        from: 'contact_page',
+      });
       toast('Message sent! We will get back to you soon.', 'success');
-      setForm({ name: '', phone: '', email: '', message: '' });
+      setForm({ name: '', phone: '', email: '', message: '', website: '' });
     } catch {
       toast('Could not send message. Please WhatsApp us.', 'error');
     } finally {
@@ -50,13 +68,19 @@ function ContactMessageForm() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="relative space-y-4">
+      <HoneypotField
+        id="ct-website"
+        value={form.website}
+        onChange={(website) => setForm({ ...form, website })}
+      />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Name" htmlFor="ct-name" required error={errors.name}>
           <Input
             id="ct-name"
             value={form.name}
             error={errors.name}
+            autoComplete="name"
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
         </Field>
@@ -64,11 +88,13 @@ function ContactMessageForm() {
           <Input
             id="ct-phone"
             type="tel"
-            inputMode="numeric"
-            maxLength={10}
+            inputMode="tel"
+            maxLength={16}
+            placeholder="10-digit mobile / +91…"
+            autoComplete="tel"
             value={form.phone}
             error={errors.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
           />
         </Field>
       </div>
@@ -78,6 +104,7 @@ function ContactMessageForm() {
           type="email"
           value={form.email}
           error={errors.email}
+          autoComplete="email"
           onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
       </Field>

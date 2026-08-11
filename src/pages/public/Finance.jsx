@@ -62,7 +62,7 @@ export default function FinancePage() {
             <Button
               href={whatsappUrl(FINANCE_WA, site)}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               variant="dealerSecondary"
               icon={MessageCircle}
               onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'finance-page' })}

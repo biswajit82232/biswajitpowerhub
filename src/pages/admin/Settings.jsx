@@ -608,7 +608,7 @@ export default function Settings() {
           </section>
         )}
 
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-4 py-3 backdrop-blur lg:left-64">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 py-3 lg:left-64">
           <div className="mx-auto flex max-w-3xl justify-end">
             <Button type="submit" variant="primary" size="lg" icon={Save} loading={saving} className="w-full sm:w-auto">
               Save Settings

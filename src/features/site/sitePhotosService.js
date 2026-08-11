@@ -173,9 +173,9 @@ export async function saveSitePhotos(photos) {
     }
   }
 
-  if (next.hero?.url && isSupabaseConfigured) {
+  if (isSupabaseConfigured) {
     try {
-      await saveHeroImage(next.hero.url);
+      await saveHeroImage(next.hero?.url || null);
     } catch (e) {
       console.warn('[sitePhotos] hero sync failed:', e?.message || e);
     }

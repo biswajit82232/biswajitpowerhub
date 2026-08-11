@@ -339,19 +339,21 @@ export const FOOTER_MORE_LINKS = [
   { label: 'Accessories', to: '/accessories' },
 ];
 
-/** Full footer Quick Links — every remaining indexable page (no exchange/updates) */
 /** Full footer Quick Links — hub-first local SEO (all towns via Areas we serve) */
 export const FOOTER_QUICK_LINKS = [
   { label: 'About Us', to: '/about' },
   { label: 'Contact Us', to: '/contact' },
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Offers', to: '/offers' },
-  { label: 'Test Ride', to: '/test-ride-berhampore' },
   { label: 'Book Service', to: '/service#book' },
-  { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
-  { label: 'Near Me — Berhampore', to: '/electric-scooter-near-me-berhampore' },
-  { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
-  { label: 'Areas We Serve', to: '/areas-we-serve' },
+  { label: 'Best EVs Berhampore', to: '/best-electric-scooters-berhampore' },
+  { label: 'Low budget EVs', to: '/low-budget-electric-scooters-berhampore' },
+  { label: 'No licence EVs', to: '/no-licence-electric-scooters-west-bengal' },
+  { label: 'Near me Berhampore', to: '/electric-scooter-near-me-berhampore' },
+  { label: 'Areas we serve', to: '/areas-we-serve' },
+  { label: 'Test ride', to: '/test-ride-berhampore' },
+  { label: 'Battery upgrade', to: '/battery-upgrade-berhampore' },
+  { label: 'Guides', to: '/guides' },
   { label: 'Jiaganj', to: '/electric-scooters-jiaganj' },
   { label: 'Beldanga', to: '/electric-scooters-beldanga' },
   { label: 'Kandi', to: '/electric-scooters-kandi' },

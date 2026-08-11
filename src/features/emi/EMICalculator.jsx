@@ -5,7 +5,7 @@ import { Select } from '@/components/ui/Input';
 import { useCountUp } from '@/hooks/useCountUp';
 import { calculateEMI } from '@/lib/finance';
 import { formatINR } from '@/lib/utils';
-import { EMI_DISCLAIMER, EMI_DISCLAIMER_NOTE } from '@/config/finance';
+import { EMI_DISCLAIMER, EMI_DISCLAIMER_NOTE, FINANCE_DEFAULTS } from '@/config/finance';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import {
   getScooterVariants,
@@ -82,7 +82,7 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
       downPayment,
       annualRate: rate,
       tenureMonths: tenure,
-      fileCharges: settings?.fileCharges ?? 0,
+      fileCharges: settings?.fileCharges ?? FINANCE_DEFAULTS.fileCharges,
     }),
     [price, downPayment, rate, tenure, settings?.fileCharges]
   );

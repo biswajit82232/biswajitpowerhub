@@ -176,7 +176,7 @@ export default function Dashboard() {
                     <a
                       href={whatsappCustomerUrl(item.phone, `Hi ${item.title}, this is BISWAJIT POWER HUB.`)}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="tap-target rounded-lg bg-[#25D366]/10 p-2 text-[#1da851]"
                       aria-label="WhatsApp"
                     >
@@ -223,7 +223,7 @@ export default function Dashboard() {
                   <a
                     href={whatsappCustomerUrl(l.phone, `Hi ${l.name || 'there'}, this is BISWAJIT POWER HUB.`)}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="tap-target rounded-lg bg-[#25D366]/10 p-2 text-[#1da851]"
                     aria-label="WhatsApp"
                   >

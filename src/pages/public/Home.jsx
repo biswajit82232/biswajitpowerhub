@@ -13,7 +13,9 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { useFinance } from '@/context/FinanceSettingsContext';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useSitePhotos } from '@/context/SitePhotosContext';
 import { SITE_URL, siteSameAs } from '@/config/site';
+import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 import {
   openingHoursSchema,
   postalAddressSchema,
@@ -29,6 +31,7 @@ import { SITE_FAQS } from '@/data/seoContent';
 
 export default function Home() {
   const { site } = useSite();
+  const { photos } = useSitePhotos();
   const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
   const { settings: financeSettings } = useFinance();
   // On-site reviews still feed JSON-LD only; the visible Home block is GoogleReviewsWidget.
@@ -39,6 +42,13 @@ export default function Home() {
     () => buildSiteFaqs(site.faqs?.length ? site.faqs : SITE_FAQS, catalog),
     [site.faqs, catalog],
   );
+
+  const heroSrc = photos?.hero?.url || financeSettings?.heroImageUrl || null;
+  const preloadImage = heroSrc
+    ? isSupabaseStorageUrl(heroSrc)
+      ? optimizedImageUrl(heroSrc, 1280, 78, { height: 560, resize: 'cover' })
+      : heroSrc
+    : undefined;
 
   const homeSchemas = useMemo(() => {
     const catalogScooters = catalog;
@@ -130,6 +140,7 @@ export default function Home() {
         description={`Biswajit Power Hub — best electric scooters in Berhampore, Murshidabad. No licence.${fromPrice ? ` From ${fromPrice}.` : ''} Call 096355 05436 for test ride at Chunakhali.`}
         jsonLd={homeSchemas}
         titleTemplate={false}
+        preloadImage={preloadImage}
       />
 
       <HeroCarousel heroImageUrl={financeSettings?.heroImageUrl} />

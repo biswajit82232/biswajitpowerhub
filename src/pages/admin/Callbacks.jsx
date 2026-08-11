@@ -95,7 +95,7 @@ export default function Callbacks() {
                 <a
                   href={whatsappCustomerUrl(c.phone, `Hi ${c.name}, this is BISWAJIT POWER HUB — you requested a callback.`)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   onClick={() => { if (!c.handled) setTimeout(() => afterContact(c.id), 600); }}
                   className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]"
                   aria-label="WhatsApp customer"

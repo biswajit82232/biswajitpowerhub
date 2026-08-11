@@ -1,5 +1,6 @@
 import { clamp } from './utils';
 import { parseBatteryKwh } from './battery';
+import { DEFAULT_REAL_RANGE_FACTOR } from './rangeDefaults';
 
 /**
  * EV real-world usage model.
@@ -18,7 +19,7 @@ export function simulate({
 }) {
   const capacityKwh = parseBatteryKwh(scooter?.batteryCapacity);
   const claimedRange = Number(scooter?.range) || 80;
-  const realFactor = Number(scooter?.realRangeFactor) || 0.83;
+  const realFactor = Number(scooter?.realRangeFactor) || DEFAULT_REAL_RANGE_FACTOR;
 
   const weightDelta = (Number(riderWeight) || BASELINE_WEIGHT) - BASELINE_WEIGHT;
   const weightFactor = clamp(1 - weightDelta * 0.0035, 0.7, 1.08);

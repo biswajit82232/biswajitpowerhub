@@ -106,3 +106,8 @@ if (missing.length === 0) {
 if (!env.SUPABASE_DB_PASSWORD && !env.DATABASE_URL) {
   console.log('Tip: add SUPABASE_DB_PASSWORD to .env (Supabase → Settings → Database) to run migrations locally.\n');
 }
+
+console.log('RLS verify: after applying harden_rls_storage_and_rpc.sql, run');
+console.log('  supabase/migrations/verify_harden_rls.sql in the SQL editor.');
+console.log('  Expect zero leftover policies named "auth all site settings" / "auth all offers".\n');
+console.log('Also ensure VITE_ADMIN_EMAILS matches every row in public.admin_allowlist.\n');

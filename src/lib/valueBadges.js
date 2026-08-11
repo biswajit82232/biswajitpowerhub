@@ -3,6 +3,7 @@
 import { parseBatteryKwh } from '@/lib/battery';
 import { CHARGE_EFFICIENCY } from '@/lib/simulator';
 import { FINANCE_DEFAULTS } from '@/config/finance';
+import { DEFAULT_REAL_RANGE_FACTOR } from '@/lib/rangeDefaults';
 
 export const VALUE_BADGE_DEFS = {
   best_value: { id: 'best_value', label: 'Best Value', emoji: '⭐', tone: 'warning' },
@@ -17,7 +18,7 @@ function parseWeightKg(weight) {
 }
 
 function realRange(scooter) {
-  return scooter.range * (scooter.realRangeFactor ?? 0.85);
+  return scooter.range * (scooter.realRangeFactor ?? DEFAULT_REAL_RANGE_FACTOR);
 }
 
 /** Estimated electricity cost per km */

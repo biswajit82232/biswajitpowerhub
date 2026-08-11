@@ -6,7 +6,8 @@ import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { SERVICE_KINDS, getServiceKind } from '@/data/serviceKinds';
 import { submitServiceBooking } from './leadService';
-import { isValidPhone, isValidName } from './validation';
+import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile } from './validation';
+import { HoneypotField } from './HoneypotField';
 
 const TIME_SLOTS = ['10:00 AM', '11:30 AM', '1:00 PM', '3:00 PM', '4:30 PM', '6:00 PM'];
 
@@ -25,6 +26,7 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
     details: '',
     date: today,
     time: TIME_SLOTS[0],
+    website: '',
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -50,12 +52,16 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
 
   const onSubmit = async (ev) => {
     ev.preventDefault();
+    if (isHoneypotFilled(form.website)) {
+      setDone(true);
+      return;
+    }
     if (!validate()) return;
     setLoading(true);
     try {
       await submitServiceBooking({
-        name: form.name,
-        phone: form.phone,
+        name: form.name.trim(),
+        phone: normalizeIndianMobile(form.phone),
         serviceKind: form.serviceKind,
         details: form.details.trim(),
         date: form.date,
@@ -91,7 +97,8 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="relative space-y-4">
+      <HoneypotField value={form.website} onChange={(website) => setForm({ ...form, website })} />
       <div>
         <p className="mb-2 text-sm font-semibold text-heading">Service type</p>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -144,12 +151,12 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
         <Input
           id="svc-phone"
           type="tel"
-          inputMode="numeric"
-          maxLength={10}
-          placeholder="10-digit mobile"
+          inputMode="tel"
+          maxLength={16}
+          placeholder="10-digit mobile / +91…"
           value={form.phone}
           error={errors.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
         />
       </Field>
 

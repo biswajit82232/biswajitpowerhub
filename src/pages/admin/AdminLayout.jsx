@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutDashboard, Bike, Package, Users, PhoneCall, CalendarCheck, Star,
@@ -134,6 +134,7 @@ function SidebarFooter({ onSignOut }) {
 export default function AdminLayout() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const [badges, setBadges] = useState({});
 
@@ -213,7 +214,7 @@ export default function AdminLayout() {
 
       <main className="lg:pl-64">
         <div className="mx-auto max-w-6xl px-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-8">
-          <ErrorBoundary>
+          <ErrorBoundary key={location.pathname}>
             <Suspense fallback={<PageLoader />}>
               <AdminInstallBanner />
               <Outlet />

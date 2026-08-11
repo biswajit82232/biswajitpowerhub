@@ -98,17 +98,19 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'cossimbazar',
     name: 'Cossimbazar',
+    description:
+      'Electric scooters near Cossimbazar. No licence models, free test ride at Biswajit Power Hub, Chunakhali Berhampore. Call 096355 05436.',
     distanceHint: 'Short ride from Cossimbazar to Chunakhali Bus Stand, Berhampore',
     nearby: ['berhampore', 'chaltia-gora-bazar', 'lalbagh', 'daulatabad'],
     intro:
       'Families in Cossimbazar choose Biswajit Power Hub for affordable no-licence electric scooters, clear EMI, and a real showroom at Chunakhali, Berhampore — minutes away for a free test ride.',
     localNote:
-      'Cossimbazar riders often use the scooter for market trips and Berhampore town hops. Single Light and Double Light are popular starters; Activa suits families who want more everyday range.',
+      'Cossimbazar riders often use the scooter for bazaar runs and quick Berhampore hops — Single Light or Double Light for short hops, Activa when the family needs more everyday range.',
     faqs: [
       {
         question: 'How far is Biswajit Power Hub from Cossimbazar?',
         answer:
-          'A short local ride to Chunakhali Bus Stand, Nimtala, Berhampore. Search BISWAJIT POWER HUB on Maps or call 096355 05436 for the quickest route from your area.',
+          'Usually under 15 minutes to Chunakhali Bus Stand, Nimtala, Berhampore via the main Berhampore road. Search BISWAJIT POWER HUB on Maps or call 096355 05436 for the quickest route from your lane.',
       },
       {
         question: 'Can Cossimbazar buyers get same-day test rides?',
@@ -134,14 +136,14 @@ export const SERVICE_LOCATIONS = [
     intro:
       'Commuters around Murshidabad town and Lalbagh choose Biswajit Power Hub for Zoom and Activa daily rides, honest on-road pricing, and after-sales support you can walk into at Chunakhali.',
     localNote:
-      'Lalbagh–Berhampore daily riders often prefer Zoom for a premium commute feel, or Activa when they want more range between charges. Bring your route questions — we match battery packs to real Murshidabad kilometres.',
+      'Lalbagh–Berhampore daily riders often prefer Zoom for a premium commute feel, or Activa when they want more range between charges — we match packs to real Lalbagh kilometres, not brochure claims.',
     distanceHint: 'Short hop from Lalbagh / Murshidabad town to Chunakhali Bus Stand',
     nearby: ['berhampore', 'cossimbazar', 'jiaganj', 'azimganj', 'daulatabad'],
     faqs: [
       {
         question: 'Which model suits Lalbagh / Murshidabad town commutes?',
         answer:
-          'Zoom is a favourite for a premium daily commute feel. Activa suits riders who want more range. Test both free at our Berhampore showroom.',
+          'Zoom is a favourite for Lalbagh–Berhampore daily commute feel. Activa suits riders who want more range between charges. Test both free at our Berhampore showroom.',
       },
       {
         question: 'Can I service my scooter after buying?',
@@ -166,14 +168,14 @@ export const SERVICE_LOCATIONS = [
     intro:
       'Looking for an electric scooter dealer serving Jiaganj? Biswajit Power Hub stocks Activa, Zoom, Single Light, and Double Light at Chunakhali, Berhampore — with free test rides and clear EMI.',
     localNote:
-      'Jiaganj customers often travel with family to compare colours and battery options in one visit. Call ahead on 096355 05436 so we can keep your preferred model ready for a test ride.',
+      'Jiaganj customers often travel with family to compare colours and battery options in one visit — call 096355 05436 ahead so we keep your preferred model ready near the Azimganj corridor.',
     distanceHint: 'Convenient for Jiaganj families travelling to Berhampore',
     nearby: ['azimganj', 'lalbagh', 'berhampore', 'bhagawangola', 'lalgola'],
     faqs: [
       {
         question: 'Is there an EV showroom in Jiaganj?',
         answer:
-          'Our physical showroom is at Chunakhali Bus Stand, Berhampore. Jiaganj customers regularly visit for test rides, battery upgrades, and servicing.',
+          'Our physical showroom is at Chunakhali Bus Stand, Berhampore. Jiaganj and Azimganj customers regularly visit for test rides, battery upgrades, and servicing.',
       },
       {
         question: 'Can I ride without a licence from Jiaganj?',
@@ -191,12 +193,14 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'azimganj',
     name: 'Azimganj',
+    description:
+      'Electric scooters for Azimganj riders. No licence EVs at Biswajit Power Hub, Berhampore. Free test ride at Chunakhali. Call 096355 05436.',
     distanceHint: 'Convenient for Azimganj riders travelling via Jiaganj to Berhampore',
     nearby: ['jiaganj', 'lalbagh', 'berhampore', 'lalgola', 'bhagawangola'],
     intro:
       'Azimganj buyers looking for a trusted electric scooter dealer visit Biswajit Power Hub at Chunakhali, Berhampore for no-licence models, EMI options, and free test rides.',
     localNote:
-      'Azimganj routes can be longer than short Berhampore town hops — ask about higher-AH packs or Lithium Pro options on eligible models so one charge covers your usual week.',
+      'Azimganj–Jiaganj corridor riders often need more range than short town hops — ask about higher-AH packs or Lithium Pro so one charge covers your usual weekly loop.',
     faqs: [
       {
         question: 'Do you serve Azimganj customers?',
@@ -206,7 +210,7 @@ export const SERVICE_LOCATIONS = [
       {
         question: 'Are battery upgrades available for Azimganj routes?',
         answer:
-          'Yes — higher-AH packs and Lithium Pro options on eligible models help with longer north Murshidabad rides.',
+          'Yes — higher-AH packs and Lithium Pro on eligible models help with Azimganj–Berhampore and north Murshidabad rides that stretch beyond short town hops.',
       },
     ],
     highlights: [
@@ -219,22 +223,24 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'raninagar',
     name: 'Raninagar',
+    description:
+      'Electric scooters for Raninagar. No licence models at Biswajit Power Hub, Berhampore. Free test ride at Chunakhali. Call 096355 05436.',
     distanceHint: 'Serving Raninagar riders who prefer a verified Berhampore showroom',
     nearby: ['domkal', 'berhampore', 'beldanga', 'hariharpara', 'lalbagh'],
     intro:
       'Raninagar families switching from petrol visit Biswajit Power Hub for low-speed electric scooters, home charging savings, and honest pricing at Chunakhali, Berhampore.',
     localNote:
-      'Raninagar buyers often want simple ownership — no licence paperwork on eligible models, home charging, and a showroom they can return to for free servicing visits.',
+      'Raninagar petrol switchers usually want home charging clarity and a showroom they can revisit for free servicing — we map that against Domkal–Berhampore travel before you buy.',
     faqs: [
       {
         question: 'Is it worth travelling from Raninagar to Berhampore?',
         answer:
-          'Yes if you want a physical test ride, transparent pricing, and after-sales at one place. Call 096355 05436 to confirm stock so the trip is worthwhile.',
+          'Yes if you want a physical test ride, transparent pricing, and after-sales at one place. Call 096355 05436 to confirm stock so the trip from Raninagar is worthwhile.',
       },
       {
         question: 'What is a good starter scooter for Raninagar?',
         answer:
-          'Single Light and Double Light are popular budget starters. Zoom and Activa suit riders who want a more premium daily feel or more range.',
+          'Single Light and Double Light suit Raninagar town and market runs. Zoom and Activa fit riders who also cover Domkal or Berhampore more often.',
       },
     ],
     highlights: [
@@ -254,7 +260,7 @@ export const SERVICE_LOCATIONS = [
     intro:
       'Beldanga riders switching from petrol visit Biswajit Power Hub for affordable electric scooters, home charging savings, and a real showroom experience at Chunakhali Bus Stand, Berhampore.',
     localNote:
-      'The Berhampore–Beldanga corridor is a common daily route. We help Beldanga buyers pick battery packs that match market days and school runs — not just brochure range numbers.',
+      'The Berhampore–Beldanga corridor is a common daily route — we help Beldanga buyers pick packs for market days and school runs, not just brochure range numbers.',
     distanceHint: 'South Murshidabad access via Berhampore–Beldanga corridor',
     nearby: ['berhampore', 'hariharpara', 'nabagram', 'daulatabad', 'domkal'],
     faqs: [
@@ -266,7 +272,7 @@ export const SERVICE_LOCATIONS = [
       {
         question: 'Do you offer battery upgrades for Beldanga customers?',
         answer:
-          'Yes — custom higher-AH packs and Lithium Pro options on eligible models. Bring your scooter or buy new with the right pack from day one.',
+          'Yes — custom higher-AH packs and Lithium Pro on eligible models help with Berhampore–Beldanga corridor kilometres. Bring your scooter or buy new with the right pack from day one.',
       },
     ],
     highlights: [
@@ -279,17 +285,19 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'nabagram',
     name: 'Nabagram',
+    description:
+      'Electric scooters for Nabagram. No licence models at Biswajit Power Hub, Berhampore. Free test ride at Chunakhali. Call 096355 05436.',
     distanceHint: 'Easy road access from Nabagram to Chunakhali, Berhampore',
     nearby: ['berhampore', 'beldanga', 'kandi', 'hariharpara', 'daulatabad'],
     intro:
       'Nabagram riders choose Biswajit Power Hub for no-licence electric scooters, free test rides, and walk-in support at Chunakhali Bus Stand, Berhampore.',
     localNote:
-      'Nabagram customers often combine a showroom visit with battery and accessory questions in one trip. WhatsApp photos of your current scooter if you are upgrading packs later.',
+      'Nabagram customers often combine a showroom visit with battery and accessory questions in one trip — WhatsApp photos of your scooter if you plan a pack upgrade later.',
     faqs: [
       {
         question: 'Do you stock spare parts for Nabagram customers?',
         answer:
-          'Yes — batteries, tyres, panels, mirrors, and controllers. Visit Chunakhali or browse accessories online, then confirm fitment at the counter.',
+          'Yes — batteries, tyres, panels, mirrors, and controllers for models sold from our floor. Nabagram riders often pick up spares while visiting for a free service slot.',
       },
       {
         question: 'Can Nabagram buyers get EMI?',
@@ -307,22 +315,24 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'hariharpara',
     name: 'Hariharpara',
+    description:
+      'Electric scooters near Hariharpara. No licence models at Biswajit Power Hub, Berhampore. Free test ride at Chunakhali. Call 096355 05436.',
     distanceHint: 'Serving Hariharpara customers travelling to Berhampore for purchase & service',
     nearby: ['beldanga', 'berhampore', 'domkal', 'raninagar', 'nabagram'],
     intro:
       'Looking for electric scooters near Hariharpara? Biswajit Power Hub in Berhampore stocks Activa, Zoom, Single Light, and Double Light with clear pricing and EMI.',
     localNote:
-      'Hariharpara families often want a reliable daily scooter for local markets and Berhampore visits. We keep the buying process simple — test ride, price, EMI talk, then handover at Chunakhali.',
+      'Hariharpara families usually want one scooter for local market days and Berhampore errands — we keep buying simple: test ride, on-road price, EMI talk, then handover at Chunakhali.',
     faqs: [
       {
         question: 'How do I plan a visit from Hariharpara?',
         answer:
-          'Call or WhatsApp 096355 05436 to confirm colours and battery options, then navigate to Chunakhali Bus Stand, Berhampore (BISWAJIT POWER HUB on Maps).',
+          'Call or WhatsApp 096355 05436 to confirm colours and battery options, then navigate to Chunakhali Bus Stand, Berhampore (BISWAJIT POWER HUB on Maps) via the Beldanga–Berhampore road.',
       },
       {
         question: 'Do purchases include free servicing?',
         answer:
-          'Yes — 3 free servicing visits plus 1 year motor & controller warranty on every purchase.',
+          'Yes — 3 free servicing visits plus 1 year motor & controller warranty. Hariharpara buyers often schedule the first service with a Berhampore market trip.',
       },
     ],
     highlights: [
@@ -344,12 +354,12 @@ export const SERVICE_LOCATIONS = [
     intro:
       'Riders from Chaltia and Gora Bazar are just a short hop from Biswajit Power Hub at Chunakhali. Free test rides, no-licence models, and same-day guidance on EMI and batteries.',
     localNote:
-      'Living near Gora Bazar or Chaltia means you can visit, compare models, and return for service without a long trip — many customers walk in after work hours before 8:30 PM.',
+      'Living near Gora Bazar or Chaltia means you can visit, compare models, and return for service without a long trip — many customers walk in after work before 8:30 PM.',
     faqs: [
       {
         question: 'How far is the showroom from Gora Bazar / Chaltia?',
         answer:
-          'Chunakhali Bus Stand is a short local ride from Chaltia and Gora Bazar. Search BISWAJIT POWER HUB on Maps or call 096355 05436 for directions.',
+          'Chunakhali Bus Stand is a short local ride from Chaltia and Gora Bazar — often under 10 minutes depending on traffic. Search BISWAJIT POWER HUB on Maps or call 096355 05436.',
       },
       {
         question: 'Can I walk in for a test ride?',
@@ -367,22 +377,24 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'daulatabad',
     name: 'Daulatabad',
+    description:
+      'Electric scooters for Daulatabad. No licence EVs at Biswajit Power Hub, Berhampore. Free test ride at Chunakhali. Call 096355 05436.',
     distanceHint: 'Serving Daulatabad riders with showroom access in Berhampore',
     nearby: ['berhampore', 'cossimbazar', 'lalbagh', 'nabagram', 'beldanga'],
     intro:
       'Daulatabad families buy low-speed electric scooters from Biswajit Power Hub for daily Murshidabad use — no licence on eligible models, EMI, and free test rides at Chunakhali.',
     localNote:
-      'Daulatabad buyers often ask about running cost versus petrol. Home charging typically lands around ₹0.30–₹0.50 per km depending on pack and usage — we walk through that before you decide.',
+      'Daulatabad buyers often compare running cost to petrol first — home charging typically lands around ₹0.30–₹0.50 per km depending on pack, and we walk that through before you decide.',
     faqs: [
       {
         question: 'Will an electric scooter handle Daulatabad daily use?',
         answer:
-          'Yes for typical town and Berhampore hops on low-speed models. Tell us your daily kilometres and we will recommend Standard vs higher-AH packs.',
+          'Yes for typical Daulatabad–Berhampore and Cossimbazar hops on low-speed models. Tell us your daily kilometres and we will recommend Standard vs higher-AH packs.',
       },
       {
         question: 'Do you help with first-time EV questions?',
         answer:
-          'Absolutely — charging, licence rules for eligible models, EMI, and service schedule are explained in plain language at the showroom.',
+          'Absolutely — charging at home, licence rules for eligible models, EMI, and service schedule are explained in plain language at Chunakhali.',
       },
     ],
     highlights: [
@@ -402,14 +414,14 @@ export const SERVICE_LOCATIONS = [
     intro:
       'Domkal families looking for a trusted electric scooter dealer in Murshidabad can visit Biswajit Power Hub at Chunakhali, Berhampore for no-licence models, EMI, and free test rides.',
     localNote:
-      'Domkal routes can stretch further than short town rides — ask about battery upgrades when you visit so your pack matches Domkal–Berhampore travel, not just brochure claims.',
+      'Domkal routes often stretch farther than short town rides — ask about battery upgrades so your pack matches Domkal–Berhampore travel, not just brochure claims.',
     distanceHint: 'Serving Domkal riders who prefer a verified Berhampore showroom',
     nearby: ['raninagar', 'hariharpara', 'berhampore', 'beldanga', 'bhagawangola'],
     faqs: [
       {
         question: 'How do I reach the showroom from Domkal?',
         answer:
-          'Navigate to Chunakhali Bus Stand, Nimtala, Berhampore on Google Maps (BISWAJIT POWER HUB). Call ahead on 096355 05436 to confirm colours and battery options.',
+          'Navigate to Chunakhali Bus Stand, Nimtala, Berhampore on Google Maps (BISWAJIT POWER HUB). Call ahead on 096355 05436 to confirm colours and battery options for Domkal–Berhampore range needs.',
       },
       {
         question: 'Are spare parts available?',
@@ -427,17 +439,19 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'lalgola',
     name: 'Lalgola',
+    description:
+      'Electric scooters for Lalgola riders. No licence EVs at Biswajit Power Hub, Berhampore. Free test ride at Chunakhali. Call 096355 05436.',
     distanceHint: 'Serving Lalgola riders travelling to Berhampore for EV purchase & service',
     nearby: ['bhagawangola', 'jiaganj', 'azimganj', 'lalbagh', 'berhampore'],
     intro:
       'Lalgola buyers looking for a trusted Murshidabad EV dealer visit Biswajit Power Hub at Chunakhali, Berhampore for no-licence scooters, battery upgrades, and free test rides.',
     localNote:
-      'Because Lalgola is farther from the showroom, we recommend calling before you travel. We confirm stock, colours, and battery options so one visit covers test ride and purchase decisions.',
+      'Lalgola is farther from the showroom, so call ahead — we confirm stock, colours, and battery options so one Berhampore visit covers test ride and purchase decisions.',
     faqs: [
       {
         question: 'Do you help Lalgola customers with longer-range batteries?',
         answer:
-          'Yes — ask about higher-AH packs and Lithium Pro options on eligible models before you buy, or book an upgrade later at Chunakhali.',
+          'Yes — Lalgola–Berhampore travel favours higher-AH packs and Lithium Pro on eligible models; ask before you buy or book an upgrade later at Chunakhali.',
       },
       {
         question: 'Should I call before travelling from Lalgola?',
@@ -457,24 +471,24 @@ export const SERVICE_LOCATIONS = [
     name: 'Kandi',
     title: 'Electric Scooters in Kandi | Biswajit Power Hub Berhampore',
     description:
-      'Buy electric scooters near Kandi, Murshidabad. No licence models at current showroom prices. Free test ride at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.',
+      'Electric scooters near Kandi, Murshidabad. No licence models at Biswajit Power Hub, Berhampore. Free test ride. Call 096355 05436.',
     h1: 'Electric Scooters for Kandi & Murshidabad — Showroom in Berhampore',
     intro:
       'Riders from Kandi choose Biswajit Power Hub in Berhampore for low-speed electric scooters with no licence, honest pricing, and free test rides at Chunakhali Bus Stand — about a short drive from Kandi town.',
     localNote:
-      'Kandi–Berhampore trips favour Activa and Zoom for many riders. Shorter Kandi town runs often suit Single Light or Double Light — test both styles when you visit.',
+      'Kandi–Berhampore highway trips favour Activa and Zoom for many riders; shorter Kandi town runs often suit Single Light or Double Light — test both styles when you visit.',
     distanceHint: 'Easy road access from Kandi to our Chunakhali showroom in Berhampore',
     nearby: ['nabagram', 'berhampore', 'beldanga', 'hariharpara'],
     faqs: [
       {
         question: 'Do you deliver electric scooters to Kandi?',
         answer:
-          'Visit our showroom at Chunakhali Bus Stand, Berhampore for purchase, paperwork guidance, and handover. Call 096355 05436 to confirm stock and plan your visit from Kandi.',
+          'Purchase and handover are at Chunakhali Bus Stand, Berhampore. Call 096355 05436 to confirm stock and plan your drive from Kandi so colours and packs are ready.',
       },
       {
         question: 'Which scooter is best for Kandi–Berhampore trips?',
         answer:
-          'Activa and Zoom are popular for longer Murshidabad routes. Single Light and Double Light suit shorter Kandi town runs. Book a free test ride to compare.',
+          'Activa and Zoom are popular for the Kandi–Berhampore stretch. Single Light and Double Light suit shorter Kandi town runs. Book a free test ride to compare.',
       },
     ],
     highlights: [
@@ -487,22 +501,24 @@ export const SERVICE_LOCATIONS = [
   buildLocation({
     slug: 'bhagawangola',
     name: 'Bhagawangola',
+    description:
+      'Electric scooters for Bhagawangola. No licence models at Biswajit Power Hub, Berhampore. Free test ride at Chunakhali. Call 096355 05436.',
     distanceHint: 'Serving Bhagawangola riders with showroom access in Berhampore',
     nearby: ['lalgola', 'jiaganj', 'azimganj', 'lalbagh', 'berhampore'],
     intro:
       'Bhagawangola families choose Biswajit Power Hub for affordable electric scooters, no-licence ownership on eligible models, and after-sales support at Chunakhali, Berhampore.',
     localNote:
-      'Bhagawangola customers often want a dependable family scooter with simple charging at home. We explain ownership rules for eligible low-speed models and schedule free service visits after purchase.',
+      'Bhagawangola families usually want a dependable home-charge scooter for school and market runs — we explain eligible low-speed ownership and book the free service visits after purchase.',
     faqs: [
       {
         question: 'Do you serve Bhagawangola for sales and service?',
         answer:
-          'Yes — purchase and servicing happen at Chunakhali Bus Stand, Berhampore. Call 096355 05436 to plan your visit from Bhagawangola.',
+          'Yes — purchase and servicing happen at Chunakhali Bus Stand, Berhampore. Call 096355 05436 to plan your visit from Bhagawangola via Lalgola or Jiaganj.',
       },
       {
         question: 'What warranty do I get?',
         answer:
-          '1 year motor & controller warranty plus 3 free servicing visits with every purchase. Details are confirmed at the counter for your model and battery pack.',
+          '1 year motor & controller warranty plus 3 free servicing visits. Bhagawangola buyers often combine a service visit with a Lalgola–Berhampore trip.',
       },
     ],
     highlights: [

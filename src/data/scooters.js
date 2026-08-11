@@ -8,6 +8,8 @@
  * All models are LOW-SPEED, NON-RTO electric scooters (<= 25 km/h).
  */
 
+import { DEFAULT_REAL_RANGE_FACTOR } from '../lib/rangeDefaults.js';
+
 const STANDARD_LITHIUM = [
   {
     id: 'standard',
@@ -42,7 +44,7 @@ const SHARED = {
   noLicence: true,
   noRegistration: true,
   stock: 'in_stock',
-  realRangeFactor: 0.82,
+  realRangeFactor: DEFAULT_REAL_RANGE_FACTOR,
   isBudget: false,
   isPremium: false,
   colors: ['Pearl White', 'Matte Black', 'Sky Blue'],

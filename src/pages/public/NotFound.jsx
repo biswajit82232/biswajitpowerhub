@@ -1,13 +1,16 @@
 import { Home, Bike } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { SEO } from '@/components/common/SEO';
 import Button from '@/components/ui/Button';
 
 export default function NotFound() {
+  const location = useLocation();
   return (
     <>
       <SEO
         title="Page Not Found | Biswajit Power Hub"
         description="This page does not exist. Browse electric scooters or visit our Berhampore showroom."
+        path={location.pathname}
         noindex
         titleTemplate={false}
       />

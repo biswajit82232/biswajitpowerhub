@@ -159,7 +159,7 @@ export default function ServiceBookings() {
                       `Hi ${b.name}, this is BISWAJIT POWER HUB regarding your ${serviceKindLabel(b.service_kind)} booking.`,
                     )}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]"
                     aria-label="WhatsApp customer"
                   >

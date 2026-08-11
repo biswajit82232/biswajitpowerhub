@@ -5,7 +5,8 @@ import { Field, Input, Select } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { submitTestRide } from './leadService';
-import { isValidPhone, isValidName } from './validation';
+import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile } from './validation';
+import { HoneypotField } from './HoneypotField';
 
 const TIME_SLOTS = ['10:00 AM', '11:30 AM', '1:00 PM', '3:00 PM', '4:30 PM', '6:00 PM'];
 
@@ -17,7 +18,7 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
   const { toast } = useToast();
   const today = new Date().toISOString().split('T')[0];
   const [modelId, setModelId] = useState(scooter?.id || '');
-  const [form, setForm] = useState({ name: '', phone: '', date: today, time: TIME_SLOTS[0] });
+  const [form, setForm] = useState({ name: '', phone: '', date: today, time: TIME_SLOTS[0], website: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -39,11 +40,18 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
 
   const onSubmit = async (ev) => {
     ev.preventDefault();
+    if (isHoneypotFilled(form.website)) {
+      setDone(true);
+      return;
+    }
     if (!validate()) return;
     setLoading(true);
     try {
       await submitTestRide({
-        ...form,
+        name: form.name.trim(),
+        phone: normalizeIndianMobile(form.phone),
+        date: form.date,
+        time: form.time,
         scooter: selected?.selectedVariant
           ? `${selected.name} — ${selected.selectedVariant.name}`
           : selected?.name || 'Any model',
@@ -76,7 +84,8 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="relative space-y-4">
+      <HoneypotField value={form.website} onChange={(website) => setForm({ ...form, website })} />
       <Field label="Your Name" htmlFor="tr-name" required error={errors.name}>
         <Input
           id="tr-name"
@@ -90,12 +99,12 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
         <Input
           id="tr-phone"
           type="tel"
-          inputMode="numeric"
-          maxLength={10}
-          placeholder="10-digit mobile"
+          inputMode="tel"
+          maxLength={16}
+          placeholder="10-digit mobile / +91…"
           value={form.phone}
           error={errors.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
         />
       </Field>
       {!scooter && scooters.length > 0 ? (

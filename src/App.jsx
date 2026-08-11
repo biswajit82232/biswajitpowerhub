@@ -1,8 +1,11 @@
 import { lazyRetry as lazy } from '@/lib/lazyRetry';
+import { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { BareAdsLayout } from '@/components/layout/BareAdsLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
+import { RouteLoader } from '@/components/ui/Loading';
+import { SERVICE_LOCATIONS } from '@/data/locations';
 
 // Public pages (lazy for code-splitting)
 const Home = lazy(() => import('@/pages/public/Home'));
@@ -55,6 +58,7 @@ const AdminNotFound = lazy(() => import('@/pages/admin/AdminNotFound'));
 
 export default function App() {
   return (
+    <Suspense fallback={<RouteLoader label="Loading" />}>
     <Routes>
       {/* Public site */}
       <Route element={<PublicLayout />}>
@@ -78,7 +82,16 @@ export default function App() {
         <Route path="test-ride-berhampore" element={<TestRide />} />
         <Route path="electric-scooter-near-me-berhampore" element={<NearMeBerhampore />} />
         <Route path="areas-we-serve" element={<AreasWeServe />} />
-        <Route path="electric-scooters-:slug" element={<LocationPage />} />
+        {/* React Router can't treat ":slug" as dynamic when it's glued to a literal
+            prefix ("electric-scooters-:slug" never matched) — register one static
+            route per town instead so /electric-scooters-<town> resolves client-side. */}
+        {SERVICE_LOCATIONS.map((location) => (
+          <Route
+            key={location.slug}
+            path={`electric-scooters-${location.slug}`}
+            element={<LocationPage slug={location.slug} />}
+          />
+        ))}
         <Route path="guides" element={<Guides />} />
         <Route path="guides/:slug" element={<GuidePost />} />
         <Route path="terms" element={<Terms />} />
@@ -139,5 +152,6 @@ export default function App() {
         <Route path="*" element={<AdminNotFound />} />
       </Route>
     </Routes>
+    </Suspense>
   );
 }

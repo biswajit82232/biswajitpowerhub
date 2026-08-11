@@ -139,7 +139,7 @@ export default function Leads() {
                     <a href={telUrl(l.phone, site)} className="rounded-xl bg-brand-50 p-2.5 text-brand-600" aria-label="Call">
                       <Phone className="h-4.5 w-4.5" />
                     </a>
-                    <a href={whatsappCustomerUrl(l.phone, `Hi ${l.name || 'there'}, this is BISWAJIT POWER HUB regarding your inquiry.`)} target="_blank" rel="noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer">
+                    <a href={whatsappCustomerUrl(l.phone, `Hi ${l.name || 'there'}, this is BISWAJIT POWER HUB regarding your inquiry.`)} target="_blank" rel="noopener noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer">
                       <MessageCircle className="h-4.5 w-4.5" />
                     </a>
                   </>

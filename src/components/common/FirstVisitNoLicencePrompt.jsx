@@ -8,7 +8,13 @@ import { Field, Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
 import { useSite } from '@/context/SiteSettingsContext';
 import { submitCallback } from '@/features/leads/leadService';
-import { isValidName, isValidPhone } from '@/features/leads/validation';
+import {
+  isValidName,
+  isValidPhone,
+  isHoneypotFilled,
+  normalizeIndianMobile,
+} from '@/features/leads/validation';
+import { HoneypotField } from '@/features/leads/HoneypotField';
 
 const STORAGE_KEY = 'bph_no_licence_prompt_seen';
 const GUIDE = '/no-licence-electric-scooters-west-bengal';
@@ -43,7 +49,7 @@ export function FirstVisitNoLicencePrompt() {
   const { toast } = useToast();
   const { site } = useSite();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '' });
+  const [form, setForm] = useState({ name: '', phone: '', website: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -68,19 +74,24 @@ export function FirstVisitNoLicencePrompt() {
   const validate = () => {
     const e = {};
     if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit number';
+    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const onSubmit = async (ev) => {
     ev.preventDefault();
+    if (isHoneypotFilled(form.website)) {
+      markSeen();
+      setDone(true);
+      return;
+    }
     if (!validate()) return;
     setLoading(true);
     try {
       await submitCallback({
         name: form.name.trim(),
-        phone: form.phone,
+        phone: normalizeIndianMobile(form.phone),
         interest: INTEREST,
       });
       markSeen();
@@ -173,7 +184,10 @@ export function FirstVisitNoLicencePrompt() {
               <p className="mt-1.5 text-sm leading-relaxed text-body">
                 {brand} will call{' '}
                 <span className="font-semibold text-heading">{form.name}</span> at{' '}
-                <span className="font-semibold text-heading">{form.phone}</span> about no-licence
+                <span className="font-semibold text-heading">
+                  {normalizeIndianMobile(form.phone) || form.phone}
+                </span>{' '}
+                about no-licence
                 models.
               </p>
               <div className="mt-5 flex flex-col gap-2">
@@ -192,7 +206,12 @@ export function FirstVisitNoLicencePrompt() {
                 pressure.
               </p>
 
-              <form onSubmit={onSubmit} className="mt-4 space-y-3">
+              <form onSubmit={onSubmit} className="relative mt-4 space-y-3">
+                <HoneypotField
+                  id="nl-cb-website"
+                  value={form.website}
+                  onChange={(website) => setForm({ ...form, website })}
+                />
                 <Field label="Your name" htmlFor="nl-cb-name" required error={errors.name}>
                   <Input
                     id="nl-cb-name"
@@ -208,14 +227,14 @@ export function FirstVisitNoLicencePrompt() {
                   <Input
                     id="nl-cb-phone"
                     type="tel"
-                    inputMode="numeric"
-                    maxLength={10}
-                    placeholder="10-digit mobile"
+                    inputMode="tel"
+                    maxLength={16}
+                    placeholder="10-digit mobile / +91…"
                     value={form.phone}
                     error={errors.phone}
                     autoComplete="tel"
                     className="h-11"
-                    onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, '') })}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   />
                 </Field>
 

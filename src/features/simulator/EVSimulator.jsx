@@ -408,7 +408,7 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
           <a
             href={whatsappUrl(waMessage, site)}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="flex w-full items-center justify-center gap-2.5 rounded-dealer bg-[#25D366] px-6 py-4 text-base font-bold text-white shadow-soft transition hover:brightness-105 active:scale-[0.99]"
           >
             <MessageCircle className="h-5 w-5" />

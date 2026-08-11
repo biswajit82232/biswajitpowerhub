@@ -211,7 +211,77 @@ function ScooterDetailsPage({ id, initialVariantId }) {
 
             <VariantSelector scooter={scooter} selectedId={variantId} onChange={handleVariantChange} />
 
-            <p className="mt-5 break-words leading-relaxed text-body">{scooter.description}</p>
+            {/* Specs + colours — top of purchase decision area */}
+            <div className="mt-7">
+              <h2 className="break-words font-display text-display-md font-bold uppercase tracking-wide text-navy">Specifications</h2>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Spec icon={BatteryCharging} label="Battery type" value={display.batteryType} />
+                {display.batteryWarranty && (
+                  <Spec icon={ShieldCheck} label="Battery warranty" value={display.batteryWarranty} />
+                )}
+                <Spec icon={Cpu} label="Battery capacity" value={display.batteryCapacity} />
+                <Spec icon={Gauge} label="Range" value={`${display.range} km`} />
+                <Spec icon={Gauge} label="Top speed" value={`${display.topSpeed} km/h`} />
+                <Spec icon={Timer} label="Charging" value={display.chargingTime} />
+                <Spec icon={Cpu} label="Motor" value={display.motor} />
+                <Spec icon={Weight} label="Weight" value={display.weight} />
+                <Spec icon={Users} label="Load capacity" value={display.loadCapacity} />
+                <Spec icon={ShieldCheck} label="Warranty" value={display.warranty} />
+              </div>
+            </div>
+
+            {scooter.colors?.length > 0 && (
+              <div className="mt-6">
+                <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
+                  <Palette className="h-5 w-5 text-brand-500" /> Available colours
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {scooter.colors.map((c) => (
+                    <span key={c} className="break-words border border-line bg-white px-3 py-2 text-sm font-medium text-body sm:px-4">
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Button
+                variant="dealerPrimary"
+                size="lg"
+                icon={CalendarCheck}
+                fullWidth
+                className="sm:flex-1"
+                onClick={() => setTestRideOpen(true)}
+              >
+                Book Test Ride
+              </Button>
+              <Button
+                href={telUrl(undefined, site)}
+                target="_self"
+                variant="dealerSecondary"
+                size="lg"
+                icon={Phone}
+                fullWidth
+                className="sm:flex-1"
+                onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
+              >
+                Call Showroom
+              </Button>
+              <Button
+                href={whatsappUrl(waMessage, site)}
+                variant="whatsapp"
+                size="lg"
+                icon={MessageCircle}
+                fullWidth
+                className="!rounded-dealer sm:flex-1"
+                onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
+              >
+                WhatsApp
+              </Button>
+            </div>
+
+            <p className="mt-8 break-words leading-relaxed text-body">{scooter.description}</p>
             <div className="mt-6 space-y-6 text-sm leading-relaxed text-body sm:text-base">
               <div>
                 <h2 className="font-display text-xl font-extrabold text-heading sm:text-2xl">
@@ -294,90 +364,13 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 </div>
               </div>
             </div>
-
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Button
-                variant="dealerPrimary"
-                size="lg"
-                icon={CalendarCheck}
-                fullWidth
-                className="sm:flex-1"
-                onClick={() => setTestRideOpen(true)}
-              >
-                Book Test Ride
-              </Button>
-              <Button
-                href={telUrl(undefined, site)}
-                target="_self"
-                variant="dealerSecondary"
-                size="lg"
-                icon={Phone}
-                fullWidth
-                className="sm:flex-1"
-                onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
-              >
-                Call Showroom
-              </Button>
-              <Button
-                href={whatsappUrl(waMessage, site)}
-                variant="whatsapp"
-                size="lg"
-                icon={MessageCircle}
-                fullWidth
-                className="!rounded-dealer sm:flex-1"
-                onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
-              >
-                WhatsApp
-              </Button>
-            </div>
-
-            {/* Quick specs */}
-            <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <Spec icon={BatteryCharging} label="Range" value={`${display.range} km`} />
-              <Spec icon={Gauge} label="Top speed" value={`${display.topSpeed} km/h`} />
-              <Spec icon={Timer} label="Charging time" value={display.chargingTime} />
-              <Spec icon={ShieldCheck} label="Warranty" value={display.warranty} />
-            </div>
           </Reveal>
         </div>
 
-        {/* Full specs + EMI — EMI first on mobile for visibility */}
+        {/* Features + EMI */}
         <div className="mt-14 grid min-w-0 gap-8 lg:grid-cols-5 lg:gap-12">
           <div className="order-2 min-w-0 lg:order-1 lg:col-span-3">
-            <h2 className="break-words font-display text-display-md font-bold uppercase tracking-wide text-navy">Specifications</h2>
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <Spec icon={BatteryCharging} label="Battery type" value={display.batteryType} />
-              {display.batteryWarranty && (
-                <Spec icon={ShieldCheck} label="Battery warranty" value={display.batteryWarranty} />
-              )}
-              <Spec icon={Cpu} label="Battery capacity" value={display.batteryCapacity} />
-              <Spec icon={Gauge} label="Range" value={`${display.range} km`} />
-              <Spec icon={Gauge} label="Top speed" value={`${display.topSpeed} km/h`} />
-              <Spec icon={Timer} label="Charging" value={display.chargingTime} />
-              <Spec icon={Cpu} label="Motor" value={display.motor} />
-              <Spec icon={Weight} label="Weight" value={display.weight} />
-              <Spec icon={Users} label="Load capacity" value={display.loadCapacity} />
-              <Spec icon={ShieldCheck} label="Warranty" value={display.warranty} />
-            </div>
-
-            {/* Colors */}
-            {scooter.colors?.length > 0 && (
-              <div className="mt-8">
-                <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-                  <Palette className="h-5 w-5 text-brand-500" /> Available colours
-                </h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {scooter.colors.map((c) => (
-                    <span key={c} className="break-words border border-line bg-white px-3 py-2 text-sm font-medium text-body sm:px-4">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Features */}
-            <div className="mt-8">
+            <div>
               <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
                 <Sparkles className="h-5 w-5 text-brand-500" /> Features
               </h3>
@@ -393,7 +386,6 @@ function ScooterDetailsPage({ id, initialVariantId }) {
               </ul>
             </div>
 
-            {/* Benefits */}
             {scooter.benefits?.length > 0 && (
               <div className="mt-8 border border-line bg-surface-alt p-6">
                 <h3 className="font-display text-lg font-bold uppercase tracking-wide text-navy">Why Riders Love It</h3>
@@ -411,7 +403,6 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             )}
           </div>
 
-          {/* EMI — shown before full specs on mobile */}
           <div className="order-1 min-w-0 lg:order-2 lg:col-span-2">
             <div className="lg:sticky lg:top-[calc(var(--header-offset)+1.5rem)] lg:self-start">
               <EMICalculator price={display.price} settings={settings} scooterId={scooter.id} />
@@ -429,7 +420,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
 
       {/* Purchase-intent sticky CTA — sits above global MobileLocalCTA */}
       <div
-        className="fixed inset-x-0 z-[9997] border-t border-line bg-surface/95 px-3 py-2 shadow-card lg:hidden bottom-[calc(4rem+env(safe-area-inset-bottom))]"
+        className="fixed inset-x-0 z-[9997] border-t border-line bg-surface px-3 py-2 shadow-card lg:hidden bottom-[calc(4rem+env(safe-area-inset-bottom))]"
         role="region"
         aria-label={`Call about ${scooter.name}`}
       >

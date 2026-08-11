@@ -67,7 +67,7 @@ export default function NearMeBerhampore() {
       description="Electric scooter near me in Berhampore? Visit Biswajit Power Hub at Chunakhali Bus Stand — no licence models, free test ride, EMI. Call 096355 05436."
       path={path}
       h1="Electric Scooter Near Me in Berhampore — Local Dealer at Chunakhali"
-      intro="Looking for an electric scooter near me in Berhampore or Murshidabad? Biswajit Power Hub is a physical showroom at Chunakhali Bus Stand, Nimtala — free test rides, clear pricing, and walk-in service."
+      intro="Looking for an electric scooter near me in Berhampore or Murshidabad? This page is for map and “near me” intent — directions, hours, and walk-in test rides at our Chunakhali Bus Stand showroom."
       breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Electric Scooter Near Me Berhampore' }]}
       jsonLd={jsonLd}
     >

@@ -82,21 +82,25 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
 
         <div className="mt-4 border-b border-line" />
 
-        <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => <ScooterCardSkeleton key={i} />)
-            : filtered.map((s) => (
-                <DealerProductCard
-                  key={s.id}
-                  scooter={s}
-                  imageOverride={photos?.models?.[s.id]?.url}
-                  tags={getScooterDiscoveryTags(s, insights)}
-                />
-              ))}
-        </div>
-
-        {!loading && filtered.length === 0 && (
-          <p className="mt-10 text-center text-sm text-muted">No models in this category yet.</p>
+        {loading || filtered.length > 0 ? (
+          <div className="mt-8 grid min-h-[28rem] gap-8 sm:min-h-[32rem] sm:grid-cols-2 lg:min-h-[36rem] lg:grid-cols-3 lg:gap-10">
+            {loading
+              ? Array.from({ length: 6 }).map((_, i) => <ScooterCardSkeleton key={i} />)
+              : filtered.map((s) => (
+                  <DealerProductCard
+                    key={s.id}
+                    scooter={s}
+                    imageOverride={photos?.models?.[s.id]?.url}
+                    tags={getScooterDiscoveryTags(s, insights)}
+                  />
+                ))}
+          </div>
+        ) : (
+          <p className="mt-10 text-center text-sm text-muted">
+            {scooters?.length > 0
+              ? 'No models in this category yet.'
+              : 'Our showroom line-up is being updated — please check back shortly or contact us for current stock.'}
+          </p>
         )}
       </div>
     </section>

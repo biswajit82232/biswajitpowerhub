@@ -1,0 +1,36 @@
+name: SEO & deploy smoke
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run qa:seo
+      - name: Live curl matrix (production)
+        continue-on-error: true
+        run: |
+          set -e
+          code=$(curl -sI -o /dev/null -w "%{http_code}" https://www.biswajitpowerhub.in/)
+          echo "www status=$code"
+          loc=$(curl -sI https://www.biswajitpowerhub.in/ | tr -d '\r' | grep -i '^location:' || true)
+          echo "$loc"
+          code404=$(curl -sI -o /dev/null -w "%{http_code}" https://biswajitpowerhub.in/this-page-should-404-audit-xyz)
+          echo "unknown 404 status=$code404"
+          test "$code404" = "404"
+          title=$(curl -s https://biswajitpowerhub.in/ | grep -oP '(?<=<title>)[^<]+' | head -1)
+          echo "home title=$title"
+          echo "$title" | grep -qi Berhampore

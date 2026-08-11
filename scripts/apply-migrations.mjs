@@ -39,6 +39,7 @@ const ORDER = [
   'add_service_bookings.sql',
   'add_admin_push_subscriptions.sql',
   'lock_admin_rls_allowlist.sql',
+  'harden_rls_storage_and_rpc.sql',
 ];
 
 function loadEnv() {

@@ -21,6 +21,11 @@ export function ReviewCard({ review, className }) {
             height={600}
             loading="lazy"
             decoding="async"
+            onError={(e) => {
+              if (review.photo && e.currentTarget.src !== review.photo) {
+                e.currentTarget.src = review.photo;
+              }
+            }}
             className="aspect-[4/3] w-full object-cover"
           />
         </div>

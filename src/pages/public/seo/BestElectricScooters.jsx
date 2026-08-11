@@ -59,7 +59,7 @@ export default function BestElectricScooters() {
       description={`Compare the best electric scooters in Berhampore${fromPrice ? ` from ${fromPrice}` : ''}. Live showroom prices. No licence models. Test ride at Chunakhali. Call 096355 05436.`}
       path={path}
       h1="Best Electric Scooters in Berhampore (2026) — Top Models Compared"
-      intro={`Looking for the best electric scooter in Berhampore and Murshidabad? Compare our current showroom models at Biswajit Power Hub — prices and ranges below update from live inventory${fromPrice ? ` (from ${fromPrice})` : ''}.`}
+      intro={`Compare models side-by-side (this page) for the best electric scooters in Berhampore — live prices and ranges from our showroom inventory${fromPrice ? ` (from ${fromPrice})` : ''}. For directions and “near me”, use our near-me hub; for town coverage see the Berhampore location page.`}
       breadcrumbs={[
         { name: 'Home', to: '/' },
         { name: 'Best Electric Scooters in Berhampore' },

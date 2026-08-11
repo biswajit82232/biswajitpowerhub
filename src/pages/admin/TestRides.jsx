@@ -83,7 +83,7 @@ export default function TestRides() {
               </div>
               <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3 sm:border-0 sm:pt-0">
                 <a href={telUrl(t.phone)} className="tap-target rounded-xl bg-brand-50 p-2.5 text-brand-600" aria-label="Call"><Phone className="h-4.5 w-4.5" /></a>
-                <a href={whatsappCustomerUrl(t.phone, `Hi ${t.name}, this is BISWAJIT POWER HUB regarding your test ride request.`)} target="_blank" rel="noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer"><MessageCircle className="h-4.5 w-4.5" /></a>
+                <a href={whatsappCustomerUrl(t.phone, `Hi ${t.name}, this is BISWAJIT POWER HUB regarding your test ride request.`)} target="_blank" rel="noopener noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer"><MessageCircle className="h-4.5 w-4.5" /></a>
                 <Select
                   value={t.status || 'requested'}
                   onChange={(e) => onStatus(t.id, e.target.value)}
