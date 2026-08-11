@@ -428,7 +428,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
 
       {/* Purchase-intent sticky CTA — sits above global MobileLocalCTA */}
       <div
-        className="fixed inset-x-0 z-[9997] border-t border-line bg-surface/95 px-3 py-2 shadow-card lg:hidden bottom-[calc(3.25rem+env(safe-area-inset-bottom))]"
+        className="fixed inset-x-0 z-[9997] border-t border-line bg-surface/95 px-3 py-2 shadow-card lg:hidden bottom-[calc(4rem+env(safe-area-inset-bottom))]"
         role="region"
         aria-label={`Call about ${scooter.name}`}
       >

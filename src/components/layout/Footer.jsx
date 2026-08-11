@@ -40,7 +40,7 @@ export function Footer() {
   const primaryPhone = site.phones[0];
 
   return (
-    <footer className="relative mt-auto overflow-x-hidden border-t border-line bg-white pb-[calc(3.25rem+env(safe-area-inset-bottom))] text-body lg:pb-0">
+    <footer className="relative mt-auto overflow-x-hidden border-t border-line bg-white pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-body lg:pb-0">
       <div className="h-1 bg-brand-500" />
 
       <div className="container-px py-6 sm:py-10 lg:py-12">

@@ -1,15 +1,11 @@
-import { Link } from 'react-router-dom';
-import { Phone, Navigation, MessageCircle, Wrench } from 'lucide-react';
+import { Phone, Navigation, MessageCircle } from 'lucide-react';
+import Button from '@/components/ui/Button';
 import { SITE, telUrl, whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
-import { cn } from '@/lib/utils';
-
-const ITEM =
-  'flex min-h-[2.75rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-0.5 py-1 text-center transition active:scale-[0.97] tap-target';
 
 /**
- * Compact mobile bottom nav — icon + label, space-saving, clear taps.
+ * Mobile sticky bar — Call + WhatsApp + Directions.
  */
 export function MobileLocalCTA() {
   const { site } = useSite();
@@ -18,49 +14,48 @@ export function MobileLocalCTA() {
     'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore';
 
   return (
-    <nav
-      className="fixed inset-x-0 bottom-0 z-[9999] border-t border-navy/10 bg-white/95 shadow-[0_-4px_20px_rgba(15,23,42,0.08)] backdrop-blur-md lg:hidden"
-      aria-label="Quick actions"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    <div
+      className="fixed inset-x-0 bottom-0 z-[9999] flex h-16 items-center bg-navy px-2 pb-[env(safe-area-inset-bottom)] lg:hidden"
+      role="navigation"
+      aria-label="Call, WhatsApp, or get directions"
     >
-      <div className="mx-auto flex h-12 max-w-lg items-stretch px-1">
-        <a
+      <div className="mx-auto grid w-full max-w-lg grid-cols-3 gap-1.5">
+        <Button
           href={telUrl(undefined, site)}
-          className={cn(ITEM, 'text-brand-600')}
+          target="_self"
+          variant="dealerPrimary"
+          size="sm"
+          icon={Phone}
+          fullWidth
+          className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'mobile_sticky' })}
         >
-          <Phone className="h-4 w-4" strokeWidth={2.4} aria-hidden />
-          <span className="text-[10px] font-bold leading-none tracking-wide">Call</span>
-        </a>
-
-        <Link to="/service#book" className={cn(ITEM, 'text-navy')}>
-          <Wrench className="h-4 w-4" strokeWidth={2.4} aria-hidden />
-          <span className="text-[10px] font-bold leading-none tracking-wide">Service</span>
-        </Link>
-
-        <a
+          Call
+        </Button>
+        <Button
           href={whatsappUrl(undefined, site)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(ITEM, 'text-[#1da851]')}
+          variant="whatsapp"
+          size="sm"
+          icon={MessageCircle}
+          fullWidth
+          className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'mobile_sticky' })}
         >
-          <MessageCircle className="h-4 w-4" strokeWidth={2.4} aria-hidden />
-          <span className="text-[10px] font-bold leading-none tracking-wide">Chat</span>
-        </a>
-
-        <a
+          Chat
+        </Button>
+        <Button
           href={mapsHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(ITEM, 'text-navy')}
+          variant="dealerSecondary"
+          size="sm"
+          icon={Navigation}
+          fullWidth
+          className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'mobile_sticky' })}
         >
-          <Navigation className="h-4 w-4" strokeWidth={2.4} aria-hidden />
-          <span className="text-[10px] font-bold leading-none tracking-wide">Map</span>
-        </a>
+          Map
+        </Button>
       </div>
       <span className="sr-only">{SITE.name}</span>
-    </nav>
+    </div>
   );
 }
