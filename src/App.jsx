@@ -29,29 +29,9 @@ const TestRide = lazy(() => import('@/pages/public/seo/TestRide'));
 const Guides = lazy(() => import('@/pages/public/Guides'));
 const GuidePost = lazy(() => import('@/pages/public/GuidePost'));
 const AdLanding = lazy(() => import('@/pages/public/AdLanding'));
-const {
-  ElectricScootersKandi,
-  ElectricScootersJiaganj,
-  ElectricScootersBeldanga,
-  ElectricScootersLalbagh,
-  ElectricScootersDomkal,
-} = {
-  ElectricScootersKandi: lazy(() =>
-    import('@/pages/public/seo/locationPages').then((m) => ({ default: m.ElectricScootersKandi })),
-  ),
-  ElectricScootersJiaganj: lazy(() =>
-    import('@/pages/public/seo/locationPages').then((m) => ({ default: m.ElectricScootersJiaganj })),
-  ),
-  ElectricScootersBeldanga: lazy(() =>
-    import('@/pages/public/seo/locationPages').then((m) => ({ default: m.ElectricScootersBeldanga })),
-  ),
-  ElectricScootersLalbagh: lazy(() =>
-    import('@/pages/public/seo/locationPages').then((m) => ({ default: m.ElectricScootersLalbagh })),
-  ),
-  ElectricScootersDomkal: lazy(() =>
-    import('@/pages/public/seo/locationPages').then((m) => ({ default: m.ElectricScootersDomkal })),
-  ),
-};
+const LocationPage = lazy(() => import('@/pages/public/seo/locationPages'));
+const NearMeBerhampore = lazy(() => import('@/pages/public/seo/NearMeBerhampore'));
+const AreasWeServe = lazy(() => import('@/pages/public/AreasWeServe'));
 
 // Admin (separate chunk)
 const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'));
@@ -96,11 +76,9 @@ export default function App() {
         <Route path="no-licence-electric-scooters-west-bengal" element={<NoLicenceElectricScooters />} />
         <Route path="battery-upgrade-berhampore" element={<BatteryUpgrade />} />
         <Route path="test-ride-berhampore" element={<TestRide />} />
-        <Route path="electric-scooters-kandi" element={<ElectricScootersKandi />} />
-        <Route path="electric-scooters-jiaganj" element={<ElectricScootersJiaganj />} />
-        <Route path="electric-scooters-beldanga" element={<ElectricScootersBeldanga />} />
-        <Route path="electric-scooters-lalbagh" element={<ElectricScootersLalbagh />} />
-        <Route path="electric-scooters-domkal" element={<ElectricScootersDomkal />} />
+        <Route path="electric-scooter-near-me-berhampore" element={<NearMeBerhampore />} />
+        <Route path="areas-we-serve" element={<AreasWeServe />} />
+        <Route path="electric-scooters-:slug" element={<LocationPage />} />
         <Route path="guides" element={<Guides />} />
         <Route path="guides/:slug" element={<GuidePost />} />
         <Route path="terms" element={<Terms />} />

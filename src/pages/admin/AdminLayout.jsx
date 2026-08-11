@@ -70,15 +70,15 @@ const NAV_GROUPS = [
 
 function NavItems({ onNavigate, compact, badges }) {
   return (
-    <nav className="flex flex-col gap-3.5">
+    <nav className="flex flex-col gap-3">
       {NAV_GROUPS.map((group) => (
         <div key={group.label || 'top'}>
           {group.label && (
-            <p className="mb-1.5 px-3.5 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-muted">
+            <p className="mb-1 px-3.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-muted">
               {group.label}
             </p>
           )}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-0.5">
             {group.links.map((l) => (
               <NavLink
                 key={l.to}
@@ -87,18 +87,18 @@ function NavItems({ onNavigate, compact, badges }) {
                 onClick={onNavigate}
                 className={({ isActive }) =>
                   cn(
-                    'tap-target flex min-h-11 items-center gap-3 rounded-xl px-3.5 py-3 text-[0.9375rem] font-semibold transition active:scale-[0.98]',
-                    compact && 'min-h-12 py-3.5 text-base',
+                    'tap-target flex min-h-10 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition active:scale-[0.98]',
+                    compact && 'min-h-11 py-3 text-[0.9375rem]',
                     isActive
                       ? 'bg-brand-gradient text-white shadow-soft [&_.nav-badge]:bg-white/25'
                       : 'text-body hover:bg-brand-50 hover:text-brand-700',
                   )
                 }
               >
-                <l.icon className={cn('h-5 w-5 shrink-0', compact && 'h-[1.35rem] w-[1.35rem]')} strokeWidth={2.2} />
+                <l.icon className={cn('h-[1.15rem] w-[1.15rem] shrink-0', compact && 'h-5 w-5')} strokeWidth={2.2} />
                 <span className="min-w-0 flex-1 truncate">{l.label}</span>
                 {!!(l.badgeKey && badges?.[l.badgeKey]) && (
-                  <span className="nav-badge ml-auto min-w-[1.35rem] rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[0.7rem] font-bold leading-none text-white">
+                  <span className="nav-badge ml-auto min-w-[1.3rem] rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[0.68rem] font-bold leading-none text-white">
                     {badges[l.badgeKey] > 99 ? '99+' : badges[l.badgeKey]}
                   </span>
                 )}
@@ -122,7 +122,7 @@ function SidebarFooter({ onSignOut }) {
       <button
         type="button"
         onClick={onSignOut}
-        className="tap-target flex min-h-12 w-full items-center gap-3 rounded-xl px-3.5 py-3.5 text-base font-semibold text-red-500 transition hover:bg-red-50 active:scale-[0.98]"
+        className="tap-target flex min-h-11 w-full items-center gap-2.5 rounded-xl px-3.5 py-3 text-[0.9375rem] font-semibold text-red-500 transition hover:bg-red-50 active:scale-[0.98]"
       >
         <LogOut className="h-5 w-5 shrink-0" /> Sign out
       </button>
@@ -193,7 +193,7 @@ export default function AdminLayout() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              className="absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col bg-surface p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+              className="absolute inset-y-0 left-0 flex w-[min(19rem,86vw)] flex-col bg-surface p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
             >
               <div className="flex shrink-0 items-center justify-between">
                 <AdminMark onNavigate={() => setOpen(false)} />

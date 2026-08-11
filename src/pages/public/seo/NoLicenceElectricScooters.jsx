@@ -82,8 +82,10 @@ export default function NoLicenceElectricScooters() {
         <Link to="/test-ride-berhampore">test ride in Berhampore</Link> at Chunakhali Bus Stand — no
         appointment needed — {DEFAULT_HOURS_SUMMARY_SHORT.toLowerCase()}. Compare also our{' '}
         <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> guide
-        and <Link to="/low-budget-electric-scooters-berhampore">low budget options</Link>. Call 096355
-        05436 for stock.
+        and <Link to="/low-budget-electric-scooters-berhampore">low budget options</Link>. Looking for a
+        local dealer? See{' '}
+        <Link to="/electric-scooter-near-me-berhampore">electric scooter near me Berhampore</Link> and{' '}
+        <Link to="/areas-we-serve">areas we serve</Link>. Call 096355 05436 for stock.
       </p>
     </SeoLandingLayout>
   );

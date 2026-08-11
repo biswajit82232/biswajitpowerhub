@@ -4,6 +4,7 @@
  */
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { SERVICE_LOCATIONS } from '../src/data/locations.js';
 
 const DIST = 'dist';
 const routes = [
@@ -14,15 +15,13 @@ const routes = [
   '/scooters/single-light',
   '/scooters/double-light',
   '/best-electric-scooters-berhampore',
+  '/electric-scooter-near-me-berhampore',
+  '/areas-we-serve',
   '/low-budget-electric-scooters-berhampore',
   '/no-licence-electric-scooters-west-bengal',
   '/battery-upgrade-berhampore',
   '/test-ride-berhampore',
-  '/electric-scooters-kandi',
-  '/electric-scooters-jiaganj',
-  '/electric-scooters-beldanga',
-  '/electric-scooters-lalbagh',
-  '/electric-scooters-domkal',
+  ...SERVICE_LOCATIONS.map((l) => l.path),
   '/guides',
   '/guides/no-licence-electric-scooter-rules-west-bengal',
   '/guides/electric-vs-petrol-cost-berhampore',

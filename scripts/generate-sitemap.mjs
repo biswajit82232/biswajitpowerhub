@@ -16,6 +16,8 @@ const STATIC_PAGES = [
   { path: '/', priority: '1.0', changefreq: 'weekly' },
   { path: '/scooters', priority: '0.9', changefreq: 'weekly' },
   { path: '/best-electric-scooters-berhampore', priority: '0.9', changefreq: 'weekly' },
+  { path: '/electric-scooter-near-me-berhampore', priority: '0.9', changefreq: 'weekly' },
+  { path: '/areas-we-serve', priority: '0.85', changefreq: 'weekly' },
   { path: '/low-budget-electric-scooters-berhampore', priority: '0.85', changefreq: 'weekly' },
   { path: '/no-licence-electric-scooters-west-bengal', priority: '0.85', changefreq: 'weekly' },
   { path: '/battery-upgrade-berhampore', priority: '0.8', changefreq: 'monthly' },

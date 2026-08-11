@@ -166,7 +166,13 @@ export default function BestElectricScooters() {
         <Link to="/low-budget-electric-scooters-berhampore">low budget electric scooters in Berhampore</Link>{' '}
         and our{' '}
         <Link to="/no-licence-electric-scooters-west-bengal">no licence electric scooters West Bengal</Link>{' '}
-        guide before you buy.
+        guide before you buy. Searching nearby? See{' '}
+        <Link to="/electric-scooter-near-me-berhampore">electric scooter near me Berhampore</Link> and{' '}
+        <Link to="/areas-we-serve">areas we serve</Link> across Murshidabad — including{' '}
+        <Link to="/electric-scooters-kandi">Kandi</Link>,{' '}
+        <Link to="/electric-scooters-jiaganj">Jiaganj</Link>,{' '}
+        <Link to="/electric-scooters-beldanga">Beldanga</Link>, and{' '}
+        <Link to="/electric-scooters-domkal">Domkal</Link>.
       </p>
     </SeoLandingLayout>
   );

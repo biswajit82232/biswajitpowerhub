@@ -100,7 +100,7 @@ export const CONTACT_DEFAULTS = {
     state: 'West Bengal',
     pincode: '742149',
     country: 'India',
-    full: 'Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal, 742149, India',
+    full: 'Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149',
   },
   maps: {
     link: 'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
@@ -340,6 +340,7 @@ export const FOOTER_MORE_LINKS = [
 ];
 
 /** Full footer Quick Links — every remaining indexable page (no exchange/updates) */
+/** Full footer Quick Links — hub-first local SEO (all towns via Areas we serve) */
 export const FOOTER_QUICK_LINKS = [
   { label: 'About Us', to: '/about' },
   { label: 'Contact Us', to: '/contact' },
@@ -348,10 +349,13 @@ export const FOOTER_QUICK_LINKS = [
   { label: 'Test Ride', to: '/test-ride-berhampore' },
   { label: 'Book Service', to: '/service#book' },
   { label: 'Battery Upgrade', to: '/battery-upgrade-berhampore' },
+  { label: 'Near Me — Berhampore', to: '/electric-scooter-near-me-berhampore' },
   { label: 'Best in Berhampore', to: '/best-electric-scooters-berhampore' },
-  { label: 'Kandi', to: '/electric-scooters-kandi' },
+  { label: 'Areas We Serve', to: '/areas-we-serve' },
   { label: 'Jiaganj', to: '/electric-scooters-jiaganj' },
   { label: 'Beldanga', to: '/electric-scooters-beldanga' },
+  { label: 'Kandi', to: '/electric-scooters-kandi' },
+  { label: 'Domkal', to: '/electric-scooters-domkal' },
 ];
 
 /** @deprecated use FOOTER_QUICK_LINKS */

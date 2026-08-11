@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useMemo } from 'react';
 import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
-import { SITE_FAQS } from '@/data/seoContent';
-import { SERVICE_LOCATIONS } from '@/data/locations';
-import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
+import { getNearbyLocations } from '@/data/locations';
+import { breadcrumbList, faqPageSchema, postalAddressSchema } from '@/lib/schemaHelpers';
 import { SITE_URL, SITE } from '@/config/site';
 
 /**
@@ -11,18 +10,17 @@ import { SITE_URL, SITE } from '@/config/site';
  */
 export default function LocationLanding({ location }) {
   const path = location.path;
-  const faqs = useMemo(
-    () => [...(location.faqs || []), ...SITE_FAQS.slice(0, 3)],
-    [location.faqs],
-  );
+  const faqs = location.faqs || [];
+  const nearbyTowns = getNearbyLocations(location, 5);
 
   const jsonLd = useMemo(
     () => [
       breadcrumbList([
         { name: 'Home', path: '/' },
+        { name: 'Areas We Serve', path: '/areas-we-serve' },
         { name: `Electric Scooters in ${location.name}`, path },
       ]),
-      faqPageSchema(faqs),
+      ...(faqs.length ? [faqPageSchema(faqs)] : []),
       {
         '@context': 'https://schema.org',
         '@type': 'WebPage',
@@ -31,8 +29,18 @@ export default function LocationLanding({ location }) {
         description: location.description,
         about: {
           '@type': 'LocalBusiness',
-          name: SITE.name,
           '@id': `${SITE_URL}/#dealership`,
+          name: SITE.name,
+          url: SITE_URL,
+          telephone: `+91${SITE.phones[0]}`,
+          address: postalAddressSchema(SITE.address),
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: SITE.geo.latitude,
+            longitude: SITE.geo.longitude,
+          },
+          hasMap: SITE.maps.link,
+          image: `${SITE_URL}/logo-512.png`,
           areaServed: [location.name, location.district, 'West Bengal', 'Berhampore'],
         },
       },
@@ -52,8 +60,6 @@ export default function LocationLanding({ location }) {
     [location, path, faqs],
   );
 
-  const otherTowns = SERVICE_LOCATIONS.filter((l) => l.slug !== location.slug);
-
   return (
     <SeoLandingLayout
       title={location.title}
@@ -61,7 +67,11 @@ export default function LocationLanding({ location }) {
       path={path}
       h1={location.h1}
       intro={location.intro}
-      breadcrumbs={[{ name: 'Home', to: '/' }, { name: `Electric Scooters — ${location.name}` }]}
+      breadcrumbs={[
+        { name: 'Home', to: '/' },
+        { name: 'Areas We Serve', to: '/areas-we-serve' },
+        { name: `Electric Scooters — ${location.name}` },
+      ]}
       jsonLd={jsonLd}
       showFaq={false}
     >
@@ -77,6 +87,13 @@ export default function LocationLanding({ location }) {
         ))}
       </ul>
 
+      {location.localNote && (
+        <>
+          <h2>Local tip for {location.name} riders</h2>
+          <p>{location.localNote}</p>
+        </>
+      )}
+
       <h2>Models popular with {location.name} buyers</h2>
       <p>
         Compare{' '}
@@ -84,8 +101,9 @@ export default function LocationLanding({ location }) {
         <Link to="/scooters/double-light">Double Light</Link>, and{' '}
         <Link to="/scooters/single-light">Single Light</Link> — all low-speed options with no licence on
         eligible units. Start from the{' '}
-        <Link to="/scooters">full scooters catalogue</Link> or our{' '}
-        <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> guide.
+        <Link to="/scooters">full scooters catalogue</Link>, our{' '}
+        <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> guide, or{' '}
+        <Link to="/electric-scooter-near-me-berhampore">electric scooter near me Berhampore</Link>.
       </p>
 
       <h2>Visit from {location.name}</h2>
@@ -97,29 +115,39 @@ export default function LocationLanding({ location }) {
         <Link to="/battery-upgrade-berhampore">battery upgrade</Link>.
       </p>
 
-      <h2>Also serving nearby towns</h2>
+      <h2>Nearby areas we also serve</h2>
       <ul>
-        {otherTowns.map((t) => (
+        {location.slug !== 'berhampore' && (
+          <li>
+            <Link to="/electric-scooters-berhampore">Electric scooters in Berhampore</Link>
+          </li>
+        )}
+        {nearbyTowns.map((t) => (
           <li key={t.slug}>
             <Link to={t.path}>Electric scooters for {t.name}</Link>
           </li>
         ))}
         <li>
+          <Link to="/areas-we-serve">All areas we serve in Murshidabad</Link>
+        </li>
+        <li>
           <Link to="/contact">Showroom contact &amp; map</Link>
         </li>
       </ul>
 
-      <div className="not-prose mt-10 space-y-2 border border-line bg-surface-alt p-4 sm:p-6">
-        <p className="font-display text-lg font-bold uppercase tracking-wide text-navy">FAQ</p>
-        {faqs.map((f) => (
-          <details key={f.question} className="border border-line bg-white open:shadow-soft">
-            <summary className="cursor-pointer list-none px-4 py-3 font-display text-sm font-bold text-navy">
-              {f.question}
-            </summary>
-            <p className="border-t border-line px-4 py-3 text-sm text-body">{f.answer}</p>
-          </details>
-        ))}
-      </div>
+      {faqs.length > 0 && (
+        <div className="not-prose mt-10 space-y-2 border border-line bg-surface-alt p-4 sm:p-6">
+          <p className="font-display text-lg font-bold uppercase tracking-wide text-navy">FAQ</p>
+          {faqs.map((f) => (
+            <details key={f.question} className="border border-line bg-white open:shadow-soft">
+              <summary className="cursor-pointer list-none px-4 py-3 font-display text-sm font-bold text-navy">
+                {f.question}
+              </summary>
+              <p className="border-t border-line px-4 py-3 text-sm text-body">{f.answer}</p>
+            </details>
+          ))}
+        </div>
+      )}
     </SeoLandingLayout>
   );
 }

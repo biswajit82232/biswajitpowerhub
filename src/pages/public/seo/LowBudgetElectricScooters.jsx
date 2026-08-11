@@ -71,7 +71,11 @@ export default function LowBudgetElectricScooters() {
       <p>
         Compare full specs on our{' '}
         <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> page, or
-        use the savings simulator on the homepage after your visit.
+        use the savings simulator on the homepage after your visit. We also serve{' '}
+        <Link to="/areas-we-serve">towns across Murshidabad</Link> — start with{' '}
+        <Link to="/electric-scooter-near-me-berhampore">near me Berhampore</Link>,{' '}
+        <Link to="/electric-scooters-beldanga">Beldanga</Link>, or{' '}
+        <Link to="/electric-scooters-kandi">Kandi</Link>.
       </p>
 
       <h2>EMI Options Available</h2>

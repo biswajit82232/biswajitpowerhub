@@ -1,6 +1,8 @@
 import { MapPin, Phone, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 import { telUrl, whatsappUrl, formatPhoneDisplay } from '@/config/site';
+import { getPriorityLocations } from '@/data/locations';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
@@ -9,6 +11,7 @@ import { trackEvent, EVENT } from '@/lib/tracking';
  */
 export function LocateUs() {
   const { site } = useSite();
+  const towns = getPriorityLocations().slice(0, 6);
 
   return (
     <section
@@ -68,6 +71,29 @@ export function LocateUs() {
           >
             Get Direction
           </Button>
+        </div>
+
+        <div className="mt-6 border-t border-white/15 pt-5">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-white/70">Serving Murshidabad</p>
+          <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm">
+            {towns.map((t) => (
+              <li key={t.slug}>
+                <Link to={t.path} className="text-white/90 underline-offset-2 hover:underline">
+                  {t.name}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link to="/areas-we-serve" className="font-semibold text-white underline-offset-2 hover:underline">
+                All areas
+              </Link>
+            </li>
+            <li>
+              <Link to="/electric-scooter-near-me-berhampore" className="font-semibold text-white underline-offset-2 hover:underline">
+                Near me
+              </Link>
+            </li>
+          </ul>
         </div>
       </div>
     </section>

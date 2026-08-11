@@ -208,12 +208,32 @@ const ROUTES = [
     crawlText:
       'Free supervised test rides are available at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore. No appointment needed any day 9 AM to 8:30 PM. A driving licence is not required for our low-speed models. Try Activa, Zoom, Double Light, or Single Light before you buy.',
   },
+  {
+    path: '/electric-scooter-near-me-berhampore',
+    title: 'Electric Scooter Near Me Berhampore | Biswajit Power Hub',
+    description:
+      'Electric scooter near me in Berhampore? Visit Biswajit Power Hub at Chunakhali Bus Stand — no licence models, free test ride, EMI. Call 096355 05436.',
+    h1: 'Electric Scooter Near Me in Berhampore — Local Dealer at Chunakhali',
+    schema: 'crumbs',
+    crawlText:
+      'Looking for an electric scooter near me in Berhampore? Biswajit Power Hub is at Chunakhali Bus Stand, Nimtala. Free test rides, no licence on eligible models, EMI guidance. Call 096355 05436. Serving Murshidabad towns including Kandi, Jiaganj, Beldanga, Domkal and more.',
+  },
+  {
+    path: '/areas-we-serve',
+    title: 'Areas We Serve — Murshidabad Electric Scooters | Biswajit Power Hub',
+    description:
+      'Biswajit Power Hub serves Berhampore, Cossimbazar, Lalbagh, Jiaganj, Kandi, Domkal, Lalgola and more. Visit Chunakhali showroom. Call 096355 05436.',
+    h1: 'Areas We Serve — Murshidabad',
+    schema: 'crumbs',
+    crawlText:
+      'One showroom in Berhampore serving Murshidabad: Berhampore, Cossimbazar, Murshidabad Lalbagh, Jiaganj, Azimganj, Raninagar, Beldanga, Nabagram, Hariharpara, Chaltia Gora Bazar, Daulatabad, Domkal, Lalgola, Kandi, Bhagawangola.',
+  },
 
   {
     path: '/contact',
-    title: 'Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub',
+    title: 'Electric Scooter Showroom Near Chunakhali, Berhampore | Biswajit Power Hub',
     description:
-      'Visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore. Electric scooter dealer. Call 096355 05436 or WhatsApp us.',
+      'Electric scooter showroom near Chunakhali Bus Stand, Berhampore. Serving Murshidabad towns — free test ride. Call 096355 05436 or WhatsApp us.',
     h1: 'Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub',
     schema: 'contact',
   },

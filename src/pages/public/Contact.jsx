@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Phone, MapPin, Clock, MessageCircle, Send, Navigation } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Reveal } from '@/components/common/Reveal';
@@ -10,6 +11,7 @@ import { useToast } from '@/components/ui/Toast';
 import { submitContact } from '@/features/leads/leadService';
 import { isValidName, isValidPhone, isValidEmail } from '@/features/leads/validation';
 import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay, siteSameAs } from '@/config/site';
+import { getPriorityLocations, getServiceAreaNames } from '@/data/locations';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
@@ -138,16 +140,19 @@ export default function Contact() {
         hasMap: site.maps.link,
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
         sameAs: siteSameAs(site),
+        areaServed: getServiceAreaNames(),
       },
     ],
     [site],
   );
 
+  const priorityTowns = getPriorityLocations();
+
   return (
     <>
       <SEO
-        title="Visit Our Showroom — Chunakhali, Berhampore | Biswajit Power Hub"
-        description="Visit Biswajit Power Hub at Chunakhali Bus Stand, Berhampore. Electric scooter dealer. Call 096355 05436 or WhatsApp us."
+        title="Electric Scooter Showroom Near Chunakhali, Berhampore | Biswajit Power Hub"
+        description="Electric scooter showroom near Chunakhali Bus Stand, Berhampore. Serving Murshidabad towns — free test ride. Call 096355 05436 or WhatsApp us."
         path="/contact"
         jsonLd={contactJsonLd}
         titleTemplate={false}
@@ -176,7 +181,7 @@ export default function Contact() {
           />
           <Reveal>
             <h1 className="mt-4 font-display text-display-lg font-extrabold uppercase tracking-wide text-white">
-              Visit Our Showroom — Chunakhali, Berhampore
+              Electric Scooter Showroom Near Chunakhali, Berhampore
             </h1>
             <p className="mt-3 max-w-xl text-base text-white/80 sm:text-lg">
               Near Chunakhali Bus Stand, Nimtala — walk in for a free test ride. We don&apos;t sell online.
@@ -255,6 +260,35 @@ export default function Contact() {
               <div className="flex items-start gap-3 border-t border-line pt-8 text-sm text-muted">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
                 <p>Landmark: Chunakhali Bus Stand — easy to find from Nimtala and Berhampore town.</p>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.08}>
+              <div className="border-t border-line pt-8">
+                <h3 className="font-display text-lg font-bold text-heading">Areas we serve</h3>
+                <p className="mt-1 text-sm text-muted">
+                  Customers visit from across Murshidabad. Looking for a dealer near you? See{' '}
+                  <Link to="/electric-scooter-near-me-berhampore" className="font-semibold text-brand-600 hover:underline">
+                    electric scooter near me Berhampore
+                  </Link>{' '}
+                  or the full{' '}
+                  <Link to="/areas-we-serve" className="font-semibold text-brand-600 hover:underline">
+                    areas we serve
+                  </Link>{' '}
+                  list.
+                </p>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {priorityTowns.map((t) => (
+                    <li key={t.slug}>
+                      <Link
+                        to={t.path}
+                        className="inline-flex rounded-lg bg-surface-alt px-2.5 py-1.5 text-xs font-semibold text-heading ring-1 ring-line hover:bg-brand-50 hover:text-brand-700"
+                      >
+                        {t.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </Reveal>
           </div>
