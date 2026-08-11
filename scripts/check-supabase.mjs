@@ -2,27 +2,7 @@
  * Verify Supabase app connection and report which tables/columns are missing.
  * Usage: node scripts/check-supabase.mjs
  */
-import { readFileSync } from 'fs';
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = resolve(__dirname, '..');
-
-function loadEnv() {
-  const env = {};
-  try {
-    for (const line of readFileSync(resolve(root, '.env'), 'utf8').split(/\r?\n/)) {
-      if (!line || line.startsWith('#')) continue;
-      const i = line.indexOf('=');
-      if (i === -1) continue;
-      env[line.slice(0, i).trim()] = line.slice(i + 1).trim();
-    }
-  } catch {
-    /* no .env */
-  }
-  return env;
-}
+import { loadEnv } from './load-env.mjs';
 
 async function probe(url, key, path) {
   const res = await fetch(`${url}/rest/v1/${path}`, {
@@ -32,7 +12,7 @@ async function probe(url, key, path) {
   return { ok: res.ok, status: res.status, body };
 }
 
-const env = { ...loadEnv(), ...process.env };
+const env = loadEnv();
 const url = env.VITE_SUPABASE_URL;
 const key = env.VITE_SUPABASE_ANON_KEY;
 
@@ -104,7 +84,7 @@ if (missing.length === 0) {
 }
 
 if (!env.SUPABASE_DB_PASSWORD && !env.DATABASE_URL) {
-  console.log('Tip: add SUPABASE_DB_PASSWORD to .env (Supabase → Settings → Database) to run migrations locally.\n');
+  console.log('Tip: add SUPABASE_DB_PASSWORD to .env or .env.local (Supabase → Settings → Database) to run migrations locally.\n');
 }
 
 console.log('RLS verify: after applying harden_rls_storage_and_rpc.sql, run');

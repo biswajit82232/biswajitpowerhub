@@ -8,6 +8,7 @@ import { readFileSync, readdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+import { loadEnv } from './load-env.mjs';
 
 const { Client } = pg;
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -41,21 +42,6 @@ const ORDER = [
   'lock_admin_rls_allowlist.sql',
   'harden_rls_storage_and_rpc.sql',
 ];
-
-function loadEnv() {
-  const env = {};
-  try {
-    for (const line of readFileSync(resolve(root, '.env'), 'utf8').split(/\r?\n/)) {
-      if (!line || line.startsWith('#')) continue;
-      const i = line.indexOf('=');
-      if (i === -1) continue;
-      env[line.slice(0, i).trim()] = line.slice(i + 1).trim();
-    }
-  } catch {
-    /* no .env */
-  }
-  return { ...env, ...process.env };
-}
 
 function getDatabaseUrl(env) {
   if (env.DATABASE_URL) return env.DATABASE_URL;
@@ -96,7 +82,7 @@ const dbUrl = getDatabaseUrl(env);
 
 if (!dbUrl) {
   console.error('\n❌ Missing database credentials.\n');
-  console.error('Add to .env (from Supabase → Project Settings → Database):');
+  console.error('Add to .env or .env.local (from Supabase → Project Settings → Database):');
   console.error('  SUPABASE_DB_PASSWORD=your-database-password\n');
   console.error('Or set DATABASE_URL=postgresql://postgres:...@db.<ref>.supabase.co:5432/postgres\n');
   process.exit(1);
