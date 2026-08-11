@@ -85,6 +85,7 @@ export function HeroCarousel({ heroImageUrl }) {
               height={840}
               loading={i === 0 ? 'eager' : 'lazy'}
               fetchPriority={i === 0 ? 'high' : undefined}
+              optimize={false}
               className="h-full w-full !aspect-auto bg-surface-alt"
               imgClassName="object-cover object-center"
               placeholderLabel="Showroom photos coming soon — visit us at Chunakhali Bus Stand"

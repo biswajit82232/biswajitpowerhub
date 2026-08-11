@@ -1,11 +1,10 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { FINANCE_DEFAULTS } from '@/config/finance';
-import { compressForUpload } from '@/lib/resizeImage';
 
-/** Upload a hero image to Supabase Storage (or base64 fallback). */
+/** Upload a hero image to Supabase Storage (or base64 fallback). No client compress — full quality. */
 export async function uploadHeroImage(file) {
-  const upload = await compressForUpload(file, 1600, 900);
+  const upload = file;
   if (isSupabaseConfigured && supabase) {
     try {
       const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';

@@ -4,6 +4,10 @@ import Button from '@/components/ui/Button';
 import { SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
+import { useAsync } from '@/hooks/useAsync';
+import { getScooters } from '@/features/scooters/scooterService';
+import { SCOOTERS } from '@/data/scooters';
+import { formatCatalogFromPrice } from '@/lib/catalogCopy';
 
 /**
  * Bare Google Ads landing — noindex, no main nav, conversion-first.
@@ -13,6 +17,8 @@ export default function AdLanding() {
   const phone = site.phones[0];
   const maps = site.maps.link;
   const perks = (site.perks || []).slice(0, 3);
+  const { data: scooters } = useAsync(() => getScooters(), []);
+  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS);
 
   return (
     <div className="min-h-screen bg-white text-body">
@@ -32,7 +38,7 @@ export default function AdLanding() {
           No Licence Electric Scooters — Test Ride Today
         </h1>
         <p className="mt-3 text-center text-sm leading-relaxed text-body">
-          From ₹38,999. No RTO. Free test ride at {site.address.line}, {site.address.city}.
+          {fromPrice ? `From ${fromPrice}. ` : ''}No RTO. Free test ride at {site.address.line}, {site.address.city}.
         </p>
 
         <div className="mt-8 flex flex-col gap-3">

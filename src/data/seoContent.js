@@ -1,4 +1,6 @@
-/** Shared SEO FAQ + landing metadata for Biswajit Power Hub */
+/** Shared SEO FAQ + landing metadata for Biswajit Power Hub.
+ * Exact prices/ranges come from live inventory via `@/lib/catalogCopy` — do not hardcode them here.
+ */
 
 import { DEFAULT_HOURS_SUMMARY_SHORT } from '@/features/site/siteHours';
 
@@ -11,12 +13,12 @@ export const SITE_FAQS = [
   {
     question: 'What is the price of electric scooters in Berhampore?',
     answer:
-      'At Biswajit Power Hub, our electric scooters start from ₹38,999 for the Single Light model. The Zoom is priced at ₹42,999, Double Light at ₹40,999, and Activa at ₹45,999. EMI options are available.',
+      'At Biswajit Power Hub, electric scooter prices depend on model and battery pack. Ask for today’s starting price and EMI at our Chunakhali showroom in Berhampore — we stock Activa, Zoom, Double Light, Single Light and more.',
   },
   {
     question: 'What is the range per full charge?',
     answer:
-      'Range varies by model, but our scooters typically deliver 60–80 km per charge. We also offer custom battery upgrades at our Berhampore showroom for customers who need extended range.',
+      'Range varies by model and battery option. Check each scooter page for current figures, or ask at the showroom. We also offer custom battery upgrades in Berhampore for customers who need extended range.',
   },
   {
     question: 'Do you offer test rides in Berhampore?',
@@ -40,64 +42,25 @@ export const SITE_FAQS = [
   },
 ];
 
+/** Titles/H1 only — price strings are filled from inventory in buildModelSeo(). */
 export const MODEL_SEO_META = {
   activa: {
     title: 'Activa Electric Scooter Berhampore — Price & Test Ride',
-    description:
-      'Buy Activa electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹45,999. Book test ride. Call 096355 05436.',
     h1: 'Activa Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   zoom: {
     title: 'Zoom Electric Scooter Berhampore — Price & Test Ride',
-    description:
-      'Buy Zoom electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹42,999. Book test ride. Call 096355 05436.',
     h1: 'Zoom Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'single-light': {
     title: 'Single Light Electric Scooter Berhampore — Price',
-    description:
-      'Buy Single Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹38,999. Book test ride. Call 096355 05436.',
     h1: 'Single Light Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
   'double-light': {
     title: 'Double Light Electric Scooter Berhampore — Price',
-    description:
-      'Buy Double Light electric scooter at Biswajit Power Hub, Chunakhali, Berhampore. No licence required. Price ₹40,999. Book test ride. Call 096355 05436.',
     h1: 'Double Light Electric Scooter in Berhampore — Price, Features & Test Ride',
   },
 };
 
-export const COMPARISON_ROWS = [
-  {
-    model: 'Activa',
-    slug: 'activa',
-    price: '₹45,999',
-    range: '80–95 km',
-    topSpeed: '25 km/h',
-    bestFor: 'Longer Murshidabad trips',
-  },
-  {
-    model: 'Zoom',
-    slug: 'zoom',
-    price: '₹42,999',
-    range: '70–120 km',
-    topSpeed: '25 km/h',
-    bestFor: 'Premium daily commute',
-  },
-  {
-    model: 'Double Light',
-    slug: 'double-light',
-    price: '₹40,999',
-    range: '60–75 km',
-    topSpeed: '25 km/h',
-    bestFor: 'Family errands',
-  },
-  {
-    model: 'Single Light',
-    slug: 'single-light',
-    price: '₹38,999',
-    range: '50–65 km',
-    topSpeed: '25 km/h',
-    bestFor: 'Lowest budget',
-  },
-];
+/** @deprecated Use buildComparisonRows(scooters) from @/lib/catalogCopy */
+export const COMPARISON_ROWS = [];

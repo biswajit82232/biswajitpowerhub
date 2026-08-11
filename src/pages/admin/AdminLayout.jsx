@@ -7,6 +7,7 @@ import {
   RefreshCw, Wrench,
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/Loading';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
 import { useAuth } from '@/context/AuthContext';
@@ -212,10 +213,12 @@ export default function AdminLayout() {
 
       <main className="lg:pl-64">
         <div className="mx-auto max-w-6xl px-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-8">
-          <Suspense fallback={<PageLoader />}>
-            <AdminInstallBanner />
-            <Outlet />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <AdminInstallBanner />
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
     </div>

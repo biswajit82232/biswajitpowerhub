@@ -110,7 +110,8 @@ export async function loadSitePhotos() {
 export async function uploadSitePhotoFile(file, folder = 'site') {
   let uploadFile = file;
   try {
-    if (folder === 'hero') uploadFile = await resizeImageFile(file, 1600, 900);
+    // Hero: keep original file (no client compress) for full-bleed sharpness.
+    if (folder === 'hero') uploadFile = file;
     else if (folder.startsWith('gallery') || folder === 'about')
       uploadFile = await resizeImageFile(file, 1200, 800);
     else if (folder.startsWith('model')) uploadFile = await resizeImageFile(file, 800, 600);

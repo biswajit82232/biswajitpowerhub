@@ -16,15 +16,18 @@ export function SiteImage({
   className,
   imgClassName,
   placeholderLabel = 'Upload Photo',
+  /** When false, serve the original Storage URL (no CDN resize/compress). */
+  optimize = true,
+  quality = 75,
 }) {
   // Fallback chain: optimized CDN variant -> original URL -> placeholder.
   const [failStage, setFailStage] = useState(0);
-  const canOptimize = isSupabaseStorageUrl(src);
+  const canOptimize = optimize && isSupabaseStorageUrl(src);
   const exhausted = failStage >= (canOptimize ? 2 : 1);
   const resolvedSrc =
     failStage === 0 && canOptimize
-      ? optimizedImageUrl(src, Math.min(width || 800, 1600), 75, {
-          height: Math.min(height || 600, 1200),
+      ? optimizedImageUrl(src, Math.min(width || 800, 1920), quality, {
+          height: Math.min(height || 600, 1080),
           resize: 'cover',
         })
       : src;

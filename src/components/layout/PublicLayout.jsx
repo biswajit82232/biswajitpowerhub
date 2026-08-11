@@ -7,6 +7,7 @@ import { FloatingDealerRail } from '@/components/common/FloatingDealerRail';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
 import { FirstVisitNoLicencePrompt } from '@/components/common/FirstVisitNoLicencePrompt';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { RouteLoader } from '@/components/ui/Loading';
 import { usePageTracking } from '@/hooks/usePageTracking';
 
@@ -36,6 +37,7 @@ function FadeOutlet() {
 
 export function PublicLayout() {
   usePageTracking();
+  const { pathname } = useLocation();
 
   return (
     <div className="flex min-h-screen min-w-0 w-full flex-col overflow-x-clip">
@@ -53,9 +55,11 @@ export function PublicLayout() {
         tabIndex={-1}
         className="min-w-0 flex-1 overflow-x-clip pt-[var(--header-offset)] pb-[calc(4.5rem+env(safe-area-inset-bottom))] outline-none lg:pb-[max(1.5rem,env(safe-area-inset-bottom))]"
       >
-        <Suspense fallback={<RouteLoader label="Loading page" />}>
-          <FadeOutlet />
-        </Suspense>
+        <ErrorBoundary key={pathname}>
+          <Suspense fallback={<RouteLoader label="Loading page" />}>
+            <FadeOutlet />
+          </Suspense>
+        </ErrorBoundary>
       </main>
       <Footer />
       <MobileLocalCTA />

@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazyRetry as lazy } from '@/lib/lazyRetry';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { BareAdsLayout } from '@/components/layout/BareAdsLayout';

@@ -13,20 +13,33 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
+    let cancelled = false;
+    const failSafe = window.setTimeout(() => {
+      if (!cancelled) setLoading(false);
+    }, 8000);
+
     supabase.auth
       .getSession()
       .then(({ data }) => {
+        if (cancelled) return;
         setSession(data.session);
         setLoading(false);
       })
       .catch((err) => {
         console.warn('[Auth] getSession failed:', err?.message);
-        setLoading(false);
+        if (!cancelled) setLoading(false);
+      })
+      .finally(() => {
+        window.clearTimeout(failSafe);
       });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
     });
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(failSafe);
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email, password) => {

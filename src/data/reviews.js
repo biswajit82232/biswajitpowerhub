@@ -19,7 +19,7 @@ export const REVIEWS = [
     name: 'Riya S., Berhampore',
     rating: 5,
     review:
-      'My first electric scooter. Single Light fit our budget at ₹38,999 and 50 km is enough for school drop and market. No licence needed — perfect for Murshidabad town rides.',
+      'My first electric scooter. Single Light fit our budget and the range is enough for school drop and market. No licence needed — perfect for Murshidabad town rides.',
     scooter: 'Single Light',
     photo: '',
     status: 'approved',

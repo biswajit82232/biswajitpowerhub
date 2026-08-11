@@ -27,7 +27,7 @@ export const BLOG_POSTS = [
       },
       {
         h2: 'Models we stock for this category',
-        p: 'Activa, Zoom, Single Light, and Double Light at Biswajit Power Hub are built as low-speed electric scooters for everyday Berhampore use. Prices start from about ₹38,999. Pair this guide with our dedicated no-licence landing page for a side-by-side comparison before your free test ride.',
+        p: 'Activa, Zoom, Single Light, and Double Light at Biswajit Power Hub are built as low-speed electric scooters for everyday Berhampore use. Check the scooters catalogue for today’s starting prices. Pair this guide with our dedicated no-licence landing page for a side-by-side comparison before your free test ride.',
       },
       {
         h2: 'Next step',
@@ -62,7 +62,7 @@ export const BLOG_POSTS = [
       },
       {
         h2: 'Purchase price still matters',
-        p: 'Entry models start near ₹38,999. EMI can spread that cost while monthly fuel savings offset the instalment. Ask at Biswajit Power Hub for current slabs on Activa, Zoom, Single Light, and Double Light.',
+        p: 'Entry models are priced for everyday Murshidabad budgets. EMI can spread that cost while monthly fuel savings offset the instalment. Ask at Biswajit Power Hub for current slabs on Activa, Zoom, Single Light, and Double Light.',
       },
       {
         h2: 'Try before you switch',
@@ -159,7 +159,7 @@ export const BLOG_POSTS = [
     sections: [
       {
         h2: 'Know your comfort instalment',
-        p: 'Decide a monthly number that still leaves room for electricity and routine care. Entry models from ₹38,999 often fit tighter budgets once EMI is structured.',
+        p: 'Decide a monthly number that still leaves room for electricity and routine care. Entry models often fit tighter budgets once EMI is structured — confirm today’s starting price at the showroom.',
       },
       {
         h2: 'Ask for on-road clarity',

@@ -24,6 +24,8 @@ import {
   siteReviewsSchema,
 } from '@/lib/schemaHelpers';
 import { SCOOTERS } from '@/data/scooters';
+import { buildSiteFaqs, formatCatalogFromPrice } from '@/lib/catalogCopy';
+import { SITE_FAQS } from '@/data/seoContent';
 
 export default function Home() {
   const { site } = useSite();
@@ -31,10 +33,15 @@ export default function Home() {
   const { settings: financeSettings } = useFinance();
   // On-site reviews still feed JSON-LD only; the visible Home block is GoogleReviewsWidget.
   const { data: reviews } = useAsync(() => getApprovedReviews(), []);
-  const faqs = useMemo(() => (site.faqs?.length ? site.faqs : []), [site.faqs]);
+  const catalog = allScooters?.length ? allScooters : SCOOTERS;
+  const fromPrice = formatCatalogFromPrice(catalog);
+  const faqs = useMemo(
+    () => buildSiteFaqs(site.faqs?.length ? site.faqs : SITE_FAQS, catalog),
+    [site.faqs, catalog],
+  );
 
   const homeSchemas = useMemo(() => {
-    const catalogScooters = allScooters?.length ? allScooters : SCOOTERS;
+    const catalogScooters = catalog;
     // Rating must come from real on-site reviews — never a hand-typed number.
     // Omit entirely until there are genuine reviews to back it, per Google's
     // rich-result guidelines. Visible Google reviews use a separate widget.
@@ -111,19 +118,16 @@ export default function Home() {
       },
       ...(faqs.length ? [faqPageSchema(faqs)] : []),
     ];
-  }, [site, allScooters, faqs, reviews]);
+  }, [site, catalog, faqs, reviews]);
 
-  const modelGrid = useMemo(() => {
-    const list = allScooters?.length ? allScooters : SCOOTERS;
-    return list;
-  }, [allScooters]);
+  const modelGrid = useMemo(() => catalog, [catalog]);
 
   return (
     <>
       <SEO
         title="Best Electric Scooter Dealer Berhampore | Biswajit Power Hub"
         path="/"
-        description="Biswajit Power Hub — best electric scooters in Berhampore, Murshidabad. No licence. From ₹38,999. Call 096355 05436 for test ride at Chunakhali."
+        description={`Biswajit Power Hub — best electric scooters in Berhampore, Murshidabad. No licence.${fromPrice ? ` From ${fromPrice}.` : ''} Call 096355 05436 for test ride at Chunakhali.`}
         jsonLd={homeSchemas}
         titleTemplate={false}
       />

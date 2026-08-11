@@ -140,7 +140,7 @@ export default function About() {
                   Murshidabad deserved a trusted electric scooter dealer who explains West Bengal no-licence
                   rules in plain language and stands behind every sale. Online-only sellers cannot feel seat
                   height with you or diagnose a controller the same afternoon. We built a showroom culture
-                  around affordability under ₹50,000, low running cost with home charging, and after-sales
+                  around everyday affordability, low running cost with home charging, and after-sales
                   support you can actually visit.
                 </p>
                 <p className="mt-4">

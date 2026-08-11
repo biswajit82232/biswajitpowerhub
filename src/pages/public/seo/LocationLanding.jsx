@@ -4,6 +4,10 @@ import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
 import { getNearbyLocations } from '@/data/locations';
 import { breadcrumbList, faqPageSchema, postalAddressSchema } from '@/lib/schemaHelpers';
 import { SITE_URL, SITE } from '@/config/site';
+import { useAsync } from '@/hooks/useAsync';
+import { getScooters } from '@/features/scooters/scooterService';
+import { SCOOTERS } from '@/data/scooters';
+import { formatCatalogFromPrice } from '@/lib/catalogCopy';
 
 /**
  * Shared local service-area page — one town, one job: bring riders to Berhampore showroom.
@@ -12,6 +16,18 @@ export default function LocationLanding({ location }) {
   const path = location.path;
   const faqs = useMemo(() => location.faqs || [], [location]);
   const nearbyTowns = getNearbyLocations(location, 5);
+  const { data: scooters } = useAsync(() => getScooters(), []);
+  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS);
+  const seoDescription = fromPrice
+    ? `${location.description.replace(/\.\s*$/, '')}. Starting from ${fromPrice}.`
+    : location.description;
+  const highlights = useMemo(() => {
+    const list = [...(location.highlights || [])];
+    if (!fromPrice) return list;
+    return list.map((h) =>
+      /Current showroom prices/i.test(h) ? `Prices from ${fromPrice} with EMI options` : h,
+    );
+  }, [location.highlights, fromPrice]);
 
   const jsonLd = useMemo(
     () => [
@@ -26,7 +42,7 @@ export default function LocationLanding({ location }) {
         '@type': 'WebPage',
         name: location.title,
         url: `${SITE_URL}${path}`,
-        description: location.description,
+        description: seoDescription,
         about: {
           '@type': 'LocalBusiness',
           '@id': `${SITE_URL}/#dealership`,
@@ -57,13 +73,13 @@ export default function LocationLanding({ location }) {
         serviceType: 'Electric scooter sales, test rides, battery upgrades',
       },
     ],
-    [location, path, faqs],
+    [location, path, faqs, seoDescription],
   );
 
   return (
     <SeoLandingLayout
       title={location.title}
-      description={location.description}
+      description={seoDescription}
       path={path}
       h1={location.h1}
       intro={location.intro}
@@ -82,7 +98,7 @@ export default function LocationLanding({ location }) {
         honest pricing, free test rides, EMI guidance, and walk-in servicing. {location.distanceHint}.
       </p>
       <ul>
-        {location.highlights.map((h) => (
+        {highlights.map((h) => (
           <li key={h}>{h}</li>
         ))}
       </ul>

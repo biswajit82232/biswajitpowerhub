@@ -21,8 +21,9 @@ function SlotEditor({ title, hint, slot, onChange, folder, maxW, maxH }) {
       toast('Please select an image file.', 'error');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast('Max 10 MB per image.', 'error');
+    const maxMb = folder === 'hero' ? 20 : 10;
+    if (file.size > maxMb * 1024 * 1024) {
+      toast(`Max ${maxMb} MB per image.`, 'error');
       return;
     }
     setUploading(true);

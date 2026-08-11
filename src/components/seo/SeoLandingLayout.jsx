@@ -90,6 +90,7 @@ export function SeoLandingLayout({
   intro,
   jsonLd,
   children,
+  faqs,
   showFaq = true,
 }) {
   return (
@@ -129,7 +130,7 @@ export function SeoLandingLayout({
               </Link>{' '}
               or contact {SITE.name}, Berhampore.
             </p>
-            {showFaq ? <FaqSection /> : null}
+            {showFaq ? <FaqSection faqs={faqs} /> : null}
             <div className="mt-8">
               <ShowroomCtaRow from={`${path}-bottom`} />
             </div>

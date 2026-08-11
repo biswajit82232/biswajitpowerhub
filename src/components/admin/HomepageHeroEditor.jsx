@@ -28,8 +28,8 @@ export function HomepageHeroEditor() {
       toast('Please select an image file.', 'error');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      toast('Max 10 MB per image.', 'error');
+    if (file.size > 20 * 1024 * 1024) {
+      toast('Max 20 MB for hero images.', 'error');
       return;
     }
     setUploading(true);

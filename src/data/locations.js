@@ -26,7 +26,7 @@ function buildLocation({
     title: title || `Electric Scooters in ${label} | Biswajit Power Hub Berhampore`,
     description:
       description ||
-      `Buy electric scooters near ${label}, Murshidabad. No licence models from ₹38,999. Free test ride at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.`,
+      `Buy electric scooters near ${label}, Murshidabad. No licence models at current showroom prices. Free test ride at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.`,
     h1: h1 || `Electric Scooters for ${label} — Showroom in Berhampore`,
     intro:
       intro ||
@@ -49,7 +49,7 @@ function buildLocation({
     ],
     highlights: highlights || [
       'No licence / no RTO on eligible low-speed models',
-      'Prices from ₹38,999 with EMI options',
+      'Current showroom prices with EMI options',
       'Custom battery upgrades for longer Murshidabad routes',
       '3 free servicing + 1 year motor & controller warranty',
     ],
@@ -63,7 +63,7 @@ export const SERVICE_LOCATIONS = [
     name: 'Berhampore',
     title: 'Electric Scooters in Berhampore | Biswajit Power Hub Showroom',
     description:
-      'Buy electric scooters in Berhampore at Biswajit Power Hub, Chunakhali Bus Stand — no licence models from ₹38,999, free test ride, EMI. Call 096355 05436.',
+      'Buy electric scooters in Berhampore at Biswajit Power Hub, Chunakhali Bus Stand — no licence models, live showroom prices, free test ride, EMI. Call 096355 05436.',
     h1: 'Electric Scooters in Berhampore — Chunakhali Showroom',
     intro:
       'Biswajit Power Hub is the Berhampore electric scooter showroom at Chunakhali Bus Stand, Nimtala — Activa, Zoom, Single Light, and Double Light with free test rides, EMI, and walk-in service. For “near me” searches, also see our dedicated near-me hub.',
@@ -118,7 +118,7 @@ export const SERVICE_LOCATIONS = [
     ],
     highlights: [
       'Close to Berhampore showroom — easy visit',
-      'No licence models from ₹38,999',
+      'No licence models at current showroom prices',
       'EMI guidance at the counter',
       'Battery upgrades for extra Murshidabad range',
     ],
@@ -249,7 +249,7 @@ export const SERVICE_LOCATIONS = [
     name: 'Beldanga',
     title: 'Electric Scooters in Beldanga | Biswajit Power Hub',
     description:
-      'Electric scooters near Beldanga, Murshidabad. Low-speed no-licence models at Biswajit Power Hub, Berhampore. From ₹38,999. Call 096355 05436.',
+      'Electric scooters near Beldanga, Murshidabad. Low-speed no-licence models at Biswajit Power Hub, Berhampore. Live showroom prices. Call 096355 05436.',
     h1: 'Electric Scooters for Beldanga — Low-Speed EVs from Berhampore',
     intro:
       'Beldanga riders switching from petrol visit Biswajit Power Hub for affordable electric scooters, home charging savings, and a real showroom experience at Chunakhali Bus Stand, Berhampore.',
@@ -261,7 +261,7 @@ export const SERVICE_LOCATIONS = [
       {
         question: 'What is the cheapest electric scooter for Beldanga buyers?',
         answer:
-          'Single Light starts around ₹38,999. Double Light, Zoom, and Activa stay under ₹50,000 on Standard batteries. Ask about EMI at the counter.',
+          'Single Light is usually the entry option; Double Light, Zoom, and Activa step up from there depending on battery pack. Ask about today’s prices and EMI at the counter.',
       },
       {
         question: 'Do you offer battery upgrades for Beldanga customers?',
@@ -338,7 +338,7 @@ export const SERVICE_LOCATIONS = [
     titleName: 'Chaltia / Gora Bazar',
     title: 'Electric Scooters in Chaltia & Gora Bazar | Power Hub',
     description:
-      'Electric scooters for Chaltia and Gora Bazar riders. No licence models from ₹38,999 at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.',
+      'Electric scooters for Chaltia and Gora Bazar riders. No licence models at current showroom prices at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.',
     distanceHint: 'Very close to Berhampore town — quick visit to Chunakhali Bus Stand',
     nearby: ['berhampore', 'cossimbazar', 'lalbagh', 'daulatabad'],
     intro:
@@ -397,7 +397,7 @@ export const SERVICE_LOCATIONS = [
     name: 'Domkal',
     title: 'Electric Scooters in Domkal | Biswajit Power Hub',
     description:
-      'Buy electric scooters serving Domkal, Murshidabad. No licence EVs from ₹38,999 at Biswajit Power Hub, Berhampore. Test ride today. Call 096355 05436.',
+      'Buy electric scooters serving Domkal, Murshidabad. No licence EVs at current showroom prices at Biswajit Power Hub, Berhampore. Test ride today. Call 096355 05436.',
     h1: 'Electric Scooters for Domkal — Visit Our Berhampore Showroom',
     intro:
       'Domkal families looking for a trusted electric scooter dealer in Murshidabad can visit Biswajit Power Hub at Chunakhali, Berhampore for no-licence models, EMI, and free test rides.',
@@ -418,7 +418,7 @@ export const SERVICE_LOCATIONS = [
       },
     ],
     highlights: [
-      'Four hero models under ₹50,000 (Standard pack)',
+      'Four hero models with Standard and upgrade battery packs',
       'No licence / no registration on eligible units',
       'Custom battery upgrades for longer Domkal routes',
       'WhatsApp support before you travel',
@@ -457,7 +457,7 @@ export const SERVICE_LOCATIONS = [
     name: 'Kandi',
     title: 'Electric Scooters in Kandi | Biswajit Power Hub Berhampore',
     description:
-      'Buy electric scooters near Kandi, Murshidabad. No licence models from ₹38,999. Free test ride at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.',
+      'Buy electric scooters near Kandi, Murshidabad. No licence models at current showroom prices. Free test ride at Biswajit Power Hub, Chunakhali, Berhampore. Call 096355 05436.',
     h1: 'Electric Scooters for Kandi & Murshidabad — Showroom in Berhampore',
     intro:
       'Riders from Kandi choose Biswajit Power Hub in Berhampore for low-speed electric scooters with no licence, honest pricing, and free test rides at Chunakhali Bus Stand — about a short drive from Kandi town.',
@@ -479,7 +479,7 @@ export const SERVICE_LOCATIONS = [
     ],
     highlights: [
       'No licence / no RTO on eligible low-speed models',
-      'Prices from ₹38,999 with EMI options',
+      'Current showroom prices with EMI options',
       'Custom battery upgrades for Kandi–Berhampore range needs',
       '3 free servicing + 1 year motor & controller warranty',
     ],

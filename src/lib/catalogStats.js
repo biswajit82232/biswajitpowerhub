@@ -3,7 +3,7 @@
 import { FINANCE_DEFAULTS } from '@/config/finance';
 import { CHARGE_EFFICIENCY } from '@/lib/simulator';
 import { parseBatteryKwh } from '@/lib/battery';
-import { getScooterVariants } from '@/lib/scooterVariants';
+import { getScooterVariants, getStartingPrice } from '@/lib/scooterVariants';
 
 function variantEntries(scooter) {
   const variants = getScooterVariants(scooter);
@@ -20,7 +20,7 @@ export function computeCatalogStats(scooters = []) {
     return {
       maxRangeKm: 120,
       minCostPerKm: 0.2,
-      minPrice: 43000,
+      minPrice: null,
       chargingLabel: '4–6 hrs',
     };
   }
@@ -32,7 +32,8 @@ export function computeCatalogStats(scooters = []) {
   const chargeTimes = new Set();
 
   for (const scooter of scooters) {
-    minPrice = Math.min(minPrice, scooter.price ?? Infinity);
+    const start = getStartingPrice(scooter);
+    if (Number.isFinite(start) && start > 0) minPrice = Math.min(minPrice, start);
     if (scooter.chargingTime) chargeTimes.add(scooter.chargingTime);
 
     for (const entry of variantEntries(scooter)) {
@@ -59,7 +60,7 @@ export function computeCatalogStats(scooters = []) {
   return {
     maxRangeKm: maxRangeKm || 120,
     minCostPerKm: Number.isFinite(minCostPerKm) ? minCostPerKm : 0.2,
-    minPrice: Number.isFinite(minPrice) ? minPrice : 43000,
+    minPrice: Number.isFinite(minPrice) ? minPrice : null,
     chargingLabel,
   };
 }

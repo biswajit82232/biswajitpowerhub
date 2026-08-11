@@ -35,6 +35,7 @@ import {
   buildScooterProductSchema,
   SCOOTER_SEO,
 } from '@/lib/schemaHelpers';
+import { buildModelSeo } from '@/lib/catalogCopy';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 
@@ -144,10 +145,10 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   const batteryUpgradeWaMessage = batteryUpgradeWhatsappMessage(scooter.name);
 
   const productSchema = buildScooterProductSchema(scooter, { reviews, site });
-  const detailSeo = SCOOTER_SEO[scooter.id] || {
+  const detailSeo = buildModelSeo(scooter, SCOOTER_SEO[scooter.id] || {
     title: `${scooter.name} Electric Scooter | Biswajit Power Hub, Berhampore`,
     description: scooter.description,
-  };
+  });
   const detailJsonLd = [
     breadcrumbList([
       { name: 'Home', path: '/' },
