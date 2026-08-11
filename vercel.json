@@ -37,6 +37,14 @@
     {
       "source": "/admin/(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/scooters/:id",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/accessories/:id",
+      "destination": "/index.html"
     }
   ],
   "headers": [

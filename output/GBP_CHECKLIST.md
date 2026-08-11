@@ -86,8 +86,18 @@ For each, add photo + price range + description:
 - [ ] Goal: lift live rating from **3.9 / 17** toward **4.5+**
 - [ ] Respond to ALL reviews within 24 hours
 
-## Step 12: Brand confusion
-- [ ] Justdial “Biswajit Enterprise” appears in brand search — claim/correct or keep naming clearly **Biswajit Power Hub** everywhere so customers don’t land on the wrong listing
+## Step 12: Brand confusion (NOT your business)
+**Biswajit Enterprise** (Justdial / other directories) is a **different** business — not Biswajit Power Hub.
+Do **not** claim or manage that listing.
+
+Your only Google profile is:
+- **BISWAJIT POWER HUB** → https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7
+- Website → https://biswajitpowerhub.in
+
+To reduce mix-ups when people search “Biswajit Berhampore”:
+- [ ] Always use the full name **Biswajit Power Hub** / **BISWAJIT POWER HUB** on GBP, photos, posts, and ads
+- [ ] Ask customers to review **Biswajit Power Hub** (use your GBP review link), not generic “Biswajit” shops
+- [ ] Optional: on Justdial, if their listing wrongly uses your phone/photos, request a correction/removal as a third party — do not claim ownership of Enterprise
 
 ## Step 13: Service areas (website synergy)
 Website location pages (already live):

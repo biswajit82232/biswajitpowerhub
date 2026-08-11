@@ -428,11 +428,29 @@ async function buildNoindexCatalogRoutes() {
     });
   }
 
-  const accessoryRows = accessories.length
-    ? accessories
-    : ACCESSORIES.map((a) => ({ id: a.id, name: a.name, description: a.description }));
+  // Always union seed catalog + live Supabase rows so sitemap URLs never 404 when
+  // production has a different (or empty) accessories table than local seeds.
+  const byId = new Map();
+  for (const a of ACCESSORIES) {
+    if (!a?.id) continue;
+    byId.set(String(a.id), {
+      id: a.id,
+      name: a.name,
+      description: a.description,
+    });
+  }
+  for (const row of accessories) {
+    if (!row?.id) continue;
+    const id = String(row.id);
+    const prev = byId.get(id) || {};
+    byId.set(id, {
+      id,
+      name: row.name || prev.name,
+      description: row.description || prev.description,
+    });
+  }
 
-  for (const row of accessoryRows) {
+  for (const row of byId.values()) {
     if (!row?.id) continue;
     const name = row.name || humanizeId(row.id);
     const desc = String(row.description || '').trim();
