@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -11,6 +11,7 @@ import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
 import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { getInboxBadges } from '@/features/analytics/analyticsService';
 import { cn } from '@/lib/utils';
 
 function AdminMark({ onNavigate }) {
@@ -29,7 +30,7 @@ function AdminMark({ onNavigate }) {
 const NAV_GROUPS = [
   {
     label: null,
-    links: [{ to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true }],
+    links: [{ to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true, badgeKey: 'total' }],
   },
   {
     label: 'Catalog',
@@ -43,16 +44,16 @@ const NAV_GROUPS = [
     label: 'Leads',
     links: [
       { to: '/admin/leads', label: 'Leads', icon: Users },
-      { to: '/admin/callbacks', label: 'Callbacks', icon: PhoneCall },
-      { to: '/admin/test-rides', label: 'Test Rides', icon: CalendarCheck },
-      { to: '/admin/service-bookings', label: 'Service', icon: Wrench },
-      { to: '/admin/messages', label: 'Messages', icon: Mail },
+      { to: '/admin/callbacks', label: 'Callbacks', icon: PhoneCall, badgeKey: 'callbacks' },
+      { to: '/admin/test-rides', label: 'Test Rides', icon: CalendarCheck, badgeKey: 'testRides' },
+      { to: '/admin/service-bookings', label: 'Service', icon: Wrench, badgeKey: 'service' },
+      { to: '/admin/messages', label: 'Messages', icon: Mail, badgeKey: 'messages' },
     ],
   },
   {
     label: 'Marketing',
     links: [
-      { to: '/admin/reviews', label: 'Reviews', icon: Star },
+      { to: '/admin/reviews', label: 'Reviews', icon: Star, badgeKey: 'reviews' },
       { to: '/admin/offers', label: 'Offers', icon: Tag },
       { to: '/admin/homepage', label: 'Homepage', icon: Home },
     ],
@@ -67,7 +68,7 @@ const NAV_GROUPS = [
   },
 ];
 
-function NavItems({ onNavigate, compact }) {
+function NavItems({ onNavigate, compact, badges }) {
   return (
     <nav className="flex flex-col gap-3">
       {NAV_GROUPS.map((group) => (
@@ -94,13 +95,18 @@ function NavItems({ onNavigate, compact }) {
                     'flex items-center gap-2.5 rounded-xl font-semibold transition',
                     compact ? 'px-3 py-2 text-[0.8125rem]' : 'gap-3 px-3.5 py-2.5 text-sm',
                     isActive
-                      ? 'bg-brand-gradient text-white shadow-soft'
+                      ? 'bg-brand-gradient text-white shadow-soft [&_.nav-badge]:bg-white/25'
                       : 'text-body hover:bg-brand-50 hover:text-brand-700',
                   )
                 }
               >
                 <l.icon className={cn(compact ? 'h-4 w-4' : 'h-4.5 w-4.5')} strokeWidth={2.2} />
-                {l.label}
+                <span className="min-w-0 flex-1 truncate">{l.label}</span>
+                {!!(l.badgeKey && badges?.[l.badgeKey]) && (
+                  <span className="nav-badge ml-auto min-w-[1.25rem] rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[0.65rem] font-bold text-white">
+                    {badges[l.badgeKey] > 99 ? '99+' : badges[l.badgeKey]}
+                  </span>
+                )}
               </NavLink>
             ))}
           </div>
@@ -132,6 +138,25 @@ export default function AdminLayout() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [badges, setBadges] = useState({});
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      getInboxBadges()
+        .then((b) => { if (!cancelled) setBadges(b || {}); })
+        .catch(() => {});
+    };
+    load();
+    const id = setInterval(load, 60000);
+    const onFocus = () => load();
+    window.addEventListener('focus', onFocus);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -144,13 +169,20 @@ export default function AdminLayout() {
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-surface p-5 lg:flex">
         <AdminMark />
         <div className="mt-8 flex-1 overflow-y-auto">
-          <NavItems />
+          <NavItems badges={badges} />
         </div>
         <SidebarFooter onSignOut={handleSignOut} />
       </aside>
 
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface px-3 py-2.5 lg:hidden">
-        <AdminMark />
+        <div className="flex items-center gap-2">
+          <AdminMark />
+          {badges.total > 0 && (
+            <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[0.65rem] font-bold text-white">
+              {badges.total > 99 ? '99+' : badges.total}
+            </span>
+          )}
+        </div>
         <button onClick={() => setOpen(true)} className="tap-target rounded-xl p-2 text-heading" aria-label="Open menu">
           <Menu className="h-5 w-5" />
         </button>
@@ -174,7 +206,7 @@ export default function AdminLayout() {
                 </button>
               </div>
               <div className="mt-4 min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                <NavItems compact onNavigate={() => setOpen(false)} />
+                <NavItems compact badges={badges} onNavigate={() => setOpen(false)} />
               </div>
               <SidebarFooter onSignOut={handleSignOut} />
             </motion.aside>

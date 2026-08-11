@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { CalendarCheck, Phone, MessageCircle, Bike } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -22,6 +23,12 @@ const STATUSES = [
 export default function TestRides() {
   const { toast } = useToast();
   const { data, loading, refetch } = useAsync(() => getTestRides(), []);
+  const [showAll, setShowAll] = useState(false);
+
+  const rows = useMemo(() => {
+    const list = data || [];
+    return showAll ? list : list.filter((t) => (t.status || 'requested') === 'requested');
+  }, [data, showAll]);
 
   const onStatus = async (id, status) => {
     try {
@@ -36,17 +43,26 @@ export default function TestRides() {
   return (
     <>
       <SEO title="Test Rides" noindex />
-      <AdminHeader title="Test Ride Requests" subtitle="Scheduled showroom test rides." />
+      <AdminHeader
+        title="Test Ride Requests"
+        subtitle="Open requests first — toggle to show all statuses."
+        action={(
+          <label className="flex items-center gap-2 text-xs font-semibold text-body">
+            <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+            Show all
+          </label>
+        )}
+      />
 
       {!isSupabaseConfigured ? (
         <EmptyState icon={CalendarCheck} title="Connect Supabase" description="Test ride bookings will appear here once Supabase is connected." />
       ) : loading ? (
         <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20" />)}</div>
-      ) : data?.length === 0 ? (
-        <EmptyState icon={CalendarCheck} title="No test ride requests yet" />
+      ) : rows.length === 0 ? (
+        <EmptyState icon={CalendarCheck} title={showAll ? 'No test ride requests yet' : 'No open test rides'} />
       ) : (
         <div className="space-y-3">
-          {data.map((t) => (
+          {rows.map((t) => (
             <div key={t.id} className="flex flex-col gap-3 rounded-xl bg-surface p-3 ring-1 ring-line shadow-soft sm:flex-row sm:items-center sm:rounded-2xl sm:p-4">
               <div className="flex min-w-0 flex-1 items-start gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 sm:h-11 sm:w-11">

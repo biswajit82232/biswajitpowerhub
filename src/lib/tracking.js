@@ -3,15 +3,24 @@ import { trackGAEvent } from './googleAnalytics';
 import { clearCache } from './cache';
 
 /**
- * Lead tracking & scoring engine (Phase 5).
+ * Lead tracking & scoring engine.
  *
- * A persistent anonymous visitor id is stored in localStorage. Every meaningful
- * interaction is recorded as an event (locally + Supabase when configured).
- * Events feed a scoring model that classifies a visitor as Hot / Warm / Cold.
+ * Dedupes noisy events (refresh / remount / SPA re-entry) so admin metrics
+ * and purchase-readiness scores stay trustworthy.
  */
 
 const VISITOR_KEY = 'bph_visitor_id';
 const EVENTS_KEY = 'bph_events';
+const DEDUPE_KEY = 'bph_track_dedupe';
+
+/** Same path/scooter won't re-count inside this window (ms). */
+const DEDUPE_MS = {
+  page_view: 30 * 60 * 1000, // 30 min — refresh shouldn't inflate visits
+  scooter_view: 15 * 60 * 1000,
+  emi_calculator_used: 10 * 60 * 1000,
+  simulator_used: 10 * 60 * 1000,
+  compare_used: 10 * 60 * 1000,
+};
 
 export const EVENT = {
   PAGE_VIEW: 'page_view',
@@ -82,7 +91,6 @@ function readLocalEvents() {
 
 function writeLocalEvents(events) {
   try {
-    // Keep the log bounded
     const trimmed = events.slice(-400);
     localStorage.setItem(EVENTS_KEY, JSON.stringify(trimmed));
   } catch {
@@ -90,16 +98,79 @@ function writeLocalEvents(events) {
   }
 }
 
+function readDedupeMap() {
+  try {
+    return JSON.parse(sessionStorage.getItem(DEDUPE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
+
+function writeDedupeMap(map) {
+  try {
+    sessionStorage.setItem(DEDUPE_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore */
+  }
+}
+
+function dedupeKey(type, meta = {}) {
+  if (type === EVENT.PAGE_VIEW) return `page:${meta.path || '/'}`;
+  if (type === EVENT.SCOOTER_VIEW) return `scooter:${meta.scooterId || meta.name || 'unknown'}`;
+  if (type === EVENT.EMI_USED) return `emi:${meta.scooterId || 'site'}`;
+  if (type === EVENT.SIMULATOR_USED) return `sim:${meta.scooterId || 'site'}`;
+  if (type === EVENT.COMPARE_USED) return `compare:${(meta.ids || []).slice().sort().join(',') || 'x'}`;
+  return null;
+}
+
+/** Returns true when this event should be skipped (already counted recently). */
+function shouldDedupe(type, meta = {}) {
+  const windowMs = DEDUPE_MS[type];
+  const key = dedupeKey(type, meta);
+  if (!windowMs || !key || typeof sessionStorage === 'undefined') return false;
+
+  const map = readDedupeMap();
+  const prev = map[key];
+  const now = Date.now();
+  if (prev && now - prev < windowMs) return true;
+
+  map[key] = now;
+  // Bound map size
+  const entries = Object.entries(map);
+  if (entries.length > 80) {
+    entries
+      .sort((a, b) => a[1] - b[1])
+      .slice(0, entries.length - 60)
+      .forEach(([k]) => { delete map[k]; });
+  }
+  writeDedupeMap(map);
+  return false;
+}
+
+function isAdminPath(path = '') {
+  return path === '/admin' || path.startsWith('/admin/');
+}
+
 /**
  * Record an interaction event.
  * @param {string} type one of EVENT
  * @param {object} meta arbitrary context (scooterId, name, etc.)
+ * @returns {Promise<boolean>} true when persisted (not deduped)
  */
 export async function trackEvent(type, meta = {}) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return false;
 
-  // Fire GA/Ads FIRST — tel:/wa.me/maps clicks navigate away and can cancel
-  // any work that awaits Supabase before gtag runs.
+  // Never count admin panel traffic as site visits / leads
+  if (type === EVENT.PAGE_VIEW && isAdminPath(meta.path || '')) return false;
+
+  if (shouldDedupe(type, meta)) {
+    // Still fire GA page_view navigation for Ads/Analytics accuracy when path changes,
+    // but skip our lead_events / scoring store for refresh spam.
+    if (type !== EVENT.PAGE_VIEW) return false;
+    trackGAEvent(type, meta);
+    return false;
+  }
+
   trackGAEvent(type, meta);
 
   const visitorId = getVisitorId();
@@ -128,29 +199,35 @@ export async function trackEvent(type, meta = {}) {
   if (POPULARITY_EVENTS.has(type)) {
     schedulePopularityCacheBust();
   }
+
+  return true;
 }
 
 /**
  * Compute a lead score & classification from a list of events.
- * Mirrors the business rules:
- *  - Hot: high-intent actions (EMI, simulator, callback, test ride, whatsapp,
- *    or viewing the same scooter multiple times)
- *  - Warm: multiple visits or multiple scooter views
- *  - Cold: single visit
  */
 export function classifyLead(events = []) {
   let score = 0;
   const counts = {};
   const scooterViews = {};
   const visits = new Set();
+  let pageViewsCounted = 0;
 
   for (const e of events) {
-    score += SCORE_WEIGHTS[e.type] || 0;
+    // Cap page_view contribution — refresh spam must not create "hot" leads
+    if (e.type === EVENT.PAGE_VIEW) {
+      pageViewsCounted += 1;
+      if (pageViewsCounted <= 5) score += SCORE_WEIGHTS[EVENT.PAGE_VIEW];
+    } else {
+      score += SCORE_WEIGHTS[e.type] || 0;
+    }
     counts[e.type] = (counts[e.type] || 0) + 1;
     if (e.type === EVENT.SCOOTER_VIEW && e.meta?.scooterId) {
       scooterViews[e.meta.scooterId] = (scooterViews[e.meta.scooterId] || 0) + 1;
     }
-    if (e.at) visits.add(new Date(e.at).toDateString());
+    if (e.at || e.created_at) {
+      visits.add(new Date(e.at || e.created_at).toDateString());
+    }
   }
 
   const repeatedSameScooter = Object.values(scooterViews).some((c) => c >= 2);
@@ -161,7 +238,9 @@ export function classifyLead(events = []) {
     (counts[EVENT.TEST_RIDE_BOOKED] || 0) > 0 ||
     (counts[EVENT.SERVICE_BOOKED] || 0) > 0 ||
     (counts[EVENT.WHATSAPP_CLICK] || 0) > 0 ||
+    (counts[EVENT.CALL_CLICK] || 0) > 0 ||
     (counts[EVENT.CONTACT_FORM] || 0) > 0 ||
+    (counts[EVENT.DIRECTIONS_CLICK] || 0) > 0 ||
     repeatedSameScooter;
 
   const totalScooterViews = counts[EVENT.SCOOTER_VIEW] || 0;
@@ -184,6 +263,7 @@ export function getLocalLeadSummary() {
 export function resetLocalTrackingEvents() {
   try {
     localStorage.removeItem(EVENTS_KEY);
+    sessionStorage.removeItem(DEDUPE_KEY);
   } catch {
     /* ignore */
   }

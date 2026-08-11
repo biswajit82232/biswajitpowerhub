@@ -119,6 +119,9 @@ function ReviewPhotoAdmin({ review, onUpdated }) {
 export default function AdminReviews() {
   const { toast } = useToast();
   const { data: reviews, loading, refetch } = useAsync(() => getAllReviews(), []);
+  const [showAll, setShowAll] = useState(false);
+
+  const rows = (reviews || []).filter((r) => showAll || r.status === 'pending');
 
   const guard = () => {
     if (!isSupabaseConfigured) {
@@ -142,7 +145,16 @@ export default function AdminReviews() {
   return (
     <>
       <SEO title="Reviews" noindex />
-      <AdminHeader title="Review Management" subtitle="Approve, feature, or hide customer reviews." />
+      <AdminHeader
+        title="Review Management"
+        subtitle="Pending first — approve, feature, or hide customer reviews."
+        action={(
+          <label className="flex items-center gap-2 text-xs font-semibold text-body">
+            <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+            Show all
+          </label>
+        )}
+      />
 
       {!isSupabaseConfigured && (
         <div className="mb-4 rounded-xl bg-amber-50 px-3 py-2.5 text-xs text-amber-700 sm:mb-5 sm:px-4 sm:py-3 sm:text-sm">
@@ -152,11 +164,11 @@ export default function AdminReviews() {
 
       {loading ? (
         <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28" />)}</div>
-      ) : reviews?.length === 0 ? (
-        <EmptyState icon={Star} title="No reviews yet" />
+      ) : rows.length === 0 ? (
+        <EmptyState icon={Star} title={showAll ? 'No reviews yet' : 'No pending reviews'} />
       ) : (
         <div className="space-y-3">
-          {reviews.map((r) => (
+          {rows.map((r) => (
             <div key={r.id} className="rounded-xl bg-surface p-3 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-5">
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <p className="font-bold text-heading">{r.name}</p>

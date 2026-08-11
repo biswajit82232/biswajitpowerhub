@@ -25,14 +25,16 @@ export default function ServiceBookings() {
   const { toast } = useToast();
   const { data, loading, refetch } = useAsync(() => getServiceBookings(), []);
   const [kindFilter, setKindFilter] = useState('all');
+  const [showAll, setShowAll] = useState(false);
 
   const list = useMemo(() => {
-    if (!data) return [];
-    if (kindFilter === 'all') return data;
-    if (kindFilter === 'free') return data.filter((b) => String(b.service_kind).startsWith('free_'));
-    if (kindFilter === 'paid') return data.filter((b) => b.service_kind === 'paid');
-    return data.filter((b) => b.service_kind === kindFilter);
-  }, [data, kindFilter]);
+    let rows = data || [];
+    if (!showAll) rows = rows.filter((b) => (b.status || 'requested') === 'requested');
+    if (kindFilter === 'all') return rows;
+    if (kindFilter === 'free') return rows.filter((b) => String(b.service_kind).startsWith('free_'));
+    if (kindFilter === 'paid') return rows.filter((b) => b.service_kind === 'paid');
+    return rows.filter((b) => b.service_kind === kindFilter);
+  }, [data, kindFilter, showAll]);
 
   const onStatus = async (id, status) => {
     try {
@@ -49,21 +51,27 @@ export default function ServiceBookings() {
       <SEO title="Service Bookings" noindex />
       <AdminHeader
         title="Service Bookings"
-        subtitle="Free 1st / 2nd / 3rd servicing and paid workshop requests."
+        subtitle="Open requests first — free and paid workshop bookings."
         action={
-          <Select
-            value={kindFilter}
-            onChange={(e) => setKindFilter(e.target.value)}
-            className="h-10 w-full text-sm sm:w-44"
-            aria-label="Filter service type"
-          >
-            <option value="all">All types</option>
-            <option value="free">Free only</option>
-            <option value="paid">Paid only</option>
-            <option value="free_1">1st free</option>
-            <option value="free_2">2nd free</option>
-            <option value="free_3">3rd free</option>
-          </Select>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label className="flex items-center gap-2 text-xs font-semibold text-body">
+              <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+              Show all
+            </label>
+            <Select
+              value={kindFilter}
+              onChange={(e) => setKindFilter(e.target.value)}
+              className="h-10 w-full text-sm sm:w-44"
+              aria-label="Filter service type"
+            >
+              <option value="all">All types</option>
+              <option value="free">Free only</option>
+              <option value="paid">Paid only</option>
+              <option value="free_1">1st free</option>
+              <option value="free_2">2nd free</option>
+              <option value="free_3">3rd free</option>
+            </Select>
+          </div>
         }
       />
 

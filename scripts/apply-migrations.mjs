@@ -38,6 +38,7 @@ const ORDER = [
   'add_vyapar_sync.sql',
   'add_service_bookings.sql',
   'add_admin_push_subscriptions.sql',
+  'lock_admin_rls_allowlist.sql',
 ];
 
 function loadEnv() {
