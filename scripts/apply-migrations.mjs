@@ -37,6 +37,7 @@ const ORDER = [
   'add_ops_inbox_fields.sql',
   'add_vyapar_sync.sql',
   'add_service_bookings.sql',
+  'add_admin_push_subscriptions.sql',
 ];
 
 function loadEnv() {

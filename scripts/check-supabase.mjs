@@ -53,6 +53,7 @@ const checks = [
   { name: 'accessories', path: 'accessories?select=id&limit=1' },
   { name: 'vyapar_settings', path: 'vyapar_settings?select=id&limit=1' },
   { name: 'vyapar_items', path: 'vyapar_items?select=id&limit=1' },
+  { name: 'admin_push_subscriptions', path: 'admin_push_subscriptions?select=id&limit=1' },
 ];
 
 const missing = [];
@@ -78,8 +79,11 @@ for (const check of checks) {
     if (check.name === 'vyapar_settings' || check.name === 'vyapar_items') {
       missing.push('add_vyapar_sync.sql');
     }
+    if (check.name === 'admin_push_subscriptions') {
+      missing.push('add_admin_push_subscriptions.sql');
+    }
   } else if (
-    (check.name === 'vyapar_settings' || check.name === 'vyapar_items')
+    (check.name === 'vyapar_settings' || check.name === 'vyapar_items' || check.name === 'admin_push_subscriptions')
     && (status === 401 || status === 403 || body.includes('JWT') || body.includes('permission'))
   ) {
     // Auth-only RLS — anon probe cannot read; table may still exist

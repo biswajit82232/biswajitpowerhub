@@ -10,6 +10,7 @@ import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
+import { AdminPushBanner } from '@/components/admin/AdminPushBanner';
 import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -179,6 +180,7 @@ export default function AdminLayout() {
           </div>
           <Suspense fallback={<PageLoader />}>
             <AdminInstallBanner />
+            <AdminPushBanner />
             <Outlet />
           </Suspense>
         </div>

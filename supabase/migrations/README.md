@@ -34,6 +34,8 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 17 | `add_site_content_json.sql` | Admin content JSON (brand, perks, FAQs, tabs) |
 | 18 | `add_ops_inbox_fields.sql` | Electricity rate + contact message is_read |
 | 19 | `add_vyapar_sync.sql` | Vyapar online-store sync settings + item cache/mapping |
+| 20 | `add_service_bookings.sql` | Service booking requests inbox |
+| 21 | `add_admin_push_subscriptions.sql` | Admin PWA Web Push subscriptions (Android background alerts) |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 
