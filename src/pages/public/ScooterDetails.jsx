@@ -23,7 +23,7 @@ import { useFinance } from '@/context/FinanceSettingsContext';
 import { getAllValueBadges } from '@/lib/valueBadges';
 import { useAsync } from '@/hooks/useAsync';
 import { formatINR } from '@/lib/utils';
-import { getScooterVariants, withVariant } from '@/lib/scooterVariants';
+import { formatVariantNames, getScooterVariants, withVariant } from '@/lib/scooterVariants';
 import { resolveLegacyScooterId } from '@/lib/legacyScooters';
 import { STOCK_LABELS } from '@/data/scooters';
 import { whatsappUrl, batteryUpgradeWhatsappMessage, telUrl } from '@/config/site';
@@ -95,6 +95,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   }, [scooter, initialVariantId]);
 
   const display = scooter ? withVariant(scooter, variantId) : null;
+  const packNames = scooter ? formatVariantNames(scooter) : null;
 
   const handleVariantChange = (nextId) => {
     setVariantId(nextId);
@@ -246,7 +247,8 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                   On-road pricing for the {scooter.name} starts near {formatINR(display.price)} depending on
                   variant. Typical range is about {display.range} km per charge with a top speed of{' '}
                   {display.topSpeed} km/h — ideal for Berhampore town rides and many Murshidabad daily
-                  routes. Our team explains Standard vs Lithium Pro packs where available, fits genuine
+                  routes. Our team explains battery pack options
+                  {packNames ? ` (${packNames})` : ''} where available, fits genuine
                   spare parts, and never rushes a decision. {site.hours?.summaryShort || 'Open all days 9 AM–8:30 PM'}.
                 </p>
               </div>

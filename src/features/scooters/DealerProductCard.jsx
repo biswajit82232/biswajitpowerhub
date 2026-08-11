@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ScooterImage } from '@/components/common/ScooterImage';
 import Button from '@/components/ui/Button';
-import { getScooterVariants } from '@/lib/scooterVariants';
+import {
+  formatBatteryCapacityRange,
+  formatRangeRange,
+} from '@/lib/scooterVariants';
 import { cn } from '@/lib/utils';
 
 /**
@@ -9,10 +12,8 @@ import { cn } from '@/lib/utils';
  */
 export function DealerProductCard({ scooter, imageOverride, className }) {
   if (!scooter) return null;
-  const variants = getScooterVariants(scooter);
-  const battery =
-    variants[0]?.batteryCapacity || scooter.batteryCapacity || scooter.motor || '—';
-  const range = variants[0]?.range ?? scooter.range ?? '—';
+  const battery = formatBatteryCapacityRange(scooter);
+  const range = formatRangeRange(scooter);
   const topSpeed = scooter.topSpeed ?? '—';
   const imgSrc = imageOverride || scooter.images?.[0];
 
@@ -42,7 +43,7 @@ export function DealerProductCard({ scooter, imageOverride, className }) {
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-xs">
               Range
             </p>
-            <p className="mt-1 text-xs font-bold text-body sm:text-sm">{range} km</p>
+            <p className="mt-1 text-xs font-bold text-body sm:text-sm">{range}</p>
           </div>
           <div className="dealer-spec-divider w-1/3 px-1">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-xs">

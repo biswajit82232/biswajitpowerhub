@@ -8,13 +8,19 @@ import { formatINR } from '@/lib/utils';
 import { emiFrom } from '@/lib/finance';
 import { useFinance } from '@/context/FinanceSettingsContext';
 import { STOCK_LABELS } from '@/data/scooters';
-import { hasVariants, getStartingPrice } from '@/lib/scooterVariants';
+import {
+  formatRangeRange,
+  formatVariantNames,
+  getStartingPrice,
+  hasVariants,
+} from '@/lib/scooterVariants';
 
 export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [], imageOverride }) {
   const { settings } = useFinance();
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
   const startingPrice = getStartingPrice(scooter);
   const emi = emiFrom({ price: startingPrice, settings });
+  const packNames = hasVariants(scooter) ? formatVariantNames(scooter, ' & ') : null;
   const extraBadges = [
     ...popularityTags,
     ...valueBadges.map((b) => ({
@@ -61,7 +67,7 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
         <div className="mt-3 flex items-center gap-4 text-sm text-body">
           <span className="inline-flex items-center gap-1.5">
             <BatteryCharging className="h-4 w-4 text-brand-600" strokeWidth={2.2} />
-            {scooter.range} km
+            {formatRangeRange(scooter)}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <Gauge className="h-4 w-4 text-brand-600" strokeWidth={2.2} />
@@ -73,8 +79,8 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
           <div>
             <p className="text-xs font-medium text-muted">Starting at</p>
             <p className="font-display text-2xl font-extrabold text-heading">{formatINR(startingPrice)}</p>
-            {hasVariants(scooter) && (
-              <p className="mt-0.5 text-xs text-muted">Standard & Lithium Pro</p>
+            {packNames && (
+              <p className="mt-0.5 text-xs text-muted">{packNames}</p>
             )}
             <p className="mt-0.5 text-xs font-semibold text-brand-700">EMI from {formatINR(emi)}/mo</p>
           </div>

@@ -37,6 +37,8 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
   const [formError, setFormError] = useState('');
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
+  const hasBatteryPacks = (form.variants || []).length > 0;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormError('');
@@ -50,18 +52,30 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
       .map((v) => v.price)
       .filter((p) => Number.isFinite(p) && p > 0);
     let price = Number(form.price);
-    if (!Number.isFinite(price) || price <= 0) {
-      price = variantPrices.length ? Math.min(...variantPrices) : NaN;
+    if (variants.length && variantPrices.length) {
+      price = Math.min(...variantPrices);
+    } else if (!Number.isFinite(price) || price <= 0) {
+      price = NaN;
     }
     if (!Number.isFinite(price) || price <= 0) {
-      setFormError('Enter a valid price or add at least one variant with a price.');
+      setFormError(
+        hasBatteryPacks
+          ? 'Each battery pack needs a valid price.'
+          : 'Enter a valid price, or add battery packs with prices.',
+      );
       return;
     }
+    const cheapest = variants.length
+      ? variants.reduce((a, b) => (a.price <= b.price ? a : b))
+      : null;
     const payload = {
       ...form,
       id: form.id || slugify(form.name),
       price,
-      range: Number(form.range),
+      // Keep model-level fallbacks aligned with the starting pack when packs exist
+      range: cheapest ? Number(cheapest.range) : Number(form.range),
+      batteryType: cheapest?.batteryType || form.batteryType,
+      batteryCapacity: cheapest?.batteryCapacity || form.batteryCapacity,
       topSpeed: Number(form.topSpeed),
       realRangeFactor: Number(form.realRangeFactor),
       variants,
@@ -78,7 +92,21 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
   };
 
   const addVariant = () => {
-    setForm((f) => ({ ...f, variants: [...(f.variants || []), { ...EMPTY_VARIANT }] }));
+    setForm((f) => {
+      const existing = f.variants || [];
+      const isFirst = existing.length === 0;
+      const seed = isFirst
+        ? {
+            ...EMPTY_VARIANT,
+            name: 'Standard',
+            price: f.price || 0,
+            batteryType: f.batteryType || '',
+            batteryCapacity: f.batteryCapacity || '',
+            range: f.range || 0,
+          }
+        : { ...EMPTY_VARIANT, name: existing.length === 1 ? 'Lithium Pro' : '' };
+      return { ...f, variants: [...existing, seed] };
+    });
   };
 
   const removeVariant = (index) => {
@@ -103,25 +131,42 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
         <Input value={form.tagline} onChange={(e) => set('tagline', e.target.value)} />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <Field label="Price (₹)" required>
-          <Input type="number" value={form.price} onChange={(e) => set('price', e.target.value)} required />
-        </Field>
-        <Field label="Range (km)">
-          <Input type="number" value={form.range} onChange={(e) => set('range', e.target.value)} />
-        </Field>
-        <Field label="Top speed (km/h)">
-          <Input type="number" value={form.topSpeed} onChange={(e) => set('topSpeed', e.target.value)} />
-        </Field>
-      </div>
+      {/* Model-level price / range / battery — only when there are no battery packs */}
+      {!hasBatteryPacks ? (
+        <>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="Price (₹)" required>
+              <Input type="number" value={form.price} onChange={(e) => set('price', e.target.value)} required />
+            </Field>
+            <Field label="Range (km)">
+              <Input type="number" value={form.range} onChange={(e) => set('range', e.target.value)} />
+            </Field>
+            <Field label="Top speed (km/h)">
+              <Input type="number" value={form.topSpeed} onChange={(e) => set('topSpeed', e.target.value)} />
+            </Field>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Battery type">
+              <Input value={form.batteryType} onChange={(e) => set('batteryType', e.target.value)} placeholder="Lithium-ion (LFP)" />
+            </Field>
+            <Field label="Battery capacity">
+              <Input value={form.batteryCapacity} onChange={(e) => set('batteryCapacity', e.target.value)} placeholder="48V / 24Ah" />
+            </Field>
+          </div>
+        </>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Top speed (km/h)">
+            <Input type="number" value={form.topSpeed} onChange={(e) => set('topSpeed', e.target.value)} />
+          </Field>
+          <p className="self-end text-xs text-muted sm:pb-2">
+            Price, range &amp; battery come from the battery packs below. Listing price = cheapest pack.
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Battery type">
-          <Input value={form.batteryType} onChange={(e) => set('batteryType', e.target.value)} placeholder="Lithium-ion (LFP)" />
-        </Field>
-        <Field label="Battery capacity">
-          <Input value={form.batteryCapacity} onChange={(e) => set('batteryCapacity', e.target.value)} placeholder="2.0 kWh" />
-        </Field>
         <Field label="Charging time">
           <Input value={form.chargingTime} onChange={(e) => set('chargingTime', e.target.value)} placeholder="4–5 hrs" />
         </Field>
@@ -207,46 +252,81 @@ export function ScooterForm({ initial, onSubmit, onCancel, saving }) {
       </Field>
 
       <div>
-        <div className="mb-2 flex items-center justify-between">
-          <Label>Variants</Label>
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div>
+            <Label>Battery options</Label>
+            <p className="mt-0.5 text-[11px] text-muted">
+              Each pack is a buyable choice on the product page (price, range, battery specs).
+            </p>
+          </div>
           <Button type="button" variant="secondary" size="sm" onClick={addVariant}>
-            Add variant
+            Add pack
           </Button>
         </div>
-        {(form.variants || []).length === 0 ? (
-          <p className="text-sm text-muted">No variants — price above is used as the listing price.</p>
+        {!hasBatteryPacks ? (
+          <p className="rounded-xl bg-surface-alt px-3 py-2.5 text-sm text-muted ring-1 ring-line">
+            No packs yet — the price &amp; battery fields above are used on the website. Add packs
+            (e.g. Standard + Lithium Pro) when this model has more than one battery.
+          </p>
         ) : (
           <div className="space-y-3">
-            {(form.variants || []).map((variant, index) => (
-              <div key={index} className="rounded-xl bg-surface-alt p-4 ring-1 ring-line">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm font-semibold text-heading">Variant {index + 1}</p>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => removeVariant(index)}>
-                    Remove
-                  </Button>
+            {(form.variants || []).map((variant, index) => {
+              const title = variant.name?.trim() || `Battery pack ${index + 1}`;
+              return (
+                <div key={index} className="rounded-xl bg-surface-alt p-4 ring-1 ring-line">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-sm font-semibold text-heading">{title}</p>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeVariant(index)}>
+                      Remove
+                    </Button>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Field label="Pack name">
+                      <Input
+                        value={variant.name}
+                        onChange={(e) => setVariant(index, 'name', e.target.value)}
+                        placeholder={index === 0 ? 'Standard' : 'Lithium Pro'}
+                      />
+                    </Field>
+                    <Field label="Price (₹)">
+                      <Input
+                        type="number"
+                        value={variant.price}
+                        onChange={(e) => setVariant(index, 'price', e.target.value)}
+                      />
+                    </Field>
+                    <Field label="Battery type">
+                      <Input
+                        value={variant.batteryType}
+                        onChange={(e) => setVariant(index, 'batteryType', e.target.value)}
+                        placeholder="Standard battery"
+                      />
+                    </Field>
+                    <Field label="Battery capacity">
+                      <Input
+                        value={variant.batteryCapacity}
+                        onChange={(e) => setVariant(index, 'batteryCapacity', e.target.value)}
+                        placeholder="48V / 24Ah"
+                      />
+                    </Field>
+                    <Field label="Battery warranty">
+                      <Input
+                        value={variant.batteryWarranty}
+                        onChange={(e) => setVariant(index, 'batteryWarranty', e.target.value)}
+                        placeholder="6 months"
+                      />
+                    </Field>
+                    <Field label="Range (km)">
+                      <Input
+                        type="number"
+                        value={variant.range}
+                        onChange={(e) => setVariant(index, 'range', e.target.value)}
+                      />
+                    </Field>
+                  </div>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Field label="Name">
-                    <Input value={variant.name} onChange={(e) => setVariant(index, 'name', e.target.value)} placeholder="Standard" />
-                  </Field>
-                  <Field label="Price (₹)">
-                    <Input type="number" value={variant.price} onChange={(e) => setVariant(index, 'price', e.target.value)} />
-                  </Field>
-                  <Field label="Battery type">
-                    <Input value={variant.batteryType} onChange={(e) => setVariant(index, 'batteryType', e.target.value)} />
-                  </Field>
-                  <Field label="Battery capacity">
-                    <Input value={variant.batteryCapacity} onChange={(e) => setVariant(index, 'batteryCapacity', e.target.value)} />
-                  </Field>
-                  <Field label="Battery warranty">
-                    <Input value={variant.batteryWarranty} onChange={(e) => setVariant(index, 'batteryWarranty', e.target.value)} placeholder="6 months" />
-                  </Field>
-                  <Field label="Range (km)">
-                    <Input type="number" value={variant.range} onChange={(e) => setVariant(index, 'range', e.target.value)} />
-                  </Field>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

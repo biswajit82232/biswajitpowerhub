@@ -92,12 +92,29 @@ export function formatBatteryCapacityRange(scooter) {
   return unique.join(' / ');
 }
 
+/** Cheapest battery pack (starting option). */
+export function getCheapestVariant(scooter) {
+  const variants = getScooterVariants(scooter);
+  if (!variants.length) return null;
+  return variants.reduce((a, b) => (a.price <= b.price ? a : b));
+}
+
+/** e.g. "Standard / Lithium Pro" from real pack names */
+export function formatVariantNames(scooter, separator = ' / ') {
+  const variants = getScooterVariants(scooter);
+  const labels = variants
+    .map((v) => v.name || v.batteryType?.replace(/\s*battery\s*/i, '').trim())
+    .filter(Boolean);
+  if (labels.length) return labels.join(separator);
+  return null;
+}
+
 /** e.g. "Standard / Lithium Pro" */
 export function formatBatteryTypeRange(scooter) {
   const variants = getScooterVariants(scooter);
   if (variants.length >= 2) {
-    const labels = variants.map((v) => v.name || v.batteryType?.replace(/\s*battery\s*/i, '').trim()).filter(Boolean);
-    if (labels.length) return labels.join(' / ');
+    const labels = formatVariantNames(scooter);
+    if (labels) return labels;
   }
   return variants[0]?.batteryType ?? scooter.batteryType ?? '—';
 }
@@ -121,9 +138,8 @@ export function formatVariantSpec(scooter, key) {
 
 export function normalizeScooter(scooter) {
   if (!scooter) return scooter;
-  const variants = getScooterVariants(scooter);
-  if (!variants.length) return scooter;
-  const base = variants.reduce((a, b) => (a.price <= b.price ? a : b));
+  const base = getCheapestVariant(scooter);
+  if (!base) return scooter;
   return {
     ...scooter,
     price: base.price,

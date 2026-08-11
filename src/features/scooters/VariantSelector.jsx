@@ -1,14 +1,15 @@
 import { Check } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
-import { getScooterVariants } from '@/lib/scooterVariants';
+import { getCheapestVariant, getScooterVariants } from '@/lib/scooterVariants';
 
 export function VariantSelector({ scooter, selectedId, onChange }) {
   const variants = getScooterVariants(scooter);
   if (variants.length < 2) return null;
 
-  const prices = variants.map((v) => v.price).filter((p) => typeof p === 'number');
+  const cheapest = getCheapestVariant(scooter);
+  const minPrice = cheapest?.price ?? null;
+  const startingName = cheapest?.name || 'starting pack';
   const ranges = variants.map((v) => v.range).filter((r) => typeof r === 'number');
-  const minPrice = prices.length ? Math.min(...prices) : null;
   const maxRange = ranges.length ? Math.max(...ranges) : null;
 
   return (
@@ -24,6 +25,7 @@ export function VariantSelector({ scooter, selectedId, onChange }) {
               ? variant.price - minPrice
               : null;
           const isBestRange = maxRange != null && variant.range === maxRange;
+          const isStarting = cheapest && variant.id === cheapest.id;
 
           return (
             <button
@@ -60,11 +62,11 @@ export function VariantSelector({ scooter, selectedId, onChange }) {
               </p>
               {priceDelta != null ? (
                 <p className="mt-1 text-xs font-semibold text-brand-700">
-                  +{formatINR(priceDelta)} vs Standard
+                  +{formatINR(priceDelta)} vs {startingName}
                 </p>
-              ) : (
+              ) : isStarting ? (
                 <p className="mt-1 text-xs font-medium text-muted">Starting pack</p>
-              )}
+              ) : null}
 
               {variant.range != null && (
                 <p className="mt-3 rounded-xl bg-white/80 px-3 py-2 text-sm font-bold text-heading ring-1 ring-brand-100">
