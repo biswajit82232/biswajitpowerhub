@@ -11,7 +11,7 @@ import { isValidName, isValidPhone } from '@/features/leads/validation';
 
 const STORAGE_KEY = 'bph_no_licence_prompt_seen';
 const GUIDE = '/no-licence-electric-scooters-west-bengal';
-const DELAY_MS = 1400;
+const DELAY_MS = 4000;
 const INTEREST = 'No-licence scooter';
 
 function alreadySeen() {
@@ -96,7 +96,7 @@ export function FirstVisitNoLicencePrompt() {
   };
 
   return (
-    <Modal open={open} onClose={dismiss} size="sm" className="!max-w-md">
+    <Modal open={open} onClose={dismiss} size="sm" centered className="!max-w-md">
       {done ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
