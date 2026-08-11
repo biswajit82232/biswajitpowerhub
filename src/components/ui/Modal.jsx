@@ -17,8 +17,18 @@ function getFocusables(container) {
  * Accessible, animated modal.
  * Default: mobile bottom sheet, desktop centered.
  * Pass `centered` to always float in the middle of the screen.
+ * Pass `hideHeader` when the child content provides its own close control.
  */
-export function Modal({ open, onClose, title, children, className, size = 'md', centered = false }) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  className,
+  size = 'md',
+  centered = false,
+  hideHeader = false,
+}) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -73,6 +83,7 @@ export function Modal({ open, onClose, title, children, className, size = 'md', 
   }, [open]);
 
   const sizes = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w-4xl' };
+  const showHeader = !hideHeader && (title || onClose);
 
   return createPortal(
     <AnimatePresence>
@@ -110,7 +121,7 @@ export function Modal({ open, onClose, title, children, className, size = 'md', 
               className,
             )}
           >
-            {(title || onClose) && (
+            {showHeader && (
               <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line bg-surface px-5 py-4 sm:bg-surface/95 sm:backdrop-blur sm:px-6">
                 {title && (
                   <h3 id="modal-title" className="text-lg font-bold text-heading">
@@ -129,7 +140,7 @@ export function Modal({ open, onClose, title, children, className, size = 'md', 
                 )}
               </div>
             )}
-            <div className="px-5 py-5 sm:px-6 sm:py-6">{children}</div>
+            <div className={cn(hideHeader ? 'p-0' : 'px-5 py-5 sm:px-6 sm:py-6')}>{children}</div>
           </motion.div>
         </div>
       )}
