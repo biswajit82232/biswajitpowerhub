@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Wrench, Phone, MessageCircle, Bike } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -48,7 +48,7 @@ export default function ServiceBookings() {
 
   return (
     <>
-      <SEO title="Service Bookings" noindex />
+      <AdminSEO title="Service Bookings" />
       <AdminHeader
         title="Service Bookings"
         subtitle="Open requests first — free and paid workshop bookings."

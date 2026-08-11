@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Save, Plus, Trash2, Clock, Phone, MapPin, RotateCcw, Sparkles, HelpCircle, LayoutGrid, Building2,
 } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
 import { AdminPushCard } from '@/components/admin/AdminPushCard';
@@ -186,7 +186,7 @@ export default function Settings() {
 
   return (
     <>
-      <SEO title="Site Settings" noindex />
+      <AdminSEO title="Site Settings" />
       <AdminHeader
         title="Site Control"
         subtitle="Contact, branding, notifications, perks, FAQs, and Explore Range tabs."

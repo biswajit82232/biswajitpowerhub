@@ -1,5 +1,5 @@
-/* BPH Admin PWA v5 — network-first shell + Web Push */
-const CACHE = 'bph-admin-v5';
+/* BPH Admin PWA v6 — network-first shell + Web Push */
+const CACHE = 'bph-admin-v6';
 const PRECACHE = [
   '/admin/manifest.webmanifest',
   '/admin/icon-192.png',

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Field, Input } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -66,7 +66,7 @@ export default function Finance() {
 
   return (
     <>
-      <SEO title="Finance Settings" noindex />
+      <AdminSEO title="Finance Settings" />
       <AdminHeader title="Finance Settings" subtitle="EMI calculator defaults and EV simulator petrol comparison." />
 
       {!isSupabaseConfigured && (

@@ -6,7 +6,7 @@
   "start_url": "/admin/?source=pwa",
   "scope": "/admin/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui", "browser"],
+  "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
   "lang": "en",
   "dir": "ltr",

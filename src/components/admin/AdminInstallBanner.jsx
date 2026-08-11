@@ -54,17 +54,17 @@ export function AdminInstallBanner() {
     setShow(false);
   };
 
-  let hint = 'Add to home screen — opens directly to your admin panel.';
+  let hint = 'Install the Admin app for a full-screen experience (no website address bar).';
   if (ios) {
-    hint = 'Tap Share, then "Add to Home Screen".';
+    hint = 'Tap Share → Add to Home Screen. Open from that icon — not from Safari tabs.';
   } else if (android && !secure) {
     hint = 'Use https:// (not http://) on your phone. Run npm run dev, then open the https:// address shown in terminal.';
   } else if (android && import.meta.env.DEV && !shouldRegisterAdminServiceWorker()) {
     hint = 'Admin works over https:// on your phone. PWA install needs a trusted certificate — use localhost on PC, or deploy to test install.';
   } else if (android && canInstall) {
-    hint = 'Tap Install below, or Chrome menu ⋮ → "Install app".';
+    hint = 'Tap Install for full-screen Admin (hides the website URL). Do not use a normal Chrome tab.';
   } else if (android) {
-    hint = 'Remove any old home-screen shortcut first. Then Chrome menu ⋮ → "Install app" (not just "Add to Home screen").';
+    hint = 'Delete old home-screen shortcuts. Chrome menu ⋮ → Install app (not “Add to Home screen”) — only Install removes the website URL bar.';
   }
 
   return (

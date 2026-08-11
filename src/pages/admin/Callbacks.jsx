@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { PhoneCall, Phone, MessageCircle } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -41,7 +41,7 @@ export default function Callbacks() {
 
   return (
     <>
-      <SEO title="Callbacks" noindex />
+      <AdminSEO title="Callbacks" />
       <AdminHeader
         title="Callback Requests"
         subtitle="Open requests first — toggle to show handled."

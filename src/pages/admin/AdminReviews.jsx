@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Star, Check, X, EyeOff, Sparkles, Camera, ImageIcon } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -144,7 +144,7 @@ export default function AdminReviews() {
 
   return (
     <>
-      <SEO title="Reviews" noindex />
+      <AdminSEO title="Reviews" />
       <AdminHeader
         title="Review Management"
         subtitle="Pending first — approve, feature, or hide customer reviews."

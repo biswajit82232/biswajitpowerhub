@@ -1,6 +1,6 @@
 import { MessageCircle, Phone, Calculator, Gauge, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { StatCard } from '@/components/admin/StatCard';
 import { BarChart, DonutChart } from '@/components/admin/Charts';
@@ -21,7 +21,7 @@ export default function Analytics() {
 
   return (
     <>
-      <SEO title="Analytics" noindex />
+      <AdminSEO title="Analytics" />
       <AdminHeader
         title="Analytics"
         subtitle="Engagement, popular models & conversion signals."

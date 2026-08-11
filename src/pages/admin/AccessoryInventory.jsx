@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Plus, Package, RefreshCw } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { CompactInventoryList, CompactInventoryItem } from '@/components/admin/CompactInventoryList';
 import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
@@ -121,7 +121,7 @@ export default function AccessoryInventory() {
 
   return (
     <>
-      <SEO title="Accessories" noindex />
+      <AdminSEO title="Accessories" />
       <AdminHeader
         title="Spare & Body Parts"
         subtitle={`${counts.all} items · manage parts, photos & stock`}

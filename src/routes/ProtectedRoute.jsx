@@ -20,7 +20,6 @@ function AdminAccessDenied() {
         <p className="mt-3 max-w-md text-xs text-muted">{hint}</p>
       )}
       <div className="mt-6 flex gap-3">
-        <Button to="/" variant="secondary">Back to site</Button>
         <Button variant="primary" onClick={() => signOut()}>Sign out</Button>
       </div>
     </div>

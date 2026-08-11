@@ -3,7 +3,7 @@ import {
   PhoneCall, CalendarCheck, Eye, Star, Flame, TrendingUp,
   PhoneForwarded, Wrench, Mail, MessageCircle, Phone, Inbox, Users,
 } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -98,7 +98,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <SEO title="Dashboard" noindex />
+      <AdminSEO title="Dashboard" />
       <AdminHeader title="Dashboard" subtitle="Open work · who to call · what’s trending." />
 
       {/* Ops KPIs — tappable */}

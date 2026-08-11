@@ -55,7 +55,7 @@ const NAV_GROUPS = [
     links: [
       { to: '/admin/reviews', label: 'Reviews', icon: Star, badgeKey: 'reviews' },
       { to: '/admin/offers', label: 'Offers', icon: Tag },
-      { to: '/admin/homepage', label: 'Homepage', icon: Home },
+      { to: '/admin/homepage', label: 'Photos', icon: Home },
     ],
   },
   {

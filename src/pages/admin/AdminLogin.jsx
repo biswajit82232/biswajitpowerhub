@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { LogIn, Lock, Mail, ArrowLeft } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { LogIn, Lock, Mail } from 'lucide-react';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { Field, Input } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
@@ -9,6 +9,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
 import { adminAccessHint } from '@/lib/adminAccess';
+import { isAdminStandalone } from '@/lib/adminPwa';
 
 export default function AdminLogin() {
   const { signIn, session } = useAuth();
@@ -17,6 +18,7 @@ export default function AdminLogin() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const standalone = isAdminStandalone();
 
   const from = location.state?.from?.pathname || '/admin';
 
@@ -40,17 +42,18 @@ export default function AdminLogin() {
 
   return (
     <>
-      <SEO title="Admin Login" noindex />
+      <AdminSEO title="Sign in" />
       <AdminPwaSetup />
-      <div className="flex min-h-screen items-center justify-center bg-sky-fade px-3 py-8 pt-[max(2rem,env(safe-area-inset-top))] sm:px-4 sm:py-12 sm:pt-[max(3rem,env(safe-area-inset-top))]">
+      <div className="flex min-h-dvh min-h-screen items-center justify-center bg-bg px-3 py-8 pt-[max(2rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-4">
         <div className="w-full max-w-md">
-          <AdminInstallBanner />
+          {!standalone && <AdminInstallBanner />}
           <div className="mb-5 text-center sm:mb-6">
-            <p className="font-display text-xl font-extrabold tracking-tight text-heading">Admin</p>
+            <p className="font-display text-2xl font-extrabold tracking-tight text-heading">Admin</p>
+            <p className="mt-1 text-sm text-muted">Dealership control panel</p>
           </div>
           <div className="rounded-2xl bg-surface p-5 shadow-card ring-1 ring-line sm:rounded-3xl sm:p-8">
             <h1 className="font-display text-xl font-extrabold text-heading sm:text-2xl">Sign in</h1>
-            <p className="mt-1 text-sm text-muted">Manage your dealership panel.</p>
+            <p className="mt-1 text-sm text-muted">Use your admin account.</p>
 
             {!isSupabaseConfigured && (
               <div className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
@@ -115,12 +118,6 @@ export default function AdminLogin() {
                 Sign In
               </Button>
             </form>
-          </div>
-
-          <div className="mt-6 text-center">
-            <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted transition hover:text-brand-700">
-              <ArrowLeft className="h-4 w-4" /> Back to website
-            </Link>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Mail, Phone, MessageCircle, Trash2 } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -50,7 +50,7 @@ export default function Messages() {
 
   return (
     <>
-      <SEO title="Messages" noindex />
+      <AdminSEO title="Messages" />
       <AdminHeader
         title="Contact Messages"
         subtitle="Unread first — toggle to show read messages."

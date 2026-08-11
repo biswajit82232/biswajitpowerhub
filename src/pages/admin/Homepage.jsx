@@ -1,4 +1,4 @@
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { SitePhotosEditor, GbpPostGenerator } from '@/components/admin/SitePhotosEditor';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 export default function Homepage() {
   return (
     <>
-      <SEO title="Site Photos" noindex />
+      <AdminSEO title="Site Photos" />
       <AdminHeader
         title="Site Photos & GBP"
         subtitle="Upload hero, gallery, model, and about images. Draft Google Business Profile posts."

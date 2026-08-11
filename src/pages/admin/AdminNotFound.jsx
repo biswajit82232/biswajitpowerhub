@@ -1,12 +1,12 @@
 import { LayoutDashboard } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import Button from '@/components/ui/Button';
 
 export default function AdminNotFound() {
   return (
     <>
-      <SEO title="Page Not Found" noindex />
+      <AdminSEO title="Page Not Found" />
       <AdminHeader title="Page not found" subtitle="This admin page doesn't exist." />
       <div className="flex flex-col items-center rounded-2xl bg-surface px-6 py-10 text-center ring-1 ring-line shadow-soft">
         <p className="font-display text-5xl font-extrabold text-heading">404</p>

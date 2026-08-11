@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus, Tag, Save, X } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
 import { Field, Input, Textarea } from '@/components/ui/Input';
@@ -72,7 +72,7 @@ export default function Offers() {
 
   return (
     <>
-      <SEO title="Promotional Offers" noindex />
+      <AdminSEO title="Promotional Offers" />
       <AdminHeader
         title="Promotional Offers"
         subtitle="Create offers shown prominently on the website homepage."

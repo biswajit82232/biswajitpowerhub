@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   RefreshCw, Settings2, Bike, Package, Link2, AlertTriangle, CloudDownload,
 } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
 import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
@@ -237,7 +237,7 @@ export default function VyaparSync() {
 
   return (
     <>
-      <SEO title="Vyapar Sync" noindex />
+      <AdminSEO title="Vyapar Sync" />
       <AdminHeader
         title="Vyapar Sync"
         subtitle="Import online-store stock into Inventory & Spare & Parts — local pages stay in full control."

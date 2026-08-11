@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { CalendarCheck, Phone, MessageCircle, Bike } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -42,7 +42,7 @@ export default function TestRides() {
 
   return (
     <>
-      <SEO title="Test Rides" noindex />
+      <AdminSEO title="Test Rides" />
       <AdminHeader
         title="Test Ride Requests"
         subtitle="Open requests first — toggle to show all statuses."

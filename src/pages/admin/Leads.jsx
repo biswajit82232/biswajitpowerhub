@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Users, Flame, Phone, MessageCircle, Zap, Clock, PhoneForwarded } from 'lucide-react';
-import { SEO } from '@/components/common/SEO';
+import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Badge } from '@/components/ui/Badge';
 import { Select, Textarea } from '@/components/ui/Input';
@@ -65,7 +65,7 @@ export default function Leads() {
 
   return (
     <>
-      <SEO title="Leads" noindex />
+      <AdminSEO title="Leads" />
       <AdminHeader
         title="Lead Management"
         subtitle="Purchase readiness scores and smart follow-up prioritization."
