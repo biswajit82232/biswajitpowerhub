@@ -22,7 +22,12 @@ export function SiteImage({
   const canOptimize = isSupabaseStorageUrl(src);
   const exhausted = failStage >= (canOptimize ? 2 : 1);
   const resolvedSrc =
-    failStage === 0 && canOptimize ? optimizedImageUrl(src, Math.min(width || 800, 1600)) : src;
+    failStage === 0 && canOptimize
+      ? optimizedImageUrl(src, Math.min(width || 800, 1600), 75, {
+          height: Math.min(height || 600, 1200),
+          resize: 'cover',
+        })
+      : src;
   const show = Boolean(src) && !exhausted;
 
   return (

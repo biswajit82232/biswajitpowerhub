@@ -124,8 +124,10 @@ export default function AccessoryDetails() {
                 alt={accessory.name}
                 hue={accessory.hue}
                 name={accessory.name}
-                className="aspect-square w-full bg-white"
-                fit="contain"
+                width={800}
+                height={800}
+                className="aspect-square w-full bg-surface-alt"
+                fit="cover"
               />
               {accessory.images?.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto border-t border-line bg-surface-alt/50 p-3">

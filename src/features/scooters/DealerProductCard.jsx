@@ -29,10 +29,10 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
           hue={scooter.hue}
           name={scooter.name}
           width={600}
-          height={400}
+          height={450}
           loading="lazy"
-          className="mx-auto aspect-[3/2] w-full max-w-full bg-white"
-          fit="contain"
+          className="mx-auto aspect-[4/3] w-full max-w-full bg-surface-alt"
+          fit="cover"
         />
         {(tags.length > 0 || scooter.noLicence || scooter.stock === 'out_of_stock') && (
           <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-start gap-1.5">

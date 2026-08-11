@@ -32,8 +32,15 @@ export function ScooterImage({
   const [failStage, setFailStage] = useState(0);
   const canOptimize = isSupabaseStorageUrl(src);
   const exhausted = failStage >= (canOptimize ? 2 : 1);
+  const displayW = width || 800;
+  const displayH = height || 600;
   const resolvedSrc =
-    failStage === 0 && canOptimize ? optimizedImageUrl(src, width || 800) : src;
+    failStage === 0 && canOptimize
+      ? optimizedImageUrl(src, displayW, 75, {
+          height: displayH,
+          resize: fit === 'cover' ? 'cover' : 'contain',
+        })
+      : src;
   const showImage = Boolean(src) && !exhausted;
 
   return (
@@ -42,14 +49,14 @@ export function ScooterImage({
         <img
           src={resolvedSrc}
           alt={alt}
-          width={width || 800}
-          height={height || 600}
+          width={displayW}
+          height={displayH}
           loading={loading}
           decoding="async"
           onError={() => setFailStage((s) => s + 1)}
           className={cn(
             'h-full w-full',
-            fit === 'contain' ? 'object-contain object-center' : 'object-cover',
+            fit === 'contain' ? 'object-contain object-center' : 'object-cover object-center',
           )}
         />
       ) : (

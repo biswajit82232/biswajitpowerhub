@@ -19,8 +19,10 @@ export function AccessoryCard({ accessory, index = 0 }) {
           alt={accessory.name}
           hue={accessory.hue}
           name={accessory.name}
-          className="aspect-[3/2] w-full bg-white"
-          fit="contain"
+          width={600}
+          height={450}
+          className="aspect-[4/3] w-full bg-surface-alt"
+          fit="cover"
         />
         <span className="absolute left-3 top-3 bg-navy px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
           {accessory.category}

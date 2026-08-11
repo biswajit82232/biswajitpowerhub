@@ -34,10 +34,12 @@ export function ScooterGallery({ scooter }) {
               hue={scooter.hue}
               name={scooter.name}
               loading="eager"
-              fit="contain"
+              width={900}
+              height={720}
+              fit="cover"
               className={cn(
                 'w-full bg-surface-alt',
-                realImages.length <= 1 ? 'aspect-[5/4] sm:aspect-[4/3]' : 'aspect-[4/3]',
+                realImages.length <= 1 ? 'aspect-[4/3]' : 'aspect-[4/3]',
               )}
             />
           </motion.div>
