@@ -6,7 +6,6 @@ import {
   Banknote, BarChart3, LogOut, Menu, X, ExternalLink, Tag, Settings, Home, Mail,
   RefreshCw, Wrench,
 } from 'lucide-react';
-import { Logo } from '@/components/common/Logo';
 import { PageLoader } from '@/components/ui/Loading';
 import { AdminPwaSetup } from '@/components/admin/AdminPwaSetup';
 import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
