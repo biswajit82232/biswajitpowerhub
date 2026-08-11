@@ -192,6 +192,23 @@
     min-width: 44px;
   }
 
+  /* Admin installed PWA — avoid bounce/overscroll chrome on phones */
+  html.admin-standalone,
+  html.admin-standalone body {
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  html.admin-standalone input,
+  html.admin-standalone textarea,
+  html.admin-standalone [contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  html.admin-standalone .admin-shell {
+    min-height: 100dvh;
+  }
+
   .glass {
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.6);

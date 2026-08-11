@@ -36,8 +36,12 @@ export function setupAdminPwa() {
   upsertMeta('mobile-web-app-capable', 'yes');
   upsertMeta('apple-mobile-web-app-capable', 'yes');
   upsertMeta('apple-mobile-web-app-title', 'BPH Admin');
-  upsertMeta('apple-mobile-web-app-status-bar-style', 'default');
+  // black-translucent helps iOS safe-area + status bar in standalone
+  upsertMeta('apple-mobile-web-app-status-bar-style', 'black-translucent');
   upsertMeta('theme-color', '#2563EB');
+  upsertMeta('format-detection', 'telephone=no');
+
+  document.documentElement.classList.toggle('admin-standalone', isAdminStandalone());
 
   if (!('serviceWorker' in navigator)) return;
 
@@ -52,6 +56,14 @@ export function setupAdminPwa() {
 
   navigator.serviceWorker.register(SW_URL, { scope: SW_SCOPE }).then((reg) => {
     reg.update();
+    // Prompt refresh when a new SW takes over (after deploy)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      // Soft reload once so the phone picks up the new bundle
+      if (isAdminStandalone()) window.location.reload();
+    });
   }).catch(() => {});
 }
 

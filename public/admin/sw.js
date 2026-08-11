@@ -1,11 +1,10 @@
-/* BPH Admin PWA v4 — caching + Web Push for admin events */
-const CACHE = 'bph-admin-v4';
+/* BPH Admin PWA v5 — network-first shell + Web Push */
+const CACHE = 'bph-admin-v5';
 const PRECACHE = [
-  '/',
-  '/admin/',
   '/admin/manifest.webmanifest',
   '/admin/icon-192.png',
   '/admin/icon-512.png',
+  '/admin/icon-96.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -14,7 +13,7 @@ self.addEventListener('install', (event) => {
       for (const url of PRECACHE) {
         try {
           await cache.add(url);
-        } catch (_) { /* dev server may differ */ }
+        } catch (_) { /* ignore */ }
       }
       await self.skipWaiting();
     })
@@ -37,29 +36,59 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   const isAdmin = url.pathname === '/admin' || url.pathname.startsWith('/admin/');
+  if (!isAdmin && request.mode !== 'navigate') return;
 
-  // Navigation under /admin — SPA shell (required for installable PWA)
+  // Always network-first for navigations / JS / CSS so deploys aren't sticky
+  const isShell =
+    request.mode === 'navigate'
+    || url.pathname.startsWith('/assets/')
+    || url.pathname.endsWith('.js')
+    || url.pathname.endsWith('.css')
+    || url.pathname === '/'
+    || url.pathname === '/index.html';
+
   if (request.mode === 'navigate' && isAdmin) {
     event.respondWith(
       fetch(request)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          caches.open(CACHE).then((cache) => cache.put('/admin/', copy)).catch(() => {});
           return res;
         })
-        .catch(() => caches.match('/') || caches.match('/index.html'))
+        .catch(() => caches.match('/admin/') || caches.match('/') || caches.match('/index.html'))
     );
     return;
   }
 
   if (!isAdmin) return;
 
+  if (isShell) {
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Icons / manifest — cache-first
   event.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request))
+    caches.match(request).then((cached) => cached || fetch(request).then((res) => {
+      if (res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+      }
+      return res;
+    }))
   );
 });
 
-/** Background / closed-app admin alerts (Android Chrome + desktop). */
 self.addEventListener('push', (event) => {
   let data = {
     title: 'BPH Admin',

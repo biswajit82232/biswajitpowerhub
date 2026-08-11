@@ -164,9 +164,9 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pt-[env(safe-area-inset-top)]">
+    <div className="admin-shell min-h-dvh min-h-screen bg-bg">
       <AdminPwaSetup />
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-surface p-5 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-surface p-5 pt-[max(1.25rem,env(safe-area-inset-top))] lg:flex">
         <AdminMark />
         <div className="mt-8 flex-1 overflow-y-auto">
           <NavItems badges={badges} />
@@ -174,7 +174,7 @@ export default function AdminLayout() {
         <SidebarFooter onSignOut={handleSignOut} />
       </aside>
 
-      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface px-3 py-2.5 lg:hidden">
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-surface px-3 pb-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] lg:hidden">
         <div className="flex items-center gap-2">
           <AdminMark />
           {badges.total > 0 && (
@@ -197,7 +197,7 @@ export default function AdminLayout() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-              className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+              className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col bg-surface p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
             >
               <div className="flex shrink-0 items-center justify-between">
                 <AdminMark onNavigate={() => setOpen(false)} />
@@ -215,7 +215,7 @@ export default function AdminLayout() {
       </AnimatePresence>
 
       <main className="lg:pl-64">
-        <div className="mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-8">
+        <div className="mx-auto max-w-6xl px-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-8">
           <Suspense fallback={<PageLoader />}>
             <AdminInstallBanner />
             <Outlet />

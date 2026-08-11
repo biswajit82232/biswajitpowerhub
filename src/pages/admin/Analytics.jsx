@@ -1,4 +1,5 @@
 import { MessageCircle, Phone, Calculator, Gauge, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { StatCard } from '@/components/admin/StatCard';
@@ -7,10 +8,9 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAsync } from '@/hooks/useAsync';
 import { getEventAggregates } from '@/features/analytics/analyticsService';
-import { ResetAllCountsButton } from '@/components/admin/ResetAllCountsButton';
 
 export default function Analytics() {
-  const { data: agg, loading, refetch } = useAsync(() => getEventAggregates(), []);
+  const { data: agg, loading } = useAsync(() => getEventAggregates(), []);
 
   const sourceData = [
     { label: 'WhatsApp', value: agg?.whatsappClicks || 0, color: '#25D366' },
@@ -66,15 +66,16 @@ export default function Analytics() {
             </div>
           </div>
 
-          <p className="mt-6 flex items-center gap-2 text-xs text-muted">
-            <Phone className="h-3.5 w-3.5" /> Data reflects tracked interactions. Connect Supabase for cross-device, persistent analytics.
+          <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+            <Phone className="h-3.5 w-3.5 shrink-0" />
+            <span>Tracked interactions. To clear analytics counters, use</span>
+            <Link to="/admin/settings" className="font-semibold text-brand-700 underline-offset-2 hover:underline">
+              Settings → Analytics reset
+            </Link>
+            .
           </p>
         </>
       )}
-
-      <div className="mt-8 flex justify-center border-t border-line pt-6 sm:mt-10">
-        <ResetAllCountsButton onReset={refetch} className="w-full sm:w-auto" />
-      </div>
     </>
   );
 }

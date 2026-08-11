@@ -1,16 +1,23 @@
 {
-  "name": "BPH Admin Panel",
-  "short_name": "BPH Admin",
-  "description": "BISWAJIT POWER HUB — dealership admin dashboard",
+  "name": "BPH Admin",
+  "short_name": "Admin",
+  "description": "Dealership admin — leads, callbacks, bookings, and inventory",
   "id": "/admin/?source=pwa",
   "start_url": "/admin/?source=pwa",
-  "scope": "/admin",
+  "scope": "/admin/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
-  "orientation": "portrait-primary",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
   "theme_color": "#2563EB",
-  "background_color": "#FFFFFF",
+  "background_color": "#F8FAFC",
   "categories": ["business", "productivity"],
+  "prefer_related_applications": false,
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
   "icons": [
     {
       "src": "/admin/icon-96.png",
@@ -41,6 +48,32 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "url": "/admin/?source=pwa",
+      "icons": [{ "src": "/admin/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Callbacks",
+      "short_name": "Callbacks",
+      "url": "/admin/callbacks?source=pwa",
+      "icons": [{ "src": "/admin/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Messages",
+      "short_name": "Messages",
+      "url": "/admin/messages?source=pwa",
+      "icons": [{ "src": "/admin/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "url": "/admin/settings?source=pwa",
+      "icons": [{ "src": "/admin/icon-96.png", "sizes": "96x96" }]
     }
   ]
 }

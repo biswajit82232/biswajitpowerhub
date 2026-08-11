@@ -217,6 +217,8 @@ function enrichLeadRow(lead, events = []) {
     signals: followUp.signals,
     topScooterId: followUp.topScooterId,
     lastActivityAt: followUp.lastActivityAt,
+    slaBreach: followUp.slaBreach,
+    slaHours: followUp.slaHours,
   };
 }
 

@@ -6,6 +6,7 @@ import { SEO } from '@/components/common/SEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
 import { AdminPushCard } from '@/components/admin/AdminPushCard';
+import { ResetAllCountsButton } from '@/components/admin/ResetAllCountsButton';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -191,8 +192,17 @@ export default function Settings() {
         subtitle="Contact, branding, notifications, perks, FAQs, and Explore Range tabs."
       />
 
-      <div className="mb-5 max-w-3xl sm:mb-6">
+      <div className="mb-5 max-w-3xl space-y-3 sm:mb-6">
         <AdminPushCard />
+        <div className="rounded-2xl border border-line bg-surface p-4">
+          <p className="font-display text-sm font-bold text-heading">Analytics reset</p>
+          <p className="mt-1 text-xs text-muted">
+            Clears visit / engagement event logs only. Leads and inbox rows are kept.
+          </p>
+          <div className="mt-3">
+            <ResetAllCountsButton />
+          </div>
+        </div>
       </div>
 
       {!isSupabaseConfigured && (
