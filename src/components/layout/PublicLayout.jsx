@@ -50,7 +50,7 @@ export function PublicLayout() {
       <main
         id="main-content"
         tabIndex={-1}
-        className="min-w-0 flex-1 overflow-x-clip pt-[var(--header-offset)] pb-[calc(4.5rem+env(safe-area-inset-bottom))] outline-none lg:pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+        className="min-w-0 flex-1 overflow-x-clip pt-[var(--header-offset)] pb-[calc(3.25rem+env(safe-area-inset-bottom))] outline-none lg:pb-[max(1.5rem,env(safe-area-inset-bottom))]"
       >
         <Suspense fallback={<RouteLoader label="Loading page" />}>
           <FadeOutlet />
