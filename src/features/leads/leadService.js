@@ -34,17 +34,23 @@ async function upsertLead({ name, phone, source, scooter }) {
   return { readinessPercent, score: leadScore, classification };
 }
 
-export async function submitCallback({ name, phone }) {
-  await trackEvent(EVENT.CALLBACK_REQUEST, { name });
+export async function submitCallback({ name, phone, interest }) {
+  await trackEvent(EVENT.CALLBACK_REQUEST, { name, interest: interest || null });
+  const displayName = interest ? `${name} · ${interest}` : name;
   if (isSupabaseConfigured && supabase) {
     const { error } = await supabase
       .from('callbacks')
-      .insert({ name, phone, visitor_id: getVisitorId() });
+      .insert({ name: displayName, phone, visitor_id: getVisitorId() });
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
   }
-  await upsertLead({ name, phone, source: 'callback' });
+  await upsertLead({
+    name,
+    phone,
+    source: 'callback',
+    scooter: interest || null,
+  });
   return { ok: true };
 }
 

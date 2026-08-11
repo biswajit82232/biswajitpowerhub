@@ -53,6 +53,9 @@ export default function Callbacks() {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-bold text-heading">{c.name}</p>
+                    {String(c.name || '').toLowerCase().includes('no-licence') && (
+                      <Badge tone="brand">No-licence</Badge>
+                    )}
                     {c.handled ? <Badge tone="success">Handled</Badge> : <Badge tone="warm">Open</Badge>}
                   </div>
                   <p className="text-sm text-muted">{c.phone} · {timeAgo(c.created_at)}</p>
