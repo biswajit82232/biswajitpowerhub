@@ -54,11 +54,15 @@ function getDatabaseUrl(env) {
 }
 
 async function ensureMigrationTable(client) {
+  // RLS with no policies denies all PostgREST access; this connection runs as
+  // postgres and bypasses it. Without this the anon key can read migration history.
   await client.query(`
     create table if not exists public.schema_migrations (
       filename text primary key,
       applied_at timestamptz default now()
     );
+    alter table public.schema_migrations enable row level security;
+    revoke all on table public.schema_migrations from anon, authenticated;
   `);
 }
 
