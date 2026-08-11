@@ -5,6 +5,7 @@ import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { FloatingDealerRail } from '@/components/common/FloatingDealerRail';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
+import { FirstVisitNoLicencePrompt } from '@/components/common/FirstVisitNoLicencePrompt';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { RouteLoader } from '@/components/ui/Loading';
 import { usePageTracking } from '@/hooks/usePageTracking';
@@ -59,6 +60,7 @@ export function PublicLayout() {
       <Footer />
       <MobileLocalCTA />
       <FloatingDealerRail />
+      <FirstVisitNoLicencePrompt />
     </div>
   );
 }
