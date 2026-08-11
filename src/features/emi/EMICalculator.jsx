@@ -1,11 +1,18 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { RangeSlider } from '@/components/ui/RangeSlider';
+import { Select } from '@/components/ui/Input';
 import { useCountUp } from '@/hooks/useCountUp';
 import { calculateEMI } from '@/lib/finance';
 import { formatINR } from '@/lib/utils';
 import { EMI_DISCLAIMER, EMI_DISCLAIMER_NOTE } from '@/config/finance';
 import { trackEvent, EVENT } from '@/lib/tracking';
+import {
+  getScooterVariants,
+  hasVariants,
+  withVariant,
+  getStartingPrice,
+} from '@/lib/scooterVariants';
 
 function Amount({ value, className }) {
   const display = useCountUp(value, { active: true, duration: 600 });
@@ -14,12 +21,17 @@ function Amount({ value, className }) {
 
 /**
  * Interactive EMI calculator. `settings` come from finance service (admin-managed).
+ * Pass `scooters` to enable model / variant picking (Finance page).
+ * Pass a fixed `price` (+ optional `scooterId`) when the model is already chosen (PDP).
  */
-export function EMICalculator({ price, settings, scooterId }) {
+export function EMICalculator({ price: priceProp, settings, scooterId: scooterIdProp, scooters }) {
+  const showPicker = Array.isArray(scooters) && scooters.length > 0;
   const tenureOptions = settings?.tenureOptions || [6, 12, 18, 24, 36];
   const [downPct, setDownPct] = useState(settings?.downPaymentPct ?? 20);
   const [rate, setRate] = useState(settings?.interestRate ?? 12);
   const [tenure, setTenure] = useState(settings?.defaultTenure ?? 12);
+  const [scooterId, setScooterId] = useState(scooterIdProp || '');
+  const [variantId, setVariantId] = useState('');
   const tracked = useRef(false);
 
   useEffect(() => {
@@ -28,6 +40,39 @@ export function EMICalculator({ price, settings, scooterId }) {
     setRate(settings.interestRate ?? 12);
     setTenure(settings.defaultTenure ?? 12);
   }, [settings]);
+
+  useEffect(() => {
+    if (!showPicker) return;
+    setScooterId((current) =>
+      current && scooters.some((s) => s.id === current) ? current : scooters[0].id
+    );
+  }, [showPicker, scooters]);
+
+  const scooter = useMemo(
+    () => (showPicker ? scooters.find((s) => s.id === scooterId) ?? null : null),
+    [showPicker, scooters, scooterId]
+  );
+
+  const variants = useMemo(() => getScooterVariants(scooter), [scooter]);
+
+  useEffect(() => {
+    if (!scooter) return;
+    const list = getScooterVariants(scooter);
+    setVariantId((current) =>
+      current && list.some((v) => v.id === current) ? current : list[0]?.id || ''
+    );
+  }, [scooterId, scooter]);
+
+  const selected = useMemo(
+    () => (scooter && variantId ? withVariant(scooter, variantId) : scooter),
+    [scooter, variantId]
+  );
+
+  const price = showPicker
+    ? (selected?.price ?? getStartingPrice(scooter) ?? 0)
+    : (priceProp ?? 0);
+
+  const trackScooterId = showPicker ? scooterId : scooterIdProp;
 
   const downPayment = Math.round((price * downPct) / 100);
 
@@ -45,7 +90,7 @@ export function EMICalculator({ price, settings, scooterId }) {
   const track = () => {
     if (!tracked.current) {
       tracked.current = true;
-      trackEvent(EVENT.EMI_USED, { scooterId, price });
+      trackEvent(EVENT.EMI_USED, { scooterId: trackScooterId, price });
     }
   };
 
@@ -55,14 +100,62 @@ export function EMICalculator({ price, settings, scooterId }) {
       <p className="mt-1 text-sm text-muted">Estimate your monthly payment.</p>
 
       <div className="mt-6 space-y-6" onPointerDown={track}>
+        {showPicker && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className={hasVariants(scooter) ? '' : 'sm:col-span-2'}>
+              <label className="mb-1.5 block text-xs font-semibold text-muted">
+                Scooter model
+              </label>
+              <Select
+                value={scooterId}
+                className="h-11"
+                onChange={(e) => {
+                  setScooterId(e.target.value);
+                  track();
+                }}
+              >
+                {scooters.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            {hasVariants(scooter) && (
+              <div>
+                <label className="mb-1.5 block text-xs font-semibold text-muted">
+                  Battery variant
+                </label>
+                <Select
+                  value={variantId}
+                  className="h-11"
+                  onChange={(e) => {
+                    setVariantId(e.target.value);
+                    track();
+                  }}
+                >
+                  {variants.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name} · {formatINR(v.price)}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            )}
+          </div>
+        )}
+
         <div>
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm font-semibold text-heading">
+          <div className="mb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm font-semibold text-heading">
             <span>Vehicle price</span>
             <span className="break-words text-brand-600">{formatINR(price)}</span>
           </div>
-          <div className="h-2 rounded-full bg-line">
-            <div className="h-full rounded-full bg-brand-gradient" style={{ width: '100%' }} />
-          </div>
+          {showPicker && selected && (
+            <p className="text-xs text-muted">
+              {selected.name}
+              {selected.selectedVariant ? ` · ${selected.selectedVariant.name}` : ''}
+            </p>
+          )}
         </div>
 
         <div>
@@ -112,7 +205,6 @@ export function EMICalculator({ price, settings, scooterId }) {
         </div>
       </div>
 
-      {/* Result */}
       <motion.div layout className="mt-6 rounded-2xl bg-surface-alt p-5">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <span className="text-sm font-medium text-body">Monthly EMI</span>

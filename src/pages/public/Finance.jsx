@@ -1,20 +1,27 @@
+import { Phone, MessageCircle } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { LocateUs } from '@/components/sections/LocateUs';
+import Button from '@/components/ui/Button';
 import { EMICalculator } from '@/features/emi/EMICalculator';
 import { EVSimulator } from '@/features/simulator/EVSimulator';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { useFinance } from '@/context/FinanceSettingsContext';
-import { getStartingPrice } from '@/lib/scooterVariants';
+import { useSite } from '@/context/SiteSettingsContext';
+import { telUrl, whatsappUrl } from '@/config/site';
 import { breadcrumbList } from '@/lib/schemaHelpers';
+import { trackEvent, EVENT } from '@/lib/tracking';
 import { SCOOTERS } from '@/data/scooters';
+
+const FINANCE_WA =
+  "Hi Biswajit Power Hub, I'd like to enquire about EMI / finance options for an electric scooter.";
 
 export default function FinancePage() {
   const { data: scooters, loading } = useAsync(() => getScooters(), []);
   const { settings } = useFinance();
+  const { site } = useSite();
   const list = scooters?.length ? scooters : SCOOTERS;
-  const samplePrice = getStartingPrice(list[0]) || 44999;
 
   const jsonLd = breadcrumbList([
     { name: 'Home', path: '/' },
@@ -42,19 +49,43 @@ export default function FinancePage() {
             Flexible monthly installments for electric scooters. Visit our finance desk at Chunakhali
             Bus Stand or calculate an estimate below — final terms confirmed at the showroom.
           </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button
+              href={telUrl(undefined, site)}
+              target="_self"
+              variant="dealerPrimary"
+              icon={Phone}
+              onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'finance-page' })}
+            >
+              Call Showroom
+            </Button>
+            <Button
+              href={whatsappUrl(FINANCE_WA, site)}
+              target="_blank"
+              rel="noreferrer"
+              variant="dealerSecondary"
+              icon={MessageCircle}
+              onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'finance-page' })}
+            >
+              WhatsApp Finance
+            </Button>
+          </div>
         </div>
       </section>
 
       <section className="bg-white py-10 sm:py-14">
         <div className="container-px">
           <h2 className="dealer-section-title">EMI Calculator</h2>
-          <div className="mt-6 max-w-xl border border-line bg-white p-5 shadow-soft sm:p-6">
-            <EMICalculator price={samplePrice} settings={settings} scooterId={list[0]?.id} />
+          <p className="mt-2 max-w-xl text-sm text-muted">
+            Pick a scooter and tenure — see an indicative monthly payment.
+          </p>
+          <div className="mt-6 max-w-xl">
+            <EMICalculator scooters={list} settings={settings} />
           </div>
         </div>
       </section>
 
-      <section className="border-t border-line bg-surface-alt py-10 sm:py-14">
+      <section id="simulator" className="scroll-mt-[var(--header-offset)] border-t border-line bg-surface-alt py-10 sm:py-14">
         <div className="container-px">
           <h2 className="dealer-section-title">See What You&apos;d Save Going Electric</h2>
           <p className="mt-2 max-w-xl text-sm text-muted">
