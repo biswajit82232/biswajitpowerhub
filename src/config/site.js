@@ -34,10 +34,21 @@ export const DAY_LABELS = {
 
 /** Google review / GBP-aligned rating — keep in sync with live Google reviews */
 export const GBP_RATING = {
-  ratingValue: 4.8,
-  reviewCount: 12,
+  ratingValue: 3.9,
+  reviewCount: 17,
   bestRating: 5,
   worstRating: 1,
+};
+
+/** Exact NAP string to paste into Google Business Profile (must match site + schema) */
+export const GBP_NAP = {
+  name: 'BISWAJIT POWER HUB',
+  website: 'https://biswajitpowerhub.in',
+  phoneDisplay: '096355 05436',
+  phoneDigits: '9635505436',
+  address:
+    'Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149',
+  hoursSummary: 'Open all days 9:00 AM – 8:30 PM',
 };
 
 /** Explore Our Range tabs — labels/enabled editable in Admin → Settings */
@@ -148,6 +159,16 @@ export const SITE = {
 
   url: SITE_URL,
 };
+
+/** Social + Google Maps profile URLs for LocalBusiness / Organization sameAs */
+export function siteSameAs(site = SITE) {
+  return [
+    site.social?.instagram,
+    site.social?.facebook,
+    site.social?.youtube,
+    site.maps?.link,
+  ].filter(Boolean);
+}
 
 export function buildAddressFull({ line, city, district, state, pincode, country }) {
   return [line, city, district, state, pincode, country].filter(Boolean).join(', ');

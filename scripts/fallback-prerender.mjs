@@ -591,6 +591,7 @@ function localBusinessSchema(reviews) {
     sameAs: [
       'https://www.instagram.com/biswajitpowerhub',
       'https://www.facebook.com/BiswajitPowerHub',
+      'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
     ],
     areaServed: [
       'Berhampore',
@@ -622,6 +623,7 @@ function organizationSchema() {
     sameAs: [
       'https://www.instagram.com/biswajitpowerhub',
       'https://www.facebook.com/BiswajitPowerHub',
+      'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
     ],
   };
 }

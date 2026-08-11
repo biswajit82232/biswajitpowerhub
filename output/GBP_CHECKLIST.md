@@ -1,12 +1,33 @@
 # GOOGLE BUSINESS PROFILE OPTIMIZATION CHECKLIST
 
-## Step 1: Log In
-- [ ] https://business.google.com → Biswajit Power Hub
+> Live verified (Aug 2026): GBP is **visible** on Maps + brand search knowledge panel.
+> Website NAP/hours/website URL already align. Finish dashboard items below for dominance.
 
-## Step 2: Verify & Standardize Info
-- [ ] Website = `https://biswajitpowerhub.in`
-- [ ] Phone = `096355 05436` (REMOVE all other numbers)
-- [ ] Address = `Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149`
+## Live status (public — already good)
+- [x] Maps listing live: https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7
+- [x] Category: Electric motor vehicle dealer
+- [x] Website on GBP: `biswajitpowerhub.in`
+- [x] Phone on GBP: `096355 05436` (matches site)
+- [x] Hours on GBP: Open daily · closes 8:30 pm (matches site 9:00–20:30)
+- [x] Coords match site schema (`24.116865, 88.2914134`)
+- [x] Recent posts / offers / Q&A-style updates publishing
+- [x] Website schema `sameAs` includes Maps short link + socials
+- [x] Site GBP rating default synced to live **3.9 ★ / 17 reviews**
+
+## Step 1: Log In
+- [ ] https://business.google.com → Biswajit Power Hub (owner account)
+
+## Step 2: Fix address wording (NAP — do in dashboard)
+Paste **exactly** (matches website + schema):
+
+`Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad, West Bengal 742149`
+
+Current public GBP shows shorter “Chunakhali, Nimtala…” — add **Bus Stand** + **Murshidabad**.
+
+Also confirm:
+- [ ] Website = `https://biswajitpowerhub.in` (apex, no www)
+- [ ] Phone = `096355 05436` only (remove any extra numbers)
+- [ ] Hours = **Every day** 9:00 AM – 8:30 PM (not Mon–Sat only)
 
 ## Step 3: Update Description (750 chars max)
 Paste this:
@@ -38,11 +59,10 @@ For each, add photo + price range + description:
 ## Step 7: Upload 1 Video
 - [ ] 30-60 sec walkaround of any scooter
 
-## Step 8: Post Update
+## Step 8: Fix conflicting post + publish clean update
+- [ ] Edit/delete any post that says **Mon–Sat / 8 PM** (conflicts with all-days 9–8:30)
 - [ ] Create post: "New Stock: Activa Electric Scooter — No Licence Needed!"
-- [ ] Add photo
-- [ ] Button: "Learn More" → link to `/scooters/activa`
-- [ ] Publish
+- [ ] Button: "Learn More" → `https://biswajitpowerhub.in/scooters/activa`
 
 ## Step 9: Add Q&A (Pre-fill these)
 - [ ] Q: Do I need a licence?
@@ -63,11 +83,14 @@ For each, add photo + price range + description:
 
 ## Step 11: Review Push (Do Weekly)
 - [ ] Ask 5 happy customers for Google reviews this week
-- [ ] Send them this link: [Get from GBP Dashboard → Home → Get more reviews]
+- [ ] Goal: lift live rating from **3.9 / 17** toward **4.5+**
 - [ ] Respond to ALL reviews within 24 hours
 
+## Step 12: Brand confusion
+- [ ] Justdial “Biswajit Enterprise” appears in brand search — claim/correct or keep naming clearly **Biswajit Power Hub** everywhere so customers don’t land on the wrong listing
+
 ## Step 13: Service areas (website synergy)
-After deploy, ensure GBP categories/services mention Murshidabad coverage. Website location pages live at:
+Website location pages (already live):
 - /electric-scooters-kandi
 - /electric-scooters-jiaganj
 - /electric-scooters-beldanga
@@ -75,3 +98,12 @@ After deploy, ensure GBP categories/services mention Murshidabad coverage. Websi
 - /electric-scooters-domkal
 
 Link 1–2 of these from a GBP post when relevant (e.g. “Serving Kandi riders — free test ride in Berhampore”).
+
+## Step 14: Note Baseline
+Write down current numbers from GBP Insights:
+- Searches: ___
+- Views: ___
+- Calls: ___
+- Direction requests: ___
+- Website clicks: ___
+- Rating / reviews: **3.9 / 17** (as of Aug 2026 check)

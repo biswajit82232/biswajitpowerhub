@@ -9,7 +9,7 @@ import { CallbackForm } from '@/features/leads/CallbackForm';
 import { useToast } from '@/components/ui/Toast';
 import { submitContact } from '@/features/leads/leadService';
 import { isValidName, isValidPhone, isValidEmail } from '@/features/leads/validation';
-import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
+import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay, siteSameAs } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
@@ -137,7 +137,7 @@ export default function Contact() {
         },
         hasMap: site.maps.link,
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
-        sameAs: [SITE.social.instagram, SITE.social.facebook].filter(Boolean),
+        sameAs: siteSameAs(site),
       },
     ],
     [site],

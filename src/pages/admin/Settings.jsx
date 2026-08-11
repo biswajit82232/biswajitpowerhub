@@ -66,8 +66,8 @@ function formFromSite(data) {
       placeId: data.maps?.placeId || data.geo?.placeId || '',
     },
     gbp: {
-      ratingValue: data.gbp?.ratingValue ?? 4.8,
-      reviewCount: data.gbp?.reviewCount ?? 12,
+      ratingValue: data.gbp?.ratingValue ?? 3.9,
+      reviewCount: data.gbp?.reviewCount ?? 17,
     },
     perks: (data.perks || []).map((p) => ({ ...p })),
     faqs: (data.faqs || []).map((f) => ({ ...f })),

@@ -13,7 +13,7 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { useFinance } from '@/context/FinanceSettingsContext';
 import { useSite } from '@/context/SiteSettingsContext';
-import { SITE_URL } from '@/config/site';
+import { SITE_URL, siteSameAs } from '@/config/site';
 import {
   openingHoursSchema,
   postalAddressSchema,
@@ -61,7 +61,7 @@ export default function Home() {
         },
         hasMap: site.maps?.link,
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
-        sameAs: [site.social?.instagram, site.social?.facebook].filter(Boolean),
+        sameAs: siteSameAs(site),
         slogan: site.tagline,
         areaServed: [
           'Berhampore',
@@ -91,7 +91,7 @@ export default function Home() {
         name: site.name,
         url: SITE_URL,
         logo: `${SITE_URL}/logo-512.png`,
-        sameAs: [site.social?.instagram, site.social?.facebook].filter(Boolean),
+        sameAs: siteSameAs(site),
       },
       {
         '@context': 'https://schema.org',

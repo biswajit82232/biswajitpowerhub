@@ -4,7 +4,7 @@ import { Section } from '@/components/common/Section';
 import { Reveal } from '@/components/common/Reveal';
 import Button from '@/components/ui/Button';
 import { SiteImage } from '@/components/common/SiteImage';
-import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
+import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay, siteSameAs } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { breadcrumbList, postalAddressSchema, openingHoursSchema } from '@/lib/schemaHelpers';
@@ -44,7 +44,7 @@ export default function About() {
         },
         hasMap: site.maps?.link || SITE.maps.link,
         openingHoursSpecification: openingHoursSchema(site.hoursPerDay),
-        sameAs: [site.social?.instagram, site.social?.facebook].filter(Boolean),
+        sameAs: siteSameAs(site),
       },
     ],
     [site],
