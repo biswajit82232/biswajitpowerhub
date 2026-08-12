@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Gift, Tag } from 'lucide-react';
+import { Tag } from 'lucide-react';
 import { SiteImage } from '@/components/common/SiteImage';
+import { SaleOfferSticker } from '@/components/common/SaleOfferSticker';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
-import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
 
 /**
- * Full-bleed dealer hero — showroom slide + promo bar and/or sticky free-with-purchase badge.
+ * Full-bleed dealer hero — showroom slide + promo bar and/or sticky sale sticker.
  */
 export function HeroCarousel({ heroImageUrl }) {
   const { site } = useSite();
@@ -20,7 +20,8 @@ export function HeroCarousel({ heroImageUrl }) {
   const heroOffers = (offers || []).filter((o) => o.showOnHero !== false);
   const promoOffers = heroOffers.filter((o) => o.kind !== 'free_with_purchase');
   const freeOffers = heroOffers.filter((o) => o.kind === 'free_with_purchase');
-  const stickyFree = freeOffers[0] || null;
+  // Sticker is free-with-purchase only — never duplicate the promo bar.
+  const stickerOffer = freeOffers[0] || null;
 
   const slides = [];
 
@@ -71,15 +72,9 @@ export function HeroCarousel({ heroImageUrl }) {
   const slide = slides[index];
   const offer = promoOffers[offerIndex] || promoOffers[0];
 
-  const freeThumb = stickyFree?.imageUrl
-    ? isSupabaseStorageUrl(stickyFree.imageUrl)
-      ? optimizedImageUrl(stickyFree.imageUrl, 160, 78, { height: 160, resize: 'cover' })
-      : stickyFree.imageUrl
-    : null;
-
   return (
-    <section className="relative isolate w-full overflow-hidden bg-surface-alt" aria-label="Hero">
-      <div className="relative aspect-[16/7] min-h-[220px] w-full sm:min-h-[320px] lg:min-h-[420px]">
+    <section className="relative isolate w-full bg-surface-alt" aria-label="Hero">
+      <div className="relative aspect-[16/7] min-h-[220px] w-full overflow-hidden sm:min-h-[320px] lg:min-h-[420px]">
         {/* Only mount current + next slide to cut DOM/image weight */}
         {slides.map((s, i) => {
           const active = i === index;
@@ -117,44 +112,6 @@ export function HeroCarousel({ heroImageUrl }) {
           aria-hidden
         />
 
-        {/* Sticky free-with-purchase badge — red, top-right on hero */}
-        {stickyFree ? (
-          <Link
-            to="/offers"
-            className="absolute right-3 top-3 z-20 flex max-w-[11.5rem] items-center gap-2 rounded-xl bg-red-600 px-2.5 py-2 text-white shadow-lg ring-2 ring-white/90 sm:right-5 sm:top-5 sm:max-w-[15rem] sm:gap-2.5 sm:rounded-2xl sm:px-3 sm:py-2.5"
-            aria-label={`${stickyFree.discountText} ${stickyFree.title} — free with scooter purchase`}
-          >
-            {freeThumb ? (
-              <img
-                src={freeThumb}
-                alt=""
-                width={48}
-                height={48}
-                className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-white/40 sm:h-12 sm:w-12"
-                loading="lazy"
-                decoding="async"
-              />
-            ) : (
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/15 sm:h-12 sm:w-12">
-                <Gift className="h-5 w-5" strokeWidth={2.2} />
-              </span>
-            )}
-            <span className="min-w-0">
-              <span className="block text-[9px] font-bold uppercase tracking-[0.14em] text-white/90 sm:text-[10px]">
-                Free with scooty
-              </span>
-              <span className="mt-0.5 block truncate font-display text-xs font-extrabold leading-tight sm:text-sm">
-                {stickyFree.discountText || stickyFree.title}
-              </span>
-              {stickyFree.title && stickyFree.discountText ? (
-                <span className="mt-0.5 block truncate text-[10px] font-medium text-white/90 sm:text-xs">
-                  {stickyFree.title}
-                </span>
-              ) : null}
-            </span>
-          </Link>
-        ) : null}
-
         <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-6 sm:px-8 sm:pb-8">
           <p className="font-display text-xl font-extrabold uppercase tracking-wide text-white drop-shadow sm:text-2xl lg:text-3xl">
             {site.name}
@@ -183,36 +140,46 @@ export function HeroCarousel({ heroImageUrl }) {
         )}
       </div>
 
+      {/* Sale sticker sits above the clipped media so the burst is never cut off */}
+      {stickerOffer ? (
+        <SaleOfferSticker
+          offer={stickerOffer}
+          to={`/offers?offer=${encodeURIComponent(stickerOffer.id)}`}
+          className="right-2 top-2 z-30 sm:right-4 sm:top-3 lg:right-6 lg:top-4"
+        />
+      ) : null}
+
       {offersLoading ? null : offer ? (
-        <div className="border-t border-brand-600 bg-brand-500 text-white">
-          <div className="container-px flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3.5">
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/80">
+        <Link
+          to={`/offers?offer=${encodeURIComponent(offer.id)}`}
+          className="block border-t border-brand-600 bg-brand-500 text-white transition hover:bg-brand-600"
+          aria-label={`View offer: ${offer.discountText}${offer.title ? ` — ${offer.title}` : ''}`}
+        >
+          <div className="container-px flex items-center justify-between gap-3 py-2.5 sm:gap-6 sm:py-3.5">
+            <div className="min-w-0 flex-1 text-left">
+              <p className="text-[9px] font-black uppercase tracking-[0.16em] text-white/85 sm:text-[10px] sm:tracking-[0.18em]">
                 Current offer{offerCount > 1 ? ` · ${offerIndex + 1}/${offerCount}` : ''}
               </p>
-              <p className="mt-0.5 truncate font-display text-base font-extrabold uppercase tracking-wide sm:text-lg">
+              <p className="mt-0.5 font-display text-[13px] font-black leading-snug tracking-tight text-white sm:text-lg">
                 {offer.discountText}
-                {offer.title ? (
-                  <span className="ml-2 font-semibold normal-case tracking-normal text-white/95">
-                    {offer.title}
-                  </span>
-                ) : null}
               </p>
+              {offer.title && offer.title !== offer.discountText ? (
+                <p className="mt-0.5 text-[11px] font-semibold leading-snug text-white/90 sm:text-sm">
+                  {offer.title}
+                </p>
+              ) : null}
               {offer.promoCode ? (
-                <p className="mt-0.5 inline-flex items-center gap-1 text-xs font-semibold text-white/90">
-                  <Tag className="h-3.5 w-3.5" />
+                <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand-600 sm:text-xs">
+                  <Tag className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
                   Code {offer.promoCode}
                 </p>
               ) : null}
             </div>
-            <Link
-              to="/offers"
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-dealer border border-white bg-white px-4 text-xs font-bold uppercase tracking-wide text-brand-600 transition hover:bg-brand-50"
-            >
-              View Offers
-            </Link>
+            <span className="inline-flex h-9 shrink-0 items-center justify-center rounded-dealer border border-white bg-white px-3 text-[10px] font-black uppercase tracking-wide text-brand-600 sm:h-11 sm:px-5 sm:text-xs">
+              Details
+            </span>
           </div>
-        </div>
+        </Link>
       ) : null}
 
       <span className="sr-only">

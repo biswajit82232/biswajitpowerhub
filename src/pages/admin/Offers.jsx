@@ -191,7 +191,15 @@ export default function Offers() {
                   <Select
                     id="offer-kind"
                     value={form.kind}
-                    onChange={(e) => set('kind', e.target.value)}
+                    onChange={(e) => {
+                      const kind = e.target.value;
+                      setForm((f) => ({
+                        ...f,
+                        kind,
+                        promoCode: kind === 'free_with_purchase' ? '' : f.promoCode,
+                        imageUrl: kind === 'promo' ? '' : f.imageUrl,
+                      }));
+                    }}
                   >
                     <option value="promo">Discount / promo strip</option>
                     <option value="free_with_purchase">Free with scooty purchase (hero sticky)</option>
