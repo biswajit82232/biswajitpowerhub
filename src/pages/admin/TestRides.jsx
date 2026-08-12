@@ -2,13 +2,16 @@ import { useMemo, useState } from 'react';
 import { CalendarCheck, Phone, MessageCircle, Bike } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { AsyncError } from '@/components/admin/AsyncError';
+import { AdminListCapNotice } from '@/components/admin/AdminListCapNotice';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/Badge';
-import { Select } from '@/components/ui/Input';
+import { Input, Select } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
 import { useAsync } from '@/hooks/useAsync';
-import { getTestRides, updateTestRide } from '@/features/leads/leadService';
+import { ADMIN_LIST_LIMIT, getTestRides, updateTestRide } from '@/features/leads/leadService';
+import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
 import { telUrl, whatsappCustomerUrl } from '@/config/site';
@@ -22,18 +25,27 @@ const STATUSES = [
 
 export default function TestRides() {
   const { toast } = useToast();
-  const { data, loading, refetch } = useAsync(() => getTestRides(), []);
+  const { data, loading, error, refetch } = useAsync(() => getTestRides(), []);
   const [showAll, setShowAll] = useState(false);
+  const [search, setSearch] = useState('');
 
   const rows = useMemo(() => {
-    const list = data || [];
-    return showAll ? list : list.filter((t) => (t.status || 'requested') === 'requested');
-  }, [data, showAll]);
+    const q = search.trim().toLowerCase();
+    let list = data || [];
+    if (!showAll) list = list.filter((t) => (t.status || 'requested') === 'requested');
+    if (q) {
+      list = list.filter((t) =>
+        `${t.name || ''} ${t.phone || ''} ${t.scooter || ''}`.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [data, showAll, search]);
 
   const onStatus = async (id, status) => {
     try {
       await updateTestRide(id, { status });
       toast('Status updated.', 'success');
+      invalidateAdminBadges();
       refetch();
     } catch (e) {
       toast(e.message || 'Update failed.', 'error');
@@ -47,19 +59,31 @@ export default function TestRides() {
         title="Test Ride Requests"
         subtitle="Open requests first — toggle to show all statuses."
         action={(
-          <label className="flex items-center gap-2 text-xs font-semibold text-body">
-            <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
-            Show all
-          </label>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name or phone…"
+              className="h-10 text-sm sm:w-44"
+              aria-label="Search test rides"
+            />
+            <label className="flex items-center gap-2 text-xs font-semibold text-body">
+              <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+              Show all
+            </label>
+          </div>
         )}
       />
+
+      <AsyncError error={error} onRetry={refetch} />
+      <AdminListCapNotice count={(data || []).length} limit={ADMIN_LIST_LIMIT} />
 
       {!isSupabaseConfigured ? (
         <EmptyState icon={CalendarCheck} title="Connect Supabase" description="Test ride bookings will appear here once Supabase is connected." />
       ) : loading ? (
         <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20" />)}</div>
-      ) : rows.length === 0 ? (
-        <EmptyState icon={CalendarCheck} title={showAll ? 'No test ride requests yet' : 'No open test rides'} />
+      ) : error ? null : rows.length === 0 ? (
+        <EmptyState icon={CalendarCheck} title={showAll || search ? 'No matches' : 'No open test rides'} />
       ) : (
         <div className="space-y-3">
           {rows.map((t) => (

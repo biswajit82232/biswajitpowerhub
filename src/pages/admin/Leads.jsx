@@ -2,13 +2,15 @@ import { useMemo, useState } from 'react';
 import { Users, Flame, Phone, MessageCircle, Zap, Clock, PhoneForwarded } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { AsyncError } from '@/components/admin/AsyncError';
+import { AdminListCapNotice } from '@/components/admin/AdminListCapNotice';
 import { Badge } from '@/components/ui/Badge';
-import { Select, Textarea } from '@/components/ui/Input';
+import { Input, Select, Textarea } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
 import { useAsync } from '@/hooks/useAsync';
-import { getLeads, updateLead } from '@/features/leads/leadService';
+import { ADMIN_LIST_LIMIT, getLeads, updateLead } from '@/features/leads/leadService';
 import { FOLLOW_UP } from '@/lib/purchaseReadiness';
 import { timeAgo } from '@/lib/utils';
 import { telUrl, whatsappCustomerUrl } from '@/config/site';
@@ -30,16 +32,36 @@ function isEditableLead(id) {
 export default function Leads() {
   const { toast } = useToast();
   const { site } = useSite();
-  const { data: leads, loading, refetch } = useAsync(() => getLeads(), []);
+  const { data: leads, loading, error, refetch } = useAsync(() => getLeads(), []);
   const [filter, setFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [search, setSearch] = useState('');
+
+  const summary = useMemo(() => {
+    const rows = leads || [];
+    return {
+      total: rows.length,
+      hot: rows.filter((l) => l.classification === 'hot').length,
+      highIntent: rows.filter((l) => (l.readinessPercent || 0) >= 60).length,
+      callNow: rows.filter((l) => l.priority === FOLLOW_UP.IMMEDIATE).length,
+    };
+  }, [leads]);
 
   const list = useMemo(() => {
     let rows = leads || [];
     if (filter !== 'all') rows = rows.filter((l) => l.classification === filter);
     if (priorityFilter !== 'all') rows = rows.filter((l) => l.priority === priorityFilter);
+    if (statusFilter !== 'all') rows = rows.filter((l) => (l.status || 'new') === statusFilter);
+    const q = search.trim().toLowerCase();
+    if (q) {
+      rows = rows.filter((l) => {
+        const hay = `${l.name || ''} ${l.phone || ''} ${l.interested_scooter || ''} ${l.notes || ''}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
     return rows;
-  }, [leads, filter, priorityFilter]);
+  }, [leads, filter, priorityFilter, statusFilter, search]);
 
   const onStatus = async (id, status) => {
     if (!isEditableLead(id)) {
@@ -71,24 +93,60 @@ export default function Leads() {
       <AdminSEO title="Leads" />
       <AdminHeader
         title="Lead Management"
-        subtitle="Purchase readiness scores and smart follow-up prioritization. Callbacks, test rides, and service bookings merge into one lead card."
+        subtitle="Purchase readiness scores and smart follow-up prioritization."
         action={
           <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-            <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-44 sm:flex-none">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name or phone…"
+              className="h-10 min-w-0 flex-1 text-sm sm:w-44 sm:flex-none"
+              aria-label="Search leads"
+            />
+            <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-40 sm:flex-none">
               <option value="all">All priorities</option>
               <option value={FOLLOW_UP.IMMEDIATE}>Call immediately</option>
               <option value={FOLLOW_UP.TODAY}>Call today</option>
               <option value={FOLLOW_UP.LATER}>Follow up later</option>
             </Select>
-            <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-36 sm:flex-none">
-              <option value="all">All leads</option>
+            <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-28 sm:flex-none">
+              <option value="all">All heat</option>
               <option value="hot">Hot</option>
               <option value="warm">Warm</option>
               <option value="cold">Cold</option>
             </Select>
+            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-32 sm:flex-none">
+              <option value="all">All status</option>
+              {STATUSES.map((s) => (
+                <option key={s} value={s}>{s.replace('_', ' ')}</option>
+              ))}
+            </Select>
           </div>
         }
       />
+
+      <AsyncError error={error} onRetry={refetch} />
+
+      {!loading && !error && (
+        <div className="mb-3 grid grid-cols-2 gap-2 sm:mb-4 sm:grid-cols-4">
+          {[
+            { label: 'Total leads', value: summary.total, icon: Users },
+            { label: 'Hot', value: summary.hot, icon: Flame },
+            { label: 'High intent', value: summary.highIntent, icon: Zap },
+            { label: 'Call now', value: summary.callNow, icon: PhoneForwarded },
+          ].map((s) => (
+            <div key={s.label} className="rounded-xl bg-surface px-3 py-2.5 ring-1 ring-line">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{s.label}</p>
+              <p className="mt-0.5 flex items-center gap-1.5 font-display text-lg font-extrabold text-heading">
+                <s.icon className="h-4 w-4 text-brand-600" />
+                {s.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <AdminListCapNotice count={(leads || []).length} limit={ADMIN_LIST_LIMIT} />
 
       {loading ? (
         <div className="space-y-3">
@@ -96,7 +154,7 @@ export default function Leads() {
             <Skeleton key={i} className="h-24" />
           ))}
         </div>
-      ) : list.length === 0 ? (
+      ) : error ? null : list.length === 0 ? (
         <EmptyState icon={Users} title="No leads yet" description="Leads appear as visitors browse, use calculators, and submit forms." />
       ) : (
         <div className="space-y-3">

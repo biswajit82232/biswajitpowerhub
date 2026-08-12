@@ -21,7 +21,7 @@ export function ResetAllCountsButton({ onReset, className }) {
     setLoading(true);
     try {
       await resetAnalyticsCounts();
-      toast('Analytics / visit counters cleared. Leads and inbox kept.', 'success');
+      toast('All visit / engagement counts set to 0. Leads and inbox kept.', 'success');
       setOpen(false);
       setConfirmText('');
       onReset?.();
@@ -41,13 +41,13 @@ export function ResetAllCountsButton({ onReset, className }) {
         onClick={() => setOpen(true)}
         className={className}
       >
-        Reset analytics
+        Reset all counts to 0
       </Button>
 
       <Modal
         open={open}
         onClose={() => { setOpen(false); setConfirmText(''); }}
-        title="Reset analytics only?"
+        title="Reset all counts to 0?"
         size="sm"
       >
         <div className="flex flex-col items-center gap-3 text-center">
@@ -55,10 +55,12 @@ export function ResetAllCountsButton({ onReset, className }) {
             <AlertTriangle className="h-7 w-7" />
           </span>
           <p className="text-sm text-body">
-            Clears website visit / engagement event logs only.
-            <strong className="block mt-1 text-heading">Leads, callbacks, test rides, service, and messages are NOT deleted.</strong>
+            Sets visit and engagement event counters to zero.
+            <strong className="mt-1 block text-heading">
+              Leads, callbacks, test rides, service, and messages are NOT deleted.
+            </strong>
           </p>
-          <Field label='Type RESET to confirm' htmlFor="reset-confirm" className="w-full text-left">
+          <Field label="Type RESET to confirm" htmlFor="reset-confirm" className="w-full text-left">
             <Input
               id="reset-confirm"
               value={confirmText}
@@ -89,7 +91,7 @@ export function ResetAllCountsButton({ onReset, className }) {
               onClick={handleReset}
               disabled={confirmText.trim().toUpperCase() !== 'RESET'}
             >
-              Reset analytics
+              Reset all counts to 0
             </Button>
           </div>
         </div>

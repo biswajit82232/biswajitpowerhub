@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Star, Check, X, EyeOff, Sparkles, Camera, ImageIcon } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { AsyncError } from '@/components/admin/AsyncError';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Stars } from '@/components/ui/StarRating';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -16,6 +18,7 @@ import {
   setReviewPhoto,
   clearReviewPhoto,
 } from '@/features/reviews/reviewService';
+import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 const STATUS_TONE = { approved: 'success', pending: 'warning', rejected: 'danger', hidden: 'neutral' };
@@ -118,10 +121,20 @@ function ReviewPhotoAdmin({ review, onUpdated }) {
 
 export default function AdminReviews() {
   const { toast } = useToast();
-  const { data: reviews, loading, refetch } = useAsync(() => getAllReviews(), []);
+  const { data: reviews, loading, error, refetch } = useAsync(() => getAllReviews(), []);
   const [showAll, setShowAll] = useState(false);
+  const [search, setSearch] = useState('');
 
-  const rows = (reviews || []).filter((r) => showAll || r.status === 'pending');
+  const rows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = (reviews || []).filter((r) => showAll || r.status === 'pending');
+    if (q) {
+      list = list.filter((r) =>
+        `${r.name || ''} ${r.scooter || ''} ${r.review || ''}`.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  }, [reviews, showAll, search]);
 
   const guard = () => {
     if (!isSupabaseConfigured) {
@@ -136,6 +149,7 @@ export default function AdminReviews() {
     try {
       await fn();
       toast(msg, 'success');
+      invalidateAdminBadges();
       refetch();
     } catch (e) {
       toast(e.message || 'Action failed.', 'error');
@@ -149,12 +163,23 @@ export default function AdminReviews() {
         title="Review Management"
         subtitle="Pending first — approve, feature, or hide customer reviews."
         action={(
-          <label className="flex items-center gap-2 text-xs font-semibold text-body">
-            <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
-            Show all
-          </label>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name or review…"
+              className="h-10 text-sm sm:w-44"
+              aria-label="Search reviews"
+            />
+            <label className="flex items-center gap-2 text-xs font-semibold text-body">
+              <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+              Show all
+            </label>
+          </div>
         )}
       />
+
+      <AsyncError error={error} onRetry={refetch} />
 
       {!isSupabaseConfigured && (
         <div className="mb-4 rounded-xl bg-amber-50 px-3 py-2.5 text-xs text-amber-700 sm:mb-5 sm:px-4 sm:py-3 sm:text-sm">
@@ -164,8 +189,8 @@ export default function AdminReviews() {
 
       {loading ? (
         <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28" />)}</div>
-      ) : rows.length === 0 ? (
-        <EmptyState icon={Star} title={showAll ? 'No reviews yet' : 'No pending reviews'} />
+      ) : error ? null : rows.length === 0 ? (
+        <EmptyState icon={Star} title={showAll || search ? 'No matches' : 'No pending reviews'} />
       ) : (
         <div className="space-y-3">
           {rows.map((r) => (
@@ -228,3 +253,4 @@ export default function AdminReviews() {
     </>
   );
 }
+

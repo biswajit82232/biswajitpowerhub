@@ -195,9 +195,9 @@ export default function Settings() {
       <div className="mb-5 max-w-3xl space-y-3 sm:mb-6">
         <AdminPushCard />
         <div className="rounded-2xl border border-line bg-surface p-4">
-          <p className="font-display text-sm font-bold text-heading">Analytics reset</p>
+          <p className="font-display text-sm font-bold text-heading">Reset all counts to 0</p>
           <p className="mt-1 text-xs text-muted">
-            Clears visit / engagement event logs only. Leads and inbox rows are kept.
+            Zeros visit and engagement counters. Leads and inbox rows are kept.
           </p>
           <div className="mt-3">
             <ResetAllCountsButton />

@@ -2,14 +2,17 @@ import { useMemo, useState } from 'react';
 import { Wrench, Phone, MessageCircle, Bike } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { AsyncError } from '@/components/admin/AsyncError';
+import { AdminListCapNotice } from '@/components/admin/AdminListCapNotice';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Badge } from '@/components/ui/Badge';
-import { Select } from '@/components/ui/Input';
+import { Input, Select } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
 import { useAsync } from '@/hooks/useAsync';
-import { getServiceBookings, updateServiceBooking } from '@/features/leads/leadService';
+import { ADMIN_LIST_LIMIT, getServiceBookings, updateServiceBooking } from '@/features/leads/leadService';
 import { getServiceKind, serviceKindLabel } from '@/data/serviceKinds';
+import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
 import { telUrl, whatsappCustomerUrl } from '@/config/site';
@@ -23,23 +26,31 @@ const STATUSES = [
 
 export default function ServiceBookings() {
   const { toast } = useToast();
-  const { data, loading, refetch } = useAsync(() => getServiceBookings(), []);
+  const { data, loading, error, refetch } = useAsync(() => getServiceBookings(), []);
   const [kindFilter, setKindFilter] = useState('all');
   const [showAll, setShowAll] = useState(false);
+  const [search, setSearch] = useState('');
 
   const list = useMemo(() => {
     let rows = data || [];
     if (!showAll) rows = rows.filter((b) => (b.status || 'requested') === 'requested');
-    if (kindFilter === 'all') return rows;
-    if (kindFilter === 'free') return rows.filter((b) => String(b.service_kind).startsWith('free_'));
-    if (kindFilter === 'paid') return rows.filter((b) => b.service_kind === 'paid');
-    return rows.filter((b) => b.service_kind === kindFilter);
-  }, [data, kindFilter, showAll]);
+    if (kindFilter === 'free') rows = rows.filter((b) => String(b.service_kind).startsWith('free_'));
+    else if (kindFilter === 'paid') rows = rows.filter((b) => b.service_kind === 'paid');
+    else if (kindFilter !== 'all') rows = rows.filter((b) => b.service_kind === kindFilter);
+    const q = search.trim().toLowerCase();
+    if (q) {
+      rows = rows.filter((b) =>
+        `${b.name || ''} ${b.phone || ''} ${b.scooter || ''} ${b.details || ''}`.toLowerCase().includes(q),
+      );
+    }
+    return rows;
+  }, [data, kindFilter, showAll, search]);
 
   const onStatus = async (id, status) => {
     try {
       await updateServiceBooking(id, { status });
       toast('Status updated.', 'success');
+      invalidateAdminBadges();
       refetch();
     } catch (e) {
       toast(e.message || 'Update failed.', 'error');
@@ -54,6 +65,13 @@ export default function ServiceBookings() {
         subtitle="Open requests first — free and paid workshop bookings."
         action={
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search name or phone…"
+              className="h-10 w-full text-sm sm:w-44"
+              aria-label="Search service bookings"
+            />
             <label className="flex items-center gap-2 text-xs font-semibold text-body">
               <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
               Show all
@@ -75,6 +93,9 @@ export default function ServiceBookings() {
         }
       />
 
+      <AsyncError error={error} onRetry={refetch} />
+      <AdminListCapNotice count={(data || []).length} limit={ADMIN_LIST_LIMIT} />
+
       {!isSupabaseConfigured ? (
         <EmptyState
           icon={Wrench}
@@ -87,20 +108,20 @@ export default function ServiceBookings() {
             <Skeleton key={i} className="h-24" />
           ))}
         </div>
-      ) : !data?.length ? (
+      ) : error ? null : !data?.length ? (
         <EmptyState icon={Wrench} title="No service bookings yet" />
       ) : !list.length ? (
         <EmptyState
           icon={Wrench}
           title="No matches"
-          description="Try another service type filter."
+          description="Try another search or filter."
           action={
             <button
               type="button"
               className="text-sm font-semibold text-brand-600"
-              onClick={() => setKindFilter('all')}
+              onClick={() => { setKindFilter('all'); setSearch(''); }}
             >
-              Clear filter
+              Clear filters
             </button>
           }
         />

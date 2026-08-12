@@ -128,7 +128,7 @@ export async function submitContact({ name, phone, email, message, from = 'conta
 
 // Cap admin list fetches so the panel stays fast as tables grow.
 // Newest rows first, so the cap only trims very old history.
-const ADMIN_LIST_LIMIT = 1000;
+export const ADMIN_LIST_LIMIT = 1000;
 
 export async function getCallbacks() {
   if (!isSupabaseConfigured || !supabase) return [];
@@ -322,50 +322,8 @@ async function enrichLeads(leads) {
     getServiceBookings(),
   ]);
 
-  const mergeOrPromote = async ({
-    source,
-    inboxId,
-    visitorId,
-    name,
-    phone,
-    scooter,
-    score,
-    fallbackEvents,
-  }) => {
-    const idx = findLeadIndex(enriched, { visitorId, phone });
-    if (idx >= 0) {
-      enriched[idx] = attachInboxMeta(
-        {
-          ...enriched[idx],
-          name: enriched[idx].name || name,
-          phone: enriched[idx].phone || phone,
-          interested_scooter: enriched[idx].interested_scooter || scooter || null,
-          last_source: enriched[idx].last_source || source,
-        },
-        source,
-        inboxId,
-      );
-      return;
-    }
-
-    const row = await ensureLeadFromInbox({
-      source,
-      inboxId,
-      visitorId,
-      name,
-      phone,
-      scooter,
-      score,
-    });
-    if (!row) return;
-    const events = visitorMap[row.visitor_id] || fallbackEvents;
-    enriched.push(
-      attachInboxMeta(enrichLeadRow(row, events), source, inboxId),
-    );
-  };
-
-  for (const cb of callbacks) {
-    await mergeOrPromote({
+  const inboxRows = [
+    ...callbacks.map((cb) => ({
       source: 'callback',
       inboxId: cb.id,
       visitorId: cb.visitor_id,
@@ -374,11 +332,8 @@ async function enrichLeads(leads) {
       scooter: null,
       score: 30,
       fallbackEvents: [{ type: EVENT.CALLBACK_REQUEST, at: cb.created_at, meta: {} }],
-    });
-  }
-
-  for (const tr of testRides) {
-    await mergeOrPromote({
+    })),
+    ...testRides.map((tr) => ({
       source: 'test_ride',
       inboxId: tr.id,
       visitorId: tr.visitor_id,
@@ -391,11 +346,8 @@ async function enrichLeads(leads) {
         at: tr.created_at,
         meta: { scooterId: tr.scooter_id, name: tr.scooter },
       }],
-    });
-  }
-
-  for (const sb of serviceBookings) {
-    await mergeOrPromote({
+    })),
+    ...serviceBookings.map((sb) => ({
       source: 'service',
       inboxId: sb.id,
       visitorId: sb.visitor_id,
@@ -408,7 +360,54 @@ async function enrichLeads(leads) {
         at: sb.created_at,
         meta: { serviceKind: sb.service_kind, scooterId: sb.scooter_id, name: sb.scooter },
       }],
-    });
+    })),
+  ];
+
+  const needsPromote = [];
+
+  for (const row of inboxRows) {
+    const idx = findLeadIndex(enriched, { visitorId: row.visitorId, phone: row.phone });
+    if (idx >= 0) {
+      enriched[idx] = attachInboxMeta(
+        {
+          ...enriched[idx],
+          name: enriched[idx].name || row.name,
+          phone: enriched[idx].phone || row.phone,
+          interested_scooter: enriched[idx].interested_scooter || row.scooter || null,
+          last_source: enriched[idx].last_source || row.source,
+        },
+        row.source,
+        row.inboxId,
+      );
+    } else {
+      needsPromote.push(row);
+    }
+  }
+
+  // Bounded parallel upserts for unmatched inbox rows only.
+  const CHUNK = 5;
+  for (let i = 0; i < needsPromote.length; i += CHUNK) {
+    const chunk = needsPromote.slice(i, i + CHUNK);
+    const created = await Promise.all(
+      chunk.map((row) =>
+        ensureLeadFromInbox({
+          source: row.source,
+          inboxId: row.inboxId,
+          visitorId: row.visitorId,
+          name: row.name,
+          phone: row.phone,
+          scooter: row.scooter,
+          score: row.score,
+        }).then((lead) => (lead ? { lead, row } : null)),
+      ),
+    );
+    for (const item of created) {
+      if (!item) continue;
+      const events = visitorMap[item.lead.visitor_id] || item.row.fallbackEvents;
+      enriched.push(
+        attachInboxMeta(enrichLeadRow(item.lead, events), item.row.source, item.row.inboxId),
+      );
+    }
   }
 
   return enriched.sort(sortByFollowUpPriority);

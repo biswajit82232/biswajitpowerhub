@@ -1,27 +1,38 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Generic async data hook with loading/error/data + refetch.
+ * refetch() returns a Promise that settles when the load finishes.
  * @param {() => Promise<any>} asyncFn
  * @param {Array} deps
  */
 export function useAsync(asyncFn, deps = []) {
   const [state, setState] = useState({ data: null, loading: true, error: null });
+  const genRef = useRef(0);
+  const asyncFnRef = useRef(asyncFn);
+  asyncFnRef.current = asyncFn;
 
   const run = useCallback(() => {
-    let active = true;
+    const gen = ++genRef.current;
     setState((s) => ({ ...s, loading: true, error: null }));
-    Promise.resolve()
-      .then(asyncFn)
-      .then((data) => active && setState({ data, loading: false, error: null }))
-      .catch((error) => active && setState({ data: null, loading: false, error }));
-    return () => {
-      active = false;
-    };
+    return Promise.resolve()
+      .then(() => asyncFnRef.current())
+      .then((data) => {
+        if (gen !== genRef.current) return data;
+        setState({ data, loading: false, error: null });
+        return data;
+      })
+      .catch((error) => {
+        if (gen !== genRef.current) throw error;
+        setState({ data: null, loading: false, error });
+        throw error;
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
-  useEffect(() => run(), [run]);
+  useEffect(() => {
+    run().catch(() => {});
+  }, [run]);
 
   return { ...state, refetch: run };
 }

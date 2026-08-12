@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 
 /**
  * Mobile pull-to-refresh while scrolled to top.
- * onRefresh should usually hard-reload (or kick off async work).
+ * onRefresh may return a Promise; refreshing clears when it settles.
  */
-export function usePullToRefresh(onRefresh, { threshold = 72, maxPull = 120, disabled = false } = {}) {
+export function usePullToRefresh(onRefresh, { threshold = 48, maxPull = 64, disabled = false } = {}) {
   const [pullPx, setPullPx] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
@@ -43,7 +43,7 @@ export function usePullToRefresh(onRefresh, { threshold = 72, maxPull = 120, dis
         setPullPx(0);
         return;
       }
-      const resisted = Math.min(maxPull, dy * 0.45);
+      const resisted = Math.min(maxPull, dy * 0.4);
       distance.current = resisted;
       setPullPx(resisted);
       if (resisted > 8) e.preventDefault();
@@ -59,8 +59,14 @@ export function usePullToRefresh(onRefresh, { threshold = 72, maxPull = 120, dis
         return;
       }
       setRefreshing(true);
-      setPullPx(Math.min(threshold, maxPull * 0.6));
-      onRefreshRef.current?.();
+      setPullPx(Math.min(28, maxPull * 0.45));
+      Promise.resolve()
+        .then(() => onRefreshRef.current?.())
+        .catch(() => {})
+        .finally(() => {
+          setRefreshing(false);
+          setPullPx(0);
+        });
     };
 
     document.addEventListener('touchstart', onStart, { passive: true });
@@ -78,7 +84,8 @@ export function usePullToRefresh(onRefresh, { threshold = 72, maxPull = 120, dis
 
   return {
     pullPx,
-    pulling: pullPx > 6 && !refreshing,
+    pulling: pullPx > 4 && !refreshing,
     refreshing,
+    threshold,
   };
 }

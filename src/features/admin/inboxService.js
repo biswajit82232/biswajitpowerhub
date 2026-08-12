@@ -1,5 +1,12 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
+import {
+  updateCallback,
+  updateTestRide,
+  updateServiceBooking,
+  updateContactMessage,
+} from '@/features/leads/leadService';
+import { setReviewStatus } from '@/features/reviews/reviewService';
 
 function hoursSince(iso) {
   if (!iso) return 999;
@@ -14,10 +21,12 @@ function slaLabel(hours) {
 }
 
 /**
- * Unified "Today" work queue across inbox tables for the admin dashboard.
+ * Unified open work queue across inbox tables for the admin Inbox home.
  */
-export async function getTodayQueue(limit = 12) {
+export async function getTodayQueue(limit = 80) {
   if (!isSupabaseConfigured || !supabase) return [];
+
+  const perType = Math.min(50, Math.max(20, limit));
 
   const [callbacks, testRides, service, messages, reviews] = await Promise.all([
     supabase
@@ -25,31 +34,31 @@ export async function getTodayQueue(limit = 12) {
       .select('id, name, phone, created_at, handled')
       .eq('handled', false)
       .order('created_at', { ascending: false })
-      .limit(20),
+      .limit(perType),
     supabase
       .from('test_rides')
       .select('id, name, phone, scooter, preferred_date, preferred_time, created_at, status')
       .eq('status', 'requested')
       .order('created_at', { ascending: false })
-      .limit(20),
+      .limit(perType),
     supabase
       .from('service_bookings')
       .select('id, name, phone, service_kind, scooter, created_at, status')
       .eq('status', 'requested')
       .order('created_at', { ascending: false })
-      .limit(20),
+      .limit(perType),
     supabase
       .from('contact_messages')
       .select('id, name, phone, message, created_at, is_read')
       .eq('is_read', false)
       .order('created_at', { ascending: false })
-      .limit(20),
+      .limit(perType),
     supabase
       .from('reviews')
       .select('id, name, rating, scooter, created_at, status')
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
-      .limit(10),
+      .limit(Math.min(20, perType)),
   ]);
 
   const rows = [];
@@ -58,6 +67,7 @@ export async function getTodayQueue(limit = 12) {
     const h = hoursSince(c.created_at);
     rows.push({
       id: `callback:${c.id}`,
+      recordId: c.id,
       kind: 'callback',
       title: c.name,
       subtitle: c.phone,
@@ -68,6 +78,7 @@ export async function getTodayQueue(limit = 12) {
       sla: slaLabel(h),
       urgency: h >= 2 ? 3 : 2,
       when: timeAgo(c.created_at),
+      doneLabel: 'Mark handled',
     });
   }
 
@@ -75,6 +86,7 @@ export async function getTodayQueue(limit = 12) {
     const h = hoursSince(t.created_at);
     rows.push({
       id: `testride:${t.id}`,
+      recordId: t.id,
       kind: 'test_ride',
       title: t.name,
       subtitle: [t.scooter, t.preferred_date, t.preferred_time].filter(Boolean).join(' · '),
@@ -85,6 +97,7 @@ export async function getTodayQueue(limit = 12) {
       sla: slaLabel(h),
       urgency: h >= 2 ? 3 : 2,
       when: timeAgo(t.created_at),
+      doneLabel: 'Confirm',
     });
   }
 
@@ -92,6 +105,7 @@ export async function getTodayQueue(limit = 12) {
     const h = hoursSince(s.created_at);
     rows.push({
       id: `service:${s.id}`,
+      recordId: s.id,
       kind: 'service',
       title: s.name,
       subtitle: [s.service_kind, s.scooter].filter(Boolean).join(' · '),
@@ -102,6 +116,7 @@ export async function getTodayQueue(limit = 12) {
       sla: slaLabel(h),
       urgency: h >= 4 ? 3 : 2,
       when: timeAgo(s.created_at),
+      doneLabel: 'Confirm',
     });
   }
 
@@ -109,6 +124,7 @@ export async function getTodayQueue(limit = 12) {
     const h = hoursSince(m.created_at);
     rows.push({
       id: `message:${m.id}`,
+      recordId: m.id,
       kind: 'message',
       title: m.name,
       subtitle: (m.message || '').slice(0, 80),
@@ -119,6 +135,7 @@ export async function getTodayQueue(limit = 12) {
       sla: slaLabel(h),
       urgency: h >= 6 ? 3 : 1,
       when: timeAgo(m.created_at),
+      doneLabel: 'Mark read',
     });
   }
 
@@ -126,6 +143,7 @@ export async function getTodayQueue(limit = 12) {
     const h = hoursSince(r.created_at);
     rows.push({
       id: `review:${r.id}`,
+      recordId: r.id,
       kind: 'review',
       title: r.name,
       subtitle: `${r.rating || '?'}★ · ${r.scooter || 'Review'}`,
@@ -136,6 +154,7 @@ export async function getTodayQueue(limit = 12) {
       sla: slaLabel(h),
       urgency: 1,
       when: timeAgo(r.created_at),
+      doneLabel: 'Approve',
     });
   }
 
@@ -147,6 +166,31 @@ export async function getTodayQueue(limit = 12) {
     .slice(0, limit);
 }
 
+/** Resolve an open inbox item from the unified Inbox home. */
+export async function resolveInboxItem(item) {
+  if (!item?.kind || !item?.recordId) throw new Error('Invalid inbox item.');
+
+  switch (item.kind) {
+    case 'callback':
+      await updateCallback(item.recordId, { handled: true });
+      break;
+    case 'test_ride':
+      await updateTestRide(item.recordId, { status: 'confirmed' });
+      break;
+    case 'service':
+      await updateServiceBooking(item.recordId, { status: 'confirmed' });
+      break;
+    case 'message':
+      await updateContactMessage(item.recordId, { is_read: true });
+      break;
+    case 'review':
+      await setReviewStatus(item.recordId, 'approved');
+      break;
+    default:
+      throw new Error(`Unknown inbox kind: ${item.kind}`);
+  }
+}
+
 export const QUEUE_KIND_LABEL = {
   callback: 'Callback',
   test_ride: 'Test ride',
@@ -154,3 +198,12 @@ export const QUEUE_KIND_LABEL = {
   message: 'Message',
   review: 'Review',
 };
+
+export const QUEUE_KIND_FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'callback', label: 'Callbacks', badgeKey: 'callbacks' },
+  { id: 'test_ride', label: 'Test rides', badgeKey: 'testRides' },
+  { id: 'service', label: 'Service', badgeKey: 'service' },
+  { id: 'message', label: 'Messages', badgeKey: 'messages' },
+  { id: 'review', label: 'Reviews', badgeKey: 'reviews' },
+];

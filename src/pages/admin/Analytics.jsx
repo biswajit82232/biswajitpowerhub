@@ -1,16 +1,61 @@
-import { MessageCircle, Phone, Calculator, Gauge, Eye } from 'lucide-react';
+import { MessageCircle, Phone, Calculator, Gauge, Eye, TrendingUp, Users, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
+import { AsyncError } from '@/components/admin/AsyncError';
 import { StatCard } from '@/components/admin/StatCard';
 import { BarChart, DonutChart } from '@/components/admin/Charts';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAsync } from '@/hooks/useAsync';
-import { getEventAggregates } from '@/features/analytics/analyticsService';
+import { getEventAggregates, getOverview } from '@/features/analytics/analyticsService';
+import { getPopularityEngine } from '@/features/analytics/popularityService';
+import { getScooters } from '@/features/scooters/scooterService';
+
+function RankList({ title, rows, empty }) {
+  return (
+    <div>
+      <p className="text-[10px] font-bold uppercase tracking-wide text-muted">{title}</p>
+      {rows?.length ? (
+        <ul className="mt-1.5 space-y-1">
+          {rows.slice(0, 5).map((row, i) => (
+            <li key={`${title}-${row.id || row.label}`} className="flex items-baseline justify-between gap-2 text-xs sm:text-sm">
+              <span className="min-w-0 truncate font-medium text-heading">{i + 1}. {row.label}</span>
+              <span className="shrink-0 text-muted">{row.value}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-1.5 text-xs text-muted">{empty}</p>
+      )}
+    </div>
+  );
+}
 
 export default function Analytics() {
-  const { data: agg, loading } = useAsync(() => getEventAggregates(), []);
+  const { data: agg, loading, error, refetch } = useAsync(() => getEventAggregates(), []);
+  const { data: overview } = useAsync(() => getOverview(), []);
+  const { data: popularity } = useAsync(() => getPopularityEngine(), []);
+  const { data: scooters } = useAsync(() => getScooters(), []);
+
+  const o = overview || {};
+  const resolveName = (id) => scooters?.find((s) => s.id === id || s.name === id)?.name || id;
+
+  const weekRows = (popularity?.mostViewedWeek || []).map((r) => ({
+    id: r.id,
+    label: resolveName(r.id),
+    value: `${r.views || r.value} views`,
+  }));
+  const monthRows = (popularity?.mostViewedMonth || []).map((r) => ({
+    id: r.id,
+    label: resolveName(r.id),
+    value: `${r.views || r.value} views`,
+  }));
+  const intentRows = (popularity?.mostIntentMonth || []).map((r) => ({
+    id: r.id,
+    label: resolveName(r.id),
+    value: 'High interest',
+  }));
 
   const sourceData = [
     { label: 'WhatsApp', value: agg?.whatsappClicks || 0, color: '#25D366' },
@@ -24,8 +69,10 @@ export default function Analytics() {
       <AdminSEO title="Analytics" />
       <AdminHeader
         title="Analytics"
-        subtitle="Engagement, popular models & conversion signals."
+        subtitle="Visitors, popular models, and engagement signals."
       />
+
+      <AsyncError error={error} onRetry={refetch} />
 
       {loading ? (
         <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
@@ -36,11 +83,35 @@ export default function Analytics() {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
-            <StatCard icon={Eye} label="Total events" value={agg?.total || 0} tone="slate" />
+            <StatCard icon={Eye} label="Unique visitors" value={o.visits || 0} tone="slate" />
+            <StatCard icon={Eye} label="Views / month" value={o.viewsMonth || 0} tone="accent" />
+            <StatCard icon={Eye} label="Views all time" value={o.viewsAllTime || 0} tone="slate" />
             <StatCard icon={MessageCircle} label="WhatsApp clicks" value={agg?.whatsappClicks || 0} tone="accent" />
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4 lg:grid-cols-4">
+            <StatCard icon={Phone} label="Call clicks" value={agg?.callClicks || 0} tone="brand" />
             <StatCard icon={Calculator} label="EMI calculator" value={agg?.emiUsage || 0} tone="brand" />
             <StatCard icon={Gauge} label="EV simulator" value={agg?.simulatorUsage || 0} tone="amber" />
+            <StatCard icon={Eye} label="Total events" value={agg?.total || 0} tone="slate" />
           </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:gap-4 lg:grid-cols-3">
+            <StatCard icon={Users} label="Leads" value={o.totalLeads || 0} tone="slate" />
+            <StatCard icon={Flame} label="Hot leads" value={o.hotLeads || 0} tone="amber" />
+            <StatCard icon={TrendingUp} label="Needs action" value={o.needsAction || 0} tone="brand" />
+          </div>
+
+          <section className="mt-6 rounded-xl bg-surface p-4 ring-1 ring-line sm:mt-8 sm:rounded-2xl sm:p-6">
+            <h2 className="flex items-center gap-1.5 font-display text-base font-bold text-heading sm:text-lg">
+              <TrendingUp className="h-4 w-4 text-orange-500" /> Popularity trends
+            </h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              <RankList title="This week" rows={weekRows} empty="No views yet" />
+              <RankList title="This month" rows={monthRows} empty="No monthly views" />
+              <RankList title="Intent this month" rows={intentRows} empty="No intent yet" />
+            </div>
+          </section>
 
           <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-6 lg:grid-cols-2">
             <div className="rounded-xl bg-surface p-4 ring-1 ring-line shadow-soft sm:rounded-2xl sm:p-6">
@@ -68,9 +139,9 @@ export default function Analytics() {
 
           <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
             <Phone className="h-3.5 w-3.5 shrink-0" />
-            <span>Tracked interactions. To clear analytics counters, use</span>
+            <span>Tracked interactions. To zero visit/engagement counters, use</span>
             <Link to="/admin/settings" className="font-semibold text-brand-700 underline-offset-2 hover:underline">
-              Settings → Analytics reset
+              Settings → Reset all counts to 0
             </Link>
             .
           </p>

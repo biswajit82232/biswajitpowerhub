@@ -2,7 +2,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  LayoutDashboard, Bike, Package, Users, PhoneCall, CalendarCheck, Star,
+  Inbox, Bike, Package, Users, PhoneCall, CalendarCheck, Star,
   Banknote, BarChart3, LogOut, Menu, X, Tag, Settings, Home, Mail,
   RefreshCw, Wrench,
 } from 'lucide-react';
@@ -13,6 +13,7 @@ import { AdminInstallBanner } from '@/components/admin/AdminInstallBanner';
 import { useAuth } from '@/context/AuthContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { getInboxBadges } from '@/features/analytics/analyticsService';
+import { ADMIN_BADGES_INVALIDATE } from '@/lib/adminBadges';
 import { cn } from '@/lib/utils';
 
 function AdminMark({ onNavigate }) {
@@ -31,7 +32,7 @@ function AdminMark({ onNavigate }) {
 const NAV_GROUPS = [
   {
     label: null,
-    links: [{ to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true, badgeKey: 'total' }],
+    links: [{ to: '/admin', label: 'Inbox', icon: Inbox, end: true, badgeKey: 'total' }],
   },
   {
     label: 'Catalog',
@@ -148,11 +149,14 @@ export default function AdminLayout() {
     load();
     const id = setInterval(load, 60000);
     const onFocus = () => load();
+    const onInvalidate = () => load();
     window.addEventListener('focus', onFocus);
+    window.addEventListener(ADMIN_BADGES_INVALIDATE, onInvalidate);
     return () => {
       cancelled = true;
       clearInterval(id);
       window.removeEventListener('focus', onFocus);
+      window.removeEventListener(ADMIN_BADGES_INVALIDATE, onInvalidate);
     };
   }, []);
 
