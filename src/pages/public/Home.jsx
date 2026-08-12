@@ -46,7 +46,7 @@ export default function Home() {
   const heroSrc = photos?.hero?.url || financeSettings?.heroImageUrl || null;
   const preloadImage = heroSrc
     ? isSupabaseStorageUrl(heroSrc)
-      ? optimizedImageUrl(heroSrc, 1280, 78, { height: 560, resize: 'cover' })
+      ? optimizedImageUrl(heroSrc, 960, 72, { height: 420, resize: 'cover' })
       : heroSrc
     : undefined;
 

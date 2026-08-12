@@ -27,6 +27,16 @@
       "source": "/reviews",
       "destination": "/community",
       "permanent": true
+    },
+    {
+      "source": "/dealership",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/updates",
+      "destination": "/offers",
+      "permanent": true
     }
   ],
   "rewrites": [

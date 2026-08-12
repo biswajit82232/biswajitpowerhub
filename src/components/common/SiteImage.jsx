@@ -19,6 +19,7 @@ export function SiteImage({
   /** When false, serve the original Storage URL (no CDN resize/compress). */
   optimize = true,
   quality = 75,
+  sizes,
 }) {
   // Fallback chain: optimized CDN variant -> original URL -> placeholder.
   const [failStage, setFailStage] = useState(0);
@@ -26,8 +27,8 @@ export function SiteImage({
   const exhausted = failStage >= (canOptimize ? 2 : 1);
   const resolvedSrc =
     failStage === 0 && canOptimize
-      ? optimizedImageUrl(src, Math.min(width || 800, 1920), quality, {
-          height: Math.min(height || 600, 1080),
+      ? optimizedImageUrl(src, Math.min(width || 800, 1280), quality, {
+          height: Math.min(height || 600, 720),
           resize: 'cover',
         })
       : src;
@@ -44,6 +45,7 @@ export function SiteImage({
           alt={alt}
           width={width}
           height={height}
+          sizes={sizes}
           loading={loading}
           decoding="async"
           fetchPriority={fetchPriority}

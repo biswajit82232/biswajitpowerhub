@@ -1,9 +1,10 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { getFinanceSettings } from '@/features/finance/financeService';
+import { compressForUpload } from '@/lib/resizeImage';
 
-const CACHE_KEY = 'promotional_offers_v2';
-const LEGACY_CACHE_KEY = 'promotional_offers';
+const CACHE_KEY = 'promotional_offers_v3';
+const LEGACY_CACHE_KEY = 'promotional_offers_v2';
 const LOCAL_KEY = 'bph_promotional_offers';
 
 function bustOfferCache() {
@@ -11,6 +12,8 @@ function bustOfferCache() {
   clearCache(`${CACHE_KEY}_active`);
   clearCache(LEGACY_CACHE_KEY);
   clearCache(`${LEGACY_CACHE_KEY}_active`);
+  clearCache('promotional_offers');
+  clearCache('promotional_offers_active');
 }
 
 function mapRow(row) {
@@ -20,6 +23,9 @@ function mapRow(row) {
     discountText: row.discount_text || '',
     promoCode: row.promo_code || '',
     description: row.description || '',
+    kind: row.kind === 'free_with_purchase' ? 'free_with_purchase' : 'promo',
+    imageUrl: row.image_url || '',
+    showOnHero: row.show_on_hero !== false,
     active: Boolean(row.active),
     sortOrder: row.sort_order ?? 0,
     createdAt: row.created_at,
@@ -33,6 +39,9 @@ function toRow(offer) {
     discount_text: offer.discountText?.trim() || '',
     promo_code: offer.promoCode?.trim() || '',
     description: offer.description?.trim() || '',
+    kind: offer.kind === 'free_with_purchase' ? 'free_with_purchase' : 'promo',
+    image_url: offer.imageUrl?.trim() || '',
+    show_on_hero: offer.showOnHero !== false,
     active: Boolean(offer.active),
     sort_order: Number(offer.sortOrder) || 0,
     updated_at: new Date().toISOString(),
@@ -77,6 +86,9 @@ async function legacyOffersFromFinance() {
         discountText: promo.discountText?.trim() || parsed.discountText,
         promoCode: promo.code?.trim() || parsed.promoCode,
         description: promo.description?.trim() || 'Visit our showroom or WhatsApp us to claim this offer.',
+        kind: 'promo',
+        imageUrl: '',
+        showOnHero: true,
         active: true,
         sortOrder: 0,
       }];
@@ -153,6 +165,26 @@ export async function getAllOffers() {
   return readLocal();
 }
 
+export async function uploadOfferImage(file) {
+  const upload = await compressForUpload(file, 800, 800);
+  if (isSupabaseConfigured && supabase) {
+    const ext = upload.name.split('.').pop()?.toLowerCase() || 'webp';
+    const path = `offers/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from('scooter-images')
+      .upload(path, upload, { upsert: true, contentType: upload.type });
+    if (error) throw new Error(error.message || 'Image upload failed');
+    const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
+    return data.publicUrl;
+  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(upload);
+  });
+}
+
 export async function saveOffer(offer) {
   const payload = toRow(offer);
 
@@ -181,7 +213,21 @@ export async function saveOffer(offer) {
 
   const list = readLocal();
   if (offer.id) {
-    const next = list.map((o) => (o.id === offer.id ? { ...o, ...offer, ...payload, discountText: payload.discount_text, promoCode: payload.promo_code, sortOrder: payload.sort_order } : o));
+    const next = list.map((o) =>
+      o.id === offer.id
+        ? {
+            ...o,
+            ...offer,
+            discountText: payload.discount_text,
+            promoCode: payload.promo_code,
+            sortOrder: payload.sort_order,
+            kind: payload.kind,
+            imageUrl: payload.image_url,
+            showOnHero: payload.show_on_hero,
+            active: payload.active,
+          }
+        : o,
+    );
     writeLocal(next);
     bustOfferCache();
     return next.find((o) => o.id === offer.id);
@@ -189,9 +235,13 @@ export async function saveOffer(offer) {
 
   const created = {
     id: crypto.randomUUID(),
-    ...offer,
+    title: payload.title,
     discountText: payload.discount_text,
     promoCode: payload.promo_code,
+    description: payload.description,
+    kind: payload.kind,
+    imageUrl: payload.image_url,
+    showOnHero: payload.show_on_hero,
     sortOrder: payload.sort_order,
     active: payload.active,
     createdAt: new Date().toISOString(),

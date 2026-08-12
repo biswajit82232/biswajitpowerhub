@@ -41,6 +41,7 @@ const ORDER = [
   'add_admin_push_subscriptions.sql',
   'lock_admin_rls_allowlist.sql',
   'harden_rls_storage_and_rpc.sql',
+  'add_offer_kind_image_hero.sql',
 ];
 
 function getDatabaseUrl(env) {

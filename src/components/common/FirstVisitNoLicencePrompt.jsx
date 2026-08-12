@@ -18,7 +18,10 @@ import { HoneypotField } from '@/features/leads/HoneypotField';
 
 const STORAGE_KEY = 'bph_no_licence_prompt_seen';
 const GUIDE = '/no-licence-electric-scooters-west-bengal';
-const DELAY_MS = 4000;
+/** Wait longer so shoppers can browse before any interrupt. */
+const DELAY_MS = 28000;
+/** Only show after meaningful scroll engagement. */
+const MIN_SCROLL_PX = 320;
 const INTEREST = 'No-licence scooter';
 const LOGO_SRC = '/logo.png';
 const LOGO_FALLBACK = '/logo-192.png';
@@ -61,9 +64,47 @@ export function FirstVisitNoLicencePrompt() {
       markSeen();
       return;
     }
+    // Skip interruptive modal on conversion / form-heavy pages.
+    if (
+      pathname.startsWith('/contact') ||
+      pathname.startsWith('/service') ||
+      pathname.startsWith('/ad-landing') ||
+      pathname.startsWith('/test-ride')
+    ) {
+      return;
+    }
 
-    const t = window.setTimeout(() => setOpen(true), DELAY_MS);
-    return () => window.clearTimeout(t);
+    let scrolledEnough = false;
+    let timerReady = false;
+    let opened = false;
+
+    const tryOpen = () => {
+      if (opened || alreadySeen()) return;
+      if (!scrolledEnough || !timerReady) return;
+      opened = true;
+      setOpen(true);
+    };
+
+    const onScroll = () => {
+      if (window.scrollY >= MIN_SCROLL_PX) {
+        scrolledEnough = true;
+        window.removeEventListener('scroll', onScroll);
+        tryOpen();
+      }
+    };
+
+    const t = window.setTimeout(() => {
+      timerReady = true;
+      tryOpen();
+    }, DELAY_MS);
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, [pathname]);
 
   const dismiss = () => {

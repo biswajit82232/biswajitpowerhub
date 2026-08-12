@@ -22,7 +22,6 @@ const FinancePage = lazy(() => import('@/pages/public/Finance'));
 const OffersPage = lazy(() => import('@/pages/public/Offers'));
 const Terms = lazy(() => import('@/pages/public/Terms'));
 const Privacy = lazy(() => import('@/pages/public/Privacy'));
-const InternalStub = lazy(() => import('@/pages/public/InternalStub'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
 const BestElectricScooters = lazy(() => import('@/pages/public/seo/BestElectricScooters'));
 const LowBudgetElectricScooters = lazy(() => import('@/pages/public/seo/LowBudgetElectricScooters'));
@@ -96,26 +95,8 @@ export default function App() {
         <Route path="guides/:slug" element={<GuidePost />} />
         <Route path="terms" element={<Terms />} />
         <Route path="privacy" element={<Privacy />} />
-        <Route
-          path="dealership"
-          element={
-            <InternalStub
-              title="Dealership Inquiry | Biswajit Power Hub"
-              heading="Dealership"
-              path="/dealership"
-            />
-          }
-        />
-        <Route
-          path="updates"
-          element={
-            <InternalStub
-              title="Updates | Biswajit Power Hub"
-              heading="Updates"
-              path="/updates"
-            />
-          }
-        />
+        <Route path="dealership" element={<Navigate to="/contact" replace />} />
+        <Route path="updates" element={<Navigate to="/offers" replace />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

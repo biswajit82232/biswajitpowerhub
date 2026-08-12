@@ -1,21 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Tag } from 'lucide-react';
+import { Gift, Tag } from 'lucide-react';
 import { SiteImage } from '@/components/common/SiteImage';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
+import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
 
 /**
- * Full-bleed dealer hero carousel — showroom slides + active offer bar.
+ * Full-bleed dealer hero — showroom slide + promo bar and/or sticky free-with-purchase badge.
  */
 export function HeroCarousel({ heroImageUrl }) {
   const { site } = useSite();
   const { photos } = useSitePhotos();
   const { data: offers, loading: offersLoading } = useAsync(() => getActiveOffers(), []);
-  const activeOffers = offers?.length ? offers : [];
+
+  const heroOffers = (offers || []).filter((o) => o.showOnHero !== false);
+  const promoOffers = heroOffers.filter((o) => o.kind !== 'free_with_purchase');
+  const freeOffers = heroOffers.filter((o) => o.kind === 'free_with_purchase');
+  const stickyFree = freeOffers[0] || null;
 
   const slides = [];
 
@@ -39,7 +44,7 @@ export function HeroCarousel({ heroImageUrl }) {
   const [index, setIndex] = useState(0);
   const [offerIndex, setOfferIndex] = useState(0);
   const count = slides.length;
-  const offerCount = activeOffers.length;
+  const offerCount = promoOffers.length;
 
   const next = useCallback(() => {
     setIndex((i) => (i + 1) % count);
@@ -64,40 +69,92 @@ export function HeroCarousel({ heroImageUrl }) {
   }, [offerCount]);
 
   const slide = slides[index];
-  const offer = activeOffers[offerIndex] || activeOffers[0];
+  const offer = promoOffers[offerIndex] || promoOffers[0];
+
+  const freeThumb = stickyFree?.imageUrl
+    ? isSupabaseStorageUrl(stickyFree.imageUrl)
+      ? optimizedImageUrl(stickyFree.imageUrl, 160, 78, { height: 160, resize: 'cover' })
+      : stickyFree.imageUrl
+    : null;
 
   return (
     <section className="relative isolate w-full overflow-hidden bg-surface-alt" aria-label="Hero">
       <div className="relative aspect-[16/7] min-h-[220px] w-full sm:min-h-[320px] lg:min-h-[420px]">
-        {slides.map((s, i) => (
-          <div
-            key={`${s.url || 'empty'}-${i}`}
-            className={cn(
-              'absolute inset-0 transition-opacity duration-700',
-              i === index ? 'opacity-100' : 'pointer-events-none opacity-0',
-            )}
-            aria-hidden={i !== index}
-          >
-            <SiteImage
-              src={s.url}
-              alt={s.alt}
-              width={1280}
-              height={560}
-              loading={i === 0 ? 'eager' : 'lazy'}
-              fetchPriority={i === 0 ? 'high' : undefined}
-              optimize
-              quality={78}
-              className="h-full w-full !aspect-auto bg-surface-alt"
-              imgClassName="object-cover object-center"
-              placeholderLabel="Showroom photos coming soon — visit us at Chunakhali Bus Stand"
-            />
-          </div>
-        ))}
+        {/* Only mount current + next slide to cut DOM/image weight */}
+        {slides.map((s, i) => {
+          const active = i === index;
+          const near = i === (index + 1) % count;
+          if (!active && !near && count > 2) return null;
+          return (
+            <div
+              key={`${s.url || 'empty'}-${i}`}
+              className={cn(
+                'absolute inset-0 transition-opacity duration-700',
+                active ? 'opacity-100' : 'pointer-events-none opacity-0',
+              )}
+              aria-hidden={!active}
+            >
+              <SiteImage
+                src={s.url}
+                alt={s.alt}
+                width={960}
+                height={420}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                fetchPriority={i === 0 ? 'high' : undefined}
+                optimize
+                quality={72}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1280px"
+                className="h-full w-full !aspect-auto bg-surface-alt"
+                imgClassName="object-cover object-center"
+                placeholderLabel="Showroom photos coming soon — visit us at Chunakhali Bus Stand"
+              />
+            </div>
+          );
+        })}
 
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent"
           aria-hidden
         />
+
+        {/* Sticky free-with-purchase badge — red, top-right on hero */}
+        {stickyFree ? (
+          <Link
+            to="/offers"
+            className="absolute right-3 top-3 z-20 flex max-w-[11.5rem] items-center gap-2 rounded-xl bg-red-600 px-2.5 py-2 text-white shadow-lg ring-2 ring-white/90 sm:right-5 sm:top-5 sm:max-w-[15rem] sm:gap-2.5 sm:rounded-2xl sm:px-3 sm:py-2.5"
+            aria-label={`${stickyFree.discountText} ${stickyFree.title} — free with scooter purchase`}
+          >
+            {freeThumb ? (
+              <img
+                src={freeThumb}
+                alt=""
+                width={48}
+                height={48}
+                className="h-10 w-10 shrink-0 rounded-lg object-cover ring-1 ring-white/40 sm:h-12 sm:w-12"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/15 sm:h-12 sm:w-12">
+                <Gift className="h-5 w-5" strokeWidth={2.2} />
+              </span>
+            )}
+            <span className="min-w-0">
+              <span className="block text-[9px] font-bold uppercase tracking-[0.14em] text-white/90 sm:text-[10px]">
+                Free with scooty
+              </span>
+              <span className="mt-0.5 block truncate font-display text-xs font-extrabold leading-tight sm:text-sm">
+                {stickyFree.discountText || stickyFree.title}
+              </span>
+              {stickyFree.title && stickyFree.discountText ? (
+                <span className="mt-0.5 block truncate text-[10px] font-medium text-white/90 sm:text-xs">
+                  {stickyFree.title}
+                </span>
+              ) : null}
+            </span>
+          </Link>
+        ) : null}
+
         <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-6 sm:px-8 sm:pb-8">
           <p className="font-display text-xl font-extrabold uppercase tracking-wide text-white drop-shadow sm:text-2xl lg:text-3xl">
             {site.name}
@@ -126,21 +183,7 @@ export function HeroCarousel({ heroImageUrl }) {
         )}
       </div>
 
-      {offersLoading ? (
-        // Reserve the offer-bar space while offers load to avoid layout shift.
-        <div className="border-t border-brand-600 bg-brand-500 text-white" aria-hidden>
-          <div className="container-px flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3.5">
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/80">
-                Current offer
-              </p>
-              <p className="mt-0.5 h-6 w-56 max-w-full animate-pulse rounded bg-white/25 sm:h-7" />
-              <p className="mt-0.5 h-4 w-32 max-w-full animate-pulse rounded bg-white/20" />
-            </div>
-            <span className="inline-flex h-10 w-full shrink-0 animate-pulse rounded-dealer bg-white/30 sm:w-28" />
-          </div>
-        </div>
-      ) : offer ? (
+      {offersLoading ? null : offer ? (
         <div className="border-t border-brand-600 bg-brand-500 text-white">
           <div className="container-px flex flex-col gap-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3.5">
             <div className="min-w-0">

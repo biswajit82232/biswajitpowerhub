@@ -408,22 +408,6 @@ function buildRoutes(catalog) {
     schema: 'none',
     noindex: true,
   },
-  {
-    path: '/dealership',
-    title: 'Dealership Inquiry | Biswajit Power Hub',
-    description: 'Internal dealership inquiry page for Biswajit Power Hub staff — not indexed.',
-    h1: 'Dealership',
-    schema: 'none',
-    noindex: true,
-  },
-  {
-    path: '/updates',
-    title: 'Updates | Biswajit Power Hub',
-    description: 'Internal updates page for Biswajit Power Hub staff — not part of the public catalogue.',
-    h1: 'Updates',
-    schema: 'none',
-    noindex: true,
-  },
   ];
 }
 

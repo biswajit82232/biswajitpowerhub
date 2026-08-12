@@ -22,6 +22,11 @@ const PRIORITY_TONE = {
   [FOLLOW_UP.LATER]: 'cold',
 };
 
+function isEditableLead(id) {
+  const s = String(id || '');
+  return !s.startsWith('demo-');
+}
+
 export default function Leads() {
   const { toast } = useToast();
   const { site } = useSite();
@@ -37,8 +42,8 @@ export default function Leads() {
   }, [leads, filter, priorityFilter]);
 
   const onStatus = async (id, status) => {
-    if (String(id).startsWith('cb-') || String(id).startsWith('tr-') || String(id).startsWith('sb-')) {
-      toast('Open Callbacks, Test Rides, or Service to manage this request.', 'error');
+    if (!isEditableLead(id)) {
+      toast('Demo leads cannot be updated. Connect live Supabase.', 'error');
       return;
     }
     try {
@@ -51,9 +56,7 @@ export default function Leads() {
   };
 
   const onNotes = async (id, notes) => {
-    if (String(id).startsWith('cb-') || String(id).startsWith('tr-') || String(id).startsWith('sb-') || String(id).startsWith('demo-')) {
-      return;
-    }
+    if (!isEditableLead(id)) return;
     try {
       await updateLead(id, { notes });
       toast('Notes saved.', 'success');
@@ -68,7 +71,7 @@ export default function Leads() {
       <AdminSEO title="Leads" />
       <AdminHeader
         title="Lead Management"
-        subtitle="Purchase readiness scores and smart follow-up prioritization."
+        subtitle="Purchase readiness scores and smart follow-up prioritization. Callbacks, test rides, and service bookings merge into one lead card."
         action={
           <div className="flex w-full flex-wrap gap-2 sm:w-auto">
             <Select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="h-10 min-w-0 flex-1 text-sm sm:w-44 sm:flex-none">
@@ -114,6 +117,13 @@ export default function Leads() {
                       {l.signals.slice(0, 3).map((s) => s.label).join(' · ')}
                     </p>
                   )}
+                  {l.inboxSources?.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {l.inboxSources.map((src) => (
+                        <Badge key={src} tone="neutral">{src.replace('_', ' ')}</Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -148,7 +158,7 @@ export default function Leads() {
                   value={l.status || 'new'}
                   onChange={(e) => onStatus(l.id, e.target.value)}
                   className="h-10 min-w-0 flex-1 text-sm sm:w-36 sm:flex-none"
-                  disabled={String(l.id).startsWith('cb-') || String(l.id).startsWith('tr-') || String(l.id).startsWith('sb-')}
+                  disabled={!isEditableLead(l.id)}
                 >
                   {STATUSES.map((s) => (
                     <option key={s} value={s}>
@@ -157,7 +167,7 @@ export default function Leads() {
                   ))}
                 </Select>
               </div>
-              {!String(l.id).startsWith('cb-') && !String(l.id).startsWith('tr-') && !String(l.id).startsWith('sb-') && !String(l.id).startsWith('demo-') && (
+              {isEditableLead(l.id) && (
                 <div className="w-full border-t border-line pt-3 lg:col-span-full">
                   <label className="block text-xs font-semibold text-muted">
                     Notes

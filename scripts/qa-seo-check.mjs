@@ -39,8 +39,6 @@ const routes = [
   '/terms',
   '/privacy',
   '/ad-landing',
-  '/dealership',
-  '/updates',
 ];
 
 function htmlPath(route) {
@@ -64,14 +62,12 @@ for (const route of routes) {
   if (!/name=["']description["']/i.test(html)) issues.push('no-description');
   if (
     !/rel=["']canonical["']/i.test(html) &&
-    route !== '/ad-landing' &&
-    route !== '/dealership' &&
-    route !== '/updates'
+    route !== '/ad-landing'
   ) {
     issues.push('no-canonical');
   }
   if (
-    (route === '/ad-landing' || route === '/dealership' || route === '/updates') &&
+    route === '/ad-landing' &&
     !/noindex/i.test(html)
   ) {
     issues.push('missing-noindex');

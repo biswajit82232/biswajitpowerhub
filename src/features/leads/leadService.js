@@ -6,6 +6,7 @@ import {
   sortByFollowUpPriority,
 } from '@/lib/purchaseReadiness';
 import { getVisitorEventsMap } from '@/features/analytics/popularityService';
+import { normalizeIndianMobile } from '@/features/leads/validation';
 
 /**
  * Upsert a lead record keyed by visitor id, enriched with the current
@@ -231,86 +232,183 @@ function enrichLeadRow(lead, events = []) {
   };
 }
 
+function phoneKey(phone) {
+  const n = normalizeIndianMobile(phone);
+  return n.length === 10 ? n : '';
+}
+
+function findLeadIndex(rows, { visitorId, phone }) {
+  if (visitorId) {
+    const i = rows.findIndex((l) => l.visitor_id && l.visitor_id === visitorId);
+    if (i >= 0) return i;
+  }
+  const key = phoneKey(phone);
+  if (key) {
+    const i = rows.findIndex((l) => phoneKey(l.phone) === key);
+    if (i >= 0) return i;
+  }
+  return -1;
+}
+
+/**
+ * Promote inbox rows (callback / test ride / service) into real `leads` rows
+ * so Admin → Leads can edit status/notes. Never returns synthetic cb-/tr-/sb- ids.
+ */
+async function ensureLeadFromInbox({
+  source,
+  inboxId,
+  visitorId,
+  name,
+  phone,
+  scooter,
+  score,
+  classification = 'hot',
+}) {
+  const vid = (visitorId && String(visitorId).trim()) || `inbox:${source}:${inboxId}`;
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.rpc('upsert_lead', {
+      p_visitor_id: vid,
+      p_name: name || null,
+      p_phone: phone || null,
+      p_last_source: source,
+      p_interested_scooter: scooter || null,
+      p_score: score,
+      p_classification: classification,
+    });
+    if (error) {
+      console.warn('[Leads] ensureLeadFromInbox failed:', error.message);
+      return null;
+    }
+    const { data } = await supabase
+      .from('leads')
+      .select('*')
+      .eq('visitor_id', vid)
+      .maybeSingle();
+    return data || null;
+  }
+  return {
+    id: `demo-inbox-${source}-${inboxId}`,
+    visitor_id: vid,
+    name,
+    phone,
+    last_source: source,
+    interested_scooter: scooter || null,
+    classification,
+    status: 'new',
+    score,
+    notes: null,
+    updated_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+  };
+}
+
+function attachInboxMeta(lead, source, inboxId) {
+  const sources = new Set(lead.inboxSources || []);
+  sources.add(source);
+  return {
+    ...lead,
+    inboxSources: [...sources],
+    inboxIds: { ...(lead.inboxIds || {}), [source]: inboxId },
+  };
+}
+
 async function enrichLeads(leads) {
   const visitorMap = await getVisitorEventsMap();
-  const enriched = leads.map((l) => enrichLeadRow(l, visitorMap[l.visitor_id] || []));
+  let enriched = leads.map((l) => enrichLeadRow(l, visitorMap[l.visitor_id] || []));
 
   const [callbacks, testRides, serviceBookings] = await Promise.all([
     getCallbacks(),
     getTestRides(),
     getServiceBookings(),
   ]);
-  const knownVisitors = new Set(leads.map((l) => l.visitor_id).filter(Boolean));
-  const knownPhones = new Set(leads.map((l) => l.phone).filter(Boolean));
+
+  const mergeOrPromote = async ({
+    source,
+    inboxId,
+    visitorId,
+    name,
+    phone,
+    scooter,
+    score,
+    fallbackEvents,
+  }) => {
+    const idx = findLeadIndex(enriched, { visitorId, phone });
+    if (idx >= 0) {
+      enriched[idx] = attachInboxMeta(
+        {
+          ...enriched[idx],
+          name: enriched[idx].name || name,
+          phone: enriched[idx].phone || phone,
+          interested_scooter: enriched[idx].interested_scooter || scooter || null,
+          last_source: enriched[idx].last_source || source,
+        },
+        source,
+        inboxId,
+      );
+      return;
+    }
+
+    const row = await ensureLeadFromInbox({
+      source,
+      inboxId,
+      visitorId,
+      name,
+      phone,
+      scooter,
+      score,
+    });
+    if (!row) return;
+    const events = visitorMap[row.visitor_id] || fallbackEvents;
+    enriched.push(
+      attachInboxMeta(enrichLeadRow(row, events), source, inboxId),
+    );
+  };
 
   for (const cb of callbacks) {
-    if (cb.visitor_id && knownVisitors.has(cb.visitor_id)) continue;
-    if (cb.phone && knownPhones.has(cb.phone)) continue;
-    const events = visitorMap[cb.visitor_id] || [{ type: EVENT.CALLBACK_REQUEST, at: cb.created_at, meta: {} }];
-    enriched.push(enrichLeadRow({
-      id: `cb-${cb.id}`,
-      visitor_id: cb.visitor_id,
+    await mergeOrPromote({
+      source: 'callback',
+      inboxId: cb.id,
+      visitorId: cb.visitor_id,
       name: cb.name,
       phone: cb.phone,
-      last_source: 'callback',
-      classification: 'hot',
-      status: 'new',
+      scooter: null,
       score: 30,
-      updated_at: cb.created_at,
-      created_at: cb.created_at,
-    }, events));
-    if (cb.visitor_id) knownVisitors.add(cb.visitor_id);
-    if (cb.phone) knownPhones.add(cb.phone);
+      fallbackEvents: [{ type: EVENT.CALLBACK_REQUEST, at: cb.created_at, meta: {} }],
+    });
   }
 
   for (const tr of testRides) {
-    if (tr.visitor_id && knownVisitors.has(tr.visitor_id)) continue;
-    if (tr.phone && knownPhones.has(tr.phone)) continue;
-    const events = visitorMap[tr.visitor_id] || [{
-      type: EVENT.TEST_RIDE_BOOKED,
-      at: tr.created_at,
-      meta: { scooterId: tr.scooter_id, name: tr.scooter },
-    }];
-    enriched.push(enrichLeadRow({
-      id: `tr-${tr.id}`,
-      visitor_id: tr.visitor_id,
+    await mergeOrPromote({
+      source: 'test_ride',
+      inboxId: tr.id,
+      visitorId: tr.visitor_id,
       name: tr.name,
       phone: tr.phone,
-      last_source: 'test_ride',
-      interested_scooter: tr.scooter,
-      classification: 'hot',
-      status: 'new',
+      scooter: tr.scooter,
       score: 35,
-      updated_at: tr.created_at,
-      created_at: tr.created_at,
-    }, events));
-    if (tr.visitor_id) knownVisitors.add(tr.visitor_id);
-    if (tr.phone) knownPhones.add(tr.phone);
+      fallbackEvents: [{
+        type: EVENT.TEST_RIDE_BOOKED,
+        at: tr.created_at,
+        meta: { scooterId: tr.scooter_id, name: tr.scooter },
+      }],
+    });
   }
 
   for (const sb of serviceBookings) {
-    if (sb.visitor_id && knownVisitors.has(sb.visitor_id)) continue;
-    if (sb.phone && knownPhones.has(sb.phone)) continue;
-    const events = visitorMap[sb.visitor_id] || [{
-      type: EVENT.SERVICE_BOOKED,
-      at: sb.created_at,
-      meta: { serviceKind: sb.service_kind, scooterId: sb.scooter_id, name: sb.scooter },
-    }];
-    enriched.push(enrichLeadRow({
-      id: `sb-${sb.id}`,
-      visitor_id: sb.visitor_id,
+    await mergeOrPromote({
+      source: 'service',
+      inboxId: sb.id,
+      visitorId: sb.visitor_id,
       name: sb.name,
       phone: sb.phone,
-      last_source: 'service',
-      interested_scooter: sb.scooter,
-      classification: 'hot',
-      status: 'new',
+      scooter: sb.scooter,
       score: 32,
-      updated_at: sb.created_at,
-      created_at: sb.created_at,
-    }, events));
-    if (sb.visitor_id) knownVisitors.add(sb.visitor_id);
-    if (sb.phone) knownPhones.add(sb.phone);
+      fallbackEvents: [{
+        type: EVENT.SERVICE_BOOKED,
+        at: sb.created_at,
+        meta: { serviceKind: sb.service_kind, scooterId: sb.scooter_id, name: sb.scooter },
+      }],
+    });
   }
 
   return enriched.sort(sortByFollowUpPriority);

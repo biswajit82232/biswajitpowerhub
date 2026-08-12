@@ -67,7 +67,7 @@ const files = walkHtml(DIST);
 const titles = new Map();
 const descs = new Map();
 const canons = new Map();
-const stubs = new Set(['/ad-landing', '/dealership', '/updates', '/404']);
+const stubs = new Set(['/ad-landing', '/404']);
 
 for (const f of files) {
   const html = readFileSync(f, 'utf8');

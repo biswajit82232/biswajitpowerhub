@@ -1,13 +1,14 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { FINANCE_DEFAULTS } from '@/config/finance';
+import { compressForUpload } from '@/lib/resizeImage';
 
-/** Upload a hero image to Supabase Storage (or base64 fallback). No client compress — full quality. */
+/** Upload a hero image — compressed for mobile LCP (CDN still serves resized variants). */
 export async function uploadHeroImage(file) {
-  const upload = file;
+  const upload = await compressForUpload(file, 1280, 720);
   if (isSupabaseConfigured && supabase) {
     try {
-      const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
+      const ext = upload.name.split('.').pop().toLowerCase() || 'webp';
       const path = `hero/${Date.now()}.${ext}`;
       const { error } = await supabase.storage
         .from('scooter-images')

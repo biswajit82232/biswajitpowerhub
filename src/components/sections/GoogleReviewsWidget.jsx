@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Button from '@/components/ui/Button';
 import { SITE } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
@@ -11,19 +11,44 @@ function buildSeedHtml(placeId) {
 }
 
 /**
- * ReplyOnTheFly Google reviews embed (carousel, size 2, autoplay 4s).
- * Seed stays crawlable; CSS hides it until the live widget replaces it.
+ * ReplyOnTheFly Google reviews embed — seed stays crawlable; third-party script
+ * loads only when the section scrolls near the viewport (saves home page weight).
  */
 export function GoogleReviewsWidget() {
   const hostRef = useRef(null);
+  const sectionRef = useRef(null);
   const { site } = useSite();
   const placeId = (site?.maps?.placeId || SITE.maps.placeId || FALLBACK_PLACE_ID).trim();
+  const [loadWidget, setLoadWidget] = useState(false);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || !placeId) return undefined;
+
+    if (typeof IntersectionObserver === 'undefined') {
+      setLoadWidget(true);
+      return undefined;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setLoadWidget(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '200px 0px' },
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, [placeId]);
 
   useEffect(() => {
     const host = hostRef.current;
-    if (!host || !placeId) return;
+    if (!host || !placeId) return undefined;
 
     host.innerHTML = buildSeedHtml(placeId);
+    if (!loadWidget) return undefined;
 
     const script = document.createElement('script');
     script.src = SCRIPT_SRC;
@@ -40,10 +65,11 @@ export function GoogleReviewsWidget() {
     return () => {
       host.innerHTML = '';
     };
-  }, [placeId]);
+  }, [placeId, loadWidget]);
 
   return (
     <section
+      ref={sectionRef}
       className="border-t border-line bg-surface-alt py-8 sm:py-12 md:py-14"
       aria-labelledby="reviews-heading"
     >
@@ -54,7 +80,7 @@ export function GoogleReviewsWidget() {
 
         <div
           ref={hostRef}
-          className="google-reviews-embed mt-6 w-full min-w-0 sm:mt-8"
+          className="google-reviews-embed mt-6 min-h-[12rem] w-full min-w-0 sm:mt-8 sm:min-h-[14rem]"
         />
 
         <div className="mt-8 text-center">
