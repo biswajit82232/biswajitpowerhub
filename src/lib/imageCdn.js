@@ -3,11 +3,13 @@ const RENDER_MARKER = '/storage/v1/render/image/public/';
 
 /** Home hero aspect used for CDN crop + responsive variants (16:7). */
 export const HERO_IMAGE = {
-  widths: [640, 960, 1280],
+  widths: [480, 640, 960, 1280],
   baseWidth: 960,
   baseHeight: 420,
-  quality: 65,
+  quality: 58,
   sizes: '100vw',
+  /** Default preload / first candidate — mobile-first for Slow 4G LCP. */
+  primaryWidth: 480,
 };
 
 /**
@@ -49,15 +51,15 @@ export function heroImageSources(src) {
   if (!src || !isSupabaseStorageUrl(src)) {
     return { href: src || null, srcSet: null, sizes: HERO_IMAGE.sizes };
   }
-  const { widths, baseWidth, baseHeight, quality, sizes } = HERO_IMAGE;
+  const { widths, baseWidth, baseHeight, quality, sizes, primaryWidth } = HERO_IMAGE;
   const srcSet = widths
     .map((w) => {
       const h = Math.round((baseHeight / baseWidth) * w);
       return `${optimizedImageUrl(src, w, quality, { height: h, resize: 'cover' })} ${w}w`;
     })
     .join(', ');
-  const href = optimizedImageUrl(src, 640, quality, {
-    height: Math.round((baseHeight / baseWidth) * 640),
+  const href = optimizedImageUrl(src, primaryWidth, quality, {
+    height: Math.round((baseHeight / baseWidth) * primaryWidth),
     resize: 'cover',
   });
   return { href, srcSet, sizes };

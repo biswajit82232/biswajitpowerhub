@@ -537,11 +537,12 @@ function optimizeStorageUrl(src, width, quality, height) {
 /** Build <link rel=preload> for homepage hero (discoverable before JS). */
 function heroPreloadTags(heroUrl) {
   if (!heroUrl) return '';
-  const widths = [640, 960, 1280];
+  const widths = [480, 640, 960, 1280];
   const baseW = 960;
   const baseH = 420;
-  const quality = 65;
-  const href = optimizeStorageUrl(heroUrl, 640, quality, Math.round((baseH / baseW) * 640));
+  const quality = 58;
+  const primary = 480;
+  const href = optimizeStorageUrl(heroUrl, primary, quality, Math.round((baseH / baseW) * primary));
   const srcSet = widths
     .map((w) => {
       const h = Math.round((baseH / baseW) * w);
@@ -551,6 +552,24 @@ function heroPreloadTags(heroUrl) {
   const safeHref = escapeHtml(href);
   const safeSrcSet = escapeHtml(srcSet);
   return `    <link rel="preload" as="image" href="${safeHref}" imagesrcset="${safeSrcSet}" imagesizes="100vw" fetchpriority="high" />\n`;
+}
+
+/** Early visible LCP image in static HTML (replaced when React mounts). */
+function heroLcpImg(heroUrl) {
+  if (!heroUrl) return '';
+  const widths = [480, 640, 960];
+  const baseW = 960;
+  const baseH = 420;
+  const quality = 58;
+  const primary = 480;
+  const href = optimizeStorageUrl(heroUrl, primary, quality, Math.round((baseH / baseW) * primary));
+  const srcSet = widths
+    .map((w) => {
+      const h = Math.round((baseH / baseW) * w);
+      return `${optimizeStorageUrl(heroUrl, w, quality, h)} ${w}w`;
+    })
+    .join(', ');
+  return `<img src="${escapeHtml(href)}" srcset="${escapeHtml(srcSet)}" sizes="100vw" width="960" height="420" alt="Biswajit Power Hub electric scooter showroom at Chunakhali Bus Stand Berhampore Murshidabad" fetchpriority="high" decoding="async" style="width:100%;aspect-ratio:16/7;object-fit:cover;object-position:center;display:block;min-height:220px;background:#e8eef5" />`;
 }
 
 async function buildNoindexCatalogRoutes() {
@@ -1327,15 +1346,22 @@ function modelCardsHtml(catalog = SCOOTERS) {
     .join('')}</div>`;
 }
 
-function crawlableBody(route) {
+function crawlableBody(route, heroUrl = null) {
   const h1 = escapeHtml(route.h1 || route.title);
   const desc = escapeHtml(route.description);
   const showCards = route.path === '/' || route.path === '/scooters';
   const catalog = route._catalog || SCOOTERS;
+  const homeLcp = route.path === '/' ? heroLcpImg(heroUrl) : '';
+  // Don't eagerly fetch heavy OG art on home — it steals bandwidth from the real LCP hero.
+  const midImage =
+    route.path === '/' && heroUrl
+      ? ''
+      : `<img src="${BASE}/og-image.png" alt="Biswajit Power Hub electric scooter showroom at Chunakhali Bus Stand Berhampore Murshidabad" width="1200" height="600" loading="lazy" decoding="async" style="width:100%;max-width:100%;height:auto;border-radius:12px;background:#e0e0e0;margin:1rem 0;" />`;
 
   // Visible HTML (not noscript): React createRoot replaces #root on client load.
   // Google and curl verification read this initial HTML without executing JavaScript.
   return `
+${homeLcp}
 <nav aria-label="Showroom CTAs" style="display:flex;flex-wrap:wrap;gap:0.5rem;padding:0.75rem 1rem;background:#0f0f0f;">
   <a href="tel:+919635505436" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0.75rem 1.25rem;background:#2563EB;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Call: 096355 05436</a>
   <a href="https://wa.me/919635505436" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0.75rem 1.25rem;background:#25d366;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">WhatsApp</a>
@@ -1344,7 +1370,7 @@ function crawlableBody(route) {
 <main data-seo-prerender="true" style="font-family:system-ui,sans-serif;max-width:800px;margin:0 auto;padding:20px 16px 120px;line-height:1.6;color:#4a4a4a;">
   <h1 style="color:#1a1a1a;font-size:1.75rem;line-height:1.25;">${h1}</h1>
   <p>${desc}</p>
-  <img src="${BASE}/og-image.png" alt="Biswajit Power Hub electric scooter showroom at Chunakhali Bus Stand Berhampore Murshidabad" width="1200" height="600" loading="eager" style="width:100%;max-width:100%;height:auto;border-radius:12px;background:#e0e0e0;margin:1rem 0;" />
+  ${midImage}
   ${sectionsHtml(route)}
   ${showCards ? `<h2 style="font-size:1.35rem;color:#1a1a1a;margin-top:2rem;">Popular Models: Activa, Zoom, Single Light &amp; Double Light</h2>${modelCardsHtml(catalog)}` : ''}
   <p style="margin-top:2rem;"><a href="${BASE}/scooters">Electric scooters in Berhampore</a> · <a href="${BASE}/best-electric-scooters-berhampore">Best electric scooters Berhampore</a> · <a href="${BASE}/contact">Visit showroom</a> · <a href="${BASE}/test-ride-berhampore">Free test ride</a></p>
@@ -1461,7 +1487,7 @@ function injectMeta(html, route, { heroUrl } = {}) {
     .join('\n');
   if (scripts) out = out.replace('</head>', `${scripts}\n  </head>`);
 
-  const ns = crawlableBody(route);
+  const ns = crawlableBody(route, heroUrl);
   if (/<div id="root">[\s\S]*?<\/div>/i.test(out)) {
     out = out.replace(/<div id="root">[\s\S]*?<\/div>/i, `<div id="root">\n      ${ns}\n    </div>`);
   } else {
