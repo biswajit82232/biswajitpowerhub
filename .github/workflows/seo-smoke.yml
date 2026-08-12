@@ -22,8 +22,10 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
       - run: npm run lint
       - run: npm test
-      - name: Production build (compile only)
-        run: npx vite build
+      - name: Production build (sitemap + vite + fallback prerender)
+        run: npm run build
+        env:
+          VITE_SITE_URL: https://biswajitpowerhub.in
       - run: npm run qa:seo
       - name: Live curl matrix (production)
         continue-on-error: true
