@@ -22,3 +22,22 @@ export function isValidEmail(email) {
 export function isHoneypotFilled(value) {
   return String(value || '').trim().length > 0;
 }
+
+export function clearFieldError(setErrors, field) {
+  setErrors((prev) => {
+    if (!prev?.[field]) return prev;
+    const next = { ...prev };
+    delete next[field];
+    return next;
+  });
+}
+
+export function focusFirstError(formEl, errors) {
+  const key = Object.keys(errors || {})[0];
+  if (!key || !formEl) return;
+  const el = formEl.querySelector(`[name="${key}"]`);
+  if (el && typeof el.focus === 'function') {
+    el.focus();
+    el.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+  }
+}

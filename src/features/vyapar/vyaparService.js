@@ -12,6 +12,7 @@ import {
 } from './vyaparMapping';
 import { getScooters, upsertScooter } from '@/features/scooters/scooterService';
 import { getAccessories, upsertAccessory } from '@/features/accessories/accessoryService';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS } from '@/lib/utils';
 
 const SETTINGS_ROW_ID = 1;
 const VYAPAR_ITEMS_URL = 'https://api1.vyaparapp.in/api/catalogue/getItems';
@@ -150,11 +151,11 @@ async function ensureConfigured() {
 export async function getVyaparSettings() {
   if (!isSupabaseConfigured || !supabase) return { ...DEFAULT_SETTINGS };
   try {
-    const { data, error } = await supabase
-      .from('vyapar_settings')
-      .select('*')
-      .eq('id', SETTINGS_ROW_ID)
-      .maybeSingle();
+    const { data, error } = await withTimeout(
+      supabase.from('vyapar_settings').select('*').eq('id', SETTINGS_ROW_ID).maybeSingle(),
+      FETCH_TIMEOUT_MS,
+      'Vyapar settings fetch timed out',
+    );
     if (error) {
       if (isMissingTableError(error)) {
         return { ...DEFAULT_SETTINGS };
@@ -172,11 +173,11 @@ export async function saveVyaparSettings(patch) {
   await ensureConfigured();
   const current = await getVyaparSettings();
   const next = { ...current, ...patch };
-  const { data, error } = await supabase
-    .from('vyapar_settings')
-    .upsert(toSettingsRow(next))
-    .select()
-    .single();
+  const { data, error } = await withTimeout(
+    supabase.from('vyapar_settings').upsert(toSettingsRow(next)).select().single(),
+    MUTATION_TIMEOUT_MS,
+    'Vyapar settings save timed out',
+  );
   if (error) throw migrationRequiredError(error);
   return fromSettingsRow(data);
 }
@@ -184,10 +185,11 @@ export async function saveVyaparSettings(patch) {
 export async function getVyaparItems() {
   if (!isSupabaseConfigured || !supabase) return [];
   try {
-    const { data, error } = await supabase
-      .from('vyapar_items')
-      .select('*')
-      .order('name', { ascending: true });
+    const { data, error } = await withTimeout(
+      supabase.from('vyapar_items').select('*').order('name', { ascending: true }),
+      FETCH_TIMEOUT_MS,
+      'Vyapar items fetch timed out',
+    );
     if (error) {
       if (isMissingTableError(error)) {
         return [];
@@ -203,11 +205,11 @@ export async function getVyaparItems() {
 
 export async function saveVyaparItem(item) {
   await ensureConfigured();
-  const { data, error } = await supabase
-    .from('vyapar_items')
-    .upsert(toItemRow(item))
-    .select()
-    .single();
+  const { data, error } = await withTimeout(
+    supabase.from('vyapar_items').upsert(toItemRow(item)).select().single(),
+    MUTATION_TIMEOUT_MS,
+    'Vyapar item save timed out',
+  );
   if (error) throw migrationRequiredError(error);
   return fromItemRow(data);
 }
@@ -413,7 +415,7 @@ async function applyLinkedUpdates(items, settings) {
 
     if (item.mappedType === 'scooter') {
       let next = { ...local };
-      if (doPrice) next = applyPriceToScooter(next, effectivePrice(item));
+      if (doPrice) next = applyPriceToScooter(next, effectivePrice(item), { previousPrice: local.price });
       if (doStock) next.stock = mapVyaparStock(item.quantity, item.stockFlag);
       await upsertScooter(next);
       scooterById[item.mappedId] = next;
@@ -455,16 +457,19 @@ export async function syncFromVyapar() {
     const merged = remote.map((r) => mergeRemoteIntoCached(r, byId[r.id]));
 
     if (merged.length) {
-      const { error } = await supabase.from('vyapar_items').upsert(merged.map(toItemRow));
+      const { error } = await withTimeout(
+        supabase.from('vyapar_items').upsert(merged.map(toItemRow)),
+        MUTATION_TIMEOUT_MS,
+        'Vyapar items upsert timed out',
+      );
       if (error) throw migrationRequiredError(error);
     }
 
     // Soft-mark missing items: keep rows but note they disappeared (do not auto-delete)
     const stale = existing.filter((e) => !remoteIds.has(e.id));
     if (stale.length) {
-      await supabase
-        .from('vyapar_items')
-        .upsert(
+      await withTimeout(
+        supabase.from('vyapar_items').upsert(
           stale.map((s) =>
             toItemRow({
               ...s,
@@ -473,7 +478,27 @@ export async function syncFromVyapar() {
                 : `${s.notes || ''}\n[Removed from Vyapar store]`.trim(),
             }),
           ),
-        );
+        ),
+        MUTATION_TIMEOUT_MS,
+        'Vyapar stale upsert timed out',
+      );
+
+      const scooters = await getScooters();
+      const accessories = await getAccessories();
+      for (const s of stale) {
+        if (!s.linked || !s.mappedId) continue;
+        if (s.mappedType === 'scooter') {
+          const local = scooters.find((x) => x.id === s.mappedId);
+          if (local && local.stock !== 'out_of_stock') {
+            await upsertScooter({ ...local, stock: 'out_of_stock' });
+          }
+        } else if (s.mappedType === 'accessory') {
+          const local = accessories.find((x) => x.id === s.mappedId);
+          if (local && local.stock !== 'out_of_stock') {
+            await upsertAccessory({ ...local, stock: 'out_of_stock' });
+          }
+        }
+      }
     }
 
     const apply = await applyLinkedUpdates(merged.filter((m) => m.linked), {
@@ -571,7 +596,7 @@ export async function linkVyaparItem(item, { type, id, pushName = false, pushCat
     let next = { ...local };
     if (pushName) next.name = effectiveName(item);
     if (item.localImages?.length && !next.images?.length) next.images = [...item.localImages];
-    if (item.syncPrice !== false) next = applyPriceToScooter(next, effectivePrice(item));
+    if (item.syncPrice !== false) next = applyPriceToScooter(next, effectivePrice(item), { previousPrice: local.price });
     if (item.syncStock !== false) next.stock = mapVyaparStock(item.quantity, item.stockFlag);
     await upsertScooter(next);
   } else {
@@ -624,7 +649,7 @@ export async function pushOverridesToLocal(item) {
       description: item.description?.trim() ? item.description : local.description,
       images: item.localImages?.length ? [...item.localImages] : local.images,
     };
-    if (item.syncPrice !== false) next = applyPriceToScooter(next, effectivePrice(item));
+    if (item.syncPrice !== false) next = applyPriceToScooter(next, effectivePrice(item), { previousPrice: local.price });
     if (item.syncStock !== false) next.stock = mapVyaparStock(item.quantity, item.stockFlag);
     const saved = await upsertScooter(next);
     await saveVyaparItem(item);

@@ -91,3 +91,30 @@ console.log('RLS verify: after applying harden_rls_storage_and_rpc.sql, run');
 console.log('  supabase/migrations/verify_harden_rls.sql in the SQL editor.');
 console.log('  Expect zero leftover policies named "auth all site settings" / "auth all offers".\n');
 console.log('Also ensure VITE_ADMIN_EMAILS matches every row in public.admin_allowlist.\n');
+
+// Anon must not be able to insert catalog rows (open RLS / using(true) footgun).
+const rlsProbe = await fetch(`${url}/rest/v1/scooters`, {
+  method: 'POST',
+  headers: {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=minimal',
+  },
+  body: JSON.stringify({
+    id: '__rls_probe_do_not_keep__',
+    name: 'RLS probe',
+    price: 0,
+  }),
+});
+if (rlsProbe.status === 201) {
+  await fetch(`${url}/rest/v1/scooters?id=eq.__rls_probe_do_not_keep__`, {
+    method: 'DELETE',
+    headers: { apikey: key, Authorization: `Bearer ${key}` },
+  });
+  console.log('❌ RLS probe: anon INSERT into scooters succeeded — database is NOT production-safe.');
+  console.log('   Apply lock_admin_rls_allowlist.sql + harden_rls_storage_and_rpc.sql, then re-run.\n');
+  process.exit(1);
+} else {
+  console.log(`✓ RLS probe: anon INSERT into scooters rejected (HTTP ${rlsProbe.status}) — expected.\n`);
+}

@@ -42,6 +42,9 @@ const ORDER = [
   'lock_admin_rls_allowlist.sql',
   'harden_rls_storage_and_rpc.sql',
   'add_offer_kind_image_hero.sql',
+  'revoke_is_admin_anon.sql',
+  'rate_limit_upsert_lead.sql',
+  'harden_public_writes_push_and_rate_limits.sql',
 ];
 
 function getDatabaseUrl(env) {

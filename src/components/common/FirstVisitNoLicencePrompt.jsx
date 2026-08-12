@@ -13,6 +13,8 @@ import {
   isValidPhone,
   isHoneypotFilled,
   normalizeIndianMobile,
+  clearFieldError,
+  focusFirstError,
 } from '@/features/leads/validation';
 import { HoneypotField } from '@/features/leads/HoneypotField';
 
@@ -112,14 +114,6 @@ export function FirstVisitNoLicencePrompt() {
     setOpen(false);
   };
 
-  const validate = () => {
-    const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
   const onSubmit = async (ev) => {
     ev.preventDefault();
     if (isHoneypotFilled(form.website)) {
@@ -127,7 +121,14 @@ export function FirstVisitNoLicencePrompt() {
       setDone(true);
       return;
     }
-    if (!validate()) return;
+    const e = {};
+    if (!isValidName(form.name)) e.name = 'Please enter your name';
+    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
+    setErrors(e);
+    if (Object.keys(e).length) {
+      focusFirstError(ev.currentTarget, e);
+      return;
+    }
     setLoading(true);
     try {
       await submitCallback({
@@ -256,17 +257,22 @@ export function FirstVisitNoLicencePrompt() {
                 <Field label="Your name" htmlFor="nl-cb-name" required error={errors.name}>
                   <Input
                     id="nl-cb-name"
+                    name="name"
                     placeholder="Full name"
                     value={form.name}
                     error={errors.name}
                     autoComplete="name"
                     className="h-11"
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    onChange={(e) => {
+                      setForm({ ...form, name: e.target.value });
+                      clearFieldError(setErrors, 'name');
+                    }}
                   />
                 </Field>
                 <Field label="Phone number" htmlFor="nl-cb-phone" required error={errors.phone}>
                   <Input
                     id="nl-cb-phone"
+                    name="phone"
                     type="tel"
                     inputMode="tel"
                     maxLength={16}
@@ -275,7 +281,10 @@ export function FirstVisitNoLicencePrompt() {
                     error={errors.phone}
                     autoComplete="tel"
                     className="h-11"
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    onChange={(e) => {
+                      setForm({ ...form, phone: e.target.value });
+                      clearFieldError(setErrors, 'phone');
+                    }}
                   />
                 </Field>
 

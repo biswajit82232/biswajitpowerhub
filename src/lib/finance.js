@@ -1,4 +1,4 @@
-import { FINANCE_DEFAULTS } from '@/config/finance';
+import { FINANCE_DEFAULTS } from '../config/finance.js';
 
 /**
  * CD / e-bike finance (Bajaj-style consumer durable loans):
@@ -6,9 +6,9 @@ import { FINANCE_DEFAULTS } from '@/config/finance';
  * - Processing / file charges added to the total
  * - Down payment paid upfront; remaining balance split into equal monthly EMIs
  *
- * Example @ ₹69,999, 10% p.a., 12 mo, ₹2,500 file charge:
- *   interest = 69,999 × 10% = ₹6,999
- *   total    = 69,999 + 6,999 + 2,500 = ₹79,498
+ * Example @ ₹69,999, 10% p.a., 12 mo, ₹2,500 file charge (rounded):
+ *   interest = round(69,999 × 10%) = ₹7,000
+ *   total    = round(69,999 + 6,999.9 + 2,500) = ₹79,499
  */
 
 export function calculateEMI({ price, downPayment = 0, annualRate, tenureMonths, fileCharges = 0 }) {

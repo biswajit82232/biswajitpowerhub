@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { REVIEWS } from '@/data/reviews';
 import { compressForUpload } from '@/lib/resizeImage';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
 
 const CACHE_KEY = 'reviews_approved_v3';
 const CACHE_TTL = 60;
@@ -31,10 +32,14 @@ export async function uploadReviewPhoto(file) {
   if (isSupabaseConfigured && supabase) {
     try {
       const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error } = await supabase.storage
-        .from('review-photos')
-        .upload(path, upload, { upsert: false, contentType: upload.type });
+      const path = `reviews/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await withTimeout(
+        supabase.storage
+          .from('review-photos')
+          .upload(path, upload, { upsert: false, contentType: upload.type }),
+        UPLOAD_TIMEOUT_MS,
+        'Review photo upload timed out',
+      );
       if (!error) {
         const { data } = supabase.storage.from('review-photos').getPublicUrl(path);
         return data.publicUrl;
@@ -57,24 +62,32 @@ export async function uploadReviewPhoto(file) {
 /** Public: only approved reviews — cached 60s. */
 export async function getApprovedReviews() {
   return fetchWithCache(CACHE_KEY, async () => {
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('reviews')
-        .select('*')
-        .eq('status', 'approved')
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
+    if (!isSupabaseConfigured || !supabase) {
+      return REVIEWS.filter((r) => r.status === 'approved');
+    }
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase
+          .from('reviews')
+          .select('*')
+          .eq('status', 'approved')
+          .order('featured', { ascending: false })
+          .order('created_at', { ascending: false }),
+        FETCH_TIMEOUT_MS,
+        'Reviews fetch timed out',
+      );
 
       if (!error) {
         return (data || []).map(fromRow);
       }
 
-      console.warn('[Reviews] Supabase fetch failed:', error.message);
-      return REVIEWS.filter((r) => r.status === 'approved');
+      throw new Error(error.message || 'Reviews fetch failed');
+    } catch (err) {
+      console.warn('[Reviews] Supabase fetch failed:', err.message);
+      throw err;
     }
-
-    return REVIEWS.filter((r) => r.status === 'approved');
-  }, CACHE_TTL);
+  }, CACHE_TTL).catch(() => REVIEWS.filter((r) => r.status === 'approved'));
 }
 
 export async function getFeaturedReviews(limit = 6) {
@@ -91,15 +104,19 @@ export async function submitReview({ name, rating, review, scooter, photo, photo
   }
 
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.from('reviews').insert({
-      name,
-      rating,
-      review,
-      scooter,
-      photo_url: photoUrl,
-      status: 'pending',
-      featured: false,
-    });
+    const { error } = await withTimeout(
+      supabase.from('reviews').insert({
+        name,
+        rating,
+        review,
+        scooter,
+        photo_url: photoUrl,
+        status: 'pending',
+        featured: false,
+      }),
+      MUTATION_TIMEOUT_MS,
+      'Review submit timed out',
+    );
     if (error) throw error;
     return { ok: true };
   }
@@ -111,10 +128,11 @@ export async function submitReview({ name, rating, review, scooter, photo, photo
 
 export async function getAllReviews() {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } = await withTimeout(
+      supabase.from('reviews').select('*').order('created_at', { ascending: false }),
+      FETCH_TIMEOUT_MS,
+      'Admin reviews fetch timed out',
+    );
     if (error) throw error;
     return (data || []).map(fromRow);
   }
@@ -123,14 +141,22 @@ export async function getAllReviews() {
 
 export async function setReviewStatus(id, status) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('reviews').update({ status }).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('reviews').update({ status }).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Review status update timed out',
+  );
   if (error) throw error;
   bustReviewCache();
 }
 
 export async function setReviewFeatured(id, featured) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('reviews').update({ featured }).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('reviews').update({ featured }).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Review featured update timed out',
+  );
   if (error) throw error;
   bustReviewCache();
 }
@@ -138,7 +164,11 @@ export async function setReviewFeatured(id, featured) {
 export async function setReviewPhoto(id, photoFile) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
   const photoUrl = await uploadReviewPhoto(photoFile);
-  const { error } = await supabase.from('reviews').update({ photo_url: photoUrl }).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('reviews').update({ photo_url: photoUrl }).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Review photo save timed out',
+  );
   if (error) throw error;
   bustReviewCache();
   return photoUrl;
@@ -146,7 +176,11 @@ export async function setReviewPhoto(id, photoFile) {
 
 export async function clearReviewPhoto(id) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('reviews').update({ photo_url: null }).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('reviews').update({ photo_url: null }).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Review photo clear timed out',
+  );
   if (error) throw error;
   bustReviewCache();
 }

@@ -15,6 +15,7 @@ export default {
           200: '#FFADC2',
           300: '#FF7A9A',
           400: '#F23D66',
+          // #DE0039 on white ≈ 5.04:1 — WCAG AA for normal text. Use 600/700 for body links.
           500: '#DE0039',
           600: '#C20032',
           700: '#A1002A',

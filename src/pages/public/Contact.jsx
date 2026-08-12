@@ -15,9 +15,12 @@ import {
   isValidEmail,
   isHoneypotFilled,
   normalizeIndianMobile,
+  clearFieldError,
+  focusFirstError,
 } from '@/features/leads/validation';
 import { HoneypotField } from '@/features/leads/HoneypotField';
 import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay, siteSameAs } from '@/config/site';
+import { safeMapsEmbedUrl } from '@/lib/mapsEmbed';
 import { getPriorityLocations, getServiceAreaNames } from '@/data/locations';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
@@ -31,16 +34,6 @@ function ContactMessageForm() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const validate = () => {
-    const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
-    if (!isValidEmail(form.email)) e.email = 'Enter a valid email';
-    if (!form.message || form.message.trim().length < 5) e.message = 'Add a short message';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
   const onSubmit = async (ev) => {
     ev.preventDefault();
     if (isHoneypotFilled(form.website)) {
@@ -48,7 +41,16 @@ function ContactMessageForm() {
       setForm({ name: '', phone: '', email: '', message: '', website: '' });
       return;
     }
-    if (!validate()) return;
+    const e = {};
+    if (!isValidName(form.name)) e.name = 'Please enter your name';
+    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
+    if (!isValidEmail(form.email)) e.email = 'Enter a valid email';
+    if (!form.message || form.message.trim().length < 5) e.message = 'Add a short message';
+    setErrors(e);
+    if (Object.keys(e).length) {
+      focusFirstError(ev.currentTarget, e);
+      return;
+    }
     setLoading(true);
     try {
       await submitContact({
@@ -78,15 +80,20 @@ function ContactMessageForm() {
         <Field label="Name" htmlFor="ct-name" required error={errors.name}>
           <Input
             id="ct-name"
+            name="name"
             value={form.name}
             error={errors.name}
             autoComplete="name"
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            onChange={(e) => {
+              setForm({ ...form, name: e.target.value });
+              clearFieldError(setErrors, 'name');
+            }}
           />
         </Field>
         <Field label="Phone" htmlFor="ct-phone" required error={errors.phone}>
           <Input
             id="ct-phone"
+            name="phone"
             type="tel"
             inputMode="tel"
             maxLength={16}
@@ -94,27 +101,38 @@ function ContactMessageForm() {
             autoComplete="tel"
             value={form.phone}
             error={errors.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            onChange={(e) => {
+              setForm({ ...form, phone: e.target.value });
+              clearFieldError(setErrors, 'phone');
+            }}
           />
         </Field>
       </div>
       <Field label="Email" htmlFor="ct-email" error={errors.email} hint="Optional">
         <Input
           id="ct-email"
+          name="email"
           type="email"
           value={form.email}
           error={errors.email}
           autoComplete="email"
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          onChange={(e) => {
+            setForm({ ...form, email: e.target.value });
+            clearFieldError(setErrors, 'email');
+          }}
         />
       </Field>
       <Field label="Message" htmlFor="ct-msg" required error={errors.message}>
         <Textarea
           id="ct-msg"
+          name="message"
           rows={4}
           value={form.message}
           error={errors.message}
-          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          onChange={(e) => {
+            setForm({ ...form, message: e.target.value });
+            clearFieldError(setErrors, 'message');
+          }}
           placeholder="How can we help?"
         />
       </Field>
@@ -233,14 +251,16 @@ export default function Contact() {
               </address>
 
               <div className="mt-6 overflow-hidden ring-1 ring-line">
+                {safeMapsEmbedUrl(site.maps.embed) ? (
                 <iframe
-                  src={site.maps.embed}
+                  src={safeMapsEmbedUrl(site.maps.embed)}
                   title="Biswajit Power Hub location map — Chunakhali Bus Stand, Berhampore"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   className="h-56 w-full border-0 sm:h-72"
                   allowFullScreen
                 />
+                ) : null}
               </div>
 
               <div className="mt-5 flex items-start gap-3 text-sm text-body">

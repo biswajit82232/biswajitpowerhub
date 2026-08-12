@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { withTimeout, MUTATION_TIMEOUT_MS } from '@/lib/utils';
 
 const VAPID_PUBLIC = import.meta.env.VITE_VAPID_PUBLIC_KEY?.trim() || '';
 
@@ -78,16 +79,20 @@ async function upsertSubscription(sub) {
   const auth = json.keys?.auth;
   if (!endpoint || !p256dh || !auth) return { ok: false, reason: 'invalid_subscription' };
 
-  const { error } = await supabase.from('admin_push_subscriptions').upsert(
-    {
-      user_id: user.id,
-      endpoint,
-      p256dh,
-      auth,
-      user_agent: navigator.userAgent?.slice(0, 300) || null,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'endpoint' },
+  const { error } = await withTimeout(
+    supabase.from('admin_push_subscriptions').upsert(
+      {
+        user_id: user.id,
+        endpoint,
+        p256dh,
+        auth,
+        user_agent: navigator.userAgent?.slice(0, 300) || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'endpoint' },
+    ),
+    MUTATION_TIMEOUT_MS,
+    'Push subscription save timed out',
   );
 
   if (error) return { ok: false, reason: error.message };
@@ -96,7 +101,11 @@ async function upsertSubscription(sub) {
 
 async function removeSubscription(endpoint) {
   if (!isSupabaseConfigured || !supabase || !endpoint) return;
-  await supabase.from('admin_push_subscriptions').delete().eq('endpoint', endpoint);
+  await withTimeout(
+    supabase.from('admin_push_subscriptions').delete().eq('endpoint', endpoint),
+    MUTATION_TIMEOUT_MS,
+    'Push subscription delete timed out',
+  ).catch(() => {});
 }
 
 /** Request permission, subscribe PushManager, persist for server delivery. */

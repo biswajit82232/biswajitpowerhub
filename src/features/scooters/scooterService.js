@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
-import { withTimeout } from '@/lib/utils';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
 import { compressForUpload } from '@/lib/resizeImage';
 import { SCOOTERS } from '@/data/scooters';
 import { normalizeScooter } from '@/lib/scooterVariants';
@@ -8,7 +8,6 @@ import { DEFAULT_REAL_RANGE_FACTOR } from '@/lib/rangeDefaults';
 
 const CACHE_KEY = 'scooters_v7';
 const CACHE_TTL = 60;
-const FETCH_TIMEOUT_MS = 8000;
 const SEED_BY_ID = Object.fromEntries(SCOOTERS.map((s) => [s.id, s]));
 
 /**
@@ -155,7 +154,11 @@ export async function getFeaturedScooters(limit = 4) {
 
 export async function upsertScooter(scooter) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { data, error } = await supabase.from('scooters').upsert(toRow(scooter)).select().single();
+  const { data, error } = await withTimeout(
+    supabase.from('scooters').upsert(toRow(scooter)).select().single(),
+    MUTATION_TIMEOUT_MS,
+    'Scooter save timed out',
+  );
   if (error) throw error;
   bustScooterCache();
   return fromRow(data);
@@ -163,14 +166,22 @@ export async function upsertScooter(scooter) {
 
 export async function deleteScooter(id) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('scooters').delete().eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('scooters').delete().eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Scooter delete timed out',
+  );
   if (error) throw error;
   bustScooterCache();
 }
 
 export async function updateStock(id, stock_status) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('scooters').update({ stock_status }).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('scooters').update({ stock_status }).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Stock update timed out',
+  );
   if (error) throw error;
   bustScooterCache();
 }
@@ -187,9 +198,13 @@ export async function uploadScooterImage(file, scooterId) {
     try {
       const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
       const path = `${scooterId || 'new'}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from('scooter-images')
-        .upload(path, upload, { upsert: false, contentType: upload.type });
+      const { error } = await withTimeout(
+        supabase.storage
+          .from('scooter-images')
+          .upload(path, upload, { upsert: false, contentType: upload.type }),
+        UPLOAD_TIMEOUT_MS,
+        'Scooter image upload timed out',
+      );
       if (!error) {
         const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
         return data.publicUrl;

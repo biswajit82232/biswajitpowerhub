@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const env = import.meta.env || {};
+const url = env.VITE_SUPABASE_URL;
+const anonKey = env.VITE_SUPABASE_ANON_KEY;
 
 /**
  * isSupabaseConfigured — when false, the app falls back to local seed data
@@ -20,7 +21,7 @@ export const supabase = isSupabaseConfigured
     })
   : null;
 
-if (!isSupabaseConfigured && import.meta.env.DEV) {
+if (!isSupabaseConfigured && env.DEV) {
   console.warn(
     '[Supabase] Not configured. Running in demo mode with local seed data. ' +
       'Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env to enable persistence.'

@@ -7,6 +7,24 @@ import {
 } from '@/lib/purchaseReadiness';
 import { getVisitorEventsMap } from '@/features/analytics/popularityService';
 import { normalizeIndianMobile } from '@/features/leads/validation';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS } from '@/lib/utils';
+
+const UPSERT_DEBOUNCE_MS = 2000;
+const lastUpsertAt = new Map();
+
+function shouldSkipLeadUpsert(visitorId) {
+  const now = Date.now();
+  const prev = lastUpsertAt.get(visitorId) || 0;
+  if (now - prev < UPSERT_DEBOUNCE_MS) return true;
+  lastUpsertAt.set(visitorId, now);
+  if (lastUpsertAt.size > 80) {
+    [...lastUpsertAt.entries()]
+      .sort((a, b) => a[1] - b[1])
+      .slice(0, 20)
+      .forEach(([key]) => lastUpsertAt.delete(key));
+  }
+  return false;
+}
 
 /**
  * Upsert a lead record keyed by visitor id, enriched with the current
@@ -14,41 +32,57 @@ import { normalizeIndianMobile } from '@/features/leads/validation';
  */
 async function upsertLead({ name, phone, source, scooter }) {
   const visitorId = getVisitorId();
-  const { events, score, classification } = getLocalLeadSummary();
-  const { readinessPercent, rawScore } = computePurchaseReadiness(events);
-  const leadScore = Math.max(score, rawScore);
+  const { events, classification } = getLocalLeadSummary();
+  const { readinessPercent } = computePurchaseReadiness(events);
+  const leadScore = readinessPercent;
 
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.rpc('upsert_lead', {
-      p_visitor_id: visitorId,
-      p_name: name,
-      p_phone: phone,
-      p_last_source: source,
-      p_interested_scooter: scooter || null,
-      p_score: leadScore,
-      p_classification: classification,
-    });
-    if (error) {
-      console.warn('[Leads] upsert_lead failed:', error.message);
+    if (shouldSkipLeadUpsert(visitorId)) {
+      return { readinessPercent, score: leadScore, classification };
+    }
+    try {
+      const { error } = await withTimeout(
+        supabase.rpc('upsert_lead', {
+          p_visitor_id: visitorId,
+          p_name: name,
+          p_phone: phone,
+          p_last_source: source,
+          p_interested_scooter: scooter || null,
+          p_score: leadScore,
+          p_classification: classification,
+        }),
+        MUTATION_TIMEOUT_MS,
+        'Lead upsert timed out',
+      );
+      if (error) {
+        console.warn('[Leads] upsert_lead failed:', error.message);
+      }
+    } catch (err) {
+      console.warn('[Leads] upsert_lead failed:', err.message);
     }
   }
   return { readinessPercent, score: leadScore, classification };
 }
 
 export async function submitCallback({ name, phone, interest }) {
-  await trackEvent(EVENT.CALLBACK_REQUEST, { name, interest: interest || null });
-  const displayName = interest ? `${name} · ${interest}` : name;
+  const cleanName = String(name || '').trim();
+  const cleanPhone = normalizeIndianMobile(phone);
+  await trackEvent(EVENT.CALLBACK_REQUEST, { name: cleanName, interest: interest || null });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase
-      .from('callbacks')
-      .insert({ name: displayName, phone, visitor_id: getVisitorId() });
+    const { error } = await withTimeout(
+      supabase
+        .from('callbacks')
+        .insert({ name: cleanName, phone: cleanPhone, visitor_id: getVisitorId() }),
+      MUTATION_TIMEOUT_MS,
+      'Callback submit timed out',
+    );
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
   }
   await upsertLead({
-    name,
-    phone,
+    name: cleanName,
+    phone: cleanPhone,
     source: 'callback',
     scooter: interest || null,
   });
@@ -56,22 +90,28 @@ export async function submitCallback({ name, phone, interest }) {
 }
 
 export async function submitTestRide({ name, phone, date, time, scooter, scooterId }) {
+  const cleanName = String(name || '').trim();
+  const cleanPhone = normalizeIndianMobile(phone);
   await trackEvent(EVENT.TEST_RIDE_BOOKED, { scooter, scooterId });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.from('test_rides').insert({
-      name,
-      phone,
-      preferred_date: date,
-      preferred_time: time,
-      scooter,
-      scooter_id: scooterId,
-      visitor_id: getVisitorId(),
-    });
+    const { error } = await withTimeout(
+      supabase.from('test_rides').insert({
+        name: cleanName,
+        phone: cleanPhone,
+        preferred_date: date,
+        preferred_time: time,
+        scooter,
+        scooter_id: scooterId,
+        visitor_id: getVisitorId(),
+      }),
+      MUTATION_TIMEOUT_MS,
+      'Test ride submit timed out',
+    );
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
   }
-  await upsertLead({ name, phone, source: 'test_ride', scooter });
+  await upsertLead({ name: cleanName, phone: cleanPhone, source: 'test_ride', scooter });
   return { ok: true };
 }
 
@@ -85,42 +125,54 @@ export async function submitServiceBooking({
   scooter,
   scooterId,
 }) {
+  const cleanName = String(name || '').trim();
+  const cleanPhone = normalizeIndianMobile(phone);
   await trackEvent(EVENT.SERVICE_BOOKED, { serviceKind, scooter, scooterId });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.from('service_bookings').insert({
-      name,
-      phone,
-      service_kind: serviceKind,
-      details: details || null,
-      preferred_date: date,
-      preferred_time: time,
-      scooter: scooter || null,
-      scooter_id: scooterId || null,
-      visitor_id: getVisitorId(),
-    });
+    const { error } = await withTimeout(
+      supabase.from('service_bookings').insert({
+        name: cleanName,
+        phone: cleanPhone,
+        service_kind: serviceKind,
+        details: details || null,
+        preferred_date: date,
+        preferred_time: time,
+        scooter: scooter || null,
+        scooter_id: scooterId || null,
+        visitor_id: getVisitorId(),
+      }),
+      MUTATION_TIMEOUT_MS,
+      'Service booking submit timed out',
+    );
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
   }
-  await upsertLead({ name, phone, source: 'service', scooter });
+  await upsertLead({ name: cleanName, phone: cleanPhone, source: 'service', scooter });
   return { ok: true };
 }
 
 export async function submitContact({ name, phone, email, message, from = 'contact_form' }) {
+  const cleanName = String(name || '').trim();
+  const cleanPhone = normalizeIndianMobile(phone);
   await trackEvent(EVENT.CONTACT_FORM, { from });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.from('contact_messages').insert({
-      name,
-      phone,
-      email: email || null,
-      message,
-      visitor_id: getVisitorId(),
-    });
+    const { error } = await withTimeout(
+      supabase.from('contact_messages').insert({
+        name: cleanName,
+        phone: cleanPhone,
+        email: email || null,
+        message,
+        visitor_id: getVisitorId(),
+      }),
+      MUTATION_TIMEOUT_MS,
+      'Contact submit timed out',
+    );
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
   }
-  await upsertLead({ name, phone, source: 'contact' });
+  await upsertLead({ name: cleanName, phone: cleanPhone, source: 'contact' });
   return { ok: true };
 }
 
@@ -132,85 +184,113 @@ export const ADMIN_LIST_LIMIT = 1000;
 
 export async function getCallbacks() {
   if (!isSupabaseConfigured || !supabase) return [];
-  const { data, error } = await supabase
-    .from('callbacks')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(ADMIN_LIST_LIMIT);
+  const { data, error } = await withTimeout(
+    supabase.from('callbacks').select('*').order('created_at', { ascending: false }).limit(ADMIN_LIST_LIMIT),
+    FETCH_TIMEOUT_MS,
+    'Callbacks fetch timed out',
+  );
   if (error) throw error;
   return data;
 }
 
 export async function getTestRides() {
   if (!isSupabaseConfigured || !supabase) return [];
-  const { data, error } = await supabase
-    .from('test_rides')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(ADMIN_LIST_LIMIT);
+  const { data, error } = await withTimeout(
+    supabase.from('test_rides').select('*').order('created_at', { ascending: false }).limit(ADMIN_LIST_LIMIT),
+    FETCH_TIMEOUT_MS,
+    'Test rides fetch timed out',
+  );
   if (error) throw error;
   return data;
 }
 
 export async function getServiceBookings() {
   if (!isSupabaseConfigured || !supabase) return [];
-  const { data, error } = await supabase
-    .from('service_bookings')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(ADMIN_LIST_LIMIT);
+  const { data, error } = await withTimeout(
+    supabase
+      .from('service_bookings')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(ADMIN_LIST_LIMIT),
+    FETCH_TIMEOUT_MS,
+    'Service bookings fetch timed out',
+  );
   if (error) throw error;
   return data;
 }
 
 export async function getContactMessages() {
   if (!isSupabaseConfigured || !supabase) return [];
-  const { data, error } = await supabase
-    .from('contact_messages')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(ADMIN_LIST_LIMIT);
+  const { data, error } = await withTimeout(
+    supabase
+      .from('contact_messages')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(ADMIN_LIST_LIMIT),
+    FETCH_TIMEOUT_MS,
+    'Messages fetch timed out',
+  );
   if (error) throw error;
   return data;
 }
 
 export async function updateCallback(id, patch) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('callbacks').update(patch).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('callbacks').update(patch).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Callback update timed out',
+  );
   if (error) throw error;
 }
 
 export async function updateTestRide(id, patch) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('test_rides').update(patch).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('test_rides').update(patch).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Test ride update timed out',
+  );
   if (error) throw error;
 }
 
 export async function updateServiceBooking(id, patch) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('service_bookings').update(patch).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('service_bookings').update(patch).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Service booking update timed out',
+  );
   if (error) throw error;
 }
 
 export async function updateContactMessage(id, patch) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('contact_messages').update(patch).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('contact_messages').update(patch).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Message update timed out',
+  );
   if (error) throw error;
 }
 
 export async function deleteContactMessage(id) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('contact_messages').delete().eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Message delete timed out',
+  );
   if (error) throw error;
 }
 
 export async function getLeads() {
   if (!isSupabaseConfigured || !supabase) return getEnrichedLeadsDemo();
-  const { data, error } = await supabase
-    .from('leads')
-    .select('*')
-    .order('score', { ascending: false })
-    .limit(ADMIN_LIST_LIMIT);
+  const { data, error } = await withTimeout(
+    supabase.from('leads').select('*').order('score', { ascending: false }).limit(ADMIN_LIST_LIMIT),
+    FETCH_TIMEOUT_MS,
+    'Leads fetch timed out',
+  );
   if (error) throw error;
   return enrichLeads(data || []);
 }
@@ -266,25 +346,34 @@ async function ensureLeadFromInbox({
 }) {
   const vid = (visitorId && String(visitorId).trim()) || `inbox:${source}:${inboxId}`;
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.rpc('upsert_lead', {
-      p_visitor_id: vid,
-      p_name: name || null,
-      p_phone: phone || null,
-      p_last_source: source,
-      p_interested_scooter: scooter || null,
-      p_score: score,
-      p_classification: classification,
-    });
-    if (error) {
-      console.warn('[Leads] ensureLeadFromInbox failed:', error.message);
+    try {
+      const { error } = await withTimeout(
+        supabase.rpc('upsert_lead', {
+          p_visitor_id: vid,
+          p_name: name || null,
+          p_phone: phone || null,
+          p_last_source: source,
+          p_interested_scooter: scooter || null,
+          p_score: score,
+          p_classification: classification,
+        }),
+        MUTATION_TIMEOUT_MS,
+        'Inbox lead upsert timed out',
+      );
+      if (error) {
+        console.warn('[Leads] ensureLeadFromInbox failed:', error.message);
+        return null;
+      }
+      const { data } = await withTimeout(
+        supabase.from('leads').select('*').eq('visitor_id', vid).maybeSingle(),
+        FETCH_TIMEOUT_MS,
+        'Inbox lead fetch timed out',
+      );
+      return data || null;
+    } catch (err) {
+      console.warn('[Leads] ensureLeadFromInbox failed:', err.message);
       return null;
     }
-    const { data } = await supabase
-      .from('leads')
-      .select('*')
-      .eq('visitor_id', vid)
-      .maybeSingle();
-    return data || null;
   }
   return {
     id: `demo-inbox-${source}-${inboxId}`,
@@ -445,6 +534,10 @@ function getEnrichedLeadsDemo() {
 
 export async function updateLead(id, patch) {
   if (!isSupabaseConfigured || !supabase) return;
-  const { error } = await supabase.from('leads').update(patch).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('leads').update(patch).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Lead update timed out',
+  );
   if (error) throw error;
 }

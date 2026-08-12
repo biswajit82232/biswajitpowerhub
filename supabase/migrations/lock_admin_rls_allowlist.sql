@@ -19,10 +19,9 @@ create policy "admins read allowlist"
     )
   );
 
--- Seed known owner (idempotent)
-insert into public.admin_allowlist (email)
-values ('biswajithowladar123@gmail.com')
-on conflict (email) do nothing;
+-- Seed admin email once in the SQL editor (do not commit personal addresses):
+-- insert into public.admin_allowlist (email) values ('you@example.com')
+-- on conflict (email) do nothing;
 
 create or replace function public.is_admin()
 returns boolean
@@ -39,7 +38,8 @@ as $$
 $$;
 
 revoke all on function public.is_admin() from public;
-grant execute on function public.is_admin() to authenticated, anon, service_role;
+revoke all on function public.is_admin() from anon;
+grant execute on function public.is_admin() to authenticated, service_role;
 
 -- Replace broad "auth all …" policies with is_admin() checks
 do $$

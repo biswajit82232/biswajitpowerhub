@@ -15,6 +15,8 @@
 - [ ] Add: `VITE_GOOGLE_ADS_ID=AW-XXXXXXXXX`
 - [ ] Redeploy
 
+**Conversion labels in code are placeholders.** `src/lib/googleAnalytics.js` (`ADS_CONVERSION_LABELS`) uses suffixes such as `phone_call_lead` and `whatsapp_lead`. Google Ads will only count conversions when those suffixes **exactly match** the labels you create in Ads (the part after `AW-XXXX/`). Do not assume the placeholders work until you paste the real labels.
+
 ## Step 4: Import GA4 Conversions
 - [ ] Tools → Conversions → Import from GA4
 - [ ] Import these events:

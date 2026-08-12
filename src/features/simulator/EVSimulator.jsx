@@ -121,6 +121,7 @@ function DetailsPanel({ petrolPrice, petrolMileage, electricityRate, result }) {
             ['Real-world range', `${result.realRange} km`],
             ['Efficiency factor', `${Math.round(result.realFactor * 100)}%`],
             ['Charging efficiency', `${Math.round(CHARGE_EFFICIENCY * 100)}%`],
+            ['Battery capacity', result.capacityUnknown ? 'Unknown — costs hidden' : `${result.energyPerCharge} kWh/charge`],
           ].map(([label, val]) => (
             <div key={label}>
               <dt className="text-xs text-muted">{label}</dt>
@@ -352,6 +353,11 @@ export function EVSimulator({ scooters = [], settings, loading = false }) {
 
         {/* Pills + table */}
         <div className="space-y-4 border-t border-line bg-surface-alt px-4 py-5 sm:space-y-5 sm:px-6 sm:py-6">
+          {result.capacityUnknown && (
+            <p className="text-center text-xs text-muted">
+              Battery capacity is unknown for this model — running-cost figures are hidden until capacity is set in admin.
+            </p>
+          )}
           <div className="flex flex-wrap justify-center gap-2">
             <span className="inline-flex items-center gap-1.5 border border-line bg-white px-3 py-1.5 text-xs font-semibold text-navy">
               <Zap className="h-3.5 w-3.5 text-brand-500" />

@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { getFinanceSettings } from '@/features/finance/financeService';
 import { compressForUpload } from '@/lib/resizeImage';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
 
 const CACHE_KEY = 'promotional_offers_v3';
 const LEGACY_CACHE_KEY = 'promotional_offers_v2';
@@ -107,13 +108,24 @@ function isMissingTable(error) {
 
 export async function getActiveOffers() {
   return fetchWithCache(`${CACHE_KEY}_active`, async () => {
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('promotional_offers')
-        .select('*')
-        .eq('active', true)
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: false });
+    if (!isSupabaseConfigured || !supabase) {
+      const local = readLocal();
+      const active = local.filter((o) => o.active).sort((a, b) => a.sortOrder - b.sortOrder);
+      if (active.length) return active;
+      return legacyOffersFromFinance();
+    }
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase
+          .from('promotional_offers')
+          .select('*')
+          .eq('active', true)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: false }),
+        FETCH_TIMEOUT_MS,
+        'Offers fetch timed out',
+      );
 
       if (!error) {
         return (data || [])
@@ -126,40 +138,48 @@ export async function getActiveOffers() {
         return legacyOffersFromFinance();
       }
 
-      console.warn('[Offers] Supabase fetch failed:', error.message);
-      const local = readLocal().filter((o) => o.active).sort((a, b) => a.sortOrder - b.sortOrder);
-      if (local.length) return local;
-      return legacyOffersFromFinance();
+      throw new Error(error.message || 'Offers fetch failed');
+    } catch (err) {
+      console.warn('[Offers] Supabase fetch failed:', err.message);
+      throw err;
     }
-
-    const local = readLocal();
-    const active = local.filter((o) => o.active).sort((a, b) => a.sortOrder - b.sortOrder);
-    if (active.length) return active;
-
+  }, 60).catch(async () => {
+    const local = readLocal().filter((o) => o.active).sort((a, b) => a.sortOrder - b.sortOrder);
+    if (local.length) return local;
     return legacyOffersFromFinance();
-  }, 60);
+  });
 }
 
 export async function getAllOffers() {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('promotional_offers')
-      .select('*')
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await withTimeout(
+        supabase
+          .from('promotional_offers')
+          .select('*')
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: false }),
+        FETCH_TIMEOUT_MS,
+        'Offers list timed out',
+      );
 
-    if (!error) {
-      const mapped = (data || []).map(mapRow);
-      writeLocal(mapped);
-      return mapped;
-    }
+      if (!error) {
+        const mapped = (data || []).map(mapRow);
+        writeLocal(mapped);
+        return mapped;
+      }
 
-    if (isMissingTable(error)) {
+      if (isMissingTable(error)) {
+        return legacyOffersFromFinance();
+      }
+
+      throw new Error(error.message || 'Offers list failed');
+    } catch (err) {
+      console.warn('[Offers] Supabase fetch failed:', err.message);
+      const local = readLocal();
+      if (local.length) return local;
       return legacyOffersFromFinance();
     }
-
-    console.warn('[Offers] Supabase fetch failed:', error.message);
-    return [];
   }
 
   return readLocal();
@@ -170,9 +190,13 @@ export async function uploadOfferImage(file) {
   if (isSupabaseConfigured && supabase) {
     const ext = upload.name.split('.').pop()?.toLowerCase() || 'webp';
     const path = `offers/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage
-      .from('scooter-images')
-      .upload(path, upload, { upsert: true, contentType: upload.type });
+    const { error } = await withTimeout(
+      supabase.storage
+        .from('scooter-images')
+        .upload(path, upload, { upsert: true, contentType: upload.type }),
+      UPLOAD_TIMEOUT_MS,
+      'Offer image upload timed out',
+    );
     if (error) throw new Error(error.message || 'Image upload failed');
     const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
     return data.publicUrl;
@@ -192,21 +216,20 @@ export async function saveOffer(offer) {
     bustOfferCache();
 
     if (offer.id && !String(offer.id).startsWith('legacy')) {
-      const { data, error } = await supabase
-        .from('promotional_offers')
-        .update(payload)
-        .eq('id', offer.id)
-        .select()
-        .single();
+      const { data, error } = await withTimeout(
+        supabase.from('promotional_offers').update(payload).eq('id', offer.id).select().single(),
+        MUTATION_TIMEOUT_MS,
+        'Offer save timed out',
+      );
       if (error) throw error;
       return mapRow(data);
     }
 
-    const { data, error } = await supabase
-      .from('promotional_offers')
-      .insert(payload)
-      .select()
-      .single();
+    const { data, error } = await withTimeout(
+      supabase.from('promotional_offers').insert(payload).select().single(),
+      MUTATION_TIMEOUT_MS,
+      'Offer save timed out',
+    );
     if (error) throw error;
     return mapRow(data);
   }
@@ -256,19 +279,23 @@ export async function deleteOffer(id) {
 
   if (isSupabaseConfigured && supabase) {
     bustOfferCache();
-    const { data, error } = await supabase
-      .from('promotional_offers')
-      .delete()
-      .eq('id', id)
-      .select('id');
+    const { data, error } = await withTimeout(
+      supabase.from('promotional_offers').delete().eq('id', id).select('id'),
+      MUTATION_TIMEOUT_MS,
+      'Offer delete timed out',
+    );
     if (error) throw error;
     if (!data?.length) throw new Error('Offer could not be deleted.');
 
-    const { data: remaining } = await supabase
-      .from('promotional_offers')
-      .select('*')
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: false });
+    const { data: remaining } = await withTimeout(
+      supabase
+        .from('promotional_offers')
+        .select('*')
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: false }),
+      FETCH_TIMEOUT_MS,
+      'Offers refresh timed out',
+    );
     writeLocal((remaining || []).map(mapRow));
     bustOfferCache();
     return;

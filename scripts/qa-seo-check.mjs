@@ -78,6 +78,19 @@ for (const route of routes) {
   if (route === '/' && !html.includes('openingHoursSpecification') && !html.includes('OpeningHoursSpecification')) {
     issues.push('missing-hours');
   }
+  if (route === '/') {
+    const blocks = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+    const valid = blocks.some((m) => {
+      try {
+        const parsed = JSON.parse(m[1]);
+        const nodes = Array.isArray(parsed) ? parsed : [parsed];
+        return nodes.some((n) => n && n['@type'] && n.name && (n.url || n['@id']));
+      } catch {
+        return false;
+      }
+    });
+    if (!valid) issues.push('jsonld-incomplete');
+  }
   if (route === '/community' && !/Our Community/i.test(html)) issues.push('missing-community-copy');
   if (route === '/contact' && !html.includes('LocalBusiness')) issues.push('missing-localbusiness');
   if (issues.length) {

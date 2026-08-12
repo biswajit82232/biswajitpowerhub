@@ -7,28 +7,17 @@ import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { submitReview } from './reviewService';
 import { ReviewPhotoUpload } from './ReviewPhotoUpload';
-import { isValidName } from '@/features/leads/validation';
+import { isValidName, isHoneypotFilled, clearFieldError, focusFirstError } from '@/features/leads/validation';
+import { HoneypotField } from '@/features/leads/HoneypotField';
 
 export function ReviewForm({ scooters = [] }) {
   const { toast } = useToast();
-  const [form, setForm] = useState({ name: '', rating: 5, review: '', scooter: '' });
+  const [form, setForm] = useState({ name: '', rating: 5, review: '', scooter: '', website: '' });
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-
-  const validate = () => {
-    const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    const rating = Number(form.rating);
-    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
-      e.rating = 'Please select a rating between 1 and 5';
-    }
-    if (!form.review || form.review.trim().length < 10) e.review = 'Tell us a little more (10+ characters)';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
 
   const handlePhoto = ({ file, preview }) => {
     setPhotoFile(file);
@@ -37,7 +26,22 @@ export function ReviewForm({ scooters = [] }) {
 
   const onSubmit = async (ev) => {
     ev.preventDefault();
-    if (!validate()) return;
+    if (isHoneypotFilled(form.website)) {
+      setDone(true);
+      return;
+    }
+    const e = {};
+    if (!isValidName(form.name)) e.name = 'Please enter your name';
+    const rating = Number(form.rating);
+    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+      e.rating = 'Please select a rating between 1 and 5';
+    }
+    if (!form.review || form.review.trim().length < 10) e.review = 'Tell us a little more (10+ characters)';
+    setErrors(e);
+    if (Object.keys(e).length) {
+      focusFirstError(ev.currentTarget, e);
+      return;
+    }
     setLoading(true);
     try {
       await submitReview({ ...form, photoFile });
@@ -67,14 +71,19 @@ export function ReviewForm({ scooters = [] }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="relative space-y-4">
+      <HoneypotField value={form.website} onChange={(website) => setForm({ ...form, website })} />
       <Field label="Your Name" htmlFor="rv-name" required error={errors.name}>
         <Input
           id="rv-name"
+          name="name"
           placeholder="Full name"
           value={form.name}
           error={errors.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          onChange={(e) => {
+            setForm({ ...form, name: e.target.value });
+            clearFieldError(setErrors, 'name');
+          }}
         />
       </Field>
 
@@ -102,11 +111,15 @@ export function ReviewForm({ scooters = [] }) {
       <Field label="Your Story" htmlFor="rv-text" required error={errors.review}>
         <Textarea
           id="rv-text"
+          name="review"
           rows={4}
           placeholder="Share your experience with Our Community…"
           value={form.review}
           error={errors.review}
-          onChange={(e) => setForm({ ...form, review: e.target.value })}
+          onChange={(e) => {
+            setForm({ ...form, review: e.target.value });
+            clearFieldError(setErrors, 'review');
+          }}
         />
       </Field>
 

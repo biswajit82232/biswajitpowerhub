@@ -1,6 +1,13 @@
 # Supabase migrations
 
-Run **`supabase/schema.sql`** and **`supabase/seed.sql`** first on a fresh project (SQL editor or CLI).
+Run **`supabase/schema.sql`** (hardened `is_admin()` RLS) and **`supabase/seed.sql`** first on a fresh project (SQL editor or CLI). Then insert your admin email into `public.admin_allowlist`. Schema.sql alone is not a full production dump — later tables live in this folder.
+
+**Do not replay migrations 1–23 on a database that already used `schema.sql`.** Those files create then later drop permissive policies; `schema.sql` already encodes the hardened end state. Apply only migrations **after** the last change inlined in `schema.sql` (currently 24+). Production tracks applied files in `public.schema_migrations` — `npm run db:migrate` skips those.
+
+**Denormalization notes (intentional, not a rewrite target):**
+- `scooters.price` is a display/fallback; variant prices in `scooters.variants` JSON win when present.
+- Local `stock_status` is coarse (`in_stock` / `low_stock` / `out_of_stock`); exact qty lives in `vyapar_items`.
+- `site_settings` JSON columns (`photos`, `content`) store CMS blobs, not 3NF tables.
 
 Then apply migrations locally:
 
@@ -39,6 +46,9 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 22 | `lock_admin_rls_allowlist.sql` | Admin email allowlist + RLS lock; tighten analytics RPC |
 | 23 | `harden_rls_storage_and_rpc.sql` | Drop leftover site/offers policies; Storage `is_admin`; anon insert CHECKs; redact analytics meta PII |
 | 24 | `add_offer_kind_image_hero.sql` | Offer kind (promo / free-with-purchase), image URL, show-on-hero flag |
+| 25 | `revoke_is_admin_anon.sql` | Revoke anon EXECUTE on `is_admin()` (RLS still works; PostgREST RPC closed) |
+| 26 | `rate_limit_upsert_lead.sql` | Debounce + flood cap on public `upsert_lead` RPC |
+| 27 | `harden_public_writes_push_and_rate_limits.sql` | Rate-limit form/review/`lead_events` inserts; admin-only push subs; review-photo path prefix; never-downgrade lead classification; revoke anon analytics RPC |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 

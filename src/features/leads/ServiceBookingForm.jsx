@@ -6,7 +6,7 @@ import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { SERVICE_KINDS, getServiceKind } from '@/data/serviceKinds';
 import { submitServiceBooking } from './leadService';
-import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile } from './validation';
+import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile, clearFieldError, focusFirstError } from './validation';
 import { HoneypotField } from './HoneypotField';
 
 const TIME_SLOTS = ['10:00 AM', '11:30 AM', '1:00 PM', '3:00 PM', '4:30 PM', '6:00 PM'];
@@ -39,24 +39,23 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
     [scooters, modelId],
   );
 
-  const validate = () => {
-    const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit number';
-    if (!form.serviceKind) e.serviceKind = 'Choose a service type';
-    if (!form.date) e.date = 'Pick a date';
-    if (isPaid && !form.details.trim()) e.details = 'Tell us what work you need';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
   const onSubmit = async (ev) => {
     ev.preventDefault();
     if (isHoneypotFilled(form.website)) {
       setDone(true);
       return;
     }
-    if (!validate()) return;
+    const e = {};
+    if (!isValidName(form.name)) e.name = 'Please enter your name';
+    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
+    if (!form.serviceKind) e.serviceKind = 'Choose a service type';
+    if (!form.date) e.date = 'Pick a date';
+    if (isPaid && !form.details.trim()) e.details = 'Tell us what work you need';
+    setErrors(e);
+    if (Object.keys(e).length) {
+      focusFirstError(ev.currentTarget, e);
+      return;
+    }
     setLoading(true);
     try {
       await submitServiceBooking({
@@ -139,25 +138,33 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
       </div>
 
       <Field label="Your Name" htmlFor="svc-name" required error={errors.name}>
-        <Input
-          id="svc-name"
-          placeholder="Full name"
-          value={form.name}
-          error={errors.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
+          <Input
+            id="svc-name"
+            name="name"
+            placeholder="Full name"
+            value={form.name}
+            error={errors.name}
+            onChange={(e) => {
+              setForm({ ...form, name: e.target.value });
+              clearFieldError(setErrors, 'name');
+            }}
+          />
       </Field>
       <Field label="Phone Number" htmlFor="svc-phone" required error={errors.phone}>
-        <Input
-          id="svc-phone"
-          type="tel"
-          inputMode="tel"
-          maxLength={16}
-          placeholder="10-digit mobile / +91…"
-          value={form.phone}
-          error={errors.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-        />
+          <Input
+            id="svc-phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            maxLength={16}
+            placeholder="10-digit mobile / +91…"
+            value={form.phone}
+            error={errors.phone}
+            onChange={(e) => {
+              setForm({ ...form, phone: e.target.value });
+              clearFieldError(setErrors, 'phone');
+            }}
+          />
       </Field>
 
       {scooters.length > 0 && (
@@ -177,11 +184,15 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
         <Field label="Preferred date" htmlFor="svc-date" required error={errors.date}>
           <Input
             id="svc-date"
+            name="date"
             type="date"
             min={today}
             value={form.date}
             error={errors.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            onChange={(e) => {
+              setForm({ ...form, date: e.target.value });
+              clearFieldError(setErrors, 'date');
+            }}
           />
         </Field>
         <Field label="Preferred time" htmlFor="svc-time">
@@ -216,7 +227,11 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
           }
           value={form.details}
           error={errors.details}
-          onChange={(e) => setForm({ ...form, details: e.target.value })}
+          name="details"
+          onChange={(e) => {
+            setForm({ ...form, details: e.target.value });
+            clearFieldError(setErrors, 'details');
+          }}
         />
       </Field>
 

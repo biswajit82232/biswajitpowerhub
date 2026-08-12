@@ -168,6 +168,12 @@ export default function AdminLayout() {
   return (
     <div className="admin-shell min-h-dvh min-h-screen bg-bg">
       <AdminPwaSetup />
+      <a
+        href="#admin-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-brand-700 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+      >
+        Skip to admin content
+      </a>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-surface p-5 pt-[max(1.25rem,env(safe-area-inset-top))] lg:flex">
         <AdminMark />
         <div className="mt-8 flex-1 overflow-y-auto">
@@ -216,7 +222,7 @@ export default function AdminLayout() {
         )}
       </AnimatePresence>
 
-      <main className="lg:pl-64">
+      <main id="admin-main" tabIndex={-1} className="lg:pl-64 outline-none">
         <div className="mx-auto max-w-6xl px-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] py-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-6 sm:pb-8">
           <ErrorBoundary key={location.pathname}>
             <Suspense fallback={<PageLoader />}>

@@ -41,7 +41,7 @@ export default function Privacy() {
               Your privacy matters to us. This policy explains what information we collect, how we
               use it, and the safeguards we apply when you interact with {SITE.name}.
             </p>
-            <p className="mt-2 text-sm text-muted">Last updated: 12 August 2026</p>
+            <p className="mt-2 text-sm text-muted">Last updated: 13 August 2026</p>
           </Reveal>
         </div>
       </section>
@@ -100,13 +100,18 @@ export default function Privacy() {
 
           <LegalSection title="4. Cookies & local storage">
             <p>
-              Our website may store an anonymous visitor identifier in your browser to track
-              interactions (such as calculator usage) for lead scoring and product popularity. This
-              helps us serve you better. You can clear site data through your browser settings.
+              Our website may store an anonymous visitor identifier (<code>bph_visitor_id</code>) in
+              your browser, plus a local event log used for lead scoring and product popularity.
+              Once you submit a form with your name or phone, that identifier is stored with your
+              enquiry and is personal data. You can clear site data through your browser settings.
             </p>
             <p>
-              If you install our admin web app, your browser may also store session and preference
-              data required for login and offline functionality.
+              Submitting a callback, test ride, service, contact, or review form is your consent for
+              us to contact you about that request by phone, WhatsApp, or email.
+            </p>
+            <p>
+              If you install our admin web app, your browser may also store session data and a Web
+              Push subscription so staff devices can receive new-lead alerts.
             </p>
           </LegalSection>
 
@@ -161,9 +166,10 @@ export default function Privacy() {
             <p>
               Under applicable Indian law (including the Digital Personal Data Protection Act, 2023,
               as it applies), you may request access, correction, or deletion of your personal
-              information by contacting us. We will respond within a reasonable timeframe. Some
-              requests may be limited where we must retain data for legal, warranty, or dispute
-              purposes.
+              information by contacting us using the details in section 11. We will respond within a
+              reasonable timeframe. Some requests may be limited where we must retain data for legal,
+              warranty, or dispute purposes. {SITE.name} is the business that decides why this
+              customer data is collected (enquiries, test rides, service, and follow-up).
             </p>
           </LegalSection>
 
@@ -185,7 +191,9 @@ export default function Privacy() {
 
           <LegalSection title="11. Contact">
             <p>
-              For privacy-related questions, contact {SITE.name} at{' '}
+              For access, correction, or erasure requests, contact the showroom proprietor at{' '}
+              {SITE.name}, Chunakhali Bus Stand, Berhampore (the business that decides how enquiry
+              data is used). Phone:{' '}
               {site.phones.map((p, i) => (
                 <span key={p}>
                   {i > 0 && ' or '}

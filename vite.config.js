@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import path from 'path';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 function googleSiteVerificationPlugin() {
   return {
@@ -27,10 +28,17 @@ function googleSiteVerificationPlugin() {
 }
 
 export default defineConfig(({ mode }) => {
-  const useHttps = mode !== 'http';
+  const useHttps = mode !== 'http' && mode !== 'analyze';
 
   return {
-    plugins: [react(), googleSiteVerificationPlugin(), ...(useHttps ? [basicSsl()] : [])],
+    plugins: [
+      react(),
+      googleSiteVerificationPlugin(),
+      ...(useHttps ? [basicSsl()] : []),
+      ...(mode === 'analyze'
+        ? [visualizer({ filename: 'dist/stats.html', gzipSize: true, brotliSize: true, open: false })]
+        : []),
+    ],
     server: {
       host: true,
       open: true,

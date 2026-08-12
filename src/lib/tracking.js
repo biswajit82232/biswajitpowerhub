@@ -1,6 +1,7 @@
-import { supabase, isSupabaseConfigured } from './supabase';
-import { trackGAEvent } from './googleAnalytics';
-import { clearCache } from './cache';
+import { supabase, isSupabaseConfigured } from './supabase.js';
+import { trackGAEvent } from './googleAnalytics.js';
+import { clearCache } from './cache.js';
+import { withTimeout, FETCH_TIMEOUT_MS } from './utils.js';
 
 /**
  * Lead tracking & scoring engine.
@@ -196,14 +197,22 @@ export async function trackEvent(type, meta = {}) {
   writeLocalEvents(events);
 
   if (isSupabaseConfigured && supabase) {
-    const { error } = await supabase.from('lead_events').insert({
-      visitor_id: visitorId,
-      event_type: type,
-      meta,
-    });
-    if (error) {
-      console.warn('[Tracking] lead_events insert failed:', error.message);
-    }
+    // Fire-and-forget: never block a lead form or page render on analytics.
+    withTimeout(
+      supabase.from('lead_events').insert({
+        visitor_id: visitorId,
+        event_type: type,
+        meta,
+      }),
+      FETCH_TIMEOUT_MS,
+      'Tracking insert timed out',
+    )
+      .then(({ error }) => {
+        if (error) console.warn('[Tracking] lead_events insert failed:', error.message);
+      })
+      .catch((err) => {
+        console.warn('[Tracking] lead_events insert failed:', err.message);
+      });
   }
 
   if (POPULARITY_EVENTS.has(type)) {
@@ -241,23 +250,25 @@ export function classifyLead(events = []) {
   }
 
   const repeatedSameScooter = Object.values(scooterViews).some((c) => c >= 2);
-  const highIntent =
-    (counts[EVENT.EMI_USED] || 0) > 0 ||
-    (counts[EVENT.SIMULATOR_USED] || 0) > 0 ||
+  const formOrChat =
     (counts[EVENT.CALLBACK_REQUEST] || 0) > 0 ||
     (counts[EVENT.TEST_RIDE_BOOKED] || 0) > 0 ||
     (counts[EVENT.SERVICE_BOOKED] || 0) > 0 ||
     (counts[EVENT.WHATSAPP_CLICK] || 0) > 0 ||
     (counts[EVENT.CALL_CLICK] || 0) > 0 ||
-    (counts[EVENT.CONTACT_FORM] || 0) > 0 ||
-    (counts[EVENT.DIRECTIONS_CLICK] || 0) > 0 ||
+    (counts[EVENT.CONTACT_FORM] || 0) > 0;
+
+  const engaged =
+    (counts[EVENT.EMI_USED] || 0) > 0 ||
+    (counts[EVENT.SIMULATOR_USED] || 0) > 0 ||
     repeatedSameScooter;
 
   const totalScooterViews = counts[EVENT.SCOOTER_VIEW] || 0;
   const multipleVisits = visits.size >= 2;
 
   let classification = 'cold';
-  if (highIntent || score >= 30) classification = 'hot';
+  if (formOrChat) classification = 'hot';
+  else if (engaged || score >= 40) classification = 'warm';
   else if (multipleVisits || totalScooterViews >= 2 || score >= 10) classification = 'warm';
 
   return { score, classification, counts, visits: visits.size };

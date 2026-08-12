@@ -5,6 +5,9 @@
 
 import { toLegacyHours } from '@/features/site/siteHours';
 import { SITE_FAQS as DEFAULT_SITE_FAQS } from '@/data/seoContent';
+import { safeMapsEmbedUrl } from '@/lib/mapsEmbed';
+
+export { safeMapsEmbedUrl };
 
 /** Per-day hours seed — open every day 9:00 AM – 8:30 PM */
 export const INITIAL_HOURS = {

@@ -22,17 +22,33 @@ The SEO overhaul in this repo is correct for **non-www** (`https://biswajitpower
    - `VITE_SITE_URL=https://biswajitpowerhub.in`
    - `VITE_GA_MEASUREMENT_ID` (GA4 measurement ID)
    - `VITE_GOOGLE_ADS_ID` (optional `AW-…` conversion ID)
-   - `VITE_ADMIN_EMAILS` — **must match** every email in Supabase `admin_allowlist` (comma-separated). UI gate and RLS both depend on this sync.
+   - `VITE_ADMIN_EMAILS` — optional extra UI gate (comma-separated). **RLS source of truth is** Supabase `admin_allowlist` via `is_admin()`. Keep the env list in sync if you set it.
    - `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` (from Supabase API settings)
    - Optional: `VITE_GOOGLE_SITE_VERIFICATION` when Search Console HTML verify is ready
 5. Deploy **this branch to Production** (not only a Preview deployment)
 
 ## Admin allowlist (security)
 
-- **DB:** `public.admin_allowlist` (enforced by RLS `is_admin()`)
-- **Client:** `VITE_ADMIN_EMAILS` (UI gate only — not a secret)
-- Keep both identical. After changing emails, update Vercel env **and** insert/delete rows in `admin_allowlist`.
-- Apply migration `harden_rls_storage_and_rpc.sql` (order 23) so leftover site/offers policies and Storage writes are admin-only.
+- **DB (source of truth):** `public.admin_allowlist` enforced by RLS `is_admin()`.
+- **Client:** `VITE_ADMIN_EMAILS` is an optional extra UI gate (public in the JS bundle — not a secret).
+- After changing emails, insert/delete rows in `admin_allowlist`. Update Vercel env only if you use the extra gate.
+- Apply migration `harden_public_writes_push_and_rate_limits.sql` (order 27) for form rate limits, admin-only push subscriptions, and review-photo path prefix.
+
+## Auth dashboard (manual)
+
+Enable **leaked password protection** in Supabase → Authentication → Providers → Email (HaveIBeenPwned). This cannot be flipped via SQL.
+
+## Manual checks (not claimed done in-repo)
+
+- Mid-range Android on throttled 4G; NVDA/VoiceOver on admin; lawyer-grade ToS/DPDP registration; Search Console cannibalization; live [Rich Results Test](https://search.google.com/test/rich-results).
+
+## Vercel rollback
+
+If a bad production deploy ships: Vercel Dashboard → Deployments → open the last good deployment → **Promote to Production** (Instant Rollback). Then fix forward on a new commit. Do not force-push `main` unless you intend to rewrite history.
+
+## Backups & free-tier limits
+
+Supabase **Free** has no point-in-time recovery. Use the dashboard backup export / `pg_dump` before risky migrations, and plan **Pro** when Storage + egress grow (hero/gallery images) — row counts are tiny today. Pause is avoided by `.github/workflows/supabase-keep-alive.yml`; site uptime is `.github/workflows/site-uptime.yml`.
 
 ## Build / deploy commands
 

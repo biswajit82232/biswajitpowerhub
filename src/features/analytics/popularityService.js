@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { EVENT } from '@/lib/tracking';
 import { fetchWithCache } from '@/lib/cache';
 import { computeValueBadges } from '@/lib/valueBadges';
+import { withTimeout, FETCH_TIMEOUT_MS } from '@/lib/utils';
 
 const MS_DAY = 86400000;
 const MS_WEEK = 7 * MS_DAY;
@@ -29,14 +30,33 @@ function normalizeEvent(row) {
 
 export async function fetchRawEvents(limit = 8000) {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase.rpc('get_analytics_events', {
-      p_limit: limit,
-    });
-    if (error) {
-      console.warn('[Analytics] get_analytics_events failed:', error.message);
+    try {
+      const { data, error } = await withTimeout(
+        supabase.rpc('get_analytics_events', { p_limit: limit }),
+        FETCH_TIMEOUT_MS,
+        'Analytics events timed out',
+      );
+      if (!error) return (data || []).map(normalizeEvent);
+
+      const pub = await withTimeout(
+        supabase.rpc('get_public_popularity_events', { p_limit: limit }),
+        FETCH_TIMEOUT_MS,
+        'Popularity events timed out',
+      );
+      if (pub.error) {
+        console.warn('[Analytics] popularity events failed:', pub.error.message);
+        return localEvents().map(normalizeEvent);
+      }
+      return (pub.data || []).map((row) => ({
+        type: row.event_type,
+        meta: { scooterId: row.scooter_key, name: row.scooter_key },
+        at: row.created_at,
+        visitorId: null,
+      }));
+    } catch (err) {
+      console.warn('[Analytics] get_analytics_events failed:', err.message);
       return localEvents().map(normalizeEvent);
     }
-    return (data || []).map(normalizeEvent);
   }
   return localEvents().map(normalizeEvent);
 }

@@ -1,4 +1,4 @@
-import { EVENT } from './tracking';
+import { EVENT } from './tracking.js';
 
 /** Base weights tuned for 0–100 purchase intent (high-intent actions dominate). */
 const READINESS_WEIGHTS = {
@@ -26,6 +26,10 @@ const TYPE_CAPS = {
   [EVENT.WHATSAPP_CLICK]: 32,
   [EVENT.CALL_CLICK]: 30,
   [EVENT.DIRECTIONS_CLICK]: 24,
+  [EVENT.CALLBACK_REQUEST]: 24,
+  [EVENT.TEST_RIDE_BOOKED]: 30,
+  [EVENT.SERVICE_BOOKED]: 26,
+  [EVENT.CONTACT_FORM]: 20,
 };
 
 const SIGNAL_LABELS = {

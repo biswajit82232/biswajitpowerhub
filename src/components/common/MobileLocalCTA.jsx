@@ -34,6 +34,8 @@ export function MobileLocalCTA() {
         </Button>
         <Button
           href={whatsappUrl(undefined, site)}
+          target="_blank"
+          rel="noopener noreferrer"
           variant="whatsapp"
           size="sm"
           icon={MessageCircle}

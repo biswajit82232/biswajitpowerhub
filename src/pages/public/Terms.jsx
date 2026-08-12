@@ -43,7 +43,7 @@ export default function Terms() {
               Please read these terms carefully before using our website, claiming an offer, booking
               a test ride, or purchasing from {SITE.name}.
             </p>
-            <p className="mt-2 text-sm text-muted">Last updated: 12 August 2026</p>
+            <p className="mt-2 text-sm text-muted">Last updated: 13 August 2026</p>
           </Reveal>
         </div>
       </section>
@@ -225,9 +225,12 @@ export default function Terms() {
           <LegalSection title="9. Finance & EMI estimates">
             <p>
               EMI figures, savings calculators, and cost estimates on this website are for
-              illustration only. Actual loan terms depend on the lender&apos;s approval, interest
-              rates, processing fees, and your credit profile. {SITE.name} is not a bank or NBFC and
-              does not guarantee loan approval, interest rate, or EMI amount.
+              illustration only. The calculator uses consumer-durable (flat) interest on vehicle
+              price as configured in our showroom tools — it is not a bank reducing-balance quote.
+              Actual loan terms depend on the lender&apos;s approval, interest rates, processing fees,
+              and your credit profile. {SITE.name} is not a bank or NBFC and does not guarantee loan
+              approval, interest rate, or EMI amount. The sale contract is formed at the showroom,
+              not by using this website.
             </p>
           </LegalSection>
 

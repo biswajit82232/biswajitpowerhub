@@ -1,6 +1,6 @@
-import { ACCESSORY_CATEGORIES } from '@/data/accessories';
-import { slugify } from '@/lib/utils';
-import { DEFAULT_REAL_RANGE_FACTOR } from '@/lib/rangeDefaults';
+import { ACCESSORY_CATEGORIES } from '../../data/accessories.js';
+import { slugify } from '../../lib/utils.js';
+import { DEFAULT_REAL_RANGE_FACTOR } from '../../lib/rangeDefaults.js';
 
 /** Vyapar online-store category → local accessory category (or scooter). */
 export const VYAPAR_CATEGORY_MAP = {
@@ -66,7 +66,7 @@ export function mapVyaparStock(quantity, stockFlag = true) {
   if (!Number.isFinite(qty)) return stockFlag ? 'in_stock' : 'out_of_stock';
   if (qty < 0) return 'in_stock';
   if (qty === 0) return 'out_of_stock';
-  if (qty === 1) return 'low_stock';
+  if (qty <= 3) return 'low_stock';
   return 'in_stock';
 }
 
@@ -107,19 +107,32 @@ export function uniqueSlug(baseName, existingIds = []) {
 
 /**
  * Apply a synced price onto a scooter without breaking variant-based display.
- * normalizeScooter() uses the cheapest variant price when variants exist, so
- * updating only top-level `price` would be ignored on the public site.
+ * Prefer the linked variant when known; otherwise update variants that still
+ * share the previous price (not only the cheapest).
  */
-export function applyPriceToScooter(scooter, price) {
+export function applyPriceToScooter(scooter, price, { variantId, previousPrice } = {}) {
   const next = { ...scooter, price };
   const variants = Array.isArray(scooter.variants) ? scooter.variants : [];
   if (!variants.length) return next;
 
-  const indexed = variants.map((v, i) => ({ v, i, price: Number(v.price) || 0 }));
-  indexed.sort((a, b) => a.price - b.price);
-  const cheapestIdx = indexed[0].i;
-  next.variants = variants.map((v, i) => (
-    i === cheapestIdx ? { ...v, price: Number(price) || 0 } : v
+  const n = Number(price) || 0;
+  if (variantId) {
+    next.variants = variants.map((v) => (v.id === variantId ? { ...v, price: n } : v));
+    return next;
+  }
+
+  const old = previousPrice != null ? Number(previousPrice) : NaN;
+  if (Number.isFinite(old)) {
+    const matching = variants.filter((v) => Number(v.price) === old);
+    if (matching.length) {
+      next.variants = variants.map((v) => (Number(v.price) === old ? { ...v, price: n } : v));
+      return next;
+    }
+  }
+
+  const cheapest = Math.min(...variants.map((v) => Number(v.price) || 0));
+  next.variants = variants.map((v) => (
+    (Number(v.price) || 0) === cheapest ? { ...v, price: n } : v
   ));
   return next;
 }

@@ -49,8 +49,8 @@ VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX   # optional — Google Analytics 4
 
 1. Create a project at [supabase.com](https://supabase.com).
 2. Copy `.env.example` → `.env` and set `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` (Project Settings → API).
-3. SQL editor: run `supabase/schema.sql`, then `supabase/seed.sql`.
-4. Apply migrations — either:
+3. SQL editor: run `supabase/schema.sql` (hardened — `is_admin()` RLS), then `supabase/seed.sql`. Then insert your admin email into `admin_allowlist`.
+4. Apply migrations — **required** for site_settings, offers, vyapar, storage. Either:
    - **CLI (recommended):** add `SUPABASE_DB_PASSWORD` to `.env`, then `npm run db:check` and `npm run db:migrate`
    - **Manual:** run files in order — see `supabase/migrations/README.md`
 5. **Authentication → Users → Add user** for admin login at `/admin/login`.
@@ -66,6 +66,14 @@ Setup (one-time):
 3. Optional: **Actions** tab → select **Supabase keep-alive** → **Run workflow** to test it immediately
 
 Run it locally any time with `npm run keep-alive`.
+
+Homepage uptime (separate from the database ping) is `.github/workflows/site-uptime.yml` (daily curl of `https://biswajitpowerhub.in/`).
+
+**Vercel rollback:** Deployments → previous good deploy → Promote to Production.
+
+**Backups:** Free-tier Supabase has no PITR. Export from the dashboard or `pg_dump` before schema changes; upgrade to Pro when Storage/bandwidth grows.
+
+**Auth:** enable leaked-password protection in the Supabase Auth dashboard.
 
 ---
 
@@ -187,13 +195,26 @@ Production optimisations already in place:
 |------|----------------|
 | JS bundle | Route lazy-loading, vendor chunks (React, Motion, Supabase, icons) |
 | Caching | 1-year immutable cache on `/assets/*` (Vercel) |
-| Fonts | Non-blocking load with `display=swap` |
+| Fonts | Non-blocking load with `display=swap` + `preconnect` to `fonts.gstatic.com` |
+| Bundle map | `npm run build:analyze` writes `dist/stats.html` |
 | Hero / UI | CSS animations instead of heavy infinite JS loops |
 | Images | Lazy loading on maps; branded placeholders |
 | GA4 | Script deferred until browser idle (~1–2s after load) |
 | Admin | Separate chunk — not loaded on public pages |
 
 **After deploy:** run [PageSpeed Insights](https://pagespeed.web.dev/) on your live URL. Target 90+ mobile where possible; real images and third-party maps will affect scores.
+
+---
+
+## Manual checks (not claimed done in-repo)
+
+These need a real device, Search Console, or a lawyer — code cannot close them:
+
+- [ ] Mid-range Android on throttled 4G (Chrome DevTools slow 4G is a proxy)
+- [ ] NVDA / VoiceOver on the admin panel (keyboard + ARIA is the code proxy)
+- [ ] Lawyer review of Terms / DPDP Data Fiduciary registration
+- [ ] Search Console query data for town-page cannibalization
+- [ ] [Google Rich Results Test](https://search.google.com/test/rich-results) on the live homepage
 
 ---
 

@@ -8,6 +8,7 @@
     "dev": "vite",
     "dev:http": "vite --mode http",
     "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/fallback-prerender.mjs",
+    "build:analyze": "vite build --mode analyze",
     "qa:seo": "node scripts/qa-seo-check.mjs",
     "qa:gsc": "node scripts/gsc-deep-audit.mjs",
     "prerender": "node scripts/prerender.mjs",
@@ -17,6 +18,7 @@
     "prebuild": "node scripts/generate-brand-pngs.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
+    "test": "node --test",
     "db:check": "node scripts/check-supabase.mjs",
     "db:migrate": "node scripts/apply-migrations.mjs",
     "vapid:generate": "node scripts/generate-vapid-keys.mjs",
@@ -44,6 +46,7 @@
     "eslint-plugin-react-refresh": "^0.4.11",
     "pg": "^8.13.1",
     "postcss": "^8.5.26",
+    "rollup-plugin-visualizer": "^5.14.0",
     "sharp": "^0.35.3",
     "tailwindcss": "^3.4.11",
     "vite": "^5.4.21"

@@ -90,7 +90,7 @@ export function Modal({
       {open && (
         <div
           className={cn(
-            'fixed inset-0 z-[100] flex justify-center p-4',
+            'fixed inset-0 z-[10050] flex justify-center p-4 max-lg:pb-[calc(4.5rem+env(safe-area-inset-bottom))]',
             centered ? 'items-center' : 'items-end sm:items-center sm:p-4',
           )}
         >

@@ -7,6 +7,7 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { saveHeroImage } from '@/features/finance/financeService';
 import { resizeImageFile } from '@/lib/resizeImage';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
 
 // Re-export for existing importers.
 export { resizeImageFile } from '@/lib/resizeImage';
@@ -82,11 +83,11 @@ export async function loadSitePhotos() {
   if (!isSupabaseConfigured || !supabase) return local;
 
   try {
-    const { data, error } = await supabase
-      .from('site_settings')
-      .select('photos')
-      .eq('id', SETTINGS_ROW_ID)
-      .maybeSingle();
+    const { data, error } = await withTimeout(
+      supabase.from('site_settings').select('photos').eq('id', SETTINGS_ROW_ID).maybeSingle(),
+      FETCH_TIMEOUT_MS,
+      'Site photos fetch timed out',
+    );
 
     if (error) {
       // Column may not exist until migration is applied — keep local quietly.
@@ -122,9 +123,13 @@ export async function uploadSitePhotoFile(file, folder = 'site') {
   if (isSupabaseConfigured && supabase) {
     const ext = uploadFile.name.split('.').pop()?.toLowerCase() || 'webp';
     const path = `${folder}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage
-      .from('scooter-images')
-      .upload(path, uploadFile, { upsert: true, contentType: uploadFile.type });
+    const { error } = await withTimeout(
+      supabase.storage
+        .from('scooter-images')
+        .upload(path, uploadFile, { upsert: true, contentType: uploadFile.type }),
+      UPLOAD_TIMEOUT_MS,
+      'Site photo upload timed out',
+    );
     if (!error) {
       const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
       return data.publicUrl;
@@ -145,11 +150,11 @@ export async function saveSitePhotos(photos) {
 
   if (isSupabaseConfigured && supabase) {
     const payload = { photos: next, updated_at: new Date().toISOString() };
-    const { data: updated, error: updateError } = await supabase
-      .from('site_settings')
-      .update(payload)
-      .eq('id', SETTINGS_ROW_ID)
-      .select('id');
+    const { data: updated, error: updateError } = await withTimeout(
+      supabase.from('site_settings').update(payload).eq('id', SETTINGS_ROW_ID).select('id'),
+      MUTATION_TIMEOUT_MS,
+      'Site photos save timed out',
+    );
 
     if (updateError) {
       const missingCol =
@@ -163,10 +168,14 @@ export async function saveSitePhotos(photos) {
         '[sitePhotos] photos column missing — run add_site_photos_json.sql. Saving hero URL only.',
       );
     } else if (!updated?.length) {
-      const { error: insertError } = await supabase.from('site_settings').insert({
-        id: SETTINGS_ROW_ID,
-        photos: next,
-      });
+      const { error: insertError } = await withTimeout(
+        supabase.from('site_settings').insert({
+          id: SETTINGS_ROW_ID,
+          photos: next,
+        }),
+        MUTATION_TIMEOUT_MS,
+        'Site photos insert timed out',
+      );
       if (insertError && !/photos/i.test(insertError.message || '')) {
         throw new Error(insertError.message || 'Could not save photos to cloud.');
       }

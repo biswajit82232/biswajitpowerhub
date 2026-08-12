@@ -1,6 +1,17 @@
 -- ============================================================================
--- BISWAJIT POWER HUB — Supabase schema
--- Run in the Supabase SQL editor. Safe to re-run (uses IF NOT EXISTS).
+-- BISWAJIT POWER HUB — Supabase schema (hardened)
+--
+-- Run in the Supabase SQL editor. Safe to re-run (IF NOT EXISTS / DROP POLICY).
+--
+-- THIS FILE IS PRODUCTION-SAFE for the tables it creates: authenticated writes
+-- require public.is_admin() (JWT email on admin_allowlist), not "any signed-in
+-- user". Stopping after this file + seed.sql will NOT leave CRM tables open.
+--
+-- It is NOT a complete dump of production. You MUST still apply
+-- supabase/migrations/ (site_settings, offers, vyapar, storage buckets, etc.).
+--
+-- After first run, insert your admin email (do not commit it here):
+--   insert into public.admin_allowlist (email) values ('you@example.com');
 -- ============================================================================
 
 create extension if not exists "pgcrypto";
@@ -184,6 +195,45 @@ create table if not exists public.finance_settings (
 );
 insert into public.finance_settings (id) values (1) on conflict (id) do nothing;
 
+-- ---------------------------------------------------------------------------
+-- ADMIN ALLOWLIST (RLS gate — insert your email after first run)
+-- ---------------------------------------------------------------------------
+create table if not exists public.admin_allowlist (
+  email text primary key,
+  created_at timestamptz not null default now()
+);
+
+alter table public.admin_allowlist enable row level security;
+
+drop policy if exists "admins read allowlist" on public.admin_allowlist;
+create policy "admins read allowlist"
+  on public.admin_allowlist for select to authenticated
+  using (
+    lower(auth.jwt() ->> 'email') = lower(email)
+    or exists (
+      select 1 from public.admin_allowlist a
+      where lower(a.email) = lower(auth.jwt() ->> 'email')
+    )
+  );
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.admin_allowlist a
+    where lower(a.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+  );
+$$;
+
+revoke all on function public.is_admin() from public;
+revoke all on function public.is_admin() from anon;
+grant execute on function public.is_admin() to authenticated, service_role;
+
 -- ============================================================================
 -- ROW LEVEL SECURITY
 -- ============================================================================
@@ -198,6 +248,38 @@ alter table public.lead_events      enable row level security;
 alter table public.leads            enable row level security;
 alter table public.finance_settings enable row level security;
 
+-- Drop legacy permissive names so re-running this file upgrades an old install
+drop policy if exists "auth all scooters" on public.scooters;
+drop policy if exists "auth all accessories" on public.accessories;
+drop policy if exists "auth all reviews" on public.reviews;
+drop policy if exists "auth all callbacks" on public.callbacks;
+drop policy if exists "auth all testrides" on public.test_rides;
+drop policy if exists "auth all service_bookings" on public.service_bookings;
+drop policy if exists "auth all contact" on public.contact_messages;
+drop policy if exists "auth all events" on public.lead_events;
+drop policy if exists "auth all leads" on public.leads;
+drop policy if exists "auth all finance" on public.finance_settings;
+drop policy if exists "public read scooters" on public.scooters;
+drop policy if exists "public read accessories" on public.accessories;
+drop policy if exists "public read finance" on public.finance_settings;
+drop policy if exists "public read approved reviews" on public.reviews;
+drop policy if exists "anon insert reviews" on public.reviews;
+drop policy if exists "anon insert callbacks" on public.callbacks;
+drop policy if exists "anon insert testrides" on public.test_rides;
+drop policy if exists "anon insert service_bookings" on public.service_bookings;
+drop policy if exists "anon insert contact" on public.contact_messages;
+drop policy if exists "anon insert events" on public.lead_events;
+drop policy if exists "admin all scooters" on public.scooters;
+drop policy if exists "admin all accessories" on public.accessories;
+drop policy if exists "admin all reviews" on public.reviews;
+drop policy if exists "admin all callbacks" on public.callbacks;
+drop policy if exists "admin all testrides" on public.test_rides;
+drop policy if exists "admin all service_bookings" on public.service_bookings;
+drop policy if exists "admin all contact" on public.contact_messages;
+drop policy if exists "admin all events" on public.lead_events;
+drop policy if exists "admin all leads" on public.leads;
+drop policy if exists "admin all finance" on public.finance_settings;
+
 -- Public READ: scooters, finance settings, and approved reviews
 create policy "public read scooters" on public.scooters
   for select using (true);
@@ -211,28 +293,49 @@ create policy "public read finance" on public.finance_settings
 create policy "public read approved reviews" on public.reviews
   for select using (status = 'approved');
 
--- Public INSERT: lead capture forms + events (anon can submit, not read)
+-- Public INSERT: lead capture forms + events (anon can submit, not read).
+-- WITH CHECK forces the default unhandled state so a client cannot hide a row.
 create policy "anon insert reviews" on public.reviews
   for insert to anon
   with check (status = 'pending' and featured = false and rating between 1 and 5);
-create policy "anon insert callbacks" on public.callbacks       for insert with check (true);
-create policy "anon insert testrides" on public.test_rides      for insert with check (true);
-create policy "anon insert service_bookings" on public.service_bookings for insert with check (true);
-create policy "anon insert contact"   on public.contact_messages for insert with check (true);
-create policy "anon insert events"    on public.lead_events     for insert with check (true);
+create policy "anon insert callbacks" on public.callbacks
+  for insert to anon
+  with check (coalesce(handled, false) = false);
+create policy "anon insert testrides" on public.test_rides
+  for insert to anon
+  with check (coalesce(status, 'requested') = 'requested');
+create policy "anon insert service_bookings" on public.service_bookings
+  for insert to anon
+  with check (coalesce(status, 'requested') = 'requested');
+create policy "anon insert contact" on public.contact_messages
+  for insert to anon
+  with check (coalesce(is_read, false) = false);
+create policy "anon insert events" on public.lead_events
+  for insert
+  with check (true);
 -- Leads: anon upsert via upsert_lead() RPC only (see functions below)
 
--- Authenticated (admin) FULL ACCESS to everything
-create policy "auth all scooters"  on public.scooters          for all to authenticated using (true) with check (true);
-create policy "auth all accessories" on public.accessories     for all to authenticated using (true) with check (true);
-create policy "auth all reviews"   on public.reviews           for all to authenticated using (true) with check (true);
-create policy "auth all callbacks" on public.callbacks         for all to authenticated using (true) with check (true);
-create policy "auth all testrides" on public.test_rides        for all to authenticated using (true) with check (true);
-create policy "auth all service_bookings" on public.service_bookings for all to authenticated using (true) with check (true);
-create policy "auth all contact"   on public.contact_messages  for all to authenticated using (true) with check (true);
-create policy "auth all events"    on public.lead_events       for all to authenticated using (true) with check (true);
-create policy "auth all leads"     on public.leads             for all to authenticated using (true) with check (true);
-create policy "auth all finance"   on public.finance_settings  for all to authenticated using (true) with check (true);
+-- Authenticated writes: allowlisted admins only (not every signed-in user)
+create policy "admin all scooters" on public.scooters
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all accessories" on public.accessories
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all reviews" on public.reviews
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all callbacks" on public.callbacks
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all testrides" on public.test_rides
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all service_bookings" on public.service_bookings
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all contact" on public.contact_messages
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all events" on public.lead_events
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all leads" on public.leads
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy "admin all finance" on public.finance_settings
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
 
 -- ============================================================================
 -- SECURITY DEFINER RPCs (public lead upsert + analytics read)
@@ -276,6 +379,23 @@ begin
     raise exception 'visitor_id required';
   end if;
 
+  if exists (
+    select 1 from public.leads
+    where visitor_id = p_visitor_id
+      and updated_at > now() - interval '2 seconds'
+  ) then
+    return;
+  end if;
+
+  if not exists (select 1 from public.leads where visitor_id = p_visitor_id) then
+    if (
+      select count(*) from public.leads
+      where created_at > now() - interval '5 minutes'
+    ) >= 40 then
+      raise exception 'rate limited';
+    end if;
+  end if;
+
   insert into public.leads (
     visitor_id, name, phone, last_source, interested_scooter,
     score, classification, updated_at
@@ -290,7 +410,11 @@ begin
     last_source = excluded.last_source,
     interested_scooter = coalesce(excluded.interested_scooter, leads.interested_scooter),
     score = greatest(coalesce(leads.score, 0), coalesce(excluded.score, 0)),
-    classification = excluded.classification,
+    classification = case
+      when leads.classification = 'hot' or excluded.classification = 'hot' then 'hot'
+      when leads.classification = 'warm' or excluded.classification = 'warm' then 'warm'
+      else coalesce(excluded.classification, leads.classification, 'cold')
+    end,
     updated_at = now();
 end;
 $$;
@@ -310,12 +434,188 @@ security definer
 set search_path = public
 stable
 as $$
-  select e.event_type, e.meta, e.created_at, e.visitor_id
+  select
+    e.event_type,
+    case
+      when public.is_admin() then e.meta
+      else coalesce(e.meta, '{}'::jsonb)
+        - 'name' - 'phone' - 'email' - 'message' - 'details'
+    end as meta,
+    e.created_at,
+    case when public.is_admin() then e.visitor_id else null end as visitor_id
   from public.lead_events e
+  where e.event_type in (
+    'scooter_view',
+    'emi_calculator_used',
+    'simulator_used',
+    'test_ride_booked',
+    'callback_request',
+    'compare_used',
+    'whatsapp_click',
+    'call_click',
+    'service_booked',
+    'contact_form',
+    'page_view'
+  )
+  and (
+    public.is_admin()
+    or e.event_type in (
+      'scooter_view',
+      'emi_calculator_used',
+      'simulator_used',
+      'test_ride_booked',
+      'callback_request',
+      'compare_used'
+    )
+  )
   order by e.created_at desc
-  limit least(greatest(coalesce(p_limit, 8000), 1), 10000);
+  limit greatest(1, least(coalesce(p_limit, 8000), 8000));
 $$;
 
-revoke all on function public.get_analytics_events(int) from public;
-grant execute on function public.get_analytics_events(int) to anon, authenticated;
+revoke all on function public.get_analytics_events(int) from public, anon;
+grant execute on function public.get_analytics_events(int) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Public write rate limits (forms, reviews, analytics events)
+-- ---------------------------------------------------------------------------
+create index if not exists callbacks_visitor_created_idx
+  on public.callbacks (visitor_id, created_at desc);
+create index if not exists callbacks_created_at_idx
+  on public.callbacks (created_at desc);
+create index if not exists test_rides_visitor_created_idx
+  on public.test_rides (visitor_id, created_at desc);
+create index if not exists test_rides_created_at_idx
+  on public.test_rides (created_at desc);
+create index if not exists service_bookings_visitor_created_idx
+  on public.service_bookings (visitor_id, created_at desc);
+create index if not exists service_bookings_created_at_idx
+  on public.service_bookings (created_at desc);
+create index if not exists contact_messages_visitor_created_idx
+  on public.contact_messages (visitor_id, created_at desc);
+create index if not exists contact_messages_created_at_idx
+  on public.contact_messages (created_at desc);
+create index if not exists reviews_created_at_idx
+  on public.reviews (created_at desc);
+create index if not exists lead_events_visitor_created_idx
+  on public.lead_events (visitor_id, created_at desc);
+create index if not exists lead_events_created_at_idx
+  on public.lead_events (created_at desc);
+
+create or replace function public.assert_public_write_rate()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  vid text;
+  recent_visitor int;
+  recent_global int;
+  visitor_window interval;
+  global_cap int;
+  global_window interval := interval '5 minutes';
+begin
+  vid := nullif(trim(coalesce(to_jsonb(NEW) ->> 'visitor_id', '')), '');
+
+  if TG_TABLE_NAME = 'lead_events' then
+    visitor_window := interval '10 seconds';
+    global_cap := 200;
+  elsif TG_TABLE_NAME = 'reviews' then
+    visitor_window := interval '30 seconds';
+    global_cap := 20;
+  else
+    visitor_window := interval '2 seconds';
+    global_cap := 40;
+  end if;
+
+  if vid is not null and TG_TABLE_NAME <> 'reviews' then
+    execute format(
+      'select count(*) from public.%I where visitor_id = $1 and created_at > now() - $2',
+      TG_TABLE_NAME
+    )
+    into recent_visitor
+    using vid, visitor_window;
+
+    if TG_TABLE_NAME = 'lead_events' then
+      if coalesce(recent_visitor, 0) >= 15 then
+        raise exception 'rate limited';
+      end if;
+    elsif coalesce(recent_visitor, 0) > 0 then
+      raise exception 'rate limited';
+    end if;
+  end if;
+
+  execute format(
+    'select count(*) from public.%I where created_at > now() - $1',
+    TG_TABLE_NAME
+  )
+  into recent_global
+  using global_window;
+
+  if coalesce(recent_global, 0) >= global_cap then
+    raise exception 'rate limited';
+  end if;
+
+  return NEW;
+end;
+$$;
+
+drop trigger if exists callbacks_write_rate on public.callbacks;
+create trigger callbacks_write_rate
+  before insert on public.callbacks
+  for each row execute function public.assert_public_write_rate();
+
+drop trigger if exists test_rides_write_rate on public.test_rides;
+create trigger test_rides_write_rate
+  before insert on public.test_rides
+  for each row execute function public.assert_public_write_rate();
+
+drop trigger if exists service_bookings_write_rate on public.service_bookings;
+create trigger service_bookings_write_rate
+  before insert on public.service_bookings
+  for each row execute function public.assert_public_write_rate();
+
+drop trigger if exists contact_messages_write_rate on public.contact_messages;
+create trigger contact_messages_write_rate
+  before insert on public.contact_messages
+  for each row execute function public.assert_public_write_rate();
+
+drop trigger if exists reviews_write_rate on public.reviews;
+create trigger reviews_write_rate
+  before insert on public.reviews
+  for each row execute function public.assert_public_write_rate();
+
+drop trigger if exists lead_events_write_rate on public.lead_events;
+create trigger lead_events_write_rate
+  before insert on public.lead_events
+  for each row execute function public.assert_public_write_rate();
+
+revoke all on function public.assert_public_write_rate() from public, anon, authenticated;
+
+create or replace function public.get_public_popularity_events(p_limit int default 8000)
+returns table (event_type text, created_at timestamptz, scooter_key text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select
+    e.event_type,
+    e.created_at,
+    coalesce(e.meta->>'scooterId', e.meta->>'name', e.meta->>'interest') as scooter_key
+  from public.lead_events e
+  where e.event_type in (
+    'scooter_view',
+    'emi_calculator_used',
+    'simulator_used',
+    'test_ride_booked',
+    'callback_request'
+  )
+  order by e.created_at desc
+  limit greatest(1, least(coalesce(p_limit, 8000), 8000));
+$$;
+
+revoke all on function public.get_public_popularity_events(int) from public;
+grant execute on function public.get_public_popularity_events(int) to anon, authenticated;
+
 

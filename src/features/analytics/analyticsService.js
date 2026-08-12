@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { EVENT, resetLocalTrackingEvents } from '@/lib/tracking';
 import { clearCache } from '@/lib/cache';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS } from '@/lib/utils';
 
 /** Read all local events (demo-mode source of truth). */
 function localEvents() {
@@ -15,12 +16,17 @@ async function countRows(table, filter) {
   if (!isSupabaseConfigured || !supabase) return 0;
   let q = supabase.from(table).select('*', { count: 'exact', head: true });
   if (filter) q = filter(q);
-  const { count, error } = await q;
-  if (error) {
-    console.warn(`[Analytics] count(${table}) failed:`, error.message);
+  try {
+    const { count, error } = await withTimeout(q, FETCH_TIMEOUT_MS, `count(${table}) timed out`);
+    if (error) {
+      console.warn(`[Analytics] count(${table}) failed:`, error.message);
+      return 0;
+    }
+    return count || 0;
+  } catch (err) {
+    console.warn(`[Analytics] count(${table}) failed:`, err.message);
     return 0;
   }
-  return count || 0;
 }
 
 /**
@@ -32,22 +38,30 @@ async function countUniqueVisitors() {
     return new Set(ev.map((e) => e.visitorId)).size;
   }
 
-  // Prefer distinct visitor_id — fall back to capped select if RPC unavailable
-  const { data, error } = await supabase
-    .from('lead_events')
-    .select('visitor_id')
-    .eq('event_type', EVENT.PAGE_VIEW)
-    .limit(8000);
+  try {
+    const { data, error } = await withTimeout(
+      supabase.from('lead_events').select('visitor_id').eq('event_type', EVENT.PAGE_VIEW).limit(8000),
+      FETCH_TIMEOUT_MS,
+      'Unique visitors fetch timed out',
+    );
 
-  if (error) {
-    const { count } = await supabase
-      .from('lead_events')
-      .select('*', { count: 'exact', head: true })
-      .eq('event_type', EVENT.PAGE_VIEW);
-    return count || 0;
+    if (error) {
+      const { count } = await withTimeout(
+        supabase
+          .from('lead_events')
+          .select('*', { count: 'exact', head: true })
+          .eq('event_type', EVENT.PAGE_VIEW),
+        FETCH_TIMEOUT_MS,
+        'Visitor count timed out',
+      );
+      return count || 0;
+    }
+
+    return new Set((data || []).map((r) => r.visitor_id).filter(Boolean)).size;
+  } catch (err) {
+    console.warn('[Analytics] unique visitors failed:', err.message);
+    return 0;
   }
-
-  return new Set((data || []).map((r) => r.visitor_id).filter(Boolean)).size;
 }
 
 /**
@@ -82,11 +96,14 @@ export async function getOverview() {
     ]);
 
     // Scooter view windows for smart KPIs
-    const { data: viewRows, error: viewError } = await supabase
-      .from('lead_events')
-      .select('created_at')
-      .eq('event_type', EVENT.SCOOTER_VIEW)
-      .limit(8000);
+    const { data: viewRows, error: viewError } = await withTimeout(
+      supabase.from('lead_events').select('created_at').eq('event_type', EVENT.SCOOTER_VIEW).limit(8000),
+      FETCH_TIMEOUT_MS,
+      'Scooter views fetch timed out',
+    ).catch((err) => {
+      console.warn('[Analytics] scooter view fetch failed:', err.message);
+      return { data: [], error: err };
+    });
     if (viewError) {
       console.warn('[Analytics] scooter view fetch failed:', viewError.message);
     }
@@ -178,15 +195,24 @@ export async function getInboxBadges() {
 export async function getEventAggregates() {
   let events = [];
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase.from('lead_events').select('event_type, meta, visitor_id').limit(8000);
-    if (error) {
-      console.warn('[Analytics] event aggregate fetch failed:', error.message);
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('lead_events').select('event_type, meta, visitor_id').limit(8000),
+        FETCH_TIMEOUT_MS,
+        'Event aggregates timed out',
+      );
+      if (error) {
+        console.warn('[Analytics] event aggregate fetch failed:', error.message);
+      }
+      events = (data || []).map((r) => ({
+        type: r.event_type,
+        meta: r.meta,
+        visitorId: r.visitor_id,
+      }));
+    } catch (err) {
+      console.warn('[Analytics] event aggregate fetch failed:', err.message);
+      events = localEvents();
     }
-    events = (data || []).map((r) => ({
-      type: r.event_type,
-      meta: r.meta,
-      visitorId: r.visitor_id,
-    }));
   } else {
     events = localEvents();
   }
@@ -238,7 +264,11 @@ export async function resetAnalyticsCounts() {
 
   const results = await Promise.all(
     ANALYTICS_RESET_TABLES.map((table) =>
-      supabase.from(table).delete().gte('created_at', '1970-01-01T00:00:00Z'),
+      withTimeout(
+        supabase.from(table).delete().gte('created_at', '1970-01-01T00:00:00Z'),
+        MUTATION_TIMEOUT_MS,
+        `Reset ${table} timed out`,
+      ),
     ),
   );
 

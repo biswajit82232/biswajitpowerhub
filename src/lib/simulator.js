@@ -1,6 +1,6 @@
-import { clamp } from './utils';
-import { parseBatteryKwh } from './battery';
-import { DEFAULT_REAL_RANGE_FACTOR } from './rangeDefaults';
+import { clamp } from './utils.js';
+import { parseBatteryKwhOrNull } from './battery.js';
+import { DEFAULT_REAL_RANGE_FACTOR } from './rangeDefaults.js';
 
 /**
  * EV real-world usage model.
@@ -17,7 +17,8 @@ export function simulate({
   petrolPricePerLitre = 110,
   petrolMileageKmPerLitre = 40,
 }) {
-  const capacityKwh = parseBatteryKwh(scooter?.batteryCapacity);
+  const capacityKwh = parseBatteryKwhOrNull(scooter?.batteryCapacity);
+  const capacityUnknown = capacityKwh == null;
   const claimedRange = Number(scooter?.range) || 80;
   const realFactor = Number(scooter?.realRangeFactor) || DEFAULT_REAL_RANGE_FACTOR;
 
@@ -26,9 +27,9 @@ export function simulate({
 
   const realRange = Math.round(claimedRange * realFactor * weightFactor);
 
-  const energyPerCharge = capacityKwh / CHARGE_EFFICIENCY;
+  const energyPerCharge = capacityUnknown ? 0 : capacityKwh / CHARGE_EFFICIENCY;
   const costPerCharge = energyPerCharge * (Number(electricityRate) || 7);
-  const costPerKm = realRange > 0 ? costPerCharge / realRange : 0;
+  const costPerKm = realRange > 0 && !capacityUnknown ? costPerCharge / realRange : 0;
 
   const daily = Number(dailyDistance) || 0;
   const daysBetweenCharges = daily > 0 ? realRange / daily : 0;
@@ -65,11 +66,24 @@ export function simulate({
     weightFactor: Number(weightFactor.toFixed(3)),
     realFactor,
     energyPerCharge: Number(energyPerCharge.toFixed(2)),
+    capacityUnknown,
   };
 }
 
 /** Human-friendly charging frequency — never show decimal "days". */
 export function getChargingHabit(daysBetweenCharges) {
+  if (!Number.isFinite(daysBetweenCharges) || daysBetweenCharges <= 0) {
+    return {
+      label: 'Charge as needed',
+      detail: 'Enter your daily travel to see how often you would charge.',
+    };
+  }
+  if (daysBetweenCharges < 1) {
+    return {
+      label: 'Charge more than once a day',
+      detail: 'Daily travel is higher than one full charge — a midday top-up keeps you going.',
+    };
+  }
   if (daysBetweenCharges >= 2.5) {
     return {
       label: 'Charge every 2–3 days',

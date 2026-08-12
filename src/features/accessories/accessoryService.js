@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { ACCESSORIES } from '@/data/accessories';
 import { compressForUpload } from '@/lib/resizeImage';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
 
 const CACHE_KEY = 'accessories_v2';
 const CACHE_TTL = 60;
@@ -38,18 +39,25 @@ export function toRow(a) {
 
 export async function getAccessories() {
   return fetchWithCache(CACHE_KEY, async () => {
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('accessories')
-        .select('*')
-        .order('category', { ascending: true })
-        .order('price', { ascending: true });
+    if (!isSupabaseConfigured || !supabase) {
+      return ACCESSORIES;
+    }
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase
+          .from('accessories')
+          .select('*')
+          .order('category', { ascending: true })
+          .order('price', { ascending: true }),
+        FETCH_TIMEOUT_MS,
+        'Accessories fetch timed out',
+      );
 
       if (!error) {
         return (data || []).map(fromRow);
       }
 
-      // Missing table or schema cache miss — keep storefront usable
       if (
         error?.code === '42P01' ||
         error?.code === 'PGRST205' ||
@@ -58,24 +66,27 @@ export async function getAccessories() {
         return ACCESSORIES;
       }
 
-      console.warn('[Accessories] Supabase fetch failed:', error.message);
-      return ACCESSORIES;
+      throw new Error(error.message || 'Accessories fetch failed');
+    } catch (err) {
+      console.warn('[Accessories] Supabase fetch failed:', err.message);
+      throw err;
     }
-
-    return ACCESSORIES;
-  }, CACHE_TTL);
+  }, CACHE_TTL).catch(() => ACCESSORIES);
 }
 
 export async function getAccessoryById(id) {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase
-      .from('accessories')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (!error && data) return fromRow(data);
-    if (!error) return null;
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('accessories').select('*').eq('id', id).maybeSingle(),
+        FETCH_TIMEOUT_MS,
+        'Accessory fetch timed out',
+      );
+      if (!error && data) return fromRow(data);
+      if (!error) return null;
+    } catch (err) {
+      console.warn('[Accessories] Single fetch failed:', err.message);
+    }
   }
 
   const all = await getAccessories();
@@ -89,7 +100,11 @@ export async function getFeaturedAccessories(limit = 4) {
 
 export async function upsertAccessory(accessory) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { data, error } = await supabase.from('accessories').upsert(toRow(accessory)).select().single();
+  const { data, error } = await withTimeout(
+    supabase.from('accessories').upsert(toRow(accessory)).select().single(),
+    MUTATION_TIMEOUT_MS,
+    'Accessory save timed out',
+  );
   if (error) throw error;
   clearCache(CACHE_KEY);
   clearCache('accessories');
@@ -98,7 +113,11 @@ export async function upsertAccessory(accessory) {
 
 export async function deleteAccessory(id) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('accessories').delete().eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('accessories').delete().eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Accessory delete timed out',
+  );
   if (error) throw error;
   clearCache(CACHE_KEY);
   clearCache('accessories');
@@ -106,7 +125,11 @@ export async function deleteAccessory(id) {
 
 export async function updateAccessoryStock(id, stock_status) {
   if (!isSupabaseConfigured || !supabase) throw new Error('Supabase not configured.');
-  const { error } = await supabase.from('accessories').update({ stock_status }).eq('id', id);
+  const { error } = await withTimeout(
+    supabase.from('accessories').update({ stock_status }).eq('id', id),
+    MUTATION_TIMEOUT_MS,
+    'Accessory stock update timed out',
+  );
   if (error) throw error;
   clearCache(CACHE_KEY);
   clearCache('accessories');
@@ -118,9 +141,13 @@ export async function uploadAccessoryImage(file, accessoryId) {
     try {
       const ext = upload.name.split('.').pop().toLowerCase() || 'jpg';
       const path = `${accessoryId || 'new'}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from('accessory-images')
-        .upload(path, upload, { upsert: false, contentType: upload.type });
+      const { error } = await withTimeout(
+        supabase.storage
+          .from('accessory-images')
+          .upload(path, upload, { upsert: false, contentType: upload.type }),
+        UPLOAD_TIMEOUT_MS,
+        'Accessory image upload timed out',
+      );
       if (!error) {
         const { data } = supabase.storage.from('accessory-images').getPublicUrl(path);
         return data.publicUrl;

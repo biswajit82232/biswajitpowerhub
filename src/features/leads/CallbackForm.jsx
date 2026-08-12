@@ -5,7 +5,7 @@ import { Field, Input } from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { submitCallback } from './leadService';
-import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile } from './validation';
+import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile, clearFieldError, focusFirstError } from './validation';
 import { HoneypotField } from './HoneypotField';
 
 export function CallbackForm({ compact = false }) {
@@ -15,21 +15,20 @@ export function CallbackForm({ compact = false }) {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
-  const validate = () => {
-    const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
-
   const onSubmit = async (ev) => {
     ev.preventDefault();
     if (isHoneypotFilled(form.website)) {
       setDone(true);
       return;
     }
-    if (!validate()) return;
+    const e = {};
+    if (!isValidName(form.name)) e.name = 'Please enter your name';
+    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
+    setErrors(e);
+    if (Object.keys(e).length) {
+      focusFirstError(ev.currentTarget, e);
+      return;
+    }
     setLoading(true);
     try {
       const phone = normalizeIndianMobile(form.phone);
@@ -66,16 +65,21 @@ export function CallbackForm({ compact = false }) {
       <Field label="Your Name" htmlFor="cb-name" required error={errors.name}>
         <Input
           id="cb-name"
+          name="name"
           placeholder="e.g. Rahul Sharma"
           value={form.name}
           error={errors.name}
           autoComplete="name"
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          onChange={(e) => {
+            setForm({ ...form, name: e.target.value });
+            clearFieldError(setErrors, 'name');
+          }}
         />
       </Field>
       <Field label="Phone Number" htmlFor="cb-phone" required error={errors.phone}>
         <Input
           id="cb-phone"
+          name="phone"
           type="tel"
           inputMode="tel"
           maxLength={16}
@@ -83,7 +87,10 @@ export function CallbackForm({ compact = false }) {
           value={form.phone}
           error={errors.phone}
           autoComplete="tel"
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          onChange={(e) => {
+            setForm({ ...form, phone: e.target.value });
+            clearFieldError(setErrors, 'phone');
+          }}
         />
       </Field>
       <Button

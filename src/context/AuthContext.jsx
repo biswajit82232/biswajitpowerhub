@@ -1,11 +1,27 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { isAdminEmail, adminAccessHint } from '@/lib/adminAccess';
+import { canAccessAdmin, adminAccessHint } from '@/lib/adminAccess';
+import { withTimeout, FETCH_TIMEOUT_MS } from '@/lib/utils';
 
 const AuthContext = createContext(null);
 
+async function fetchIsDbAdmin() {
+  if (!isSupabaseConfigured || !supabase) return false;
+  try {
+    const { data, error } = await withTimeout(
+      supabase.rpc('is_admin'),
+      FETCH_TIMEOUT_MS,
+      'Admin check timed out',
+    );
+    return !error && data === true;
+  } catch {
+    return false;
+  }
+}
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
+  const [isDbAdmin, setIsDbAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,10 +36,12 @@ export function AuthProvider({ children }) {
 
     supabase.auth
       .getSession()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         if (cancelled) return;
         setSession(data.session);
-        setLoading(false);
+        const admin = data.session ? await fetchIsDbAdmin() : false;
+        if (!cancelled) setIsDbAdmin(admin);
+        if (!cancelled) setLoading(false);
       })
       .catch((err) => {
         console.warn('[Auth] getSession failed:', err?.message);
@@ -34,6 +52,13 @@ export function AuthProvider({ children }) {
       });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
+      if (!s) {
+        setIsDbAdmin(false);
+        return;
+      }
+      fetchIsDbAdmin().then((admin) => {
+        if (!cancelled) setIsDbAdmin(admin);
+      });
     });
     return () => {
       cancelled = true;
@@ -49,23 +74,35 @@ export function AuthProvider({ children }) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
 
+    const admin = await fetchIsDbAdmin();
     const signedInEmail = data.session?.user?.email;
-    if (!isAdminEmail(signedInEmail)) {
+    if (!canAccessAdmin({ email: signedInEmail, isDbAdmin: admin })) {
       await supabase.auth.signOut();
+      setIsDbAdmin(false);
       throw new Error(
         adminAccessHint() || 'This account is not authorized for admin access.',
       );
     }
+    setIsDbAdmin(true);
   };
 
   const signOut = async () => {
     if (supabase) await supabase.auth.signOut();
     setSession(null);
+    setIsDbAdmin(false);
   };
 
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user || null, loading, signIn, signOut, isConfigured: isSupabaseConfigured }}
+      value={{
+        session,
+        user: session?.user || null,
+        loading,
+        signIn,
+        signOut,
+        isDbAdmin,
+        isConfigured: isSupabaseConfigured,
+      }}
     >
       {children}
     </AuthContext.Provider>

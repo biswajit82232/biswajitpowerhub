@@ -22,11 +22,19 @@ export function SeoAboutBlock() {
             At {SITE.name}, Chunakhali Bus Stand, Nimtala, Berhampore, you can get a quote for the
             on-road price of your favourite low-speed electric scooters. Explore easy finance and
             EMI options while checking offers and discounts available for buying electric scooters
-            in Berhampore and Murshidabad. Searching for an{' '}
-            <Link to="/electric-scooter-near-me-berhampore" className="font-semibold text-brand-600 hover:underline">
+            in Berhampore and Murshidabad.             Searching for an{' '}
+            <Link to="/electric-scooter-near-me-berhampore" className="font-semibold text-brand-700 hover:underline">
               electric scooter near me in Berhampore
             </Link>
-            ? Visit our physical showroom — we do not sell online-only.
+            ? Visit our physical showroom — we do not sell online-only. Compare models on{' '}
+            <Link to="/best-electric-scooters-berhampore" className="font-semibold text-brand-700 hover:underline">
+              best electric scooters in Berhampore
+            </Link>
+            {' '}or the{' '}
+            <Link to="/electric-scooters-berhampore" className="font-semibold text-brand-700 hover:underline">
+              Berhampore showroom hub
+            </Link>
+            .
           </p>
           <p>
             On this website you can look through specifications and features, compare models, access

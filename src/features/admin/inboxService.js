@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { timeAgo } from '@/lib/utils';
+import { timeAgo, withTimeout, FETCH_TIMEOUT_MS } from '@/lib/utils';
 import {
   updateCallback,
   updateTestRide,
@@ -28,37 +28,58 @@ export async function getTodayQueue(limit = 80) {
 
   const perType = Math.min(50, Math.max(20, limit));
 
+  const timed = (query, label) =>
+    withTimeout(query, FETCH_TIMEOUT_MS, `${label} timed out`).catch((err) => {
+      console.warn(`[Inbox] ${label} failed:`, err.message);
+      return { data: [], error: err };
+    });
+
   const [callbacks, testRides, service, messages, reviews] = await Promise.all([
-    supabase
-      .from('callbacks')
-      .select('id, name, phone, created_at, handled')
-      .eq('handled', false)
-      .order('created_at', { ascending: false })
-      .limit(perType),
-    supabase
-      .from('test_rides')
-      .select('id, name, phone, scooter, preferred_date, preferred_time, created_at, status')
-      .eq('status', 'requested')
-      .order('created_at', { ascending: false })
-      .limit(perType),
-    supabase
-      .from('service_bookings')
-      .select('id, name, phone, service_kind, scooter, created_at, status')
-      .eq('status', 'requested')
-      .order('created_at', { ascending: false })
-      .limit(perType),
-    supabase
-      .from('contact_messages')
-      .select('id, name, phone, message, created_at, is_read')
-      .eq('is_read', false)
-      .order('created_at', { ascending: false })
-      .limit(perType),
-    supabase
-      .from('reviews')
-      .select('id, name, rating, scooter, created_at, status')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(Math.min(20, perType)),
+    timed(
+      supabase
+        .from('callbacks')
+        .select('id, name, phone, created_at, handled')
+        .eq('handled', false)
+        .order('created_at', { ascending: false })
+        .limit(perType),
+      'callbacks',
+    ),
+    timed(
+      supabase
+        .from('test_rides')
+        .select('id, name, phone, scooter, preferred_date, preferred_time, created_at, status')
+        .eq('status', 'requested')
+        .order('created_at', { ascending: false })
+        .limit(perType),
+      'test rides',
+    ),
+    timed(
+      supabase
+        .from('service_bookings')
+        .select('id, name, phone, service_kind, scooter, created_at, status')
+        .eq('status', 'requested')
+        .order('created_at', { ascending: false })
+        .limit(perType),
+      'service bookings',
+    ),
+    timed(
+      supabase
+        .from('contact_messages')
+        .select('id, name, phone, message, created_at, is_read')
+        .eq('is_read', false)
+        .order('created_at', { ascending: false })
+        .limit(perType),
+      'messages',
+    ),
+    timed(
+      supabase
+        .from('reviews')
+        .select('id, name, rating, scooter, created_at, status')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(Math.min(20, perType)),
+      'reviews',
+    ),
   ]);
 
   const rows = [];

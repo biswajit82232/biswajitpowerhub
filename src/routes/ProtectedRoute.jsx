@@ -2,7 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { ShieldX } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { RouteLoader } from '@/components/ui/Loading';
-import { isAdminEmail, adminAccessHint } from '@/lib/adminAccess';
+import { canAccessAdmin, adminAccessHint } from '@/lib/adminAccess';
 import Button from '@/components/ui/Button';
 
 function AdminAccessDenied() {
@@ -27,7 +27,7 @@ function AdminAccessDenied() {
 }
 
 export function ProtectedRoute({ children }) {
-  const { session, loading } = useAuth();
+  const { session, loading, isDbAdmin } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -42,7 +42,7 @@ export function ProtectedRoute({ children }) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  if (!isAdminEmail(session.user?.email)) {
+  if (!canAccessAdmin({ email: session.user?.email, isDbAdmin })) {
     return <AdminAccessDenied />;
   }
 

@@ -15,20 +15,27 @@
  * HTTP Header: Authorization: Bearer <ADMIN_NOTIFY_SECRET>
  */
 import webpush from 'web-push';
+import { safeEqual } from '../src/lib/safeEqual.js';
+
+function maskPhone(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  if (digits.length < 4) return '';
+  return `····${digits.slice(-4)}`;
+}
 
 const EVENT_COPY = {
   callbacks: {
     title: 'New callback request',
     path: '/admin/callbacks',
     tag: 'bph-callback',
-    body: (r) => [r.name, r.phone].filter(Boolean).join(' · ') || 'Someone requested a callback.',
+    body: (r) => [r.name, maskPhone(r.phone)].filter(Boolean).join(' · ') || 'Someone requested a callback.',
   },
   test_rides: {
     title: 'New test ride booking',
     path: '/admin/test-rides',
     tag: 'bph-testride',
     body: (r) => {
-      const bits = [r.name, r.phone, r.scooter_name || r.scooter || r.model].filter(Boolean);
+      const bits = [r.name, maskPhone(r.phone), r.scooter_name || r.scooter || r.model].filter(Boolean);
       return bits.join(' · ') || 'A test ride was booked.';
     },
   },
@@ -36,7 +43,7 @@ const EVENT_COPY = {
     title: 'New service booking',
     path: '/admin/service-bookings',
     tag: 'bph-service',
-    body: (r) => [r.name, r.phone, r.scooter_name || r.model].filter(Boolean).join(' · ') || 'A service booking arrived.',
+    body: (r) => [r.name, maskPhone(r.phone), r.scooter_name || r.model].filter(Boolean).join(' · ') || 'A service booking arrived.',
   },
   contact_messages: {
     title: 'New contact message',
@@ -57,6 +64,24 @@ const EVENT_COPY = {
     },
   },
 };
+
+const recentNotifies = new Map();
+const DEDUPE_MS = 10 * 60 * 1000;
+
+function alreadyNotified(table, id) {
+  if (!table || !id) return false;
+  const key = `${table}:${id}`;
+  const now = Date.now();
+  const prev = recentNotifies.get(key);
+  if (prev && now - prev < DEDUPE_MS) return true;
+  recentNotifies.set(key, now);
+  if (recentNotifies.size > 200) {
+    for (const [k, ts] of recentNotifies) {
+      if (now - ts > DEDUPE_MS) recentNotifies.delete(k);
+    }
+  }
+  return false;
+}
 
 function env(name, ...aliases) {
   for (const key of [name, ...aliases]) {
@@ -83,12 +108,15 @@ function buildPayload(table, record) {
 
 async function fetchSubscriptions(supabaseUrl, serviceKey) {
   const res = await fetch(
-    `${supabaseUrl}/rest/v1/admin_push_subscriptions?select=id,endpoint,p256dh,auth`,
+    `${supabaseUrl}/rest/v1/rpc/list_admin_push_subscriptions`,
     {
+      method: 'POST',
       headers: {
         apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
       },
+      body: '{}',
     },
   );
   if (!res.ok) {
@@ -110,9 +138,6 @@ async function deleteSubscription(supabaseUrl, serviceKey, id) {
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.status(204).end();
   }
 
@@ -123,7 +148,7 @@ export default async function handler(req, res) {
   const secret = env('ADMIN_NOTIFY_SECRET');
   const auth = req.headers.authorization || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!secret || token !== secret) {
+  if (!secret || !safeEqual(token, secret)) {
     return unauthorized(res);
   }
 
@@ -153,6 +178,10 @@ export default async function handler(req, res) {
 
   if (type && type !== 'INSERT') {
     return res.status(200).json({ ok: true, skipped: true, reason: 'not_insert' });
+  }
+
+  if (alreadyNotified(table, record.id)) {
+    return res.status(200).json({ ok: true, skipped: true, reason: 'duplicate' });
   }
 
   const payload = buildPayload(table, record);

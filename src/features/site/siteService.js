@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS } from '@/lib/utils';
 import {
   CONTACT_DEFAULTS,
   buildAddressFull,
@@ -178,27 +179,27 @@ export async function getSiteSettings({ bypassCache = false } = {}) {
   if (bypassCache) bustSiteCache();
 
   return fetchWithCache(CACHE_KEY, async () => {
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('*')
-        .eq('id', ROW_ID)
-        .maybeSingle();
-
-      if (!error && data) return mapRow(data);
-
-      if (!error) return getDefaultSiteSettings();
-
-      if (error?.code === '42P01') {
-        return getDefaultSiteSettings();
-      }
-
-      console.warn('[Site settings] Supabase fetch failed:', error.message);
-      return getDefaultSiteSettings();
+    if (!isSupabaseConfigured || !supabase) {
+      return readLocal() || getDefaultSiteSettings();
     }
 
-    return readLocal() || getDefaultSiteSettings();
-  }, CACHE_TTL);
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('site_settings').select('*').eq('id', ROW_ID).maybeSingle(),
+        FETCH_TIMEOUT_MS,
+        'Site settings fetch timed out',
+      );
+
+      if (!error && data) return mapRow(data);
+      if (!error) return getDefaultSiteSettings();
+      if (error?.code === '42P01') return getDefaultSiteSettings();
+
+      throw new Error(error.message || 'Site settings fetch failed');
+    } catch (err) {
+      console.warn('[Site settings] Supabase fetch failed:', err.message);
+      throw err;
+    }
+  }, CACHE_TTL).catch(() => readLocal() || getDefaultSiteSettings());
 }
 
 export async function saveSiteSettings(settings) {
@@ -241,7 +242,11 @@ export async function saveSiteSettings(settings) {
       content,
       updated_at: new Date().toISOString(),
     };
-    const { error } = await supabase.from('site_settings').upsert(row);
+    const { error } = await withTimeout(
+      supabase.from('site_settings').upsert(row),
+      MUTATION_TIMEOUT_MS,
+      'Site settings save timed out',
+    );
     if (error) throw error;
   } else {
     writeLocal(merged);

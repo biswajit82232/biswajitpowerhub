@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { FINANCE_DEFAULTS } from '@/config/finance';
 import { compressForUpload } from '@/lib/resizeImage';
+import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
 
 /** Upload a hero image — compressed for mobile LCP (CDN still serves resized variants). */
 export async function uploadHeroImage(file) {
@@ -10,9 +11,13 @@ export async function uploadHeroImage(file) {
     try {
       const ext = upload.name.split('.').pop().toLowerCase() || 'webp';
       const path = `hero/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from('scooter-images')
-        .upload(path, upload, { upsert: true, contentType: upload.type });
+      const { error } = await withTimeout(
+        supabase.storage
+          .from('scooter-images')
+          .upload(path, upload, { upsert: true, contentType: upload.type }),
+        UPLOAD_TIMEOUT_MS,
+        'Hero image upload timed out',
+      );
       if (!error) {
         const { data } = supabase.storage.from('scooter-images').getPublicUrl(path);
         return data.publicUrl;
@@ -45,12 +50,16 @@ export async function getFinanceSettings({ bypassCache = false } = {}) {
   if (bypassCache) bustFinanceCache();
 
   return fetchWithCache(CACHE_KEY, async () => {
-    if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase
-        .from('finance_settings')
-        .select('*')
-        .eq('id', ROW_ID)
-        .maybeSingle();
+    if (!isSupabaseConfigured || !supabase) {
+      return { ...FINANCE_DEFAULTS, heroImageUrl: null };
+    }
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase.from('finance_settings').select('*').eq('id', ROW_ID).maybeSingle(),
+        FETCH_TIMEOUT_MS,
+        'Finance settings fetch timed out',
+      );
 
       if (!error && data) {
         return {
@@ -73,10 +82,12 @@ export async function getFinanceSettings({ bypassCache = false } = {}) {
         return { ...FINANCE_DEFAULTS, heroImageUrl: null };
       }
 
-      console.warn('[finance] Failed to load settings:', error.message);
+      throw new Error(error.message || 'Finance settings fetch failed');
+    } catch (err) {
+      console.warn('[finance] Failed to load settings:', err.message);
+      throw err;
     }
-    return { ...FINANCE_DEFAULTS, heroImageUrl: null };
-  }, CACHE_TTL);
+  }, CACHE_TTL).catch(() => ({ ...FINANCE_DEFAULTS, heroImageUrl: null }));
 }
 
 export async function saveFinanceSettings(settings) {
@@ -96,7 +107,11 @@ export async function saveFinanceSettings(settings) {
     updated_at: new Date().toISOString(),
   };
   if (settings.promo !== undefined) row.promo = settings.promo;
-  const { error } = await supabase.from('finance_settings').upsert(row);
+  const { error } = await withTimeout(
+    supabase.from('finance_settings').upsert(row),
+    MUTATION_TIMEOUT_MS,
+    'Finance settings save timed out',
+  );
   if (error) throw error;
   bustFinanceCache();
 }
@@ -109,19 +124,23 @@ export async function saveHeroImage(heroImageUrl) {
     updated_at: new Date().toISOString(),
   };
 
-  const { data: updated, error: updateError } = await supabase
-    .from('finance_settings')
-    .update(payload)
-    .eq('id', ROW_ID)
-    .select('id');
+  const { data: updated, error: updateError } = await withTimeout(
+    supabase.from('finance_settings').update(payload).eq('id', ROW_ID).select('id'),
+    MUTATION_TIMEOUT_MS,
+    'Hero image save timed out',
+  );
 
   if (updateError) throw updateError;
 
   if (!updated?.length) {
-    const { error: insertError } = await supabase.from('finance_settings').insert({
-      id: ROW_ID,
-      ...payload,
-    });
+    const { error: insertError } = await withTimeout(
+      supabase.from('finance_settings').insert({
+        id: ROW_ID,
+        ...payload,
+      }),
+      MUTATION_TIMEOUT_MS,
+      'Hero image insert timed out',
+    );
     if (insertError) throw insertError;
   }
 

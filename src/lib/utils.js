@@ -52,10 +52,18 @@ export function clamp(n, min, max) {
   return Math.min(Math.max(n, min), max);
 }
 
+/** Public catalog / settings reads — fail over to seed/stale before the UI spins forever. */
+export const FETCH_TIMEOUT_MS = 8000;
+/** Form submits and admin writes — long enough for a free-tier resume, short enough to recover. */
+export const MUTATION_TIMEOUT_MS = 12000;
+/** Storage uploads (images) — slower on mobile networks. */
+export const UPLOAD_TIMEOUT_MS = 30000;
+
 /**
  * Reject if a promise does not settle within `ms` milliseconds.
+ * Pass a Supabase builder directly — it is thenable.
  */
-export function withTimeout(promise, ms, message = 'Request timed out') {
+export function withTimeout(promise, ms = FETCH_TIMEOUT_MS, message = 'Request timed out') {
   let timer;
   const timeout = new Promise((_, reject) => {
     timer = setTimeout(() => reject(new Error(message)), ms);

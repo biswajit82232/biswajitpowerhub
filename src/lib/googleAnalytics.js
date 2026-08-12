@@ -5,10 +5,10 @@
  */
 
 export const GA_MEASUREMENT_ID =
-  import.meta.env.VITE_GA_MEASUREMENT_ID?.trim() || 'G-ZPSM06SEY4';
+  import.meta.env?.VITE_GA_MEASUREMENT_ID?.trim() || 'G-ZPSM06SEY4';
 
 /** Google Ads Conversion/Remarketing ID — set in Vercel when Ads account is ready */
-export const GOOGLE_ADS_ID = import.meta.env.VITE_GOOGLE_ADS_ID?.trim() || '';
+export const GOOGLE_ADS_ID = import.meta.env?.VITE_GOOGLE_ADS_ID?.trim() || '';
 
 export const isGoogleAnalyticsConfigured = Boolean(GA_MEASUREMENT_ID);
 export const isGoogleAdsConfigured = Boolean(GOOGLE_ADS_ID && /^AW-/.test(GOOGLE_ADS_ID));
@@ -29,7 +29,7 @@ export const ADS_CONVERSION_LABELS = {
 let adsWarned = false;
 
 function warnMissingAdsId() {
-  if (adsWarned || !import.meta.env.DEV || isGoogleAdsConfigured) return;
+  if (adsWarned || !import.meta.env?.DEV || isGoogleAdsConfigured) return;
   adsWarned = true;
   console.warn('[Ads] VITE_GOOGLE_ADS_ID not set — Google Ads conversions disabled');
 }
