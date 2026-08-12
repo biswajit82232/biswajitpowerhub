@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import {
   DEFAULT_SITE_PHOTOS,
   loadSitePhotos,
+  readSitePhotos,
   saveSitePhotos as persistPhotos,
 } from '@/features/site/sitePhotosService';
 import { getFinanceSettings } from '@/features/finance/financeService';
@@ -9,7 +10,16 @@ import { getFinanceSettings } from '@/features/finance/financeService';
 const SitePhotosContext = createContext(null);
 
 export function SitePhotosProvider({ children }) {
-  const [photos, setPhotos] = useState(DEFAULT_SITE_PHOTOS);
+  // Hydrate from local cache immediately so the hero URL is known before network
+  // (cuts LCP resource-load delay on repeat visits).
+  const [photos, setPhotos] = useState(() => {
+    if (typeof window === 'undefined') return DEFAULT_SITE_PHOTOS;
+    try {
+      return readSitePhotos();
+    } catch {
+      return DEFAULT_SITE_PHOTOS;
+    }
+  });
 
   useEffect(() => {
     let cancelled = false;

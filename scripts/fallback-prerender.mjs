@@ -15,6 +15,12 @@ import { REVIEWS } from '../src/data/reviews.js';
 import { SERVICE_LOCATIONS } from '../src/data/locations.js';
 import { BLOG_POSTS } from '../src/data/blogPosts.js';
 import { ACCESSORIES } from '../src/data/accessories.js';
+import { loadEnv } from './load-env.mjs';
+
+const loadedEnv = loadEnv();
+for (const [k, v] of Object.entries(loadedEnv)) {
+  if (process.env[k] == null && v != null) process.env[k] = v;
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -475,6 +481,76 @@ async function fetchApprovedReviewsForBuild() {
     console.warn('[fallback-prerender] Supabase reviews fetch failed, using seed data:', e.message);
     return REVIEWS.filter((r) => r.status === 'approved');
   }
+}
+
+/** Live homepage hero URL for early LCP preload in static HTML. */
+async function fetchHeroImageUrlForBuild() {
+  const url = process.env.VITE_SUPABASE_URL;
+  const key = process.env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+
+  try {
+    const photosRes = await fetch(
+      `${url}/rest/v1/site_settings?select=photos&id=eq.1`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+    );
+    if (photosRes.ok) {
+      const rows = await photosRes.json();
+      const hero = rows?.[0]?.photos?.hero?.url;
+      if (typeof hero === 'string' && hero) return hero;
+    }
+  } catch (e) {
+    console.warn('[fallback-prerender] site photos fetch failed:', e.message);
+  }
+
+  try {
+    const finRes = await fetch(
+      `${url}/rest/v1/finance_settings?select=hero_image_url&id=eq.1`,
+      { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+    );
+    if (finRes.ok) {
+      const rows = await finRes.json();
+      const hero = rows?.[0]?.hero_image_url;
+      if (typeof hero === 'string' && hero) return hero;
+    }
+  } catch (e) {
+    console.warn('[fallback-prerender] finance hero fetch failed:', e.message);
+  }
+
+  return null;
+}
+
+function optimizeStorageUrl(src, width, quality, height) {
+  const OBJECT = '/storage/v1/object/public/';
+  const RENDER = '/storage/v1/render/image/public/';
+  if (!src || !src.includes(OBJECT)) return src;
+  const base = src.replace(OBJECT, RENDER);
+  const params = new URLSearchParams({
+    width: String(width),
+    quality: String(quality),
+    height: String(height),
+    resize: 'cover',
+  });
+  return `${base}${base.includes('?') ? '&' : '?'}${params.toString()}`;
+}
+
+/** Build <link rel=preload> for homepage hero (discoverable before JS). */
+function heroPreloadTags(heroUrl) {
+  if (!heroUrl) return '';
+  const widths = [640, 960, 1280];
+  const baseW = 960;
+  const baseH = 420;
+  const quality = 65;
+  const href = optimizeStorageUrl(heroUrl, 640, quality, Math.round((baseH / baseW) * 640));
+  const srcSet = widths
+    .map((w) => {
+      const h = Math.round((baseH / baseW) * w);
+      return `${optimizeStorageUrl(heroUrl, w, quality, h)} ${w}w`;
+    })
+    .join(', ');
+  const safeHref = escapeHtml(href);
+  const safeSrcSet = escapeHtml(srcSet);
+  return `    <link rel="preload" as="image" href="${safeHref}" imagesrcset="${safeSrcSet}" imagesizes="100vw" fetchpriority="high" />\n`;
 }
 
 async function buildNoindexCatalogRoutes() {
@@ -1308,7 +1384,7 @@ function crawlableBody(route) {
 <a href="https://wa.me/919635505436" aria-label="Chat on WhatsApp" style="position:fixed;right:1rem;bottom:calc(4.5rem + env(safe-area-inset-bottom));z-index:9998;width:56px;height:56px;border-radius:999px;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,0.25);">WA</a>`;
 }
 
-function injectMeta(html, route) {
+function injectMeta(html, route, { heroUrl } = {}) {
   const url = canonicalFor(route.path);
   const title = escapeHtml(route.title);
   const desc = escapeHtml(route.description);
@@ -1368,6 +1444,15 @@ function injectMeta(html, route) {
     );
   }
 
+  // Homepage LCP: strip any prior hero preload, then inject early-discoverable tags
+  out = out.replace(
+    /<link\s+rel="preload"\s+as="image"[^>]*>\s*/gi,
+    '',
+  );
+  if (route.path === '/' && heroUrl) {
+    out = out.replace('</head>', `${heroPreloadTags(heroUrl)}  </head>`);
+  }
+
   // Strip previous injected ld+json from fallback runs; keep GA scripts
   out = out.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/gi, '');
 
@@ -1401,10 +1486,12 @@ const shell = readFileSync(shellPath, 'utf8');
 const enrichment = await fetchScooterEnrichment();
 const liveCatalog = mergeCatalog(enrichment);
 const liveReviews = await fetchApprovedReviewsForBuild();
+const heroUrl = await fetchHeroImageUrlForBuild();
 console.log(`[fallback-prerender] using ${liveReviews.length} approved review(s) for rating schema`);
 console.log(
   `[fallback-prerender] catalog from-price ${catalogFromPrice(liveCatalog) || 'n/a'} (${liveCatalog.length} models)`,
 );
+console.log(`[fallback-prerender] homepage hero preload ${heroUrl ? 'yes' : 'no'}`);
 const catalogNoindex = await buildNoindexCatalogRoutes();
 const allRoutes = [
   ...buildRoutes(liveCatalog).map((r) => ({
@@ -1419,7 +1506,7 @@ const allRoutes = [
 let count = 0;
 let noindexCount = 0;
 for (const route of allRoutes) {
-  const html = injectMeta(shell, route);
+  const html = injectMeta(shell, route, { heroUrl });
   const out = outPathFor(route.path);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, html, 'utf8');
@@ -1439,7 +1526,7 @@ const notFoundRoute = {
   crawlText:
     'Page not found. Browse electric scooters at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore, or contact the showroom on 096355 05436.',
 };
-writeFileSync(join(DIST, '404.html'), injectMeta(shell, notFoundRoute), 'utf8');
+writeFileSync(join(DIST, '404.html'), injectMeta(shell, notFoundRoute, { heroUrl: null }), 'utf8');
 console.log('[fallback-prerender] wrote /404.html');
 
 console.log(

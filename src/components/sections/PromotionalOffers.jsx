@@ -306,7 +306,13 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
   }, [searchParams, offers]);
 
   if (loading) {
-    if (compact) return null;
+    if (compact) {
+      return (
+        <Section id="offers" tight className="py-3 sm:py-6">
+          <div className="min-h-[9.5rem] rounded-xl bg-surface-alt/80 ring-1 ring-line sm:min-h-[10.5rem]" aria-hidden />
+        </Section>
+      );
+    }
     return (
       <Section id="offers" className="py-8 sm:py-10">
         <div className="space-y-2 sm:space-y-4">

@@ -33,7 +33,18 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
   const { photos } = useSitePhotos();
   const scooterKey = (scooters || []).map((s) => s.id).join('|');
   const { data: insights } = useAsync(
-    () => getScooterInsights(scooters || []),
+    () =>
+      new Promise((resolve) => {
+        const run = () => {
+          getScooterInsights(scooters || []).then(resolve).catch(() => resolve(null));
+        };
+        // Don't compete with hero LCP / first paint for popularity RPCs.
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          window.requestIdleCallback(run, { timeout: 4000 });
+        } else {
+          setTimeout(run, 2000);
+        }
+      }),
     [scooterKey],
   );
 
@@ -82,26 +93,26 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
 
         <div className="mt-4 border-b border-line" />
 
-        {loading || filtered.length > 0 ? (
-          <div className="mt-8 grid min-h-[28rem] gap-8 sm:min-h-[32rem] sm:grid-cols-2 lg:min-h-[36rem] lg:grid-cols-3 lg:gap-10">
-            {loading
-              ? Array.from({ length: 6 }).map((_, i) => <ScooterCardSkeleton key={i} />)
-              : filtered.map((s) => (
+        <div className="mt-8 grid min-h-[34rem] content-start gap-8 sm:min-h-[36rem] sm:grid-cols-2 lg:min-h-[22rem] lg:grid-cols-3 lg:gap-10">
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => <ScooterCardSkeleton key={i} />)
+            : filtered.length > 0
+              ? filtered.map((s) => (
                   <DealerProductCard
                     key={s.id}
                     scooter={s}
                     imageOverride={photos?.models?.[s.id]?.url}
                     tags={getScooterDiscoveryTags(s, insights)}
                   />
-                ))}
-          </div>
-        ) : (
-          <p className="mt-10 text-center text-sm text-muted">
-            {scooters?.length > 0
-              ? 'No models in this category yet.'
-              : 'Our showroom line-up is being updated — please check back shortly or contact us for current stock.'}
-          </p>
-        )}
+                ))
+              : (
+                  <p className="col-span-full mt-2 text-center text-sm text-muted">
+                    {scooters?.length > 0
+                      ? 'No models in this category yet.'
+                      : 'Our showroom line-up is being updated — please check back shortly or contact us for current stock.'}
+                  </p>
+                )}
+        </div>
       </div>
     </section>
   );

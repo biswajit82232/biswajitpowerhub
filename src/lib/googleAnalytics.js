@@ -107,10 +107,11 @@ export function initGoogleAnalytics() {
   }
 
   const start = () => loadGtagScript();
+  // Keep ~300KB of gtag off the LCP window; still loads for Ads/GA on idle.
   if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(start, { timeout: 2500 });
+    window.requestIdleCallback(start, { timeout: 5500 });
   } else {
-    window.setTimeout(start, 1200);
+    window.setTimeout(start, 3200);
   }
 }
 

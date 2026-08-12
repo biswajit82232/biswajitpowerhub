@@ -7,6 +7,7 @@ import { useSitePhotos } from '@/context/SitePhotosContext';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
+import { HERO_IMAGE } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
 
 /**
@@ -44,6 +45,8 @@ export function HeroCarousel({ heroImageUrl }) {
 
   const [index, setIndex] = useState(0);
   const [offerIndex, setOfferIndex] = useState(0);
+  // Defer mounting the next slide so LCP isn't competing for bandwidth.
+  const [mountNear, setMountNear] = useState(false);
   const count = slides.length;
   const offerCount = promoOffers.length;
 
@@ -53,9 +56,25 @@ export function HeroCarousel({ heroImageUrl }) {
 
   useEffect(() => {
     if (count < 2) return undefined;
+    let idleId;
+    let timeoutId;
+    const enable = () => setMountNear(true);
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(enable, { timeout: 3500 });
+    } else {
+      timeoutId = window.setTimeout(enable, 2800);
+    }
+    return () => {
+      if (idleId != null && 'cancelIdleCallback' in window) window.cancelIdleCallback(idleId);
+      if (timeoutId != null) window.clearTimeout(timeoutId);
+    };
+  }, [count]);
+
+  useEffect(() => {
+    if (count < 2 || !mountNear) return undefined;
     const id = setInterval(next, 5500);
     return () => clearInterval(id);
-  }, [count, next]);
+  }, [count, next, mountNear]);
 
   useEffect(() => {
     if (offerCount < 2) return undefined;
@@ -75,11 +94,12 @@ export function HeroCarousel({ heroImageUrl }) {
   return (
     <section className="relative isolate w-full bg-surface-alt" aria-label="Hero">
       <div className="relative aspect-[16/7] min-h-[220px] w-full overflow-hidden sm:min-h-[320px] lg:min-h-[420px]">
-        {/* Only mount current + next slide to cut DOM/image weight */}
+        {/* Only mount current (+ next after idle) to protect LCP bandwidth */}
         {slides.map((s, i) => {
           const active = i === index;
-          const near = i === (index + 1) % count;
+          const near = mountNear && i === (index + 1) % count;
           if (!active && !near && count > 2) return null;
+          if (!active && !near && count === 2 && !mountNear) return null;
           return (
             <div
               key={`${s.url || 'empty'}-${i}`}
@@ -92,13 +112,14 @@ export function HeroCarousel({ heroImageUrl }) {
               <SiteImage
                 src={s.url}
                 alt={s.alt}
-                width={960}
-                height={420}
+                width={HERO_IMAGE.baseWidth}
+                height={HERO_IMAGE.baseHeight}
                 loading={i === 0 ? 'eager' : 'lazy'}
                 fetchPriority={i === 0 ? 'high' : undefined}
                 optimize
-                quality={72}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1280px"
+                quality={HERO_IMAGE.quality}
+                srcSetWidths={i === 0 ? HERO_IMAGE.widths : undefined}
+                sizes={HERO_IMAGE.sizes}
                 className="h-full w-full !aspect-auto bg-surface-alt"
                 imgClassName="object-cover object-center"
                 placeholderLabel="Showroom photos coming soon — visit us at Chunakhali Bus Stand"
@@ -129,7 +150,10 @@ export function HeroCarousel({ heroImageUrl }) {
                 key={i}
                 type="button"
                 aria-label={`Go to slide ${i + 1}`}
-                onClick={() => setIndex(i)}
+                onClick={() => {
+                  setMountNear(true);
+                  setIndex(i);
+                }}
                 className={cn(
                   'h-1 w-6 rounded-sm transition sm:w-8',
                   i === index ? 'bg-brand-500' : 'bg-white/50 hover:bg-white/80',
@@ -149,10 +173,13 @@ export function HeroCarousel({ heroImageUrl }) {
         />
       ) : null}
 
-      {offersLoading ? null : offer ? (
+      {/* Reserve promo-bar height while loading to avoid pushing #models (CLS). */}
+      {offersLoading ? (
+        <div className="min-h-[4.75rem] border-t border-brand-600 bg-brand-500 sm:min-h-[5.5rem]" aria-hidden />
+      ) : offer ? (
         <Link
           to={`/offers?offer=${encodeURIComponent(offer.id)}`}
-          className="block border-t border-brand-600 bg-brand-500 text-white transition hover:bg-brand-600"
+          className="block min-h-[4.75rem] border-t border-brand-600 bg-brand-500 text-white transition hover:bg-brand-600 sm:min-h-[5.5rem]"
           aria-label={`View offer: ${offer.discountText}${offer.title ? ` — ${offer.title}` : ''}`}
         >
           <div className="container-px flex items-center justify-between gap-3 py-2.5 sm:gap-6 sm:py-3.5">

@@ -22,6 +22,9 @@ export function SEO({
   titleTemplate = true,
   /** Optional LCP / hero image URL to preload */
   preloadImage,
+  /** Responsive LCP preload (imagesrcset / imagesizes) */
+  preloadImageSrcSet,
+  preloadImageSizes = '100vw',
 }) {
   const fullTitle = title
     ? titleTemplate && !title.includes(SITE.name) && !title.includes('Biswajit Power Hub')
@@ -43,7 +46,15 @@ export function SEO({
       <link rel="alternate" hrefLang="en-IN" href={canonical} />
       <link rel="alternate" hrefLang="x-default" href={canonical} />
       {preloadImage ? (
-        <link rel="preload" as="image" href={preloadImage} fetchPriority="high" />
+        <link
+          rel="preload"
+          as="image"
+          href={preloadImage}
+          {...(preloadImageSrcSet
+            ? { imageSrcSet: preloadImageSrcSet, imageSizes: preloadImageSizes }
+            : {})}
+          fetchPriority="high"
+        />
       ) : null}
       {!noindex && <meta name="robots" content="index, follow, max-image-preview:large" />}
       {noindex && <meta name="robots" content="noindex, nofollow" />}

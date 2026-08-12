@@ -20,18 +20,30 @@ export function SiteImage({
   optimize = true,
   quality = 75,
   sizes,
+  /** Optional responsive widths for CDN srcset (e.g. [640, 960, 1280]). */
+  srcSetWidths,
 }) {
   // Fallback chain: optimized CDN variant -> original URL -> placeholder.
   const [failStage, setFailStage] = useState(0);
   const canOptimize = optimize && isSupabaseStorageUrl(src);
   const exhausted = failStage >= (canOptimize ? 2 : 1);
-  const resolvedSrc =
-    failStage === 0 && canOptimize
-      ? optimizedImageUrl(src, Math.min(width || 800, 1280), quality, {
-          height: Math.min(height || 600, 720),
-          resize: 'cover',
+
+  let resolvedSrc = src;
+  let resolvedSrcSet;
+  if (failStage === 0 && canOptimize) {
+    const w = Math.min(width || 800, 1280);
+    const h = Math.min(height || 600, 720);
+    resolvedSrc = optimizedImageUrl(src, w, quality, { height: h, resize: 'cover' });
+    if (Array.isArray(srcSetWidths) && srcSetWidths.length > 1 && width > 0 && height > 0) {
+      resolvedSrcSet = srcSetWidths
+        .map((sw) => {
+          const sh = Math.round((height / width) * sw);
+          return `${optimizedImageUrl(src, sw, quality, { height: sh, resize: 'cover' })} ${sw}w`;
         })
-      : src;
+        .join(', ');
+    }
+  }
+
   const show = Boolean(src) && !exhausted;
 
   return (
@@ -42,10 +54,11 @@ export function SiteImage({
       {show ? (
         <img
           src={resolvedSrc}
+          srcSet={resolvedSrcSet}
           alt={alt}
           width={width}
           height={height}
-          sizes={sizes}
+          sizes={resolvedSrcSet ? sizes : undefined}
           loading={loading}
           decoding="async"
           fetchPriority={fetchPriority}

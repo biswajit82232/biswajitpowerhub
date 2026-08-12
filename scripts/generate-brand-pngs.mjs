@@ -71,17 +71,24 @@ async function main() {
   const trimmed = await sharp(SOURCE).trim({ threshold: 20 }).png().toBuffer();
   const transparent = await makeTransparent(trimmed);
 
-  // Master logo used in UI (transparent). Displayed at <=160px, so 384px
-  // (2.4x retina) is plenty — keeps the file ~40KB instead of ~85KB.
-  await sharp(transparent)
-    .resize(384, 384, { fit: 'inside', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .png()
-    .toFile(join(PUBLIC, 'logo.png'));
+  // Master UI logo — match header display (~125×49 CSS, 2x retina ≈ 240w).
+  // Preserve aspect (wide mark); square padding wasted ~30KB+ in Lighthouse.
+  const logoUi = await sharp(transparent)
+    .resize(240, null, { fit: 'inside', withoutEnlargement: true })
+    .png({ compressionLevel: 9 })
+    .toBuffer();
+  await sharp(logoUi).toFile(join(PUBLIC, 'logo.png'));
   console.log('[brand-pngs] wrote public/logo.png');
+
+  await sharp(transparent)
+    .resize(240, null, { fit: 'inside', withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toFile(join(PUBLIC, 'logo.webp'));
+  console.log('[brand-pngs] wrote public/logo.webp');
 
   // Header / preload sized copy
   await sharp(transparent)
-    .resize(384, 384, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize(192, 192, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .png()
     .toFile(join(PUBLIC, 'logo-192.png'));
   console.log('[brand-pngs] wrote public/logo-192.png');

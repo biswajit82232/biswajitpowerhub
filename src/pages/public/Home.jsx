@@ -15,7 +15,7 @@ import { useFinance } from '@/context/FinanceSettingsContext';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { SITE_URL, siteSameAs } from '@/config/site';
-import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
+import { heroImageSources } from '@/lib/imageCdn';
 import {
   openingHoursSchema,
   postalAddressSchema,
@@ -44,11 +44,9 @@ export default function Home() {
   );
 
   const heroSrc = photos?.hero?.url || financeSettings?.heroImageUrl || null;
-  const preloadImage = heroSrc
-    ? isSupabaseStorageUrl(heroSrc)
-      ? optimizedImageUrl(heroSrc, 960, 72, { height: 420, resize: 'cover' })
-      : heroSrc
-    : undefined;
+  const heroPreload = heroSrc ? heroImageSources(heroSrc) : null;
+  // Prefer seed catalog immediately — skeleton→card swap was a major CLS culprit.
+  const showModelSkeletons = scootersLoading && !(allScooters?.length || SCOOTERS.length);
 
   const homeSchemas = useMemo(() => {
     const catalogScooters = catalog;
@@ -140,12 +138,14 @@ export default function Home() {
         description={`Biswajit Power Hub — best electric scooters in Berhampore, Murshidabad. No licence.${fromPrice ? ` From ${fromPrice}.` : ''} Call 096355 05436 for test ride at Chunakhali.`}
         jsonLd={homeSchemas}
         titleTemplate={false}
-        preloadImage={preloadImage}
+        preloadImage={heroPreload?.href}
+        preloadImageSrcSet={heroPreload?.srcSet}
+        preloadImageSizes={heroPreload?.sizes}
       />
 
       <HeroCarousel heroImageUrl={financeSettings?.heroImageUrl} />
       <PromotionalOffers compact />
-      <ExploreRange scooters={modelGrid} loading={scootersLoading} />
+      <ExploreRange scooters={modelGrid} loading={showModelSkeletons} />
       <MoreFromUs />
       <LocateUs />
       <SeoAboutBlock />
