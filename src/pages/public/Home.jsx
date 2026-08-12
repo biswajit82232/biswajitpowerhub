@@ -1,12 +1,7 @@
-import { useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { SEO } from '@/components/common/SEO';
 import { HeroCarousel } from '@/components/sections/HeroCarousel';
 import { ExploreRange } from '@/components/sections/ExploreRange';
-import { MoreFromUs } from '@/components/sections/MoreFromUs';
-import { LocateUs } from '@/components/sections/LocateUs';
-import { SeoAboutBlock } from '@/components/sections/SeoAboutBlock';
-import { DealerFaq } from '@/components/sections/DealerFaq';
-import { GoogleReviewsWidget } from '@/components/sections/GoogleReviewsWidget';
 import { PromotionalOffers } from '@/components/sections/PromotionalOffers';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { useAsync } from '@/hooks/useAsync';
@@ -29,13 +24,76 @@ import { SCOOTERS } from '@/data/scooters';
 import { buildSiteFaqs, formatCatalogFromPrice } from '@/lib/catalogCopy';
 import { SITE_FAQS } from '@/data/seoContent';
 
+const MoreFromUs = lazy(() =>
+  import('@/components/sections/MoreFromUs').then((m) => ({ default: m.MoreFromUs })),
+);
+const LocateUs = lazy(() =>
+  import('@/components/sections/LocateUs').then((m) => ({ default: m.LocateUs })),
+);
+const SeoAboutBlock = lazy(() =>
+  import('@/components/sections/SeoAboutBlock').then((m) => ({ default: m.SeoAboutBlock })),
+);
+const DealerFaq = lazy(() =>
+  import('@/components/sections/DealerFaq').then((m) => ({ default: m.DealerFaq })),
+);
+const GoogleReviewsWidget = lazy(() =>
+  import('@/components/sections/GoogleReviewsWidget').then((m) => ({
+    default: m.GoogleReviewsWidget,
+  })),
+);
+
+/** Below-fold home blocks — deferred so first paint / TBT stay light. */
+function DeferredHomeTail({ faqs }) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let idleId;
+    let timeoutId;
+    const enable = () => setReady(true);
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(enable, { timeout: 2200 });
+    } else {
+      timeoutId = window.setTimeout(enable, 900);
+    }
+    return () => {
+      if (idleId != null && 'cancelIdleCallback' in window) window.cancelIdleCallback(idleId);
+      if (timeoutId != null) window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  if (!ready) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <MoreFromUs />
+      <LocateUs />
+      <SeoAboutBlock />
+      <DealerFaq faqs={faqs} />
+      <GoogleReviewsWidget />
+    </Suspense>
+  );
+}
+
 export default function Home() {
   const { site } = useSite();
   const { photos } = useSitePhotos();
   const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
   const { settings: financeSettings } = useFinance();
-  // On-site reviews still feed JSON-LD only; the visible Home block is GoogleReviewsWidget.
-  const { data: reviews } = useAsync(() => getApprovedReviews(), []);
+  // JSON-LD only — defer fetch so it doesn't compete with LCP/TBT.
+  const { data: reviews } = useAsync(
+    () =>
+      new Promise((resolve) => {
+        const run = () => {
+          getApprovedReviews().then(resolve).catch(() => resolve([]));
+        };
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          window.requestIdleCallback(run, { timeout: 5000 });
+        } else {
+          setTimeout(run, 2500);
+        }
+      }),
+    [],
+  );
   const catalog = allScooters?.length ? allScooters : SCOOTERS;
   const fromPrice = formatCatalogFromPrice(catalog);
   const faqs = useMemo(
@@ -146,11 +204,7 @@ export default function Home() {
       <HeroCarousel heroImageUrl={financeSettings?.heroImageUrl} />
       <PromotionalOffers compact />
       <ExploreRange scooters={modelGrid} loading={showModelSkeletons} />
-      <MoreFromUs />
-      <LocateUs />
-      <SeoAboutBlock />
-      <DealerFaq faqs={faqs} />
-      <GoogleReviewsWidget />
+      <DeferredHomeTail faqs={faqs} />
     </>
   );
 }

@@ -106,12 +106,48 @@ export function initGoogleAnalytics() {
     return;
   }
 
-  const start = () => loadGtagScript();
-  // Keep ~300KB of gtag off the LCP window; still loads for Ads/GA on idle.
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(start, { timeout: 5500 });
+  let started = false;
+  const start = () => {
+    if (started) return;
+    started = true;
+    cleanup();
+    loadGtagScript();
+  };
+
+  const events = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
+  const onInteract = () => start();
+  const cleanup = () => {
+    events.forEach((e) => window.removeEventListener(e, onInteract));
+    if (fallbackId != null) window.clearTimeout(fallbackId);
+    if (idleId != null && 'cancelIdleCallback' in window) window.cancelIdleCallback(idleId);
+  };
+
+  events.forEach((e) => window.addEventListener(e, onInteract, { once: true, passive: true }));
+
+  // Fallback: after full load + delay so Lighthouse TBT window is usually quiet.
+  let fallbackId = null;
+  let idleId = null;
+  const scheduleFallback = () => {
+    fallbackId = window.setTimeout(start, 9000);
+  };
+  if (document.readyState === 'complete') {
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(scheduleFallback, { timeout: 10000 });
+    } else {
+      scheduleFallback();
+    }
   } else {
-    window.setTimeout(start, 3200);
+    window.addEventListener(
+      'load',
+      () => {
+        if ('requestIdleCallback' in window) {
+          idleId = window.requestIdleCallback(scheduleFallback, { timeout: 10000 });
+        } else {
+          scheduleFallback();
+        }
+      },
+      { once: true },
+    );
   }
 }
 

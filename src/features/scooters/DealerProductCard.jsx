@@ -21,7 +21,9 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
 
   return (
-    <article className={cn('flex h-full flex-col bg-white text-center', className)}>
+    <article
+      className={cn('flex h-full flex-col bg-white text-center [content-visibility:auto] [contain-intrinsic-size:auto_28rem]', className)}
+    >
       <Link to={`/scooters/${scooter.id}`} className="relative block bg-white px-2 pt-2">
         <ScooterImage
           src={imgSrc}

@@ -344,11 +344,15 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
         </h2>
       ) : null}
       <div className="space-y-2 sm:space-y-3">
-        {visibleOffers.map((offer, i) => (
-          <Reveal key={offer.id} delay={i * 0.04}>
-            <OfferStrip offer={offer} site={site} onOpen={openOffer} />
-          </Reveal>
-        ))}
+        {visibleOffers.map((offer, i) =>
+          compact ? (
+            <OfferStrip key={offer.id} offer={offer} site={site} onOpen={openOffer} />
+          ) : (
+            <Reveal key={offer.id} delay={i * 0.04}>
+              <OfferStrip offer={offer} site={site} onOpen={openOffer} />
+            </Reveal>
+          ),
+        )}
       </div>
 
       <OfferDetailsModal

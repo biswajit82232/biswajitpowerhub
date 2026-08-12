@@ -1,15 +1,20 @@
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { FloatingDealerRail } from '@/components/common/FloatingDealerRail';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
-import { FirstVisitNoLicencePrompt } from '@/components/common/FirstVisitNoLicencePrompt';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { RouteLoader } from '@/components/ui/Loading';
 import { usePageTracking } from '@/hooks/usePageTracking';
+
+const FirstVisitNoLicencePrompt = lazy(() =>
+  import('@/components/common/FirstVisitNoLicencePrompt').then((m) => ({
+    default: m.FirstVisitNoLicencePrompt,
+  })),
+);
 
 function FadeOutlet() {
   const location = useLocation();
@@ -32,6 +37,30 @@ function FadeOutlet() {
     <div ref={ref} className="min-w-0">
       <Outlet />
     </div>
+  );
+}
+
+function DeferredFirstVisitPrompt() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let idleId;
+    let timeoutId;
+    const enable = () => setReady(true);
+    if ('requestIdleCallback' in window) {
+      idleId = window.requestIdleCallback(enable, { timeout: 8000 });
+    } else {
+      timeoutId = window.setTimeout(enable, 4000);
+    }
+    return () => {
+      if (idleId != null && 'cancelIdleCallback' in window) window.cancelIdleCallback(idleId);
+      if (timeoutId != null) window.clearTimeout(timeoutId);
+    };
+  }, []);
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <FirstVisitNoLicencePrompt />
+    </Suspense>
   );
 }
 
@@ -64,7 +93,7 @@ export function PublicLayout() {
       <Footer />
       <MobileLocalCTA />
       <FloatingDealerRail />
-      <FirstVisitNoLicencePrompt />
+      <DeferredFirstVisitPrompt />
     </div>
   );
 }
