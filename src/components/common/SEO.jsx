@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { SITE, SITE_URL } from '@/config/site';
 
@@ -37,6 +38,20 @@ export function SEO({
   const canonical = path === '/' || !normalizedPath ? `${SITE_URL}/` : `${SITE_URL}${normalizedPath}`;
   const ogImage = image || DEFAULT_OG_IMAGE;
   const schemas = jsonLd == null ? [] : Array.isArray(jsonLd) ? jsonLd : [jsonLd];
+
+  // Prerender injects JSON-LD into static HTML for bots that don't run JS.
+  // Googlebot smartphone then hydrates React, and Helmet adds a second copy.
+  // Two LocalBusiness/Product graphs with the same @id cause GSC errors
+  // ("Review has multiple aggregate ratings", invalid merchant listings).
+  useEffect(() => {
+    if (!schemas.length || typeof document === 'undefined') return;
+    document
+      .querySelectorAll('script[type="application/ld+json"]')
+      .forEach((el) => {
+        if (el.getAttribute('data-rh')) return;
+        el.parentNode?.removeChild(el);
+      });
+  }, [schemas]);
 
   return (
     <Helmet>

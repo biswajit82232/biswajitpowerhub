@@ -1,6 +1,7 @@
 import { DAY_KEYS, DAY_LABELS, SITE, SITE_URL } from '@/config/site';
 import { getScooterVariants, getStartingPrice } from '@/lib/scooterVariants';
 import { SITE_FAQS, MODEL_SEO_META } from '@/data/seoContent';
+import { SEO_READY_SCOOTER_IDS } from '@/data/seoReady';
 
 const SCHEMA_DAYS = {
   mon: 'Monday',
@@ -15,7 +16,7 @@ const SCHEMA_DAYS = {
 /** Schema.org OpeningHoursSpecification from admin hours */
 export function openingHoursSchema(hoursPerDay) {
   if (!hoursPerDay) return undefined;
-  return DAY_KEYS.map((day) => {
+  const specs = DAY_KEYS.map((day) => {
     const d = hoursPerDay[day];
     if (!d || d.closed) return null;
     return {
@@ -25,6 +26,19 @@ export function openingHoursSchema(hoursPerDay) {
       closes: d.close,
     };
   }).filter(Boolean);
+  if (!specs.length) return undefined;
+  const sameHours = specs.every((s) => s.opens === specs[0].opens && s.closes === specs[0].closes);
+  if (sameHours && specs.length > 1) {
+    return [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: specs.map((s) => s.dayOfWeek),
+        opens: specs[0].opens,
+        closes: specs[0].closes,
+      },
+    ];
+  }
+  return specs;
 }
 
 /** PostalAddress from site settings — includes district in street when present */
@@ -226,7 +240,8 @@ export function buildScooterProductSchema(scooter, { reviews, site } = {}) {
 export function buildScooterOfferCatalogItems(scooters, site) {
   if (!Array.isArray(scooters)) return [];
   const seller = localBusinessRef(site);
-  return scooters.map((scooter) => {
+  const ready = new Set(SEO_READY_SCOOTER_IDS);
+  return scooters.filter((scooter) => ready.has(scooter.id)).map((scooter) => {
     const url = `${SITE_URL}/scooters/${scooter.id}`;
     const variants = getScooterVariants(scooter);
     const startingPrice = getStartingPrice(scooter);
@@ -301,10 +316,11 @@ export function buildReviewedProductRef(scooter) {
 
 /**
  * Site-wide AggregateRating from all approved on-site reviews, regardless of
- * which scooter they mention. Use for the homepage/Reviews-page LocalBusiness
- * schema instead of a hand-typed rating — returns null when there are no
- * real reviews yet so callers omit aggregateRating rather than fabricate
- * rich-result eligibility with content that isn't actually on the page.
+ * which scooter they mention. Use on the community page LocalBusiness only —
+ * do not also nest this on the homepage (duplicate graphs with the same @id
+ * trigger GSC "Review has multiple aggregate ratings"). Returns null when
+ * there are no real reviews yet so callers omit aggregateRating rather than
+ * fabricate rich-result eligibility with content that isn't actually on the page.
  */
 export function siteAggregateRating(reviews) {
   if (!Array.isArray(reviews) || !reviews.length) return null;

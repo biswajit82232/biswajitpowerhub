@@ -90,6 +90,13 @@ for (const route of routes) {
       }
     });
     if (!valid) issues.push('jsonld-incomplete');
+    const homeLd = blocks.map((m) => m[1]).join('\n');
+    if (homeLd.includes('"aggregateRating"') || homeLd.includes('"reviewBody"')) {
+      issues.push('homepage-must-not-embed-reviews');
+    }
+    if (homeLd.includes('hasOfferCatalog') || homeLd.includes('gt-90') || homeLd.includes('dubble-light')) {
+      issues.push('homepage-must-not-embed-product-offers');
+    }
   }
   if (route === '/community' && !/Our Community/i.test(html)) issues.push('missing-community-copy');
   if (route === '/contact' && !html.includes('LocalBusiness')) issues.push('missing-localbusiness');

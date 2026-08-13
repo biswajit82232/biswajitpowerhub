@@ -730,9 +730,7 @@ function offerCatalogItems() {
   });
 }
 
-function localBusinessSchema(reviews) {
-  const aggregateRating = siteAggregateRatingForBuild(reviews);
-  const review = siteReviewsSchemaForBuild(reviews);
+function localBusinessSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': ['LocalBusiness', 'MotorcycleDealer', 'Store', 'AutoDealer'],
@@ -796,13 +794,6 @@ function localBusinessSchema(reviews) {
       'Bhagawangola',
       'West Bengal',
     ],
-    ...(aggregateRating ? { aggregateRating } : {}),
-    ...(review ? { review } : {}),
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Electric Scooters',
-      itemListElement: offerCatalogItems(),
-    },
   };
 }
 
@@ -1022,7 +1013,7 @@ function schemasFor(route, enrichment = {}, reviews = []) {
   const crumbs = breadcrumbSchema(route.path, route.h1 || route.title);
   const catalog = route._catalog || mergeCatalog(enrichment);
   if (route.schema === 'local') {
-    return [crumbs, localBusinessSchema(reviews), organizationSchema(), websiteSchema(), faqSchema(catalog)];
+    return [crumbs, localBusinessSchema(), organizationSchema(), websiteSchema(), faqSchema(catalog)];
   }
   if (route.schema === 'faq') {
     return [crumbs, itemListSchema(), faqSchema(catalog)];
@@ -1136,7 +1127,7 @@ function schemasFor(route, enrichment = {}, reviews = []) {
     ];
   }
   if (route.schema === 'contact' || route.path === '/contact' || route.path === '/about') {
-    return [crumbs, localBusinessSchema(reviews)];
+    return [crumbs, localBusinessSchema()];
   }
   return [crumbs];
 }
@@ -1480,10 +1471,10 @@ function injectMeta(html, route, { heroUrl } = {}) {
   }
 
   // Strip previous injected ld+json from fallback runs; keep GA scripts
-  out = out.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/gi, '');
+  out = out.replace(/<script type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>\s*/gi, '');
 
   const scripts = schemasFor(route, route._enrichment || {}, route._reviews || [])
-    .map((s) => `    <script type="application/ld+json">${JSON.stringify(s)}</script>`)
+    .map((s) => `    <script type="application/ld+json" data-prerender-jsonld="true">${JSON.stringify(s)}</script>`)
     .join('\n');
   if (scripts) out = out.replace('</head>', `${scripts}\n  </head>`);
 

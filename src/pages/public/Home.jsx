@@ -3,7 +3,6 @@ import { SEO } from '@/components/common/SEO';
 import { HeroCarousel } from '@/components/sections/HeroCarousel';
 import { ExploreRange } from '@/components/sections/ExploreRange';
 import { PromotionalOffers } from '@/components/sections/PromotionalOffers';
-import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { useFinance } from '@/context/FinanceSettingsContext';
@@ -15,10 +14,7 @@ import {
   openingHoursSchema,
   postalAddressSchema,
   breadcrumbList,
-  buildScooterOfferCatalogItems,
   faqPageSchema,
-  siteAggregateRating,
-  siteReviewsSchema,
 } from '@/lib/schemaHelpers';
 import { SCOOTERS } from '@/data/scooters';
 import { buildSiteFaqs, formatCatalogFromPrice } from '@/lib/catalogCopy';
@@ -79,21 +75,6 @@ export default function Home() {
   const { photos } = useSitePhotos();
   const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
   const { settings: financeSettings } = useFinance();
-  // JSON-LD only — defer fetch so it doesn't compete with LCP/TBT.
-  const { data: reviews } = useAsync(
-    () =>
-      new Promise((resolve) => {
-        const run = () => {
-          getApprovedReviews().then(resolve).catch(() => resolve([]));
-        };
-        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-          window.requestIdleCallback(run, { timeout: 5000 });
-        } else {
-          setTimeout(run, 2500);
-        }
-      }),
-    [],
-  );
   const catalog = allScooters?.length ? allScooters : SCOOTERS;
   const fromPrice = formatCatalogFromPrice(catalog);
   const faqs = useMemo(
@@ -107,12 +88,11 @@ export default function Home() {
   const showModelSkeletons = scootersLoading && !(allScooters?.length || SCOOTERS.length);
 
   const homeSchemas = useMemo(() => {
-    const catalogScooters = catalog;
-    // Rating must come from real on-site reviews — never a hand-typed number.
-    // Omit entirely until there are genuine reviews to back it, per Google's
-    // rich-result guidelines. Visible Google reviews use a separate widget.
-    const aggregateRating = siteAggregateRating(reviews);
-    const review = siteReviewsSchema(reviews);
+    // Homepage LocalBusiness is NAP + hours only. Nested Review + AggregateRating
+    // here (and again after React hydrates prerendered JSON-LD) made Google report
+    // "Review has multiple aggregate ratings". Product Offers on the homepage also
+    // triggered Merchant listings checks we cannot pass (no online checkout/shipping).
+    // Reviews live on /community; product Offers live on /scooters/:id.
     return [
       breadcrumbList([{ name: 'Home', path: '/' }]),
       {
@@ -156,17 +136,6 @@ export default function Home() {
           'Bhagawangola',
           'West Bengal',
         ],
-        ...(aggregateRating ? { aggregateRating } : {}),
-        ...(review ? { review } : {}),
-        ...(catalogScooters.length
-          ? {
-              hasOfferCatalog: {
-                '@type': 'OfferCatalog',
-                name: 'Electric Scooters',
-                itemListElement: buildScooterOfferCatalogItems(catalogScooters, site),
-              },
-            }
-          : {}),
       },
       {
         '@context': 'https://schema.org',
@@ -184,7 +153,7 @@ export default function Home() {
       },
       ...(faqs.length ? [faqPageSchema(faqs)] : []),
     ];
-  }, [site, catalog, faqs, reviews]);
+  }, [site, faqs]);
 
   const modelGrid = useMemo(() => catalog, [catalog]);
 
