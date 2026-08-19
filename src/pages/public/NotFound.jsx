@@ -2,9 +2,11 @@ import { Home, Bike } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { SEO } from '@/components/common/SEO';
 import Button from '@/components/ui/Button';
+import { useLocale } from '@/context/LocaleContext';
 
 export default function NotFound() {
   const location = useLocation();
+  const { t } = useLocale();
   return (
     <>
       <SEO
@@ -21,20 +23,20 @@ export default function NotFound() {
           </span>
           <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">404</p>
           <h1 className="mt-2 font-display text-display-xl font-extrabold uppercase tracking-wide text-navy">
-            Page Not Found
+            {t('nf.h1')}
           </h1>
           <p className="mt-3 max-w-sm text-body">
-            Looks like this page took a different route. Browse scooters or head back home.
+            {t('nf.body')}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button to="/" variant="dealerPrimary" icon={Home}>
-              Back Home
+              {t('nf.home')}
             </Button>
             <Button to="/scooters" variant="dealerSecondary">
-              Browse Scooters
+              {t('nf.browse')}
             </Button>
             <Button to="/contact" variant="outline">
-              Contact Showroom
+              {t('nf.contact')}
             </Button>
           </div>
         </div>

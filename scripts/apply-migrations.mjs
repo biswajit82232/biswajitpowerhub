@@ -45,6 +45,7 @@ const ORDER = [
   'revoke_is_admin_anon.sql',
   'rate_limit_upsert_lead.sql',
   'harden_public_writes_push_and_rate_limits.sql',
+  'add_lead_attribution.sql',
 ];
 
 function getDatabaseUrl(env) {

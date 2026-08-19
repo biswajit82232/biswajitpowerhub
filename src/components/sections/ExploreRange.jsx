@@ -8,6 +8,8 @@ import { getScooterInsights } from '@/features/analytics/popularityService';
 import { getScooterDiscoveryTags, sortScootersByFame } from '@/lib/catalogRank';
 import { DEFAULT_RANGE_TABS } from '@/config/site';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/context/LocaleContext';
+import { RANGE_TAB_KEYS } from '@/i18n/messages';
 
 function matchesTab(scooter, tabId) {
   if (tabId === 'all') return true;
@@ -20,7 +22,9 @@ function matchesTab(scooter, tabId) {
 /**
  * Explore Our Range — smart-sorted famous models first, with discovery badges.
  */
-export function ExploreRange({ scooters = [], loading = false, title = 'Explore Our Range' }) {
+export function ExploreRange({ scooters = [], loading = false, title }) {
+  const { t } = useLocale();
+  const heading = title || t('home.explore');
   const { site } = useSite();
   const tabs = useMemo(() => {
     const raw = Array.isArray(site.rangeTabs) && site.rangeTabs.length
@@ -65,27 +69,27 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
     <section id="models" className="bg-white py-10 sm:py-14" aria-labelledby="explore-heading">
       <div className="container-px">
         <h2 id="explore-heading" className="dealer-section-title text-center">
-          {title}
+          {heading}
         </h2>
         <p className="mx-auto mt-2 max-w-lg text-center text-xs text-muted sm:text-sm">
-          Popular and best-value models shown first — based on real visitor interest.
+          {t('home.exploreHint')}
         </p>
 
         {tabs.length > 0 && (
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:mt-8 sm:gap-3">
-            {tabs.map((t) => (
+            {tabs.map((tabItem) => (
               <button
-                key={t.id}
+                key={tabItem.id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => setTab(tabItem.id)}
                 className={cn(
                   'rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition sm:px-5 sm:text-sm',
-                  activeTab === t.id
+                  activeTab === tabItem.id
                     ? 'border-navy bg-navy text-white'
                     : 'border-navy/40 bg-white text-navy hover:border-navy',
                 )}
               >
-                {t.label}
+                {RANGE_TAB_KEYS[tabItem.id] ? t(RANGE_TAB_KEYS[tabItem.id]) : tabItem.label}
               </button>
             ))}
           </div>
@@ -108,8 +112,8 @@ export function ExploreRange({ scooters = [], loading = false, title = 'Explore 
               : (
                   <p className="col-span-full mt-2 text-center text-sm text-muted">
                     {scooters?.length > 0
-                      ? 'No models in this category yet.'
-                      : 'Our showroom line-up is being updated — please check back shortly or contact us for current stock.'}
+                      ? t('home.emptyTab')
+                      : t('home.emptyStock')}
                   </p>
                 )}
         </div>

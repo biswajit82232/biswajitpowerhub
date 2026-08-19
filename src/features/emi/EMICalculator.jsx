@@ -13,6 +13,7 @@ import {
   withVariant,
   getStartingPrice,
 } from '@/lib/scooterVariants';
+import { useLocale } from '@/context/LocaleContext';
 
 function Amount({ value, className }) {
   const display = useCountUp(value, { active: true, duration: 600 });
@@ -25,6 +26,7 @@ function Amount({ value, className }) {
  * Pass a fixed `price` (+ optional `scooterId`) when the model is already chosen (PDP).
  */
 export function EMICalculator({ price: priceProp, settings, scooterId: scooterIdProp, scooters }) {
+  const { t } = useLocale();
   const showPicker = Array.isArray(scooters) && scooters.length > 0;
   const tenureOptions = settings?.tenureOptions || [6, 12, 18, 24, 36];
   const [downPct, setDownPct] = useState(settings?.downPaymentPct ?? 20);
@@ -96,15 +98,15 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
 
   return (
     <div className="min-w-0 rounded-2xl bg-surface p-4 ring-1 ring-line shadow-soft sm:p-6">
-      <h3 className="font-display text-lg font-bold text-heading">EMI Calculator</h3>
-      <p className="mt-1 text-sm text-muted">Estimate your monthly payment.</p>
+      <h3 className="font-display text-lg font-bold text-heading">{t('fin.emi')}</h3>
+      <p className="mt-1 text-sm text-muted">{t('fin.estimate')}</p>
 
       <div className="mt-6 space-y-6" onPointerDown={track}>
         {showPicker && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div className={hasVariants(scooter) ? '' : 'sm:col-span-2'}>
               <label className="mb-1.5 block text-xs font-semibold text-muted">
-                Scooter model
+                {t('fin.model')}
               </label>
               <Select
                 value={scooterId}
@@ -124,7 +126,7 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
             {hasVariants(scooter) && (
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-muted">
-                  Battery variant
+                  {t('fin.variant')}
                 </label>
                 <Select
                   value={variantId}
@@ -147,7 +149,7 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
 
         <div>
           <div className="mb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm font-semibold text-heading">
-            <span>Vehicle price</span>
+            <span>{t('fin.vehicle')}</span>
             <span className="break-words text-brand-600">{formatINR(price)}</span>
           </div>
           {showPicker && selected && (
@@ -160,7 +162,7 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
 
         <div>
           <div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm font-semibold text-heading">
-            <span>Down payment ({downPct}%)</span>
+            <span>{t('fin.down', { pct: downPct })}</span>
             <span className="break-words text-brand-600">{formatINR(downPayment)}</span>
           </div>
           <RangeSlider
@@ -175,30 +177,30 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
 
         <div>
           <div className="mb-2 flex items-center justify-between text-sm font-semibold text-heading">
-            <span>Interest rate</span>
+            <span>{t('fin.interest')}</span>
             <span className="text-brand-600">{rate}% p.a.</span>
           </div>
           <RangeSlider value={rate} min={6} max={24} step={0.5} onChange={setRate} ariaLabel="Interest rate" />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold text-heading">Tenure</label>
+          <label className="mb-2 block text-sm font-semibold text-heading">{t('fin.tenure')}</label>
           <div className="flex flex-wrap gap-2">
-            {tenureOptions.map((t) => (
+            {tenureOptions.map((months) => (
               <button
-                key={t}
+                key={months}
                 type="button"
                 onClick={() => {
-                  setTenure(t);
+                  setTenure(months);
                   track();
                 }}
                 className={`tap-target rounded-full px-4 py-2 text-sm font-semibold ring-1 transition ${
-                  tenure === t
+                  tenure === months
                     ? 'bg-brand-gradient text-white ring-transparent shadow-soft'
                     : 'bg-surface text-body ring-line hover:ring-brand-200'
                 }`}
               >
-                {t} mo
+                {t('fin.months', { n: months })}
               </button>
             ))}
           </div>
@@ -207,22 +209,22 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
 
       <motion.div layout className="mt-6 rounded-2xl bg-surface-alt p-5">
         <div className="flex flex-wrap items-end justify-between gap-2">
-          <span className="text-sm font-medium text-body">Monthly EMI</span>
+          <span className="text-sm font-medium text-body">{t('fin.monthly')}</span>
           <Amount value={result.emi} className="break-words font-display text-2xl font-extrabold text-brand-700 sm:text-3xl" />
         </div>
         <div className="mt-4 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm">
           <div>
-            <p className="text-muted">Total interest</p>
+            <p className="text-muted">{t('fin.totalInterest')}</p>
             <Amount value={result.totalInterest} className="font-bold text-heading" />
           </div>
           <div className="text-right">
-            <p className="text-muted">Balance via EMI</p>
+            <p className="text-muted">{t('fin.balance')}</p>
             <Amount value={result.balanceViaEmi} className="font-bold text-heading" />
           </div>
           <div className="col-span-2 flex items-center justify-between border-t border-line pt-3">
             <div>
-              <p className="text-muted">Total payable</p>
-              <p className="mt-0.5 text-[10px] text-muted">+ file charges · On full vehicle price</p>
+              <p className="text-muted">{t('fin.total')}</p>
+              <p className="mt-0.5 text-[10px] text-muted">{t('fin.fileNote')}</p>
             </div>
             <Amount value={result.totalPayable} className="font-bold text-heading" />
           </div>

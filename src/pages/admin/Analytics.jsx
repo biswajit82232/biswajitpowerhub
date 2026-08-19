@@ -1,4 +1,4 @@
-import { MessageCircle, Phone, Calculator, Gauge, Eye, TrendingUp, Users, Flame } from 'lucide-react';
+import { MessageCircle, Phone, Calculator, Gauge, Eye, TrendingUp, Users, Flame, CalendarCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
@@ -8,7 +8,7 @@ import { BarChart, DonutChart } from '@/components/admin/Charts';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAsync } from '@/hooks/useAsync';
-import { getEventAggregates, getOverview } from '@/features/analytics/analyticsService';
+import { getEventAggregates, getOverview, getChannelCloseRates } from '@/features/analytics/analyticsService';
 import { getPopularityEngine } from '@/features/analytics/popularityService';
 import { getScooters } from '@/features/scooters/scooterService';
 
@@ -37,6 +37,7 @@ export default function Analytics() {
   const { data: overview } = useAsync(() => getOverview(), []);
   const { data: popularity } = useAsync(() => getPopularityEngine(), []);
   const { data: scooters } = useAsync(() => getScooters(), []);
+  const { data: channels } = useAsync(() => getChannelCloseRates(), []);
 
   const o = overview || {};
   const resolveName = (id) => scooters?.find((s) => s.id === id || s.name === id)?.name || id;
@@ -69,7 +70,7 @@ export default function Analytics() {
       <AdminSEO title="Analytics" />
       <AdminHeader
         title="Analytics"
-        subtitle="Visitors, popular models, and engagement signals."
+        subtitle="Visitors, popular models, and ads vs SEO views + close-rate."
       />
 
       <AsyncError error={error} onRetry={refetch} />
@@ -101,6 +102,64 @@ export default function Analytics() {
             <StatCard icon={Flame} label="Hot leads" value={o.hotLeads || 0} tone="amber" />
             <StatCard icon={TrendingUp} label="Needs action" value={o.needsAction || 0} tone="brand" />
           </div>
+
+          <section className="mt-6 rounded-xl bg-surface p-4 ring-1 ring-line sm:mt-8 sm:rounded-2xl sm:p-6">
+            <h2 className="font-display text-base font-bold text-heading sm:text-lg">
+              Ads vs SEO — views & close-rate
+            </h2>
+            <p className="mt-1 text-xs text-muted">
+              First-touch channel on the visit (UTM / gclid / Google search). Views count even if they never fill a form.
+              Close-rate = leads marked converted.
+            </p>
+            {channels?.rows?.length ? (
+              <>
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <StatCard icon={Users} label="Visitors" value={channels.totals.visitors} tone="slate" />
+                  <StatCard icon={Eye} label="Page views" value={channels.totals.pageViews} tone="accent" />
+                  <StatCard icon={Eye} label="Scooter views" value={channels.totals.scooterViews} tone="slate" />
+                  <StatCard icon={TrendingUp} label="Lead rate" value={`${channels.totals.leadRate}%`} tone="brand" />
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <StatCard icon={Users} label="Leads" value={channels.totals.leads} tone="slate" />
+                  <StatCard icon={Flame} label="Converted" value={channels.totals.converted} tone="amber" />
+                  <StatCard icon={TrendingUp} label="Close rate" value={`${channels.totals.closeRate}%`} tone="brand" />
+                  <StatCard icon={CalendarCheck} label="Test rides" value={channels.totals.testRides} tone="accent" />
+                </div>
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-[40rem] text-left text-sm">
+                    <thead>
+                      <tr className="text-[10px] font-bold uppercase tracking-wide text-muted">
+                        <th className="pb-2 pr-3">Channel</th>
+                        <th className="pb-2 pr-3">Visitors</th>
+                        <th className="pb-2 pr-3">Pages</th>
+                        <th className="pb-2 pr-3">Scooters</th>
+                        <th className="pb-2 pr-3">Leads</th>
+                        <th className="pb-2 pr-3">Converted</th>
+                        <th className="pb-2">Close rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {channels.rows.map((row) => (
+                        <tr key={row.channel} className="border-t border-line">
+                          <td className="py-2 pr-3 font-semibold text-heading">{row.label}</td>
+                          <td className="py-2 pr-3 text-body">{row.visitors}</td>
+                          <td className="py-2 pr-3 text-body">{row.pageViews}</td>
+                          <td className="py-2 pr-3 text-body">{row.scooterViews}</td>
+                          <td className="py-2 pr-3 text-body">{row.leads}</td>
+                          <td className="py-2 pr-3 text-body">{row.converted}</td>
+                          <td className="py-2 font-bold text-heading">{row.closeRate}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            ) : (
+              <p className="mt-3 text-sm text-muted">
+                No attributed visits yet. New visits with ?utm_source= or Google Ads gclid will appear here — forms are not required.
+              </p>
+            )}
+          </section>
 
           <section className="mt-6 rounded-xl bg-surface p-4 ring-1 ring-line sm:mt-8 sm:rounded-2xl sm:p-6">
             <h2 className="flex items-center gap-1.5 font-display text-base font-bold text-heading sm:text-lg">

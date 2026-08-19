@@ -8,11 +8,13 @@ import {
 } from '@/lib/scooterVariants';
 import { STOCK_LABELS } from '@/data/scooters';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/context/LocaleContext';
 
 /**
  * Dealer-style product card with smart discovery badges (trending / value).
  */
 export function DealerProductCard({ scooter, imageOverride, tags = [], className }) {
+  const { t } = useLocale();
   if (!scooter) return null;
   const battery = formatBatteryCapacityRange(scooter);
   const range = formatRangeRange(scooter);
@@ -38,12 +40,14 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
         />
         {(tags.length > 0 || scooter.noLicence || scooter.stock === 'out_of_stock' || scooter.stock === 'low_stock') && (
           <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-start gap-1.5">
-            {scooter.noLicence && <Badge tone="success">No Licence</Badge>}
+            {scooter.noLicence && <Badge tone="success">{t('card.noLicence')}</Badge>}
             {(scooter.stock === 'out_of_stock' || scooter.stock === 'low_stock') && (
-              <Badge tone={stock.tone}>{stock.label}</Badge>
+              <Badge tone={stock.tone}>{t(`stock.${scooter.stock}`)}</Badge>
             )}
-            {tags.map((t) => (
-              <Badge key={t.id || t.label} tone={t.tone || 'brand'}>{t.label}</Badge>
+            {tags.map((tag) => (
+              <Badge key={tag.id || tag.label} tone={tag.tone || 'brand'}>
+                {tag.id === 'trending' || tag.id === 'hot' ? t(`tag.${tag.id}`) : tag.label}
+              </Badge>
             ))}
           </div>
         )}
@@ -57,19 +61,19 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
         <div className="mt-4 flex border-y border-black/10 py-3">
           <div className="dealer-spec-divider w-1/3 px-1">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-xs">
-              Range
+              {t('pdp.range')}
             </p>
             <p className="mt-1 text-xs font-bold text-body sm:text-sm">{range}</p>
           </div>
           <div className="dealer-spec-divider w-1/3 px-1">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-xs">
-              Top Speed
+              {t('pdp.topSpeed')}
             </p>
             <p className="mt-1 text-xs font-bold text-body sm:text-sm">{topSpeed} km/h</p>
           </div>
           <div className="dealer-spec-divider w-1/3 px-1">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-muted sm:text-xs">
-              Battery
+              {t('pdp.batteryCapacity')}
             </p>
             <p className="mt-1 text-xs font-bold text-body sm:text-sm">{battery}</p>
           </div>
@@ -77,10 +81,10 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           <Button to="/test-ride-berhampore" variant="dealerPrimary" size="sm">
-            Book Test Ride
+            {t('cta.testRide')}
           </Button>
           <Button to={`/scooters/${scooter.id}`} variant="dealerSecondary" size="sm">
-            View More
+            {t('card.viewMore')}
           </Button>
         </div>
       </div>

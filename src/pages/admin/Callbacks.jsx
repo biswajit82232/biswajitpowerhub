@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { PhoneCall, Phone, MessageCircle } from 'lucide-react';
+import { PhoneCall, Phone } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
@@ -15,7 +15,8 @@ import { ADMIN_LIST_LIMIT, getCallbacks, updateCallback } from '@/features/leads
 import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
-import { telUrl, whatsappCustomerUrl } from '@/config/site';
+import { telUrl } from '@/config/site';
+import { WhatsAppQuoteMenu } from '@/components/admin/WhatsAppQuoteMenu';
 
 export default function Callbacks() {
   const { toast } = useToast();
@@ -115,16 +116,12 @@ export default function Callbacks() {
                 >
                   <Phone className="h-4.5 w-4.5" />
                 </a>
-                <a
-                  href={whatsappCustomerUrl(c.phone, `Hi ${c.name}, this is BISWAJIT POWER HUB — you requested a callback.`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => { if (!c.handled) setTimeout(() => afterContact(c.id), 600); }}
-                  className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]"
-                  aria-label="WhatsApp"
-                >
-                  <MessageCircle className="h-4.5 w-4.5" />
-                </a>
+                <WhatsAppQuoteMenu
+                  phone={c.phone}
+                  name={c.name}
+                  kind="callback"
+                  onOpen={() => { if (!c.handled) setTimeout(() => afterContact(c.id), 600); }}
+                />
                 <div className="ml-auto">
                   <AdminToggle
                     checked={!!c.handled}

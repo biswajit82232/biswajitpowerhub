@@ -8,6 +8,7 @@ import { SERVICE_KINDS, getServiceKind } from '@/data/serviceKinds';
 import { submitServiceBooking } from './leadService';
 import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile, clearFieldError, focusFirstError } from './validation';
 import { HoneypotField } from './HoneypotField';
+import { useLocale } from '@/context/LocaleContext';
 
 const TIME_SLOTS = ['10:00 AM', '11:30 AM', '1:00 PM', '3:00 PM', '4:30 PM', '6:00 PM'];
 
@@ -17,6 +18,7 @@ const TIME_SLOTS = ['10:00 AM', '11:30 AM', '1:00 PM', '3:00 PM', '4:30 PM', '6:
  */
 export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSuccess }) {
   const { toast } = useToast();
+  const { t } = useLocale();
   const today = new Date().toISOString().split('T')[0];
   const [modelId, setModelId] = useState('');
   const [form, setForm] = useState({
@@ -46,11 +48,11 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
       return;
     }
     const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
-    if (!form.serviceKind) e.serviceKind = 'Choose a service type';
-    if (!form.date) e.date = 'Pick a date';
-    if (isPaid && !form.details.trim()) e.details = 'Tell us what work you need';
+    if (!isValidName(form.name)) e.name = t('form.errName');
+    if (!isValidPhone(form.phone)) e.phone = t('form.errPhone');
+    if (!form.serviceKind) e.serviceKind = t('form.errService');
+    if (!form.date) e.date = t('form.errDate');
+    if (isPaid && !form.details.trim()) e.details = t('form.errDetails');
     setErrors(e);
     if (Object.keys(e).length) {
       focusFirstError(ev.currentTarget, e);
@@ -69,10 +71,10 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
         scooterId: selectedScooter?.id || null,
       });
       setDone(true);
-      toast('Service booked! We will confirm shortly.', 'success');
+      toast(t('toast.serviceOk'), 'success');
       onSuccess?.();
     } catch {
-      toast('Could not book right now. Please call or WhatsApp us.', 'error');
+      toast(t('toast.serviceFail'), 'error');
     } finally {
       setLoading(false);
     }
@@ -86,10 +88,9 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
         className="flex flex-col items-center gap-3 py-6 text-center"
       >
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
-        <h3 className="text-lg font-bold text-heading">Service request sent!</h3>
+        <h3 className="text-lg font-bold text-heading">{t('done.serviceTitle')}</h3>
         <p className="max-w-sm text-sm text-body">
-          {selectedKind?.label || 'Service'} on {form.date} at {form.time}.
-          We&apos;ll confirm your slot at the showroom.
+          {t('done.serviceBody', { kind: selectedKind?.label || 'Service', date: form.date, time: form.time })}
         </p>
       </motion.div>
     );
@@ -99,7 +100,7 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
     <form onSubmit={onSubmit} className="relative space-y-4">
       <HoneypotField value={form.website} onChange={(website) => setForm({ ...form, website })} />
       <div>
-        <p className="mb-2 text-sm font-semibold text-heading">Service type</p>
+        <p className="mb-2 text-sm font-semibold text-heading">{t('form.serviceType')}</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {SERVICE_KINDS.map((kind) => {
             const active = form.serviceKind === kind.id;
@@ -116,7 +117,7 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
                 }`}
               >
                 <span className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-heading">{kind.label}</span>
+                  <span className="text-sm font-bold text-heading">{t(`svc.${kind.id === 'paid' ? 'paidLabel' : kind.id.replace('_', '')}`)}</span>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
                       kind.id === 'paid'
@@ -124,10 +125,12 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
                         : 'bg-emerald-50 text-emerald-700'
                     }`}
                   >
-                    {kind.badge}
+                    {kind.id === 'paid' ? t('svc.paid') : t('svc.free')}
                   </span>
                 </span>
-                <span className="mt-1 block text-xs text-muted">{kind.description}</span>
+                <span className="mt-1 block text-xs text-muted">
+                  {t(`svc.${kind.id === 'paid' ? 'paidd' : `${kind.id.replace('_', '')}d`}`)}
+                </span>
               </button>
             );
           })}
@@ -137,11 +140,11 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
         )}
       </div>
 
-      <Field label="Your Name" htmlFor="svc-name" required error={errors.name}>
+      <Field label={t('form.name')} htmlFor="svc-name" required error={errors.name}>
           <Input
             id="svc-name"
             name="name"
-            placeholder="Full name"
+            placeholder={t('form.fullName')}
             value={form.name}
             error={errors.name}
             onChange={(e) => {
@@ -150,14 +153,14 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
             }}
           />
       </Field>
-      <Field label="Phone Number" htmlFor="svc-phone" required error={errors.phone}>
+      <Field label={t('form.phone')} htmlFor="svc-phone" required error={errors.phone}>
           <Input
             id="svc-phone"
             name="phone"
             type="tel"
             inputMode="tel"
             maxLength={16}
-            placeholder="10-digit mobile / +91…"
+            placeholder={t('form.phoneHint')}
             value={form.phone}
             error={errors.phone}
             onChange={(e) => {
@@ -168,9 +171,9 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
       </Field>
 
       {scooters.length > 0 && (
-        <Field label="Scooter model (optional)" htmlFor="svc-model" hint="Helps us prepare parts & tools">
+        <Field label={t('form.modelOptional')} htmlFor="svc-model" hint={t('svc.modelHint')}>
           <Select id="svc-model" value={modelId} onChange={(e) => setModelId(e.target.value)}>
-            <option value="">Select if known</option>
+            <option value="">{t('form.selectIfKnown')}</option>
             {scooters.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -181,7 +184,7 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
       )}
 
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Preferred date" htmlFor="svc-date" required error={errors.date}>
+        <Field label={t('form.preferredDate')} htmlFor="svc-date" required error={errors.date}>
           <Input
             id="svc-date"
             name="date"
@@ -195,15 +198,15 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
             }}
           />
         </Field>
-        <Field label="Preferred time" htmlFor="svc-time">
+        <Field label={t('form.preferredTime')} htmlFor="svc-time">
           <Select
             id="svc-time"
             value={form.time}
             onChange={(e) => setForm({ ...form, time: e.target.value })}
           >
-            {TIME_SLOTS.map((t) => (
-              <option key={t} value={t}>
-                {t}
+            {TIME_SLOTS.map((slot) => (
+              <option key={slot} value={slot}>
+                {slot}
               </option>
             ))}
           </Select>
@@ -211,20 +214,16 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
       </div>
 
       <Field
-        label={isPaid ? 'What do you need?' : 'Notes (optional)'}
+        label={isPaid ? t('form.detailsPaid') : t('form.detailsFree')}
         htmlFor="svc-details"
         required={isPaid}
         error={errors.details}
-        hint={isPaid ? 'Describe the issue, noise, battery, brakes, etc.' : 'Purchase date, invoice no., or anything we should know'}
+        hint={isPaid ? t('svc.hintPaid') : t('svc.hintFree')}
       >
         <Textarea
           id="svc-details"
           rows={3}
-          placeholder={
-            isPaid
-              ? 'e.g. Battery not holding charge, brake noise, controller check…'
-              : 'Optional notes for the workshop'
-          }
+          placeholder={isPaid ? t('svc.phPaid') : t('svc.phFree')}
           value={form.details}
           error={errors.details}
           name="details"
@@ -236,7 +235,7 @@ export function ServiceBookingForm({ scooters = [], defaultKind = 'free_1', onSu
       </Field>
 
       <Button type="submit" variant="primary" fullWidth size="lg" loading={loading} icon={Wrench}>
-        Book Service
+        {t('form.bookService')}
       </Button>
     </form>
   );

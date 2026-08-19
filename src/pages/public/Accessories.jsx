@@ -12,6 +12,7 @@ import { getAccessories } from '@/features/accessories/accessoryService';
 import { ACCESSORY_CATEGORIES, PART_SECTIONS } from '@/data/accessories';
 import { breadcrumbList } from '@/lib/schemaHelpers';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/context/LocaleContext';
 
 const SORTS = {
   'price-asc': (a, b) => a.price - b.price,
@@ -26,6 +27,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function Accessories() {
+  const { t } = useLocale();
   const { data: accessories, loading } = useAsync(() => getAccessories(), []);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('price-asc');
@@ -79,10 +81,10 @@ export default function Accessories() {
       />
 
       <DealerPageHero
-        eyebrow="Accessories"
-        title="Parts & Accessories"
-        subtitle="Genuine spare parts and body panels — batteries, brake pads, panels, mirrors, and more."
-        breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Parts & Accessories' }]}
+        eyebrow={t('acc.eyebrow')}
+        title={t('acc.h1')}
+        subtitle={t('acc.sub')}
+        breadcrumbs={[{ name: t('crumb.home'), to: '/' }, { name: t('acc.h1') }]}
       />
 
       <CatalogToolbar
@@ -105,7 +107,7 @@ export default function Accessories() {
             ))}
           </div>
         }
-        searchPlaceholder="Search parts…"
+        searchPlaceholder={t('acc.search')}
         query={query}
         onQueryChange={setQuery}
         searchAriaLabel="Search accessories"
@@ -122,7 +124,7 @@ export default function Accessories() {
           className="w-full min-w-0 sm:w-32"
           aria-label="Category"
         >
-          <option value="all">All categories</option>
+          <option value="all">{t('acc.allCat')}</option>
           {ACCESSORY_CATEGORIES.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}

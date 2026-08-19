@@ -90,7 +90,9 @@ export default function NearMeBerhampore() {
         models on our{' '}
         <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> page
         or the dedicated{' '}
-        <Link to="/electric-scooters-berhampore">Berhampore electric scooters</Link> service page. Book a{' '}
+        <Link to="/electric-scooters-berhampore">Berhampore electric scooters</Link> service page.
+        Searching <Link to="/battery-scooty-berhampore">battery scooty in Berhampore</Link>? That hub
+        matches the local wording. Book a{' '}
         <Link to="/test-ride-berhampore">free test ride</Link> or visit{' '}
         <Link to="/contact">Contact / map</Link>.
       </p>

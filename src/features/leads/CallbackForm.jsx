@@ -7,9 +7,11 @@ import { useToast } from '@/components/ui/Toast';
 import { submitCallback } from './leadService';
 import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile, clearFieldError, focusFirstError } from './validation';
 import { HoneypotField } from './HoneypotField';
+import { useLocale } from '@/context/LocaleContext';
 
 export function CallbackForm({ compact = false }) {
   const { toast } = useToast();
+  const { t } = useLocale();
   const [form, setForm] = useState({ name: '', phone: '', website: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -22,8 +24,8 @@ export function CallbackForm({ compact = false }) {
       return;
     }
     const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
+    if (!isValidName(form.name)) e.name = t('form.errName');
+    if (!isValidPhone(form.phone)) e.phone = t('form.errPhone');
     setErrors(e);
     if (Object.keys(e).length) {
       focusFirstError(ev.currentTarget, e);
@@ -34,9 +36,9 @@ export function CallbackForm({ compact = false }) {
       const phone = normalizeIndianMobile(form.phone);
       await submitCallback({ name: form.name.trim(), phone });
       setDone(true);
-      toast('Thanks! We will call you back shortly.', 'success');
+      toast(t('toast.callbackOk'), 'success');
     } catch {
-      toast('Something went wrong. Please try WhatsApp or call us.', 'error');
+      toast(t('toast.callbackFail'), 'error');
     } finally {
       setLoading(false);
     }
@@ -50,10 +52,9 @@ export function CallbackForm({ compact = false }) {
         className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-brand-50 px-6 py-10 text-center"
       >
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
-        <h3 className="text-lg font-bold text-heading">Request received!</h3>
+        <h3 className="text-lg font-bold text-heading">{t('done.callbackTitle')}</h3>
         <p className="max-w-xs text-sm text-body">
-          Our team will call <span className="font-semibold">{form.name}</span> at{' '}
-          {normalizeIndianMobile(form.phone) || form.phone} very soon.
+          {t('done.callbackBody', { name: form.name, phone: normalizeIndianMobile(form.phone) || form.phone })}
         </p>
       </motion.div>
     );
@@ -62,11 +63,11 @@ export function CallbackForm({ compact = false }) {
   return (
     <form onSubmit={onSubmit} className={`relative ${compact ? 'space-y-3' : 'space-y-4'}`}>
       <HoneypotField value={form.website} onChange={(website) => setForm({ ...form, website })} />
-      <Field label="Your Name" htmlFor="cb-name" required error={errors.name}>
+      <Field label={t('form.name')} htmlFor="cb-name" required error={errors.name}>
         <Input
           id="cb-name"
           name="name"
-          placeholder="e.g. Rahul Sharma"
+          placeholder={t('form.fullName')}
           value={form.name}
           error={errors.name}
           autoComplete="name"
@@ -76,14 +77,14 @@ export function CallbackForm({ compact = false }) {
           }}
         />
       </Field>
-      <Field label="Phone Number" htmlFor="cb-phone" required error={errors.phone}>
+      <Field label={t('form.phone')} htmlFor="cb-phone" required error={errors.phone}>
         <Input
           id="cb-phone"
           name="phone"
           type="tel"
           inputMode="tel"
           maxLength={16}
-          placeholder="10-digit mobile / +91…"
+          placeholder={t('form.phoneHint')}
           value={form.phone}
           error={errors.phone}
           autoComplete="tel"
@@ -102,7 +103,7 @@ export function CallbackForm({ compact = false }) {
         icon={PhoneCall}
         className="min-h-12"
       >
-        Request callback
+        {t('form.callback')}
       </Button>
     </form>
   );

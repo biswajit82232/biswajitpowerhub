@@ -14,8 +14,10 @@ import {
   getStartingPrice,
   hasVariants,
 } from '@/lib/scooterVariants';
+import { useLocale } from '@/context/LocaleContext';
 
 export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [], imageOverride }) {
+  const { t } = useLocale();
   const { settings } = useFinance();
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
   const startingPrice = getStartingPrice(scooter);
@@ -50,8 +52,8 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
           className="aspect-[4/3] w-full max-w-full bg-surface-alt transition-transform duration-500 ease-premium group-hover:scale-[1.02]"
         />
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
-          {scooter.noLicence && <Badge tone="success">No Licence*</Badge>}
-          <Badge tone={stock.tone}>{stock.label}</Badge>
+          {scooter.noLicence && <Badge tone="success">{t('card.noLicence')}*</Badge>}
+          <Badge tone={stock.tone}>{t(`stock.${scooter.stock}`)}</Badge>
           {extraBadges.slice(0, 1).map((b) => (
             <Badge key={b.label} tone={b.tone}>
               {b.label}
@@ -77,12 +79,12 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-5">
           <div>
-            <p className="text-xs font-medium text-muted">Starting at</p>
+            <p className="text-xs font-medium text-muted">{t('card.starting')}</p>
             <p className="font-display text-2xl font-extrabold text-heading">{formatINR(startingPrice)}</p>
             {packNames && (
               <p className="mt-0.5 text-xs text-muted">{packNames}</p>
             )}
-            <p className="mt-0.5 text-xs font-semibold text-brand-700">EMI from {formatINR(emi)}/mo</p>
+            <p className="mt-0.5 text-xs font-semibold text-brand-700">{t('card.emiFrom', { amount: formatINR(emi) })}</p>
           </div>
           <Button
             to={`/scooters/${scooter.id}`}
@@ -91,7 +93,7 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
             iconRight={ArrowRight}
             aria-label={`Book test ride for ${scooter.name}`}
           >
-            Test ride
+            {t('card.testRide')}
           </Button>
         </div>
       </div>

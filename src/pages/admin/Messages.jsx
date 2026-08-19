@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Mail, Phone, MessageCircle, Trash2 } from 'lucide-react';
+import { Mail, Phone, Trash2 } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminToggle } from '@/components/admin/AdminToggle';
@@ -20,7 +20,8 @@ import {
 import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
-import { telUrl, whatsappCustomerUrl } from '@/config/site';
+import { telUrl } from '@/config/site';
+import { WhatsAppQuoteMenu } from '@/components/admin/WhatsAppQuoteMenu';
 
 export default function Messages() {
   const { toast } = useToast();
@@ -125,16 +126,12 @@ export default function Messages() {
                   >
                     <Phone className="h-4.5 w-4.5" />
                   </a>
-                  <a
-                    href={whatsappCustomerUrl(m.phone, `Hi ${m.name}, this is BISWAJIT POWER HUB regarding your message.`)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => { if (!m.is_read) markRead(m.id, true); }}
-                    className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]"
-                    aria-label="WhatsApp"
-                  >
-                    <MessageCircle className="h-4.5 w-4.5" />
-                  </a>
+                  <WhatsAppQuoteMenu
+                    phone={m.phone}
+                    name={m.name}
+                    kind="message"
+                    onOpen={() => { if (!m.is_read) markRead(m.id, true); }}
+                  />
                   <button
                     type="button"
                     onClick={() => remove(m.id)}

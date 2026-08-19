@@ -118,7 +118,8 @@ export default function LocationLanding({ location }) {
         <Link to="/scooters/single-light">Single Light</Link> — all low-speed options with no licence on
         eligible units. Start from the{' '}
         <Link to="/scooters">full scooters catalogue</Link>, our{' '}
-        <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> guide, or{' '}
+        <Link to="/best-electric-scooters-berhampore">best electric scooters in Berhampore</Link> guide,{' '}
+        <Link to="/battery-scooty-berhampore">battery scooty in Berhampore</Link>, or{' '}
         <Link to="/electric-scooter-near-me-berhampore">electric scooter near me Berhampore</Link>.
       </p>
 

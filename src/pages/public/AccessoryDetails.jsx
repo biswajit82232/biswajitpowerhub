@@ -16,9 +16,11 @@ import { SCOOTERS, STOCK_LABELS } from '@/data/scooters';
 import { buildAccessoryProductSchema } from '@/lib/schemaHelpers';
 import { whatsappUrl, telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 function CompatibleScooterLinks({ compatibility }) {
+  const { t } = useLocale();
   if (!compatibility) return null;
   const parts = compatibility.split(/,\s*/).map((p) => p.trim()).filter(Boolean);
   const linked = parts.map((part) => {
@@ -33,7 +35,7 @@ function CompatibleScooterLinks({ compatibility }) {
   return (
     <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-body">
       <Wrench className="h-4 w-4 shrink-0 text-brand-500" />
-      <span className="font-medium text-heading">Fits:</span>
+      <span className="font-medium text-heading">{t('acc.fits')}</span>
       {linked.map(({ label, scooter }, i) => (
         <span key={label} className="inline-flex items-center gap-1">
           {i > 0 && <span className="text-muted">·</span>}
@@ -56,6 +58,7 @@ function CompatibleScooterLinks({ compatibility }) {
 export default function AccessoryDetails() {
   const { id } = useParams();
   const { site } = useSite();
+  const { t } = useLocale();
   const { data: accessory, loading } = useAsync(() => getAccessoryById(id), [id]);
 
   if (loading) {
@@ -113,7 +116,7 @@ export default function AccessoryDetails() {
           className="mb-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 transition hover:text-brand-700"
         >
           <ChevronLeft className="h-4 w-4" />
-          All accessories
+          {t('acc.all')}
         </Link>
 
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
@@ -154,7 +157,7 @@ export default function AccessoryDetails() {
           <Reveal delay={0.1}>
             <div className="flex flex-wrap gap-2">
               <Badge tone="brand">{accessory.category}</Badge>
-              <Badge tone={stock.tone}>{stock.label}</Badge>
+              <Badge tone={stock.tone}>{t(`stock.${accessory.stock}`)}</Badge>
             </div>
 
             <h1 className="mt-4 font-display text-display-md font-extrabold uppercase tracking-wide text-navy">
@@ -166,7 +169,7 @@ export default function AccessoryDetails() {
             )}
 
             <div className="mt-6 border border-line bg-white p-5">
-              <p className="text-xs font-bold uppercase tracking-wide text-muted">Price</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">{t('cmp.price')}</p>
               <p className="font-display text-4xl font-extrabold text-navy">
                 {formatINR(accessory.price)}
               </p>
@@ -176,7 +179,7 @@ export default function AccessoryDetails() {
               <div className="mt-6">
                 <h2 className="flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide text-navy">
                   <Tag className="h-5 w-5 text-brand-500" />
-                  About This Item
+                  {t('acc.about')}
                 </h2>
                 <p className="mt-3 text-body leading-relaxed">{accessory.description}</p>
               </div>
@@ -192,7 +195,7 @@ export default function AccessoryDetails() {
                 fullWidth
                 onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'accessory-detail', accessoryId: accessory.id })}
               >
-                Call Showroom
+                {t('cta.callShowroom')}
               </Button>
               <Button
                 href={whatsappUrl(waMessage, site)}
@@ -203,11 +206,11 @@ export default function AccessoryDetails() {
                 className="!rounded-dealer"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'accessory-detail', accessoryId: accessory.id })}
               >
-                Enquire on WhatsApp
+                {t('acc.enquire')}
               </Button>
             </div>
             <Button to="/scooters" variant="dealerSecondary" size="md" className="mt-3 w-full">
-              Browse Compatible Scooters
+              {t('acc.browse')}
             </Button>
           </Reveal>
         </div>

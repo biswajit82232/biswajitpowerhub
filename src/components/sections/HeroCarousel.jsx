@@ -9,12 +9,14 @@ import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
 import { HERO_IMAGE } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/context/LocaleContext';
 
 /**
  * Full-bleed dealer hero — showroom slide + promo bar and/or sticky sale sticker.
  */
 export function HeroCarousel({ heroImageUrl }) {
   const { site } = useSite();
+  const { t } = useLocale();
   const { photos } = useSitePhotos();
   const { data: offers, loading: offersLoading } = useAsync(() => getActiveOffers(), []);
 
@@ -138,7 +140,7 @@ export function HeroCarousel({ heroImageUrl }) {
             {site.name}
           </p>
           <h1 className="mt-1 font-display text-xs font-bold uppercase leading-snug tracking-wide text-white drop-shadow sm:text-xl lg:text-2xl">
-            Best Electric Scooter Dealer in Berhampore, Murshidabad
+            {t('home.h1')}
           </h1>
           <p className="mt-1 text-sm font-medium text-white/90 sm:text-base">{site.tagline}</p>
         </div>
@@ -185,7 +187,7 @@ export function HeroCarousel({ heroImageUrl }) {
           <div className="container-px flex items-center justify-between gap-3 py-2.5 sm:gap-6 sm:py-3.5">
             <div className="min-w-0 flex-1 text-left">
               <p className="text-[9px] font-black uppercase tracking-[0.16em] text-white/85 sm:text-[10px] sm:tracking-[0.18em]">
-                Current offer{offerCount > 1 ? ` · ${offerIndex + 1}/${offerCount}` : ''}
+                {t('home.offer')}{offerCount > 1 ? ` · ${offerIndex + 1}/${offerCount}` : ''}
               </p>
               <p className="mt-0.5 font-display text-[13px] font-black leading-snug tracking-tight text-white sm:text-lg">
                 {offer.discountText}
@@ -198,12 +200,12 @@ export function HeroCarousel({ heroImageUrl }) {
               {offer.promoCode ? (
                 <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand-600 sm:text-xs">
                   <Tag className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
-                  Code {offer.promoCode}
+                  {t('home.code')} {offer.promoCode}
                 </p>
               ) : null}
             </div>
             <span className="inline-flex h-9 shrink-0 items-center justify-center rounded-dealer border border-white bg-white px-3 text-[10px] font-black uppercase tracking-wide text-brand-600 sm:h-11 sm:px-5 sm:text-xs">
-              Details
+              {t('home.details')}
             </span>
           </div>
         </Link>

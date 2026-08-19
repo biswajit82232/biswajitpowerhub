@@ -2,41 +2,42 @@ import { Link } from 'react-router-dom';
 import { Bike, FileText, MapPin, Phone, Wrench } from 'lucide-react';
 import { telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { cn } from '@/lib/utils';
 
 const RAIL = [
   {
     id: 'test-ride',
-    label: 'Test Ride',
+    labelKey: 'rail.testRide',
     to: '/test-ride-berhampore',
     icon: Bike,
     event: null,
   },
   {
     id: 'service',
-    label: 'Book Service',
+    labelKey: 'rail.service',
     to: '/service#book',
     icon: Wrench,
     event: null,
   },
   {
     id: 'quote',
-    label: 'Quotation',
+    labelKey: 'rail.quote',
     to: '/contact#callback',
     icon: FileText,
     event: null,
   },
   {
     id: 'location',
-    label: 'Get Location',
+    labelKey: 'rail.location',
     hrefKey: 'maps',
     icon: MapPin,
     event: EVENT.DIRECTIONS_CLICK,
   },
   {
     id: 'call',
-    label: 'Call',
+    labelKey: 'rail.call',
     hrefKey: 'tel',
     icon: Phone,
     event: EVENT.CALL_CLICK,
@@ -49,6 +50,7 @@ const RAIL = [
  */
 export function FloatingDealerRail() {
   const { site } = useSite();
+  const { t } = useLocale();
 
   return (
     <aside
@@ -71,7 +73,7 @@ export function FloatingDealerRail() {
                   onClick={() => trackEvent(item.event, { from: 'dealer_rail' })}
                 >
                   <Icon className="h-4 w-4" strokeWidth={2} />
-                  {item.label}
+                  {t(item.labelKey)}
                 </a>
               </li>
             );
@@ -88,7 +90,7 @@ export function FloatingDealerRail() {
                   onClick={() => trackEvent(item.event, { from: 'dealer_rail' })}
                 >
                   <Icon className="h-4 w-4" strokeWidth={2} />
-                  {item.label}
+                  {t(item.labelKey)}
                 </a>
               </li>
             );
@@ -98,7 +100,7 @@ export function FloatingDealerRail() {
             <li key={item.id}>
               <Link to={item.to} className={className}>
                 <Icon className="h-4 w-4" strokeWidth={2} />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             </li>
           );

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Users, Flame, Phone, MessageCircle, Zap, Clock, PhoneForwarded } from 'lucide-react';
+import { Users, Flame, Phone, Zap, Clock, PhoneForwarded } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AsyncError } from '@/components/admin/AsyncError';
@@ -13,7 +13,9 @@ import { useAsync } from '@/hooks/useAsync';
 import { ADMIN_LIST_LIMIT, getLeads, updateLead } from '@/features/leads/leadService';
 import { FOLLOW_UP } from '@/lib/purchaseReadiness';
 import { timeAgo } from '@/lib/utils';
-import { telUrl, whatsappCustomerUrl } from '@/config/site';
+import { telUrl } from '@/config/site';
+import { WhatsAppQuoteMenu } from '@/components/admin/WhatsAppQuoteMenu';
+import { CHANNEL_LABELS } from '@/lib/attribution';
 import { useSite } from '@/context/SiteSettingsContext';
 
 const STATUSES = ['new', 'contacted', 'follow_up', 'converted', 'lost'];
@@ -195,6 +197,9 @@ export default function Leads() {
                 </span>
                 <Badge tone={l.classification}>{l.classification?.toUpperCase()}</Badge>
                 {l.last_source && <Badge tone="neutral">{l.last_source}</Badge>}
+                {l.attribution?.channel && (
+                  <Badge tone="accent">{CHANNEL_LABELS[l.attribution.channel] || l.attribution.channel}</Badge>
+                )}
                 <span className="inline-flex items-center gap-1 text-xs text-muted">
                   <Clock className="h-3.5 w-3.5" />
                   {timeAgo(l.lastActivityAt || l.updated_at)}
@@ -207,9 +212,12 @@ export default function Leads() {
                     <a href={telUrl(l.phone, site)} className="rounded-xl bg-brand-50 p-2.5 text-brand-600" aria-label="Call">
                       <Phone className="h-4.5 w-4.5" />
                     </a>
-                    <a href={whatsappCustomerUrl(l.phone, `Hi ${l.name || 'there'}, this is BISWAJIT POWER HUB regarding your inquiry.`)} target="_blank" rel="noopener noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer">
-                      <MessageCircle className="h-4.5 w-4.5" />
-                    </a>
+                    <WhatsAppQuoteMenu
+                      phone={l.phone}
+                      name={l.name}
+                      kind="lead"
+                      scooterName={l.interested_scooter}
+                    />
                   </>
                 )}
                 <Select

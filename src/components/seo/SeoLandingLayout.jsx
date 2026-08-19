@@ -8,9 +8,11 @@ import { SITE, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { SITE_FAQS } from '@/data/seoContent';
+import { useLocale } from '@/context/LocaleContext';
 
 export function ShowroomCtaRow({ from = 'seo-landing' }) {
   const { site } = useSite();
+  const { t } = useLocale();
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
       <Button
@@ -32,7 +34,7 @@ export function ShowroomCtaRow({ from = 'seo-landing' }) {
         className="min-h-12 !rounded-dealer"
         onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from })}
       >
-        WhatsApp
+        {t('cta.whatsapp')}
       </Button>
       <Button
         href={site.maps.link}
@@ -42,19 +44,22 @@ export function ShowroomCtaRow({ from = 'seo-landing' }) {
         className="min-h-12"
         onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from })}
       >
-        Get Direction
+        {t('home.getDirection')}
       </Button>
     </div>
   );
 }
 
-export function FaqSection({ faqs, title = 'Frequently Asked Questions' }) {
+export function FaqSection({ faqs, title }) {
   const { site } = useSite();
+  const { locale, t } = useLocale();
   const list = faqs?.length ? faqs : (site.faqs?.length ? site.faqs : SITE_FAQS);
+  const heading = title || t('home.faq');
+  const bn = locale === 'bn';
   return (
     <section className="mt-14" aria-labelledby="faq-heading">
       <h2 id="faq-heading" className="dealer-section-title !text-left">
-        {title}
+        {heading}
       </h2>
       <div className="mt-6 space-y-2">
         {list.map((f, i) => (
@@ -65,12 +70,14 @@ export function FaqSection({ faqs, title = 'Frequently Asked Questions' }) {
             <summary className="cursor-pointer list-none px-4 py-4 font-display text-sm font-bold text-navy marker:content-none sm:text-base [&::-webkit-details-marker]:hidden">
               <span className="flex items-start justify-between gap-3">
                 <span>
-                  Q{i + 1}. {f.question}
+                  Q{i + 1}. {bn && f.bnQuestion ? f.bnQuestion : f.question}
                 </span>
                 <span className="shrink-0 text-brand-500 transition group-open:rotate-45">+</span>
               </span>
             </summary>
-            <p className="border-t border-line px-4 py-3 text-sm leading-relaxed text-body">{f.answer}</p>
+            <p className="border-t border-line px-4 py-3 text-sm leading-relaxed text-body">
+              {bn && f.bnAnswer ? f.bnAnswer : f.answer}
+            </p>
           </details>
         ))}
       </div>
@@ -93,6 +100,8 @@ export function SeoLandingLayout({
   faqs,
   showFaq = true,
 }) {
+  const { t } = useLocale();
+  const { site } = useSite();
   return (
     <>
       <SEO title={title} description={description} path={path} jsonLd={jsonLd} titleTemplate={false} />
@@ -122,13 +131,13 @@ export function SeoLandingLayout({
           </Reveal>
 
           <div className="mx-auto mt-12 max-w-[800px] border border-line bg-surface-alt p-6 shadow-soft sm:p-8">
-            <p className="font-display text-lg font-bold uppercase tracking-wide text-navy sm:text-xl">Visit Our Showroom</p>
+            <p className="font-display text-lg font-bold uppercase tracking-wide text-navy sm:text-xl">{t('seo.visit')}</p>
             <p className="mt-1 text-sm text-muted">
-              Looking for models? Browse{' '}
+              {t('seo.visitBefore')}
               <Link to="/scooters" className="font-semibold text-brand-600 hover:underline">
-                all electric scooters
-              </Link>{' '}
-              or contact {SITE.name}, Berhampore.
+                {t('seo.allScooters')}
+              </Link>
+              {t('seo.visitAfter', { name: site.name || SITE.name })}
             </p>
             {showFaq ? <FaqSection faqs={faqs} /> : null}
             <div className="mt-8">

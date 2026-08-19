@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Button from '@/components/ui/Button';
 import { SITE } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 
 const SCRIPT_SRC = 'https://www.replyonthefly.com/widget/reviews.js';
 const FALLBACK_PLACE_ID = 'ChIJP_miqYx9-TkR9z1fb-iGyxI';
@@ -18,6 +19,7 @@ export function GoogleReviewsWidget() {
   const hostRef = useRef(null);
   const sectionRef = useRef(null);
   const { site } = useSite();
+  const { t } = useLocale();
   const placeId = (site?.maps?.placeId || SITE.maps.placeId || FALLBACK_PLACE_ID).trim();
   const [loadWidget, setLoadWidget] = useState(false);
 
@@ -75,7 +77,7 @@ export function GoogleReviewsWidget() {
     >
       <div className="container-px">
         <h2 id="reviews-heading" className="dealer-section-title !text-left">
-          Customer Reviews for {SITE.name}, Berhampore
+          {t('home.reviews', { name: SITE.name })}
         </h2>
 
         <div
@@ -85,7 +87,7 @@ export function GoogleReviewsWidget() {
 
         <div className="mt-8 text-center">
           <Button to="/community" variant="dealerSecondary" size="dealer">
-            Our Community
+            {t('home.community')}
           </Button>
         </div>
       </div>

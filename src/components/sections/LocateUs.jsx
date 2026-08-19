@@ -5,12 +5,14 @@ import { telUrl, whatsappUrl, formatPhoneDisplay } from '@/config/site';
 import { getPriorityLocations } from '@/data/locations';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
+import { useLocale } from '@/context/LocaleContext';
 
 /**
  * LOCATE US — full-width navy band with address, phone, WhatsApp, GET DIRECTION.
  */
 export function LocateUs() {
   const { site } = useSite();
+  const { t } = useLocale();
   const towns = getPriorityLocations().slice(0, 6);
 
   return (
@@ -24,7 +26,7 @@ export function LocateUs() {
       />
       <div className="container-px relative z-10">
         <h2 id="locate-heading" className="font-display text-lg font-bold uppercase tracking-wide text-white md:text-[30px]">
-          Locate Us
+          {t('home.locate')}
         </h2>
 
         <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
@@ -58,7 +60,7 @@ export function LocateUs() {
                 className="text-sm font-semibold text-white hover:underline"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'locate-us' })}
               >
-                WhatsApp us
+                {t('home.whatsappUs')}
               </a>
             </div>
           </div>
@@ -69,28 +71,28 @@ export function LocateUs() {
             className="shrink-0 self-start lg:self-center"
             onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'locate-us' })}
           >
-            Get Direction
+            {t('home.getDirection')}
           </Button>
         </div>
 
         <div className="mt-6 border-t border-white/15 pt-5">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-white/70">Serving Murshidabad</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-white/70">{t('home.serving')}</p>
           <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm">
-            {towns.map((t) => (
-              <li key={t.slug}>
-                <Link to={t.path} className="text-white/90 underline-offset-2 hover:underline">
-                  {t.name}
+            {towns.map((town) => (
+              <li key={town.slug}>
+                <Link to={town.path} className="text-white/90 underline-offset-2 hover:underline">
+                  {town.name}
                 </Link>
               </li>
             ))}
             <li>
               <Link to="/areas-we-serve" className="font-semibold text-white underline-offset-2 hover:underline">
-                All areas
+                {t('home.allAreas')}
               </Link>
             </li>
             <li>
               <Link to="/electric-scooter-near-me-berhampore" className="font-semibold text-white underline-offset-2 hover:underline">
-                Near me
+                {t('home.nearMe')}
               </Link>
             </li>
           </ul>

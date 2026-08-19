@@ -3,10 +3,10 @@ import { Wrench } from 'lucide-react';
 import { AccessoryImage } from '@/components/common/AccessoryImage';
 import Button from '@/components/ui/Button';
 import { formatINR } from '@/lib/utils';
-import { STOCK_LABELS } from '@/data/scooters';
+import { useLocale } from '@/context/LocaleContext';
 
 export function AccessoryCard({ accessory, index = 0 }) {
-  const stock = STOCK_LABELS[accessory.stock] || STOCK_LABELS.in_stock;
+  const { t } = useLocale();
 
   return (
     <article
@@ -28,7 +28,7 @@ export function AccessoryCard({ accessory, index = 0 }) {
           {accessory.category}
         </span>
         <span className="absolute right-3 top-3 bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-navy ring-1 ring-line">
-          {stock.label}
+          {t(`stock.${accessory.stock}`)}
         </span>
       </Link>
 
@@ -47,7 +47,7 @@ export function AccessoryCard({ accessory, index = 0 }) {
         </p>
         <div className="mt-auto pt-3">
           <Button to={`/accessories/${accessory.id}`} variant="dealerPrimary" size="sm" fullWidth>
-            View More
+            {t('card.viewMore')}
           </Button>
         </div>
       </div>

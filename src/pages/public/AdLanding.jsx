@@ -1,8 +1,10 @@
 import { Phone, MessageCircle, Navigation, Check } from 'lucide-react';
 import { SEO } from '@/components/common/SEO';
 import Button from '@/components/ui/Button';
+import { LanguageToggle } from '@/components/common/LanguageToggle';
 import { SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
@@ -14,6 +16,7 @@ import { formatCatalogFromPrice } from '@/lib/catalogCopy';
  */
 export default function AdLanding() {
   const { site } = useSite();
+  const { t } = useLocale();
   const phone = site.phones[0];
   const maps = site.maps.link;
   const perks = (site.perks || []).slice(0, 3);
@@ -21,7 +24,7 @@ export default function AdLanding() {
   const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS);
 
   return (
-    <div className="min-h-screen bg-white text-body">
+    <div className="relative min-h-screen bg-white text-body">
       <SEO
         title="No Licence Electric Scooters in Berhampore — Test Ride Today"
         description={`No licence electric scooters in Berhampore. Test ride at ${site.name}, Chunakhali. Call ${formatPhoneDisplay(phone)}.`}
@@ -30,15 +33,23 @@ export default function AdLanding() {
         titleTemplate={false}
       />
 
+      <div className="absolute right-4 top-4 z-10">
+        <LanguageToggle compact />
+      </div>
+
       <main className="relative mx-auto max-w-lg px-4 pb-16 pt-10 sm:pt-14">
         <p className="text-center text-xs font-bold uppercase tracking-widest text-brand-500">
           {site.name} · Chunakhali
         </p>
         <h1 className="mt-3 text-center font-display text-2xl font-extrabold uppercase leading-tight tracking-wide text-navy sm:text-3xl">
-          No Licence Electric Scooters — Test Ride Today
+          {t('ad.h1')}
         </h1>
         <p className="mt-3 text-center text-sm leading-relaxed text-body">
-          {fromPrice ? `From ${fromPrice}. ` : ''}No RTO. Free test ride at {site.address.line}, {site.address.city}.
+          {t('ad.sub', {
+            from: fromPrice ? `From ${fromPrice}. ` : '',
+            line: site.address.line,
+            city: site.address.city,
+          })}
         </p>
 
         <div className="mt-8 flex flex-col gap-3">
@@ -51,7 +62,7 @@ export default function AdLanding() {
             fullWidth
             onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'ad-landing' })}
           >
-            Call Now: {formatPhoneDisplay(phone).replace('+91 ', '0')}
+            {t('cta.call')}: {formatPhoneDisplay(phone).replace('+91 ', '0')}
           </Button>
           <Button
             href={whatsappUrl('Hi, I saw your ad — I want a test ride', site)}
@@ -62,7 +73,7 @@ export default function AdLanding() {
             className="!rounded-dealer"
             onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'ad-landing' })}
           >
-            WhatsApp Us
+            {t('cta.whatsapp')}
           </Button>
           <Button
             href={maps}
@@ -72,7 +83,7 @@ export default function AdLanding() {
             fullWidth
             onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'ad-landing' })}
           >
-            Get Direction
+            {t('cta.map')}
           </Button>
         </div>
 

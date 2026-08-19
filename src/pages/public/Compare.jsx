@@ -22,24 +22,25 @@ import {
 } from '@/lib/scooterVariants';
 import { ShowroomCtaRow } from '@/components/seo/SeoLandingLayout';
 import { DealerPageHero } from '@/components/common/DealerPageHero';
+import { useLocale } from '@/context/LocaleContext';
 
 const MAX_SLOTS = 3;
 const LABEL_W = '8.75rem';
 
-function compareRows(settings) {
+function compareRows(settings, t) {
   return [
-    { label: 'Price', get: (s) => formatPriceRange(s, formatINR) },
-    { label: 'EMI from', get: (s) => `${formatINR(emiFrom({ price: getStartingPrice(s), settings }))}/mo*` },
-    { label: 'Range', get: (s) => formatRangeRange(s) },
-    { label: 'Top speed', get: (s) => `${s.topSpeed} km/h` },
-    { label: 'Battery', get: (s) => formatVariantSpec(s, 'batteryCapacity') },
-    { label: 'Battery type', get: (s) => formatVariantSpec(s, 'batteryType') },
-    { label: 'Battery warranty', get: (s) => formatVariantSpec(s, 'batteryWarranty') },
-    { label: 'Charging time', get: (s) => s.chargingTime },
-    { label: 'Motor', get: (s) => s.motor },
-    { label: 'Weight', get: (s) => s.weight },
-    { label: 'Load capacity', get: (s) => s.loadCapacity },
-    { label: 'Warranty', get: (s) => s.warranty },
+    { label: t('cmp.price'), get: (s) => formatPriceRange(s, formatINR) },
+    { label: t('cmp.emi'), get: (s) => `${formatINR(emiFrom({ price: getStartingPrice(s), settings }))}/mo*` },
+    { label: t('pdp.range'), get: (s) => formatRangeRange(s) },
+    { label: t('pdp.topSpeed'), get: (s) => `${s.topSpeed} km/h` },
+    { label: t('pdp.batteryCapacity'), get: (s) => formatVariantSpec(s, 'batteryCapacity') },
+    { label: t('pdp.batteryType'), get: (s) => formatVariantSpec(s, 'batteryType') },
+    { label: t('pdp.batteryWarranty'), get: (s) => formatVariantSpec(s, 'batteryWarranty') },
+    { label: t('cmp.charging'), get: (s) => s.chargingTime },
+    { label: t('pdp.motor'), get: (s) => s.motor },
+    { label: t('pdp.weight'), get: (s) => s.weight },
+    { label: t('pdp.load'), get: (s) => s.loadCapacity },
+    { label: t('pdp.warranty'), get: (s) => s.warranty },
   ];
 }
 
@@ -91,7 +92,7 @@ function CompactSlot({ scooter, options, onChange, onRemove, canRemove }) {
   );
 }
 
-function CompactAddSlot({ options, onAdd }) {
+function CompactAddSlot({ options, onAdd, addLabel }) {
   return (
     <div className="flex min-w-[9.5rem] items-center gap-2 border-l border-dashed border-line p-2 sm:min-w-[10.5rem] sm:p-2.5">
       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-500 ring-1 ring-brand-100">
@@ -99,7 +100,7 @@ function CompactAddSlot({ options, onAdd }) {
       </span>
       <Select onChange={(e) => onAdd(e.target.value)} value="" className="h-8 min-w-0 flex-1 px-2 text-xs">
         <option value="" disabled>
-          Add model
+          {addLabel}
         </option>
         {options.map((s) => (
           <option key={s.id} value={s.id}>
@@ -111,7 +112,7 @@ function CompactAddSlot({ options, onAdd }) {
   );
 }
 
-function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, optionsFor }) {
+function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, optionsFor, addLabel, modelsLabel, swipeHint }) {
   const showAdd = chosen.length < MAX_SLOTS && available.length > 0;
   const colCount = chosen.length + (showAdd ? 1 : 0);
   const gridCols = `${LABEL_W} repeat(${colCount}, minmax(9.5rem, 1fr))`;
@@ -119,7 +120,7 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
   return (
     <div className="overflow-hidden border border-line bg-white shadow-soft">
       <p className="border-b border-line bg-surface-alt px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-muted sm:hidden">
-        Swipe to compare →
+        {swipeHint}
       </p>
 
       <div className="isolate overflow-x-auto overscroll-x-contain">
@@ -134,7 +135,7 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
               'text-[10px] font-bold uppercase tracking-wide text-muted shadow-[4px_0_8px_-4px_rgba(15,23,42,0.14)]',
             )}
           >
-            Models
+            {modelsLabel}
           </div>
 
           {chosen.map((s, i) => (
@@ -157,7 +158,7 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
 
           {showAdd && (
             <div className="border-b border-line bg-surface-alt">
-              <CompactAddSlot options={available} onAdd={onAdd} />
+              <CompactAddSlot options={available} onAdd={onAdd} addLabel={addLabel} />
             </div>
           )}
 
@@ -219,7 +220,8 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
 export default function Compare() {
   const { data: scooters, loading } = useAsync(() => getScooters(), []);
   const { settings } = useFinance();
-  const rows = useMemo(() => compareRows(settings), [settings]);
+  const { t } = useLocale();
+  const rows = useMemo(() => compareRows(settings, t), [settings, t]);
   const [selected, setSelected] = useState([]);
   const tracked = useRef(false);
 
@@ -273,10 +275,10 @@ export default function Compare() {
       />
 
       <DealerPageHero
-        eyebrow="Compare"
-        title="Compare Models"
-        subtitle="Pick up to three scooters — compact view below, swipe on mobile to read specs."
-        breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Compare' }]}
+        eyebrow={t('cmp.eyebrow')}
+        title={t('cmp.h1')}
+        subtitle={t('cmp.sub')}
+        breadcrumbs={[{ name: t('crumb.home'), to: '/' }, { name: t('nav.compare') }]}
       />
 
       <div className="container-px py-6 sm:py-8">
@@ -306,12 +308,12 @@ export default function Compare() {
               ))}
               {available.length > 0 && (
                 <div className="border border-dashed border-line">
-                  <CompactAddSlot options={available} onAdd={addSlot} />
+                  <CompactAddSlot options={available} onAdd={addSlot} addLabel={t('cmp.add')} />
                 </div>
               )}
             </div>
             <p className="border border-line bg-surface-alt px-4 py-3 text-center text-sm text-navy">
-              Add one more model to compare specs side by side.
+              {t('cmp.needOne')}
             </p>
           </div>
         ) : (
@@ -324,6 +326,9 @@ export default function Compare() {
               onRemove={remove}
               onAdd={addSlot}
               optionsFor={optionsFor}
+              addLabel={t('cmp.add')}
+              modelsLabel={t('cmp.models')}
+              swipeHint={t('cmp.swipe')}
             />
             <p className="mt-4 text-xs text-muted">
               {EMI_DISCLAIMER} {EMI_DISCLAIMER_NOTE}
@@ -332,9 +337,9 @@ export default function Compare() {
         )}
 
         <div className="mt-10 border border-line bg-surface-alt p-5 sm:mt-12 sm:p-8">
-          <p className="font-display text-lg font-bold uppercase tracking-wide text-navy">Ready to Decide?</p>
+          <p className="font-display text-lg font-bold uppercase tracking-wide text-navy">{t('cmp.ready')}</p>
           <p className="mt-1 text-sm text-muted">
-            Call or WhatsApp for today&apos;s stock, EMI, and a free test ride at Chunakhali.
+            {t('cmp.readyHint')}
           </p>
           <div className="mt-5">
             <ShowroomCtaRow from="compare" />

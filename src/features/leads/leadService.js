@@ -8,6 +8,31 @@ import {
 import { getVisitorEventsMap } from '@/features/analytics/popularityService';
 import { normalizeIndianMobile } from '@/features/leads/validation';
 import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS } from '@/lib/utils';
+import { attributionPayload } from '@/lib/attribution';
+
+function isMissingAttributionColumn(error) {
+  const msg = String(error?.message || '');
+  return /attribution/i.test(msg) && /column|schema cache|could not find/i.test(msg);
+}
+
+async function insertPublicRow(table, payload) {
+  const first = await withTimeout(
+    supabase.from(table).insert(payload),
+    MUTATION_TIMEOUT_MS,
+    `${table} submit timed out`,
+  );
+  if (!first.error) return first;
+  if (payload.attribution && isMissingAttributionColumn(first.error)) {
+    const rest = { ...payload };
+    delete rest.attribution;
+    return withTimeout(
+      supabase.from(table).insert(rest),
+      MUTATION_TIMEOUT_MS,
+      `${table} submit timed out`,
+    );
+  }
+  return first;
+}
 
 const UPSERT_DEBOUNCE_MS = 2000;
 const lastUpsertAt = new Map();
@@ -35,25 +60,37 @@ async function upsertLead({ name, phone, source, scooter }) {
   const { events, classification } = getLocalLeadSummary();
   const { readinessPercent } = computePurchaseReadiness(events);
   const leadScore = readinessPercent;
+  const attribution = attributionPayload();
 
   if (isSupabaseConfigured && supabase) {
     if (shouldSkipLeadUpsert(visitorId)) {
       return { readinessPercent, score: leadScore, classification };
     }
+    const params = {
+      p_visitor_id: visitorId,
+      p_name: name,
+      p_phone: phone,
+      p_last_source: source,
+      p_interested_scooter: scooter || null,
+      p_score: leadScore,
+      p_classification: classification,
+      p_attribution: attribution,
+    };
     try {
-      const { error } = await withTimeout(
-        supabase.rpc('upsert_lead', {
-          p_visitor_id: visitorId,
-          p_name: name,
-          p_phone: phone,
-          p_last_source: source,
-          p_interested_scooter: scooter || null,
-          p_score: leadScore,
-          p_classification: classification,
-        }),
+      let { error } = await withTimeout(
+        supabase.rpc('upsert_lead', params),
         MUTATION_TIMEOUT_MS,
         'Lead upsert timed out',
       );
+      if (error && /p_attribution|could not find the function|schema cache/i.test(error.message || '')) {
+        const legacy = { ...params };
+        delete legacy.p_attribution;
+        ({ error } = await withTimeout(
+          supabase.rpc('upsert_lead', legacy),
+          MUTATION_TIMEOUT_MS,
+          'Lead upsert timed out',
+        ));
+      }
       if (error) {
         console.warn('[Leads] upsert_lead failed:', error.message);
       }
@@ -69,13 +106,12 @@ export async function submitCallback({ name, phone, interest }) {
   const cleanPhone = normalizeIndianMobile(phone);
   await trackEvent(EVENT.CALLBACK_REQUEST, { name: cleanName, interest: interest || null });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await withTimeout(
-      supabase
-        .from('callbacks')
-        .insert({ name: cleanName, phone: cleanPhone, visitor_id: getVisitorId() }),
-      MUTATION_TIMEOUT_MS,
-      'Callback submit timed out',
-    );
+    const { error } = await insertPublicRow('callbacks', {
+      name: cleanName,
+      phone: cleanPhone,
+      visitor_id: getVisitorId(),
+      attribution: attributionPayload(),
+    });
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
@@ -94,19 +130,16 @@ export async function submitTestRide({ name, phone, date, time, scooter, scooter
   const cleanPhone = normalizeIndianMobile(phone);
   await trackEvent(EVENT.TEST_RIDE_BOOKED, { scooter, scooterId });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await withTimeout(
-      supabase.from('test_rides').insert({
-        name: cleanName,
-        phone: cleanPhone,
-        preferred_date: date,
-        preferred_time: time,
-        scooter,
-        scooter_id: scooterId,
-        visitor_id: getVisitorId(),
-      }),
-      MUTATION_TIMEOUT_MS,
-      'Test ride submit timed out',
-    );
+    const { error } = await insertPublicRow('test_rides', {
+      name: cleanName,
+      phone: cleanPhone,
+      preferred_date: date,
+      preferred_time: time,
+      scooter,
+      scooter_id: scooterId,
+      visitor_id: getVisitorId(),
+      attribution: attributionPayload(),
+    });
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
@@ -129,21 +162,18 @@ export async function submitServiceBooking({
   const cleanPhone = normalizeIndianMobile(phone);
   await trackEvent(EVENT.SERVICE_BOOKED, { serviceKind, scooter, scooterId });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await withTimeout(
-      supabase.from('service_bookings').insert({
-        name: cleanName,
-        phone: cleanPhone,
-        service_kind: serviceKind,
-        details: details || null,
-        preferred_date: date,
-        preferred_time: time,
-        scooter: scooter || null,
-        scooter_id: scooterId || null,
-        visitor_id: getVisitorId(),
-      }),
-      MUTATION_TIMEOUT_MS,
-      'Service booking submit timed out',
-    );
+    const { error } = await insertPublicRow('service_bookings', {
+      name: cleanName,
+      phone: cleanPhone,
+      service_kind: serviceKind,
+      details: details || null,
+      preferred_date: date,
+      preferred_time: time,
+      scooter: scooter || null,
+      scooter_id: scooterId || null,
+      visitor_id: getVisitorId(),
+      attribution: attributionPayload(),
+    });
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));
@@ -157,17 +187,14 @@ export async function submitContact({ name, phone, email, message, from = 'conta
   const cleanPhone = normalizeIndianMobile(phone);
   await trackEvent(EVENT.CONTACT_FORM, { from });
   if (isSupabaseConfigured && supabase) {
-    const { error } = await withTimeout(
-      supabase.from('contact_messages').insert({
-        name: cleanName,
-        phone: cleanPhone,
-        email: email || null,
-        message,
-        visitor_id: getVisitorId(),
-      }),
-      MUTATION_TIMEOUT_MS,
-      'Contact submit timed out',
-    );
+    const { error } = await insertPublicRow('contact_messages', {
+      name: cleanName,
+      phone: cleanPhone,
+      email: email || null,
+      message,
+      visitor_id: getVisitorId(),
+      attribution: attributionPayload(),
+    });
     if (error) throw error;
   } else {
     await new Promise((r) => setTimeout(r, 600));

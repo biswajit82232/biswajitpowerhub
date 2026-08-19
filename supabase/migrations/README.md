@@ -49,6 +49,7 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 25 | `revoke_is_admin_anon.sql` | Revoke anon EXECUTE on `is_admin()` (RLS still works; PostgREST RPC closed) |
 | 26 | `rate_limit_upsert_lead.sql` | Debounce + flood cap on public `upsert_lead` RPC |
 | 27 | `harden_public_writes_push_and_rate_limits.sql` | Rate-limit form/review/`lead_events` inserts; admin-only push subs; review-photo path prefix; never-downgrade lead classification; revoke anon analytics RPC |
+| 28 | `add_lead_attribution.sql` | UTM / gclid / channel JSON on leads + inbox rows; `upsert_lead` first-touch attribution |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 

@@ -172,8 +172,14 @@ create table if not exists public.leads (
   status              text default 'new',  -- new | contacted | follow_up | converted | lost
   notes               text,
   created_at          timestamptz default now(),
-  updated_at          timestamptz default now()
+  updated_at          timestamptz default now(),
+  attribution         jsonb
 );
+
+alter table public.callbacks add column if not exists attribution jsonb;
+alter table public.test_rides add column if not exists attribution jsonb;
+alter table public.service_bookings add column if not exists attribution jsonb;
+alter table public.contact_messages add column if not exists attribution jsonb;
 
 -- ---------------------------------------------------------------------------
 -- FINANCE SETTINGS (single row)
@@ -367,13 +373,16 @@ create or replace function public.upsert_lead(
   p_last_source text,
   p_interested_scooter text,
   p_score int,
-  p_classification text
+  p_classification text,
+  p_attribution jsonb default null
 )
 returns void
 language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  new_leads_recent int;
 begin
   if p_visitor_id is null or length(trim(p_visitor_id)) = 0 then
     raise exception 'visitor_id required';
@@ -388,21 +397,21 @@ begin
   end if;
 
   if not exists (select 1 from public.leads where visitor_id = p_visitor_id) then
-    if (
-      select count(*) from public.leads
-      where created_at > now() - interval '5 minutes'
-    ) >= 40 then
+    select count(*) into new_leads_recent
+    from public.leads
+    where created_at > now() - interval '5 minutes';
+    if coalesce(new_leads_recent, 0) >= 40 then
       raise exception 'rate limited';
     end if;
   end if;
 
   insert into public.leads (
     visitor_id, name, phone, last_source, interested_scooter,
-    score, classification, updated_at
+    score, classification, attribution, updated_at
   )
   values (
     p_visitor_id, p_name, p_phone, p_last_source, p_interested_scooter,
-    coalesce(p_score, 0), coalesce(p_classification, 'cold'), now()
+    coalesce(p_score, 0), coalesce(p_classification, 'cold'), p_attribution, now()
   )
   on conflict (visitor_id) do update set
     name = coalesce(excluded.name, leads.name),
@@ -415,12 +424,19 @@ begin
       when leads.classification = 'warm' or excluded.classification = 'warm' then 'warm'
       else coalesce(excluded.classification, leads.classification, 'cold')
     end,
+    attribution = case
+      when leads.attribution is null then excluded.attribution
+      when coalesce(leads.attribution->>'channel', 'direct') = 'direct'
+           and coalesce(excluded.attribution->>'channel', 'direct') is distinct from 'direct'
+        then excluded.attribution
+      else leads.attribution
+    end,
     updated_at = now();
 end;
 $$;
 
-revoke all on function public.upsert_lead(text, text, text, text, text, int, text) from public;
-grant execute on function public.upsert_lead(text, text, text, text, text, int, text) to anon, authenticated;
+revoke all on function public.upsert_lead(text, text, text, text, text, int, text, jsonb) from public;
+grant execute on function public.upsert_lead(text, text, text, text, text, int, text, jsonb) to anon, authenticated;
 
 create or replace function public.get_analytics_events(p_limit int default 8000)
 returns table (

@@ -2,6 +2,7 @@ import { Phone, Navigation, MessageCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { SITE, telUrl, whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 /**
@@ -9,6 +10,7 @@ import { trackEvent, EVENT } from '@/lib/tracking';
  */
 export function MobileLocalCTA() {
   const { site } = useSite();
+  const { t } = useLocale();
   const mapsHref =
     site.maps?.link ||
     'https://www.google.com/maps?q=Biswajit+Power+Hub+Chunakhali+Berhampore';
@@ -30,7 +32,7 @@ export function MobileLocalCTA() {
           className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'mobile_sticky' })}
         >
-          Call
+          {t('cta.call')}
         </Button>
         <Button
           href={whatsappUrl(undefined, site)}
@@ -43,7 +45,7 @@ export function MobileLocalCTA() {
           className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'mobile_sticky' })}
         >
-          Chat
+          {t('cta.chat')}
         </Button>
         <Button
           href={mapsHref}
@@ -54,7 +56,7 @@ export function MobileLocalCTA() {
           className="min-h-11 !rounded-dealer"
           onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'mobile_sticky' })}
         >
-          Map
+          {t('cta.map')}
         </Button>
       </div>
       <span className="sr-only">{SITE.name}</span>

@@ -179,7 +179,8 @@ export default function BestElectricScooters() {
         and our{' '}
         <Link to="/no-licence-electric-scooters-west-bengal">no licence electric scooters West Bengal</Link>{' '}
         guide. See{' '}
-        <Link to="/electric-scooter-near-me-berhampore">electric scooter near me Berhampore</Link> and{' '}
+        <Link to="/electric-scooter-near-me-berhampore">electric scooter near me Berhampore</Link>,{' '}
+        <Link to="/battery-scooty-berhampore">battery scooty in Berhampore</Link>, and{' '}
         <Link to="/areas-we-serve">areas we serve</Link> across Murshidabad.
       </p>
       <p className="text-xs text-muted">

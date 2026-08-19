@@ -8,10 +8,12 @@ import { ShowroomCtaRow } from '@/components/seo/SeoLandingLayout';
 import { SERVICE_LOCATIONS } from '@/data/locations';
 import { breadcrumbList, postalAddressSchema } from '@/lib/schemaHelpers';
 import { SITE, SITE_URL, GBP_NAP } from '@/config/site';
+import { useLocale } from '@/context/LocaleContext';
 
 const path = '/areas-we-serve';
 
 export default function AreasWeServe() {
+  const { t } = useLocale();
   const jsonLd = useMemo(
     () => [
       breadcrumbList([
@@ -59,10 +61,10 @@ export default function AreasWeServe() {
 
       <div className="border-b border-line bg-surface-alt">
         <div className="container-px py-8 sm:py-12">
-          <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Areas We Serve' }]} />
+          <Breadcrumbs items={[{ name: t('crumb.home'), to: '/' }, { name: t('page.areas') }]} />
           <Reveal>
             <h1 className="mt-4 font-display text-2xl font-extrabold uppercase tracking-wide text-navy sm:text-3xl md:text-4xl">
-              Areas We Serve — Murshidabad
+              {t('page.areasH1')}
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-body sm:text-base">
               One showroom in Berhampore — customers from across Murshidabad. Free test rides at{' '}

@@ -33,6 +33,7 @@ const GuidePost = lazy(() => import('@/pages/public/GuidePost'));
 const AdLanding = lazy(() => import('@/pages/public/AdLanding'));
 const LocationPage = lazy(() => import('@/pages/public/seo/locationPages'));
 const NearMeBerhampore = lazy(() => import('@/pages/public/seo/NearMeBerhampore'));
+const BatteryScootyBerhampore = lazy(() => import('@/pages/public/seo/BatteryScootyBerhampore'));
 const AreasWeServe = lazy(() => import('@/pages/public/AreasWeServe'));
 
 // Admin (separate chunk)
@@ -80,6 +81,8 @@ export default function App() {
         <Route path="battery-upgrade-berhampore" element={<BatteryUpgrade />} />
         <Route path="test-ride-berhampore" element={<TestRide />} />
         <Route path="electric-scooter-near-me-berhampore" element={<NearMeBerhampore />} />
+        <Route path="battery-scooty-berhampore" element={<BatteryScootyBerhampore />} />
+        <Route path="e-scooty-berhampore" element={<Navigate to="/battery-scooty-berhampore" replace />} />
         <Route path="areas-we-serve" element={<AreasWeServe />} />
         {/* React Router can't treat ":slug" as dynamic when it's glued to a literal
             prefix ("electric-scooters-:slug" never matched) — register one static

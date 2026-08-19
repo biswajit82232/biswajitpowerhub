@@ -21,7 +21,7 @@ export function Logo({ to = '/', className, compact = false, light = false }) {
         <source type="image/webp" srcSet={LOGO_WEBP} />
         <img
           src={LOGO_PNG}
-          alt={`${site.name} — Electric Scooter Dealership`}
+          alt=""
           width={240}
           height={94}
           loading="eager"

@@ -34,8 +34,8 @@
       "permanent": true
     },
     {
-      "source": "/updates",
-      "destination": "/offers",
+      "source": "/e-scooty-berhampore",
+      "destination": "/battery-scooty-berhampore",
       "permanent": true
     }
   ],

@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import { Field, Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 import { submitCallback } from '@/features/leads/leadService';
 import {
   isValidName,
@@ -53,6 +54,7 @@ export function FirstVisitNoLicencePrompt() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { site } = useSite();
+  const { t } = useLocale();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: '', phone: '', website: '' });
   const [errors, setErrors] = useState({});
@@ -122,8 +124,8 @@ export function FirstVisitNoLicencePrompt() {
       return;
     }
     const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
+    if (!isValidName(form.name)) e.name = t('form.errName');
+    if (!isValidPhone(form.phone)) e.phone = t('form.errPhone');
     setErrors(e);
     if (Object.keys(e).length) {
       focusFirstError(ev.currentTarget, e);
@@ -138,9 +140,9 @@ export function FirstVisitNoLicencePrompt() {
       });
       markSeen();
       setDone(true);
-      toast('Thanks! We will call you shortly.', 'success');
+      toast(t('toast.callbackOk'), 'success');
     } catch {
-      toast('Could not submit. Please call or WhatsApp us.', 'error');
+      toast(t('toast.callbackFail'), 'error');
     } finally {
       setLoading(false);
     }
@@ -174,7 +176,7 @@ export function FirstVisitNoLicencePrompt() {
           <button
             type="button"
             onClick={dismiss}
-            aria-label="Close"
+            aria-label={t('prompt.close')}
             className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/90 transition hover:bg-white/20"
           >
             <X className="h-4 w-4" strokeWidth={2.4} />
@@ -203,10 +205,10 @@ export function FirstVisitNoLicencePrompt() {
           </div>
 
           <p className="relative mt-4 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-200">
-            No licence · No registration
+            {t('prompt.kicker')}
           </p>
           <h2 className="relative mt-1.5 font-display text-xl font-extrabold leading-tight tracking-tight text-white sm:text-2xl">
-            Looking for a no-licence electric scooter?
+            {t('prompt.title')}
           </h2>
         </div>
 
@@ -221,31 +223,28 @@ export function FirstVisitNoLicencePrompt() {
                 <CheckCircle2 className="h-6 w-6" strokeWidth={2.2} />
               </span>
               <h3 className="mt-3 font-display text-lg font-extrabold text-navy">
-                Request received
+                {t('done.callbackTitle')}
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed text-body">
-                {brand} will call{' '}
-                <span className="font-semibold text-heading">{form.name}</span> at{' '}
-                <span className="font-semibold text-heading">
-                  {normalizeIndianMobile(form.phone) || form.phone}
-                </span>{' '}
-                about no-licence
-                models.
+                {t('prompt.receivedBody', {
+                  brand,
+                  name: form.name,
+                  phone: normalizeIndianMobile(form.phone) || form.phone,
+                })}
               </p>
               <div className="mt-5 flex flex-col gap-2">
                 <Button type="button" variant="dealerPrimary" fullWidth onClick={browseGuide}>
-                  View no-licence models
+                  {t('prompt.viewModels')}
                 </Button>
                 <Button type="button" variant="ghost" size="sm" fullWidth onClick={dismiss}>
-                  Close
+                  {t('prompt.close')}
                 </Button>
               </div>
             </motion.div>
           ) : (
             <>
               <p className="text-sm leading-relaxed text-body">
-                Share your name and number. Our showroom team will call you back — no spam, no
-                pressure.
+                {t('prompt.body')}
               </p>
 
               <form onSubmit={onSubmit} className="relative mt-4 space-y-3">
@@ -254,11 +253,11 @@ export function FirstVisitNoLicencePrompt() {
                   value={form.website}
                   onChange={(website) => setForm({ ...form, website })}
                 />
-                <Field label="Your name" htmlFor="nl-cb-name" required error={errors.name}>
+                <Field label={t('form.name')} htmlFor="nl-cb-name" required error={errors.name}>
                   <Input
                     id="nl-cb-name"
                     name="name"
-                    placeholder="Full name"
+                    placeholder={t('form.fullName')}
                     value={form.name}
                     error={errors.name}
                     autoComplete="name"
@@ -269,14 +268,14 @@ export function FirstVisitNoLicencePrompt() {
                     }}
                   />
                 </Field>
-                <Field label="Phone number" htmlFor="nl-cb-phone" required error={errors.phone}>
+                <Field label={t('form.phone')} htmlFor="nl-cb-phone" required error={errors.phone}>
                   <Input
                     id="nl-cb-phone"
                     name="phone"
                     type="tel"
                     inputMode="tel"
                     maxLength={16}
-                    placeholder="10-digit mobile / +91…"
+                    placeholder={t('form.phoneHint')}
                     value={form.phone}
                     error={errors.phone}
                     autoComplete="tel"
@@ -295,7 +294,7 @@ export function FirstVisitNoLicencePrompt() {
                   loading={loading}
                   icon={PhoneCall}
                 >
-                  Request a callback
+                  {t('form.callback')}
                 </Button>
               </form>
 
@@ -305,14 +304,14 @@ export function FirstVisitNoLicencePrompt() {
                   onClick={browseGuide}
                   className="text-xs font-bold uppercase tracking-wide text-brand-600 hover:text-brand-700"
                 >
-                  Browse models
+                  {t('prompt.browse')}
                 </button>
                 <button
                   type="button"
                   onClick={dismiss}
                   className="text-xs font-medium text-muted hover:text-heading"
                 >
-                  Not now
+                  {t('prompt.notNow')}
                 </button>
               </div>
             </>

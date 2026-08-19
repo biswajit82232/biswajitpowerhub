@@ -10,6 +10,7 @@ import { PREMIUM_PERKS, telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { breadcrumbList } from '@/lib/schemaHelpers';
+import { useLocale } from '@/context/LocaleContext';
 
 const ICONS = {
   servicing: Wrench,
@@ -19,6 +20,7 @@ const ICONS = {
 
 export default function Service() {
   const { site } = useSite();
+  const { t } = useLocale();
   const { data: scooters } = useAsync(() => getScooters(), []);
   const perks = site.perks?.length ? site.perks : PREMIUM_PERKS;
   const batteryTagline = site.batteryUpgradeTagline;
@@ -39,18 +41,17 @@ export default function Service() {
 
       <section className="border-b border-line bg-white">
         <div className="container-px py-8 sm:py-12">
-          <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Service' }]} />
-          <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">Service</p>
+          <Breadcrumbs items={[{ name: t('crumb.home'), to: '/' }, { name: t('nav.service') }]} />
+          <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">{t('svc.pageEyebrow')}</p>
           <h1 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
-            Service &amp; Battery Upgrades
+            {t('svc.pageH1')}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-body sm:text-base">
-            Authorised showroom support for your electric scooter — book your free 1st, 2nd or 3rd
-            servicing visit, or schedule paid repairs and battery upgrades.
+            {t('svc.pageSub')}
           </p>
           <div className="mt-5">
             <Button href="#book" variant="dealerPrimary">
-              Book Service Online
+              {t('svc.bookOnlineCta')}
             </Button>
           </div>
         </div>
@@ -80,23 +81,18 @@ export default function Service() {
             className="mt-12 scroll-mt-24 grid gap-8 border border-line bg-surface-alt p-5 sm:p-8 lg:grid-cols-5 lg:gap-10"
           >
             <div className="lg:col-span-2">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-500">Book online</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-500">{t('svc.bookOnline')}</p>
               <h2 className="mt-2 font-display text-xl font-bold uppercase text-navy sm:text-2xl">
-                Book your service
+                {t('svc.bookH2')}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-body">
-                Choose free 1st / 2nd / 3rd servicing (included with eligible scooters) or paid workshop
-                work. Pick a preferred date — we&apos;ll confirm by phone.
+                {t('svc.bookBody')}
               </p>
               <ul className="mt-4 space-y-2">
-                {[
-                  'Free 1st, 2nd & 3rd servicing options',
-                  'Paid repairs & diagnostics',
-                  'Showroom at Chunakhali Bus Stand',
-                ].map((item) => (
+                {['svc.bullet1', 'svc.bullet2', 'svc.bullet3'].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-body">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
-                    {item}
+                    {t(item)}
                   </li>
                 ))}
               </ul>
@@ -107,7 +103,7 @@ export default function Service() {
                 className="mt-5"
                 onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'service-book' })}
               >
-                Or call showroom
+                {t('svc.orCall')}
               </Button>
             </div>
             <div className="rounded-2xl bg-white p-4 ring-1 ring-line shadow-soft sm:p-6 lg:col-span-3">
@@ -116,27 +112,22 @@ export default function Service() {
           </div>
 
           <div className="mt-12 border border-line bg-white p-6 sm:p-8">
-            <h2 className="font-display text-xl font-bold uppercase text-navy">Battery upgrades</h2>
+            <h2 className="font-display text-xl font-bold uppercase text-navy">{t('svc.batteryH2')}</h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-body">{batteryTagline}</p>
             <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-              {[
-                'Higher AH battery options',
-                'Expert fitting at our showroom',
-                'Extended range on the same model',
-                'Advice for daily Berhampore routes',
-              ].map((item) => (
+              {['svc.bat1', 'svc.bat2', 'svc.bat3', 'svc.bat4'].map((item) => (
                 <li key={item} className="flex items-start gap-2 text-sm text-body">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
-                  {item}
+                  {t(item)}
                 </li>
               ))}
             </ul>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button to="/battery-upgrade-berhampore" variant="dealerPrimary">
-                Learn More
+                {t('svc.learnMore')}
               </Button>
               <Button href="#book" variant="dealerSecondary">
-                Book Service
+                {t('form.bookService')}
               </Button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Wrench, Phone, MessageCircle, Bike } from 'lucide-react';
+import { Wrench, Phone, Bike } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AsyncError } from '@/components/admin/AsyncError';
@@ -15,7 +15,8 @@ import { getServiceKind, serviceKindLabel } from '@/data/serviceKinds';
 import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
-import { telUrl, whatsappCustomerUrl } from '@/config/site';
+import { telUrl } from '@/config/site';
+import { WhatsAppQuoteMenu } from '@/components/admin/WhatsAppQuoteMenu';
 
 const STATUSES = [
   { v: 'requested', l: 'Requested' },
@@ -174,18 +175,15 @@ export default function ServiceBookings() {
                   >
                     <Phone className="h-4.5 w-4.5" />
                   </a>
-                  <a
-                    href={whatsappCustomerUrl(
-                      b.phone,
-                      `Hi ${b.name}, this is BISWAJIT POWER HUB regarding your ${serviceKindLabel(b.service_kind)} booking.`,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]"
-                    aria-label="WhatsApp customer"
-                  >
-                    <MessageCircle className="h-4.5 w-4.5" />
-                  </a>
+                  <WhatsAppQuoteMenu
+                    phone={b.phone}
+                    name={b.name}
+                    kind="service"
+                    scooterName={b.scooter}
+                    date={b.preferred_date}
+                    time={b.preferred_time}
+                    serviceKind={serviceKindLabel(b.service_kind)}
+                  />
                   <Select
                     value={b.status || 'requested'}
                     onChange={(e) => onStatus(b.id, e.target.value)}

@@ -19,6 +19,7 @@ import {
   focusFirstError,
 } from '@/features/leads/validation';
 import { HoneypotField } from '@/features/leads/HoneypotField';
+import { useLocale } from '@/context/LocaleContext';
 import { SITE, SITE_URL, whatsappUrl, telUrl, formatPhoneDisplay, siteSameAs } from '@/config/site';
 import { safeMapsEmbedUrl } from '@/lib/mapsEmbed';
 import { getPriorityLocations, getServiceAreaNames } from '@/data/locations';
@@ -30,6 +31,7 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 
 function ContactMessageForm() {
   const { toast } = useToast();
+  const { t } = useLocale();
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '', website: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -37,15 +39,15 @@ function ContactMessageForm() {
   const onSubmit = async (ev) => {
     ev.preventDefault();
     if (isHoneypotFilled(form.website)) {
-      toast('Message sent! We will get back to you soon.', 'success');
+      toast(t('toast.contactOk'), 'success');
       setForm({ name: '', phone: '', email: '', message: '', website: '' });
       return;
     }
     const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
-    if (!isValidEmail(form.email)) e.email = 'Enter a valid email';
-    if (!form.message || form.message.trim().length < 5) e.message = 'Add a short message';
+    if (!isValidName(form.name)) e.name = t('form.errName');
+    if (!isValidPhone(form.phone)) e.phone = t('form.errPhone');
+    if (!isValidEmail(form.email)) e.email = t('form.errEmail');
+    if (!form.message || form.message.trim().length < 5) e.message = t('form.errMessage');
     setErrors(e);
     if (Object.keys(e).length) {
       focusFirstError(ev.currentTarget, e);
@@ -60,10 +62,10 @@ function ContactMessageForm() {
         message: form.message.trim(),
         from: 'contact_page',
       });
-      toast('Message sent! We will get back to you soon.', 'success');
+      toast(t('toast.contactOk'), 'success');
       setForm({ name: '', phone: '', email: '', message: '', website: '' });
     } catch {
-      toast('Could not send message. Please WhatsApp us.', 'error');
+      toast(t('toast.contactFail'), 'error');
     } finally {
       setLoading(false);
     }
@@ -77,7 +79,7 @@ function ContactMessageForm() {
         onChange={(website) => setForm({ ...form, website })}
       />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Name" htmlFor="ct-name" required error={errors.name}>
+        <Field label={t('form.name')} htmlFor="ct-name" required error={errors.name}>
           <Input
             id="ct-name"
             name="name"
@@ -90,14 +92,14 @@ function ContactMessageForm() {
             }}
           />
         </Field>
-        <Field label="Phone" htmlFor="ct-phone" required error={errors.phone}>
+        <Field label={t('form.phone')} htmlFor="ct-phone" required error={errors.phone}>
           <Input
             id="ct-phone"
             name="phone"
             type="tel"
             inputMode="tel"
             maxLength={16}
-            placeholder="10-digit mobile / +91…"
+          placeholder={t('form.phoneHint')}
             autoComplete="tel"
             value={form.phone}
             error={errors.phone}
@@ -108,7 +110,7 @@ function ContactMessageForm() {
           />
         </Field>
       </div>
-      <Field label="Email" htmlFor="ct-email" error={errors.email} hint="Optional">
+      <Field label={t('form.email')} htmlFor="ct-email" error={errors.email} hint={t('form.optional')}>
         <Input
           id="ct-email"
           name="email"
@@ -122,7 +124,7 @@ function ContactMessageForm() {
           }}
         />
       </Field>
-      <Field label="Message" htmlFor="ct-msg" required error={errors.message}>
+      <Field label={t('form.message')} htmlFor="ct-msg" required error={errors.message}>
         <Textarea
           id="ct-msg"
           name="message"
@@ -133,7 +135,7 @@ function ContactMessageForm() {
             setForm({ ...form, message: e.target.value });
             clearFieldError(setErrors, 'message');
           }}
-          placeholder="How can we help?"
+          placeholder={t('form.help')}
         />
       </Field>
       <Button
@@ -145,7 +147,7 @@ function ContactMessageForm() {
         icon={Send}
         className="min-h-12"
       >
-        Send Message
+        {t('form.send')}
       </Button>
     </form>
   );
@@ -153,6 +155,7 @@ function ContactMessageForm() {
 
 export default function Contact() {
   const { site } = useSite();
+  const { t } = useLocale();
   const { photos } = useSitePhotos();
   const landmarkPhoto = photos?.gallery?.[0]?.url || photos?.hero?.url || photos?.about?.url || null;
   const landmarkAlt =
@@ -222,15 +225,15 @@ export default function Contact() {
         />
         <div className="container-px relative flex min-h-[42vh] flex-col justify-end pb-10 pt-20 sm:min-h-[48vh] sm:pb-14">
           <Breadcrumbs
-            items={[{ name: 'Home', to: '/' }, { name: 'Contact' }]}
+            items={[{ name: t('crumb.home'), to: '/' }, { name: t('nav.contact') }]}
             className="mb-0 text-white/70 [&_a]:text-white/80 [&_a:hover]:text-white [&_[aria-current]]:text-white"
           />
           <Reveal>
             <h1 className="mt-4 font-display text-display-lg font-extrabold uppercase tracking-wide text-white">
-              Electric Scooter Showroom Near Chunakhali, Berhampore
+              {t('contact.h1')}
             </h1>
             <p className="mt-3 max-w-xl text-base text-white/80 sm:text-lg">
-              Near Chunakhali Bus Stand, Nimtala — walk in for a free test ride. We don&apos;t sell online.
+              {t('contact.heroSub')}
             </p>
           </Reveal>
         </div>
@@ -241,7 +244,7 @@ export default function Contact() {
           {/* Place first: map + hours + CTAs */}
           <div className="space-y-10">
             <Reveal>
-              <h2 className="font-display text-2xl font-extrabold text-heading">Find us in Berhampore</h2>
+              <h2 className="font-display text-2xl font-extrabold text-heading">{t('contact.findUs')}</h2>
               <address className="mt-4 not-italic leading-relaxed text-body">
                 <strong className="font-display text-lg text-heading">{SITE.name}</strong>
                 <br />
@@ -266,7 +269,7 @@ export default function Contact() {
               <div className="mt-5 flex items-start gap-3 text-sm text-body">
                 <Clock className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
                 <p>
-                  <span className="font-semibold text-heading">Hours — </span>
+                  <span className="font-semibold text-heading">{t('contact.hours')} </span>
                   {site.hours?.summary || 'Open all days 9:00 AM – 8:30 PM'}
                 </p>
               </div>
@@ -280,7 +283,7 @@ export default function Contact() {
                   icon={Phone}
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'contact' })}
                 >
-                  Call {formatPhoneDisplay(site.phones[0])}
+                  {t('cta.call')}: {formatPhoneDisplay(site.phones[0])}
                 </Button>
                 <Button
                   href={whatsappUrl(undefined, site)}
@@ -290,7 +293,7 @@ export default function Contact() {
                   className="!rounded-dealer"
                   onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'contact' })}
                 >
-                  Chat on WhatsApp
+                  {t('contact.chatWa')}
                 </Button>
                 <Button
                   href={site.maps.link}
@@ -299,7 +302,7 @@ export default function Contact() {
                   icon={Navigation}
                   onClick={() => trackEvent(EVENT.DIRECTIONS_CLICK, { from: 'contact' })}
                 >
-                  Get Direction
+                  {t('home.getDirection')}
                 </Button>
               </div>
             </Reveal>
@@ -307,32 +310,32 @@ export default function Contact() {
             <Reveal delay={0.05}>
               <div className="flex items-start gap-3 border-t border-line pt-8 text-sm text-muted">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
-                <p>Landmark: Chunakhali Bus Stand — easy to find from Nimtala and Berhampore town.</p>
+                <p>{t('contact.landmark')}</p>
               </div>
             </Reveal>
 
             <Reveal delay={0.08}>
               <div className="border-t border-line pt-8">
-                <h3 className="font-display text-lg font-bold text-heading">Areas we serve</h3>
+                <h3 className="font-display text-lg font-bold text-heading">{t('contact.areas')}</h3>
                 <p className="mt-1 text-sm text-muted">
-                  Customers visit from across Murshidabad. Looking for a dealer near you? See{' '}
+                  {t('contact.areasBefore')}
                   <Link to="/electric-scooter-near-me-berhampore" className="font-semibold text-brand-600 hover:underline">
-                    electric scooter near me Berhampore
-                  </Link>{' '}
-                  or the full{' '}
+                    {t('contact.nearLink')}
+                  </Link>
+                  {t('contact.areasMid')}
                   <Link to="/areas-we-serve" className="font-semibold text-brand-600 hover:underline">
-                    areas we serve
-                  </Link>{' '}
-                  list.
+                    {t('contact.areasLink')}
+                  </Link>
+                  {t('contact.areasAfter')}
                 </p>
                 <ul className="mt-3 flex flex-wrap gap-2">
-                  {priorityTowns.map((t) => (
-                    <li key={t.slug}>
+                  {priorityTowns.map((town) => (
+                    <li key={town.slug}>
                       <Link
-                        to={t.path}
+                        to={town.path}
                         className="inline-flex rounded-lg bg-surface-alt px-2.5 py-1.5 text-xs font-semibold text-heading ring-1 ring-line hover:bg-brand-50 hover:text-brand-700"
                       >
-                        {t.name}
+                        {town.name}
                       </Link>
                     </li>
                   ))}
@@ -344,8 +347,8 @@ export default function Contact() {
           {/* Forms secondary */}
           <div className="space-y-8">
             <Reveal>
-              <h3 className="font-display text-xl font-bold text-heading">Send us a message</h3>
-              <p className="mt-1 text-sm text-muted">We typically reply within a few hours.</p>
+              <h3 className="font-display text-xl font-bold text-heading">{t('contact.send')}</h3>
+              <p className="mt-1 text-sm text-muted">{t('contact.sendHint')}</p>
               <div className="mt-5 border-t border-line pt-5">
                 <ContactMessageForm />
               </div>
@@ -353,8 +356,8 @@ export default function Contact() {
 
             <Reveal delay={0.08}>
               <div id="callback" className="scroll-mt-24 border-t border-line pt-8">
-                <h3 className="font-display text-xl font-bold uppercase tracking-wide text-navy">Prefer a Callback?</h3>
-                <p className="mt-1 text-sm text-muted">Drop your number and we&apos;ll call you.</p>
+                <h3 className="font-display text-xl font-bold uppercase tracking-wide text-navy">{t('contact.callback')}</h3>
+                <p className="mt-1 text-sm text-muted">{t('contact.callbackHint')}</p>
                 <div className="mt-5">
                   <CallbackForm compact />
                 </div>

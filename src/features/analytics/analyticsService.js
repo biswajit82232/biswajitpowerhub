@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { EVENT, resetLocalTrackingEvents } from '@/lib/tracking';
 import { clearCache } from '@/lib/cache';
 import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS } from '@/lib/utils';
+import { aggregateChannelCloseRates } from '@/lib/channelReport';
 
 /** Read all local events (demo-mode source of truth). */
 function localEvents() {
@@ -276,6 +277,50 @@ export async function resetAnalyticsCounts() {
   if (failed?.error) throw new Error(failed.error.message || 'Reset failed.');
 
   return { mode: 'supabase' };
+}
+
+/** Ads vs SEO traffic (views) + close-rate (leads.status = converted). */
+export async function getChannelCloseRates() {
+  if (!isSupabaseConfigured || !supabase) {
+    return aggregateChannelCloseRates({ leads: [], testRides: [], viewEvents: localEvents() });
+  }
+
+  const timed = (query, label) =>
+    withTimeout(query, FETCH_TIMEOUT_MS, `${label} timed out`).catch((err) => {
+      console.warn(`[Analytics] ${label} failed:`, err.message);
+      return { data: [], error: err };
+    });
+
+  const [leadsRes, ridesRes, viewsRes] = await Promise.all([
+    timed(
+      supabase
+        .from('leads')
+        .select('id, visitor_id, status, attribution')
+        .limit(1000),
+      'channel leads',
+    ),
+    timed(
+      supabase
+        .from('test_rides')
+        .select('id, attribution')
+        .limit(1000),
+      'channel test rides',
+    ),
+    timed(
+      supabase
+        .from('lead_events')
+        .select('visitor_id, event_type, meta, created_at')
+        .in('event_type', [EVENT.PAGE_VIEW, EVENT.SCOOTER_VIEW])
+        .limit(8000),
+      'channel views',
+    ),
+  ]);
+
+  return aggregateChannelCloseRates({
+    leads: leadsRes.data || [],
+    testRides: ridesRes.data || [],
+    viewEvents: viewsRes.data || [],
+  });
 }
 
 /** @deprecated use resetAnalyticsCounts — kept name for existing imports */

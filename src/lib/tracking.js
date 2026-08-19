@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from './supabase.js';
 import { trackGAEvent } from './googleAnalytics.js';
 import { clearCache } from './cache.js';
 import { withTimeout, FETCH_TIMEOUT_MS } from './utils.js';
+import { attributionPayload } from './attribution.js';
 
 /**
  * Lead tracking & scoring engine.
@@ -185,9 +186,11 @@ export async function trackEvent(type, meta = {}) {
   trackGAEvent(type, meta);
 
   const visitorId = getVisitorId();
+  const attr = attributionPayload();
+  const mergedMeta = attr ? { ...meta, channel: attr.channel, utm_source: attr.source, utm_medium: attr.medium, utm_campaign: attr.campaign, landing: attr.landing } : meta;
   const event = {
     type,
-    meta,
+    meta: mergedMeta,
     visitorId,
     at: new Date().toISOString(),
   };
@@ -202,7 +205,7 @@ export async function trackEvent(type, meta = {}) {
       supabase.from('lead_events').insert({
         visitor_id: visitorId,
         event_type: type,
-        meta,
+        meta: mergedMeta,
       }),
       FETCH_TIMEOUT_MS,
       'Tracking insert timed out',

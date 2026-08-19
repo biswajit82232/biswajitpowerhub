@@ -1,49 +1,27 @@
 import { Link } from 'react-router-dom';
 import { Percent, BookOpen, Wrench, Package } from 'lucide-react';
+import { useLocale } from '@/context/LocaleContext';
 
 const ITEMS = [
-  {
-    id: 'finance',
-    label: 'FINANCE',
-    to: '/finance',
-    icon: Percent,
-    desc: 'Easy EMI options',
-  },
-  {
-    id: 'guides',
-    label: 'GUIDES',
-    to: '/guides',
-    icon: BookOpen,
-    desc: 'Local EV buying tips',
-  },
-  {
-    id: 'service',
-    label: 'SERVICE',
-    to: '/service',
-    icon: Wrench,
-    desc: 'Care & upgrades',
-  },
-  {
-    id: 'accessories',
-    label: 'ACCESSORIES',
-    to: '/accessories',
-    icon: Package,
-    desc: 'Parts & extras',
-  },
+  { id: 'finance', labelKey: 'more.finance', descKey: 'more.financeD', to: '/finance', icon: Percent },
+  { id: 'guides', labelKey: 'more.guides', descKey: 'more.guidesD', to: '/guides', icon: BookOpen },
+  { id: 'service', labelKey: 'more.service', descKey: 'more.serviceD', to: '/service', icon: Wrench },
+  { id: 'accessories', labelKey: 'more.accessories', descKey: 'more.accessoriesD', to: '/accessories', icon: Package },
 ];
 
 /**
  * More From Us — four icon tiles (dealer pattern).
  */
 export function MoreFromUs() {
+  const { t } = useLocale();
   return (
     <section className="bg-white py-10 sm:py-14" aria-labelledby="more-heading">
       <div className="container-px">
         <h2 id="more-heading" className="dealer-section-title text-center text-body">
-          More From Us
+          {t('home.more')}
         </h2>
         <div className="mt-10 grid grid-cols-2 gap-8 sm:grid-cols-4 sm:gap-6">
-          {ITEMS.map(({ id, label, to, icon: Icon, desc }) => (
+          {ITEMS.map(({ id, labelKey, descKey, to, icon: Icon }) => (
             <Link
               key={id}
               to={to}
@@ -53,9 +31,9 @@ export function MoreFromUs() {
                 <Icon className="h-9 w-9 sm:h-11 sm:w-11" strokeWidth={1.5} />
               </span>
               <span className="mt-4 text-sm font-bold uppercase tracking-wide text-body sm:text-base">
-                {label}
+                {t(labelKey)}
               </span>
-              <span className="mt-1 text-xs text-muted">{desc}</span>
+              <span className="mt-1 text-xs text-muted">{t(descKey)}</span>
             </Link>
           ))}
         </div>

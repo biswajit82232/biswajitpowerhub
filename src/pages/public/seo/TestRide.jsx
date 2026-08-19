@@ -8,9 +8,11 @@ import { SITE_URL } from '@/config/site';
 import { DEFAULT_HOURS_SUMMARY } from '@/features/site/siteHours';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
+import { useLocale } from '@/context/LocaleContext';
 
 export default function TestRide() {
   const path = '/test-ride-berhampore';
+  const { t } = useLocale();
   const { data: scooters } = useAsync(() => getScooters(), []);
   const jsonLd = useMemo(
     () => [
@@ -38,7 +40,7 @@ export default function TestRide() {
       path={path}
       h1="Free Test Ride Electric Scooter in Berhampore — Book Today"
       intro="Feel the ride before you buy. Free test rides are available at Biswajit Power Hub, Chunakhali Bus Stand, Berhampore — no appointment needed for low-speed, no-licence models."
-      breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Test Ride' }]}
+      breadcrumbs={[{ name: t('crumb.home'), to: '/' }, { name: t('page.testRide') }]}
       jsonLd={jsonLd}
     >
       <h2>How to Book a Free Test Ride</h2>
@@ -65,10 +67,10 @@ export default function TestRide() {
 
       <div className="my-10 max-w-xl border border-line bg-white p-5 shadow-soft sm:p-6">
         <h2 className="!mt-0 font-display text-lg font-bold uppercase tracking-wide text-navy">
-          Book Online
+          {t('ride.bookOnline')}
         </h2>
         <p className="mt-1 text-sm text-body">
-          Prefer to schedule ahead? Send a request and we&apos;ll confirm by phone or WhatsApp.
+          {t('ride.bookHint')}
         </p>
         <div className="mt-5">
           <TestRideForm scooters={scooters || []} />

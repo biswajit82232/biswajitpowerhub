@@ -5,15 +5,33 @@ import { ChevronDown, Menu, X, Phone } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { NAV_LINKS, SITE, telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
+import { LanguageToggle } from '@/components/common/LanguageToggle';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { cn } from '@/lib/utils';
 
-function DesktopNavItem({ link }) {
+const NAV_I18N = {
+  PRODUCT: 'nav.product',
+  Scooters: 'nav.scooters',
+  Accessories: 'nav.accessories',
+  Compare: 'nav.compare',
+  'ABOUT US': 'nav.about',
+  SERVICE: 'nav.service',
+  FINANCE: 'nav.finance',
+  'CONTACT US': 'nav.contact',
+};
+
+function navLabel(link, t) {
+  return t(NAV_I18N[link.label] || link.label);
+}
+
+function DesktopNavItem({ link, t }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const hasChildren = link.children?.length > 0;
   const childActive = hasChildren && link.children.some((c) => location.pathname.startsWith(c.to));
   const isActive = location.pathname === link.to || childActive;
+  const label = navLabel(link, t);
 
   if (!hasChildren) {
     return (
@@ -26,7 +44,7 @@ function DesktopNavItem({ link }) {
             'after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-brand-500',
         )}
       >
-        {link.label}
+        {label}
       </NavLink>
     );
   }
@@ -49,7 +67,7 @@ function DesktopNavItem({ link }) {
         aria-haspopup="true"
         onFocus={() => setOpen(true)}
       >
-        {link.label}
+        {label}
         <ChevronDown className={cn('h-3.5 w-3.5 transition', open && 'rotate-180')} />
       </Link>
       <AnimatePresence>
@@ -67,7 +85,7 @@ function DesktopNavItem({ link }) {
                 to={child.to}
                 className="block px-4 py-2.5 text-sm font-medium text-body transition hover:bg-surface-alt hover:text-navy"
               >
-                {child.label}
+                {navLabel(child, t)}
               </Link>
             ))}
           </motion.div>
@@ -79,6 +97,7 @@ function DesktopNavItem({ link }) {
 
 export function Navbar() {
   const { site } = useSite();
+  const { t } = useLocale();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobileProductOpen, setMobileProductOpen] = useState(false);
@@ -124,11 +143,12 @@ export function Navbar() {
 
         <div className="hidden min-w-0 shrink items-center gap-0.5 lg:flex">
           {NAV_LINKS.map((link) => (
-            <DesktopNavItem key={link.label} link={link} />
+            <DesktopNavItem key={link.label} link={link} t={t} />
           ))}
         </div>
 
-        <div className="hidden shrink-0 items-center lg:flex">
+        <div className="hidden shrink-0 items-center gap-2 lg:flex">
+          <LanguageToggle compact />
           <Button
             variant="dealerPrimary"
             size="sm"
@@ -137,18 +157,20 @@ export function Navbar() {
             icon={Phone}
             onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'navbar' })}
           >
-            Call
+            {t('cta.call')}
           </Button>
         </div>
-
-        <button
-          className="tap-target -mr-2 flex items-center justify-center rounded-dealer p-2 text-navy lg:hidden"
-          onClick={() => setOpen((o) => !o)}
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-        >
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex shrink-0 items-center gap-1 lg:hidden">
+          <LanguageToggle compact />
+          <button
+            className="tap-target -mr-2 flex items-center justify-center rounded-dealer p-2 text-navy"
+            onClick={() => setOpen((o) => !o)}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+          >
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </nav>
 
       <AnimatePresence>
@@ -177,7 +199,7 @@ export function Navbar() {
                         onClick={() => setMobileProductOpen((v) => !v)}
                         className="flex w-full items-center justify-between rounded-dealer px-4 py-3.5 text-left text-sm font-bold uppercase tracking-wide text-navy"
                       >
-                        {link.label}
+                        {navLabel(link, t)}
                         <ChevronDown
                           className={cn('h-4 w-4 transition', mobileProductOpen && 'rotate-180')}
                         />
@@ -195,7 +217,7 @@ export function Navbar() {
                                 )
                               }
                             >
-                              {child.label}
+                              {navLabel(child, t)}
                             </NavLink>
                           ))}
                         </div>
@@ -212,21 +234,22 @@ export function Navbar() {
                         )
                       }
                     >
-                      {link.label}
+                      {navLabel(link, t)}
                     </NavLink>
                   ),
                 )}
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <LanguageToggle />
                 <Button
                   variant="dealerPrimary"
                   href={telUrl(undefined, site)}
                   target="_self"
                   icon={Phone}
-                  fullWidth
+                  className="flex-1"
                   onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'mobile-menu' })}
                 >
-                  Call Us
+                  {t('cta.callUs')}
                 </Button>
               </div>
               <p className="mt-4 text-center text-xs text-muted">

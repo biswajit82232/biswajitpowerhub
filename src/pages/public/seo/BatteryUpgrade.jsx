@@ -4,10 +4,12 @@ import { SeoLandingLayout } from '@/components/seo/SeoLandingLayout';
 import { SITE_FAQS } from '@/data/seoContent';
 import { breadcrumbList, faqPageSchema } from '@/lib/schemaHelpers';
 import { SITE_URL } from '@/config/site';
+import { useLocale } from '@/context/LocaleContext';
 import { DEFAULT_HOURS_SUMMARY } from '@/features/site/siteHours';
 
 export default function BatteryUpgrade() {
   const path = '/battery-upgrade-berhampore';
+  const { t } = useLocale();
   const jsonLd = useMemo(
     () => [
       breadcrumbList([
@@ -34,7 +36,7 @@ export default function BatteryUpgrade() {
       path={path}
       h1="Electric Scooter Battery Upgrade in Berhampore — Extra Range"
       intro="Need more kilometres per charge? Biswajit Power Hub offers custom higher-AH battery upgrades and genuine spare batteries for electric scooters in Berhampore and Murshidabad."
-      breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Battery Upgrade' }]}
+      breadcrumbs={[{ name: t('crumb.home'), to: '/' }, { name: t('page.battery') }]}
       jsonLd={jsonLd}
     >
       <h2>Increase Your Scooter&apos;s Range</h2>
@@ -66,8 +68,8 @@ export default function BatteryUpgrade() {
         in stock. Hours: {DEFAULT_HOURS_SUMMARY}.
       </p>
       <p>
-        If your scooter is ageing overall, compare our{' '}
-        <Link to="/scooters">electric scooters</Link> — including{' '}
+        If your scooter is ageing overall, compare a new{' '}
+        <Link to="/battery-scooty-berhampore">battery scooty in Berhampore</Link> — including{' '}
         <Link to="/scooters/activa">Activa</Link> and <Link to="/scooters/zoom">Zoom</Link> Lithium Pro
         options — then decide with our team. Pair upgrades with a{' '}
         <Link to="/test-ride-berhampore">test ride</Link> if you are switching models, or browse{' '}

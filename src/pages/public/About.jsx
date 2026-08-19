@@ -11,11 +11,13 @@ import { breadcrumbList, postalAddressSchema, openingHoursSchema } from '@/lib/s
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { useMemo } from 'react';
+import { useLocale } from '@/context/LocaleContext';
 
 const PERK_ICONS = [Wrench, ShieldCheck, BatteryCharging];
 
 export default function About() {
   const { site } = useSite();
+  const { t } = useLocale();
   const { photos } = useSitePhotos();
   const aboutPhoto = photos?.about?.url || photos?.gallery?.[0]?.url || photos?.hero?.url || null;
   const perks = site.perks?.length ? site.perks : [];
@@ -80,16 +82,16 @@ export default function About() {
         />
         <div className="container-px relative flex min-h-[40vh] flex-col justify-end pb-10 pt-20 sm:min-h-[46vh] sm:pb-14">
           <Breadcrumbs
-            items={[{ name: 'Home', to: '/' }, { name: 'About' }]}
+            items={[{ name: t('crumb.home'), to: '/' }, { name: t('nav.about') }]}
             className="mb-0 text-white/70 [&_a]:text-white/80 [&_a:hover]:text-white [&_[aria-current]]:text-white"
           />
           <Reveal>
-            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-200">About Us</p>
+            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-200">{t('about.eyebrow')}</p>
             <h1 className="mt-2 font-display text-3xl font-extrabold uppercase tracking-wide text-white sm:text-4xl">
-              A Local Showroom You Can Trust
+              {t('about.h1')}
             </h1>
             <p className="mt-3 max-w-xl text-base text-white/80">
-              Biswajit Power Hub at Chunakhali — premium low-speed EVs for Berhampore and Murshidabad.
+              {t('about.heroSub')}
             </p>
           </Reveal>
         </div>
@@ -184,7 +186,7 @@ export default function About() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button to="/scooters" variant="dealerPrimary" className="min-h-12">
-                View Scooters
+                {t('about.viewScooters')}
               </Button>
               <Button
                 href={whatsappUrl(undefined, site)}
@@ -193,10 +195,10 @@ export default function About() {
                 className="min-h-12 !rounded-dealer"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'about' })}
               >
-                WhatsApp Us
+                {t('cta.whatsappUs')}
               </Button>
               <Button to="/contact" variant="dealerSecondary" className="min-h-12">
-                Contact &amp; Map
+                {t('about.contactMap')}
               </Button>
             </div>
           </Reveal>

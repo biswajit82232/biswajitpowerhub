@@ -289,6 +289,16 @@ function buildRoutes(catalog) {
       'Looking for an electric scooter near me in Berhampore? Biswajit Power Hub is at Chunakhali Bus Stand, Nimtala. Free test rides, no licence on eligible models, EMI guidance. Call 096355 05436. Serving Murshidabad towns including Kandi, Jiaganj, Beldanga, Domkal and more.',
   },
   {
+    path: '/battery-scooty-berhampore',
+    title: `Battery Scooty in Berhampore | E-Scooty Showroom${fromPrice ? ` From ${fromPrice}` : ''}`,
+    description:
+      `Battery scooty / e-scooty showroom in Berhampore at Chunakhali Bus Stand${fromPrice ? ` — from ${fromPrice}` : ''}. No licence models, free test ride, EMI. Call 096355 05436.`,
+    h1: `Battery Scooty in Berhampore — Local E-Scooty Showroom at Chunakhali${fromPrice ? ` (From ${fromPrice})` : ''}`,
+    schema: 'crumbs',
+    crawlText:
+      `Searching battery scooty, e-scooty, or battery wali scooty near Berhampore? Biswajit Power Hub at Chunakhali Bus Stand stocks Activa, Zoom, Single Light, and Double Light low-speed battery scooties.${fromBit} No licence on eligible models, free test ride, EMI. Call 096355 05436. This is the buy-new page — battery upgrades for existing scooters are a separate service.`,
+  },
+  {
     path: '/areas-we-serve',
     title: 'Areas We Serve — Murshidabad Electric Scooters | Biswajit Power Hub',
     description:

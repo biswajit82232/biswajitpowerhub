@@ -7,8 +7,10 @@ import { getScooters } from '@/features/scooters/scooterService';
 import { breadcrumbList, faqPageSchema, SCOOTER_FAQS } from '@/lib/schemaHelpers';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { SCOOTERS } from '@/data/scooters';
+import { useLocale } from '@/context/LocaleContext';
 
 export default function Scooters() {
+  const { t } = useLocale();
   const { data: scooters, loading } = useAsync(() => getScooters(), []);
   const list = scooters?.length ? scooters : SCOOTERS;
 
@@ -51,20 +53,19 @@ export default function Scooters() {
 
       <section className="border-b border-line bg-white">
         <div className="container-px py-8 sm:py-10">
-          <Breadcrumbs items={[{ name: 'Home', to: '/' }, { name: 'Scooters' }]} />
-          <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">Product</p>
+          <Breadcrumbs items={[{ name: t('crumb.home'), to: '/' }, { name: t('nav.scooters') }]} />
+          <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-500">{t('page.product')}</p>
           <h1 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
-            Electric Scooters in Berhampore
+            {t('page.scootersH1')}
           </h1>
           <p className="mt-2 max-w-xl text-sm text-body sm:text-base">
-            Explore our full range — Activa, Zoom, Single Light &amp; Double Light. Compare specs and book a
-            free test ride at Chunakhali, Berhampore.
+            {t('page.scootersSub')}
           </p>
         </div>
       </section>
 
-      <ExploreRange scooters={list} loading={loading} title="All Models" />
-      <DealerFaq faqs={SCOOTER_FAQS} title="Frequently Asked Questions" />
+      <ExploreRange scooters={list} loading={loading} title={t('home.allModels')} />
+      <DealerFaq faqs={SCOOTER_FAQS} />
     </>
   );
 }

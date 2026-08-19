@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Inbox, Phone, MessageCircle, Check } from 'lucide-react';
+import { Inbox, Phone, Check } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AdminPullRefresh } from '@/components/admin/AdminPullRefresh';
@@ -23,7 +23,8 @@ import {
 import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
-import { telUrl, whatsappCustomerUrl } from '@/config/site';
+import { telUrl } from '@/config/site';
+import { WhatsAppQuoteMenu } from '@/components/admin/WhatsAppQuoteMenu';
 
 function matchesSearch(item, q) {
   if (!q) return true;
@@ -181,18 +182,16 @@ export default function Dashboard() {
                           >
                             <Phone className="h-4 w-4" />
                           </a>
-                          <a
-                            href={whatsappCustomerUrl(
-                              item.phone,
-                              `Hi ${item.title}, this is BISWAJIT POWER HUB.`,
-                            )}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="tap-target rounded-lg bg-[#25D366]/10 p-2 text-[#1da851]"
-                            aria-label="WhatsApp"
-                          >
-                            <MessageCircle className="h-4 w-4" />
-                          </a>
+                          <WhatsAppQuoteMenu
+                            compact
+                            phone={item.phone}
+                            name={item.title}
+                            kind={item.kind}
+                            scooterName={item.scooter}
+                            date={item.date}
+                            time={item.time}
+                            serviceKind={item.serviceKind}
+                          />
                         </>
                       )}
                       <Button

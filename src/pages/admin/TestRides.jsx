@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CalendarCheck, Phone, MessageCircle, Bike } from 'lucide-react';
+import { CalendarCheck, Phone, Bike } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { AsyncError } from '@/components/admin/AsyncError';
@@ -14,7 +14,8 @@ import { ADMIN_LIST_LIMIT, getTestRides, updateTestRide } from '@/features/leads
 import { invalidateAdminBadges } from '@/lib/adminBadges';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { timeAgo } from '@/lib/utils';
-import { telUrl, whatsappCustomerUrl } from '@/config/site';
+import { telUrl } from '@/config/site';
+import { WhatsAppQuoteMenu } from '@/components/admin/WhatsAppQuoteMenu';
 
 const STATUSES = [
   { v: 'requested', l: 'Requested' },
@@ -107,7 +108,14 @@ export default function TestRides() {
               </div>
               <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3 sm:border-0 sm:pt-0">
                 <a href={telUrl(t.phone)} className="tap-target rounded-xl bg-brand-50 p-2.5 text-brand-600" aria-label="Call"><Phone className="h-4.5 w-4.5" /></a>
-                <a href={whatsappCustomerUrl(t.phone, `Hi ${t.name}, this is BISWAJIT POWER HUB regarding your test ride request.`)} target="_blank" rel="noopener noreferrer" className="tap-target rounded-xl bg-[#25D366]/10 p-2.5 text-[#1da851]" aria-label="WhatsApp customer"><MessageCircle className="h-4.5 w-4.5" /></a>
+                <WhatsAppQuoteMenu
+                  phone={t.phone}
+                  name={t.name}
+                  kind="test_ride"
+                  scooterName={t.scooter}
+                  date={t.preferred_date}
+                  time={t.preferred_time}
+                />
                 <Select
                   value={t.status || 'requested'}
                   onChange={(e) => onStatus(t.id, e.target.value)}

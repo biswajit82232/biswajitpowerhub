@@ -173,8 +173,33 @@ export function siteSameAs(site = SITE) {
   ].filter(Boolean);
 }
 
-export function buildAddressFull({ line, city, district, state, pincode, country }) {
-  return [line, city, district, state, pincode, country].filter(Boolean).join(', ');
+export function buildAddressFull({ line, city, district, state, pincode, country } = {}) {
+  const parts = [];
+  for (const part of [line, city, district, state, pincode, country]) {
+    const value = String(part || '').trim();
+    if (!value) continue;
+    const lower = value.toLowerCase();
+    const already = parts.some((existing) => {
+      const e = existing.toLowerCase();
+      if (e === lower) return true;
+      return e.split(',').some((bit) => bit.trim() === lower);
+    });
+    if (already) continue;
+    parts.push(value);
+  }
+  return parts.join(', ');
+}
+
+/** Short showroom line for chrome (footer) — skips country and repeated city. */
+export function formatShowroomAddress(address = {}, { includeCountry = false } = {}) {
+  return buildAddressFull({
+    line: address.line,
+    city: address.city,
+    district: address.district,
+    state: address.state,
+    pincode: address.pincode,
+    country: includeCountry ? address.country : '',
+  });
 }
 
 const DEFAULT_PLACE_ID = 'ChIJP_miqYx9-TkR9z1fb-iGyxI';
@@ -335,32 +360,21 @@ export const FOOTER_MODEL_LINKS = [
 
 export const FOOTER_MORE_LINKS = [
   { label: 'Finance', to: '/finance' },
-  { label: 'Simulator', to: '/finance#simulator' },
   { label: 'Service', to: '/service#book' },
+  { label: 'Offers', to: '/offers' },
   { label: 'Our Community', to: '/community' },
   { label: 'Guides', to: '/guides' },
   { label: 'Accessories', to: '/accessories' },
 ];
 
-/** Full footer Quick Links — hub-first local SEO (all towns via Areas we serve) */
+/** Footer Explore — hubs only; town pages live under Areas we serve */
 export const FOOTER_QUICK_LINKS = [
-  { label: 'About Us', to: '/about' },
-  { label: 'Contact Us', to: '/contact' },
-  { label: 'Privacy Policy', to: '/privacy' },
-  { label: 'Offers', to: '/offers' },
-  { label: 'Book Service', to: '/service#book' },
-  { label: 'Best EVs Berhampore', to: '/best-electric-scooters-berhampore' },
-  { label: 'Low budget EVs', to: '/low-budget-electric-scooters-berhampore' },
-  { label: 'No licence EVs', to: '/no-licence-electric-scooters-west-bengal' },
-  { label: 'Near me Berhampore', to: '/electric-scooter-near-me-berhampore' },
-  { label: 'Areas we serve', to: '/areas-we-serve' },
+  { label: 'Contact', to: '/contact' },
   { label: 'Test ride', to: '/test-ride-berhampore' },
+  { label: 'Battery scooty', to: '/battery-scooty-berhampore' },
+  { label: 'Near me', to: '/electric-scooter-near-me-berhampore' },
+  { label: 'Areas we serve', to: '/areas-we-serve' },
   { label: 'Battery upgrade', to: '/battery-upgrade-berhampore' },
-  { label: 'Guides', to: '/guides' },
-  { label: 'Jiaganj', to: '/electric-scooters-jiaganj' },
-  { label: 'Beldanga', to: '/electric-scooters-beldanga' },
-  { label: 'Kandi', to: '/electric-scooters-kandi' },
-  { label: 'Domkal', to: '/electric-scooters-domkal' },
 ];
 
 /** @deprecated use FOOTER_QUICK_LINKS */

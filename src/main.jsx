@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App.jsx';
 import { AuthProvider } from '@/context/AuthContext';
+import { LocaleProvider } from '@/context/LocaleContext';
 import { SiteSettingsProvider } from '@/context/SiteSettingsContext';
 import { FinanceSettingsProvider } from '@/context/FinanceSettingsContext';
 import { SitePhotosProvider } from '@/context/SitePhotosContext';
@@ -17,15 +18,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <HelmetProvider>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <AuthProvider>
-            <SiteSettingsProvider>
-              <FinanceSettingsProvider>
-                <SitePhotosProvider>
-                  <ToastProvider>
-                    <App />
-                  </ToastProvider>
-                </SitePhotosProvider>
-              </FinanceSettingsProvider>
-            </SiteSettingsProvider>
+            <LocaleProvider>
+              <SiteSettingsProvider>
+                <FinanceSettingsProvider>
+                  <SitePhotosProvider>
+                    <ToastProvider>
+                      <App />
+                    </ToastProvider>
+                  </SitePhotosProvider>
+                </FinanceSettingsProvider>
+              </SiteSettingsProvider>
+            </LocaleProvider>
           </AuthProvider>
         </BrowserRouter>
       </HelmetProvider>

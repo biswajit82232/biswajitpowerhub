@@ -16,11 +16,13 @@ import { useSite } from '@/context/SiteSettingsContext';
 import { REVIEWS as SEED_REVIEWS } from '@/data/reviews';
 import { Star, PenLine, ChevronDown, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useLocale } from '@/context/LocaleContext';
 
 const PAGE_SIZE = 10;
 
 export default function Reviews() {
   const { site } = useSite();
+  const { t } = useLocale();
   const { data: reviews, loading } = useAsync(() => getApprovedReviews(), []);
   const { data: scooters } = useAsync(() => getScooters(), []);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -108,10 +110,10 @@ export default function Reviews() {
       />
 
       <DealerPageHero
-        eyebrow="Community"
-        title="Our Community"
-        subtitle="Real stories from riders across Berhampore and Murshidabad who chose Activa, Zoom, Single Light, or Double Light at our Chunakhali showroom."
-        breadcrumbs={[{ name: 'Home', to: '/' }, { name: 'Our Community' }]}
+        eyebrow={t('com.eyebrow')}
+        title={t('com.h1')}
+        subtitle={t('com.sub')}
+        breadcrumbs={[{ name: t('crumb.home'), to: '/' }, { name: t('com.h1') }]}
       >
         <div className="mt-4 flex items-center gap-3">
           <Stars value={Number(avg)} size={20} />
@@ -119,13 +121,13 @@ export default function Reviews() {
             {Number(avg).toFixed(1)}
           </span>
           <span className="text-sm text-muted">
-            from {displayReviews?.length || GBP_RATING.reviewCount} community stories
+            {t('com.stories', { n: displayReviews?.length || GBP_RATING.reviewCount })}
           </span>
         </div>
       </DealerPageHero>
 
       <div className="container-px py-10 sm:py-12">
-        <h2 className="dealer-section-title !text-left">What Our Community Says</h2>
+        <h2 className="dealer-section-title !text-left">{t('com.says')}</h2>
         <p className="mt-4 max-w-3xl text-sm leading-relaxed text-body sm:text-base">
           From first-time EV buyers in Berhampore town to longer Murshidabad commuters, customers praise
           free test rides, clear EMI guidance, battery upgrade options, and the convenience of a showroom
@@ -173,9 +175,9 @@ export default function Reviews() {
         </div>
 
         <Reveal className="mx-auto mt-14 max-w-xl">
-          <h2 className="dealer-section-title !text-left">Join Our Community</h2>
+          <h2 className="dealer-section-title !text-left">{t('com.join')}</h2>
           <div className="mt-6 border border-line bg-surface-alt p-5 sm:p-6">
-            <p className="text-sm font-bold uppercase tracking-wide text-navy">Leave a Google Review</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-navy">{t('com.google')}</p>
             <p className="mt-1 text-sm text-body">
               Bought from our Chunakhali showroom? Your Google review helps other Berhampore and
               Murshidabad riders find Biswajit Power Hub.
@@ -186,12 +188,12 @@ export default function Reviews() {
               className="mt-4 min-h-12"
               icon={Star}
             >
-              Leave a Review on Google
+              {t('com.googleCta')}
             </Button>
           </div>
           <div className="mt-6 border border-line bg-white p-6 shadow-soft sm:p-7">
             <h3 className="flex items-center gap-2 font-display text-lg font-bold uppercase tracking-wide text-navy">
-              <PenLine className="h-5 w-5 text-brand-500" /> Share with Our Community
+              <PenLine className="h-5 w-5 text-brand-500" /> {t('com.shareTitle')}
             </h3>
             <p className="mt-1 text-sm text-muted">
               Tell your story here. Community posts are held as{' '}

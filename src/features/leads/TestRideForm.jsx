@@ -7,6 +7,7 @@ import { useToast } from '@/components/ui/Toast';
 import { submitTestRide } from './leadService';
 import { isValidPhone, isValidName, isHoneypotFilled, normalizeIndianMobile, clearFieldError, focusFirstError } from './validation';
 import { HoneypotField } from './HoneypotField';
+import { useLocale } from '@/context/LocaleContext';
 
 const TIME_SLOTS = ['10:00 AM', '11:30 AM', '1:00 PM', '3:00 PM', '4:30 PM', '6:00 PM'];
 
@@ -16,6 +17,7 @@ const TIME_SLOTS = ['10:00 AM', '11:30 AM', '1:00 PM', '3:00 PM', '4:30 PM', '6:
  */
 export function TestRideForm({ scooter, scooters = [], onSuccess }) {
   const { toast } = useToast();
+  const { t } = useLocale();
   const today = new Date().toISOString().split('T')[0];
   const [modelId, setModelId] = useState(scooter?.id || '');
   const [form, setForm] = useState({ name: '', phone: '', date: today, time: TIME_SLOTS[0], website: '' });
@@ -35,10 +37,10 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
       return;
     }
     const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
-    if (!isValidPhone(form.phone)) e.phone = 'Enter a valid 10-digit mobile number';
-    if (!form.date) e.date = 'Pick a date';
-    if (!scooter && scooters.length && !modelId) e.model = 'Select a scooter model';
+    if (!isValidName(form.name)) e.name = t('form.errName');
+    if (!isValidPhone(form.phone)) e.phone = t('form.errPhone');
+    if (!form.date) e.date = t('form.errDate');
+    if (!scooter && scooters.length && !modelId) e.model = t('form.errModel');
     setErrors(e);
     if (Object.keys(e).length) {
       focusFirstError(ev.currentTarget, e);
@@ -57,10 +59,10 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
         scooterId: selected?.id,
       });
       setDone(true);
-      toast('Test ride booked! We will confirm shortly.', 'success');
+      toast(t('toast.rideOk'), 'success');
       onSuccess?.();
     } catch {
-      toast('Could not book right now. Please WhatsApp us.', 'error');
+      toast(t('toast.rideFail'), 'error');
     } finally {
       setLoading(false);
     }
@@ -74,9 +76,9 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
         className="flex flex-col items-center gap-3 py-6 text-center"
       >
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
-        <h3 className="text-lg font-bold text-heading">Test ride requested!</h3>
+        <h3 className="text-lg font-bold text-heading">{t('done.rideTitle')}</h3>
         <p className="max-w-xs text-sm text-body">
-          We&apos;ll confirm your {selected?.name || 'scooter'} test ride on {form.date} at {form.time}.
+          {t('done.rideBody', { model: selected?.name || 'scooter', date: form.date, time: form.time })}
         </p>
       </motion.div>
     );
@@ -85,11 +87,11 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
   return (
     <form onSubmit={onSubmit} className="relative space-y-4">
       <HoneypotField value={form.website} onChange={(website) => setForm({ ...form, website })} />
-      <Field label="Your Name" htmlFor="tr-name" required error={errors.name}>
+      <Field label={t('form.name')} htmlFor="tr-name" required error={errors.name}>
         <Input
           id="tr-name"
           name="name"
-          placeholder="Full name"
+          placeholder={t('form.fullName')}
           value={form.name}
           error={errors.name}
           onChange={(e) => {
@@ -98,14 +100,14 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
           }}
         />
       </Field>
-      <Field label="Phone Number" htmlFor="tr-phone" required error={errors.phone}>
+      <Field label={t('form.phone')} htmlFor="tr-phone" required error={errors.phone}>
         <Input
           id="tr-phone"
           name="phone"
           type="tel"
           inputMode="tel"
           maxLength={16}
-          placeholder="10-digit mobile / +91…"
+          placeholder={t('form.phoneHint')}
           value={form.phone}
           error={errors.phone}
           onChange={(e) => {
@@ -115,7 +117,7 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
         />
       </Field>
       {!scooter && scooters.length > 0 ? (
-        <Field label="Scooter Model" htmlFor="tr-model" required error={errors.model}>
+        <Field label={t('form.model')} htmlFor="tr-model" required error={errors.model}>
           <Select
             id="tr-model"
             name="model"
@@ -126,7 +128,7 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
               clearFieldError(setErrors, 'model');
             }}
           >
-            <option value="">Select a model</option>
+            <option value="">{t('form.selectModel')}</option>
             {scooters.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -136,7 +138,7 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
         </Field>
       ) : null}
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Date" htmlFor="tr-date" required error={errors.date}>
+        <Field label={t('form.date')} htmlFor="tr-date" required error={errors.date}>
           <Input
             id="tr-date"
             name="date"
@@ -150,7 +152,7 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
             }}
           />
         </Field>
-        <Field label="Time" htmlFor="tr-time">
+        <Field label={t('form.time')} htmlFor="tr-time">
           <Select id="tr-time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })}>
             {TIME_SLOTS.map((t) => (
               <option key={t} value={t}>
@@ -161,7 +163,7 @@ export function TestRideForm({ scooter, scooters = [], onSuccess }) {
         </Field>
       </div>
       <Button type="submit" variant="primary" fullWidth size="lg" loading={loading} icon={CalendarCheck}>
-        Book Test Ride
+        {t('form.bookRide')}
       </Button>
     </form>
   );

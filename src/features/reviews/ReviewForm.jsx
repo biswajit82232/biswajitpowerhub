@@ -9,9 +9,11 @@ import { submitReview } from './reviewService';
 import { ReviewPhotoUpload } from './ReviewPhotoUpload';
 import { isValidName, isHoneypotFilled, clearFieldError, focusFirstError } from '@/features/leads/validation';
 import { HoneypotField } from '@/features/leads/HoneypotField';
+import { useLocale } from '@/context/LocaleContext';
 
 export function ReviewForm({ scooters = [] }) {
   const { toast } = useToast();
+  const { t } = useLocale();
   const [form, setForm] = useState({ name: '', rating: 5, review: '', scooter: '', website: '' });
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
@@ -31,12 +33,12 @@ export function ReviewForm({ scooters = [] }) {
       return;
     }
     const e = {};
-    if (!isValidName(form.name)) e.name = 'Please enter your name';
+    if (!isValidName(form.name)) e.name = t('form.errName');
     const rating = Number(form.rating);
     if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
-      e.rating = 'Please select a rating between 1 and 5';
+      e.rating = t('form.errRating');
     }
-    if (!form.review || form.review.trim().length < 10) e.review = 'Tell us a little more (10+ characters)';
+    if (!form.review || form.review.trim().length < 10) e.review = t('form.errReview');
     setErrors(e);
     if (Object.keys(e).length) {
       focusFirstError(ev.currentTarget, e);
@@ -46,9 +48,9 @@ export function ReviewForm({ scooters = [] }) {
     try {
       await submitReview({ ...form, photoFile });
       setDone(true);
-      toast('Thank you! Your story is awaiting approval for Our Community.', 'success');
+      toast(t('toast.reviewOk'), 'success');
     } catch {
-      toast('Could not share right now. Please try again.', 'error');
+      toast(t('toast.reviewFail'), 'error');
     } finally {
       setLoading(false);
     }
@@ -62,9 +64,9 @@ export function ReviewForm({ scooters = [] }) {
         className="flex flex-col items-center gap-3 py-8 text-center"
       >
         <CheckCircle2 className="h-12 w-12 text-brand-500" />
-        <h3 className="text-lg font-bold text-heading">Thanks for sharing!</h3>
+        <h3 className="text-lg font-bold text-heading">{t('done.reviewTitle')}</h3>
         <p className="max-w-xs text-sm text-body">
-          Thanks, {form.name}. Your story is <strong className="font-semibold text-heading">pending</strong> and will appear in Our Community after our team approves it.
+          {t('done.reviewBody', { name: form.name })}
         </p>
       </motion.div>
     );
@@ -73,7 +75,7 @@ export function ReviewForm({ scooters = [] }) {
   return (
     <form onSubmit={onSubmit} className="relative space-y-4">
       <HoneypotField value={form.website} onChange={(website) => setForm({ ...form, website })} />
-      <Field label="Your Name" htmlFor="rv-name" required error={errors.name}>
+      <Field label={t('review.name')} htmlFor="rv-name" required error={errors.name}>
         <Input
           id="rv-name"
           name="name"
@@ -88,18 +90,18 @@ export function ReviewForm({ scooters = [] }) {
       </Field>
 
       <div>
-        <Label>Your Rating</Label>
+        <Label>{t('review.rating')}</Label>
         <StarInput value={form.rating} onChange={(rating) => setForm({ ...form, rating })} />
         {errors.rating && <p className="mt-1 text-xs text-red-600">{errors.rating}</p>}
       </div>
 
-      <Field label="Scooter Purchased" htmlFor="rv-scooter">
+      <Field label={t('review.scooter')} htmlFor="rv-scooter">
         <Select
           id="rv-scooter"
           value={form.scooter}
           onChange={(e) => setForm({ ...form, scooter: e.target.value })}
         >
-          <option value="">Select a model (optional)</option>
+          <option value="">{t('review.selectModel')}</option>
           {scooters.map((s) => (
             <option key={s.id} value={s.name}>
               {s.name}
@@ -108,12 +110,12 @@ export function ReviewForm({ scooters = [] }) {
         </Select>
       </Field>
 
-      <Field label="Your Story" htmlFor="rv-text" required error={errors.review}>
+      <Field label={t('review.story')} htmlFor="rv-text" required error={errors.review}>
         <Textarea
           id="rv-text"
           name="review"
           rows={4}
-          placeholder="Share your experience with Our Community…"
+          placeholder={t('review.placeholder')}
           value={form.review}
           error={errors.review}
           onChange={(e) => {
@@ -124,7 +126,7 @@ export function ReviewForm({ scooters = [] }) {
       </Field>
 
       <div>
-        <Label>Photo <span className="ml-1 text-xs font-normal text-muted">(optional)</span></Label>
+        <Label>{t('review.photo')} <span className="ml-1 text-xs font-normal text-muted">({t('form.optional')})</span></Label>
         <div className="mt-1.5">
           <ReviewPhotoUpload
             preview={photoPreview}
@@ -135,7 +137,7 @@ export function ReviewForm({ scooters = [] }) {
       </div>
 
       <Button type="submit" variant="primary" fullWidth size="lg" loading={loading} icon={Send}>
-        Share with Our Community
+        {t('review.submit')}
       </Button>
     </form>
   );

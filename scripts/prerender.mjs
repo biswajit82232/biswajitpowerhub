@@ -20,6 +20,7 @@ const ROUTES = [
   '/scooters/zoom',
   '/best-electric-scooters-berhampore',
   '/electric-scooter-near-me-berhampore',
+  '/battery-scooty-berhampore',
   '/areas-we-serve',
   '/low-budget-electric-scooters-berhampore',
   '/no-licence-electric-scooters-west-bengal',

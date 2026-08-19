@@ -14,6 +14,7 @@ import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/context/LocaleContext';
 
 function offerImage(url, size = 96) {
   if (!url) return null;
@@ -34,6 +35,7 @@ function offerWhatsappMessage(offer, site) {
 }
 
 function OfferDetailsModal({ offer, site, open, onClose }) {
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
   if (!offer) return null;
 
@@ -53,7 +55,7 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Offer details" size="md" centered>
+    <Modal open={open} onClose={onClose} title={t('off.details')} size="md" centered>
       <div className="space-y-4">
         {img ? (
           <img
@@ -72,11 +74,11 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
         <div className="text-center">
           {isFree ? (
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-red-700">
-              Free with scooty purchase
+              {t('off.freeGift')}
             </p>
           ) : (
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-600">
-              Special offer
+              {t('off.special')}
             </p>
           )}
           <h3 className="mt-1 font-display text-2xl font-extrabold text-navy">
@@ -97,7 +99,7 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
             className="mx-auto flex items-center gap-2 rounded-xl bg-brand-50 px-4 py-2.5 text-sm font-bold uppercase tracking-wide text-brand-700 ring-1 ring-brand-100"
           >
             <Tag className="h-4 w-4" />
-            Code {offer.promoCode}
+            {t('home.code')} {offer.promoCode}
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4 opacity-60" />}
           </button>
         ) : null}
@@ -271,6 +273,7 @@ function OfferStrip({ offer, site, onOpen }) {
  */
 export function PromotionalOffers({ compact = false, showEmpty = false }) {
   const { site } = useSite();
+  const { t } = useLocale();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: offers, loading } = useAsync(() => getActiveOffers(), []);
   const [selected, setSelected] = useState(null);
@@ -329,8 +332,8 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
       <Section id="offers">
         <EmptyState
           icon={Tag}
-          title="No active offers right now"
-          description="Call or WhatsApp the showroom — seasonal deals and freebies change often at Chunakhali."
+          title={t('off.empty')}
+          description={t('off.emptyD')}
         />
       </Section>
     );
@@ -340,7 +343,7 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
     <Section id="offers" tight={compact} className={compact ? 'py-3 sm:py-6' : 'py-5 sm:py-10'}>
       {!compact ? (
         <h2 className="dealer-section-title mb-3 !text-left text-lg sm:mb-8 sm:text-inherit">
-          Active Offers
+          {t('off.active')}
         </h2>
       ) : null}
       <div className="space-y-2 sm:space-y-3">

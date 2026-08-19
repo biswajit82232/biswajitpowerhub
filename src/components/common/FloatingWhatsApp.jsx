@@ -2,6 +2,7 @@ import { MessageCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 
 const DEFAULT_MSG = 'Hi, I want to know about electric scooters';
@@ -11,6 +12,7 @@ const DEFAULT_MSG = 'Hi, I want to know about electric scooters';
  */
 export function FloatingWhatsApp() {
   const { site } = useSite();
+  const { t } = useLocale();
   const href = whatsappUrl(DEFAULT_MSG, site);
 
   return (
@@ -19,7 +21,7 @@ export function FloatingWhatsApp() {
       variant="whatsapp"
       size="icon"
       icon={MessageCircle}
-      aria-label="Chat on WhatsApp"
+      aria-label={t('contact.chatWa')}
       onClick={() =>
         trackEvent(EVENT.WHATSAPP_CLICK, {
           from: 'floating_whatsapp',

@@ -28,6 +28,7 @@ import { resolveLegacyScooterId } from '@/lib/legacyScooters';
 import { STOCK_LABELS } from '@/data/scooters';
 import { whatsappUrl, batteryUpgradeWhatsappMessage, telUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
+import { useLocale } from '@/context/LocaleContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { scrollToTop } from '@/components/common/ScrollToTop';
 import {
@@ -70,6 +71,7 @@ export default function ScooterDetails() {
 
 function ScooterDetailsPage({ id, initialVariantId }) {
   const { site } = useSite();
+  const { t } = useLocale();
   const [, setSearchParams] = useSearchParams();
   const { data: scooter, loading } = useAsync(() => getScooterById(id), [id]);
   const { data: reviews } = useAsync(() => getApprovedReviews(), []);
@@ -173,13 +175,13 @@ function ScooterDetailsPage({ id, initialVariantId }) {
       <div className="container-px min-w-0 pb-28 pt-6 sm:pb-14 sm:pt-10 lg:pb-14">
         <Breadcrumbs
           items={[
-            { name: 'Home', to: '/' },
-            { name: 'Scooters', to: '/scooters' },
+            { name: t('crumb.home'), to: '/' },
+            { name: t('nav.scooters'), to: '/scooters' },
             { name: scooter.name },
           ]}
         />
         <Link to="/scooters" className="inline-flex items-center gap-1 text-sm font-semibold text-muted transition hover:text-brand-700">
-          <ChevronLeft className="h-4 w-4 shrink-0" /> All scooters
+          <ChevronLeft className="h-4 w-4 shrink-0" /> {t('pdp.allScooters')}
         </Link>
 
         <div className="mt-6 grid min-w-0 gap-8 lg:grid-cols-2 lg:gap-12">
@@ -191,9 +193,9 @@ function ScooterDetailsPage({ id, initialVariantId }) {
           {/* Summary */}
           <Reveal delay={0.05} className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge tone={stock.tone}>{stock.label}</Badge>
-              {scooter.noLicence && <Badge tone="brand">No Licence*</Badge>}
-              {scooter.noRegistration && <Badge tone="accent">No Registration*</Badge>}
+              <Badge tone={stock.tone}>{t(`stock.${scooter.stock}`)}</Badge>
+              {scooter.noLicence && <Badge tone="brand">{t('card.noLicence')}*</Badge>}
+              {scooter.noRegistration && <Badge tone="accent">{t('card.noRegistration')}*</Badge>}
               {popularityTags.map((b) => <Badge key={b.label} tone={b.tone}>{b.label}</Badge>)}
               {valueBadges.map((b) => (
                 <Badge key={b.id} tone={b.tone}>{b.emoji} {b.label}</Badge>
@@ -206,34 +208,34 @@ function ScooterDetailsPage({ id, initialVariantId }) {
 
             <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
               <span className="break-words font-display text-3xl font-extrabold text-heading sm:text-4xl">{formatINR(display.price)}</span>
-              <span className="pb-1 text-sm text-muted">on-road price{display.selectedVariant ? ` · ${display.selectedVariant.name}` : ''}</span>
+              <span className="pb-1 text-sm text-muted">{t('pdp.onRoad')}{display.selectedVariant ? ` · ${display.selectedVariant.name}` : ''}</span>
             </div>
 
             <VariantSelector scooter={scooter} selectedId={variantId} onChange={handleVariantChange} />
 
             {/* Specs + colours — top of purchase decision area */}
             <div className="mt-7">
-              <h2 className="break-words font-display text-display-md font-bold uppercase tracking-wide text-navy">Specifications</h2>
+              <h2 className="break-words font-display text-display-md font-bold uppercase tracking-wide text-navy">{t('pdp.specs')}</h2>
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Spec icon={BatteryCharging} label="Battery type" value={display.batteryType} />
+                <Spec icon={BatteryCharging} label={t('pdp.batteryType')} value={display.batteryType} />
                 {display.batteryWarranty && (
-                  <Spec icon={ShieldCheck} label="Battery warranty" value={display.batteryWarranty} />
+                  <Spec icon={ShieldCheck} label={t('pdp.batteryWarranty')} value={display.batteryWarranty} />
                 )}
-                <Spec icon={Cpu} label="Battery capacity" value={display.batteryCapacity} />
-                <Spec icon={Gauge} label="Range" value={`${display.range} km`} />
-                <Spec icon={Gauge} label="Top speed" value={`${display.topSpeed} km/h`} />
-                <Spec icon={Timer} label="Charging" value={display.chargingTime} />
-                <Spec icon={Cpu} label="Motor" value={display.motor} />
-                <Spec icon={Weight} label="Weight" value={display.weight} />
-                <Spec icon={Users} label="Load capacity" value={display.loadCapacity} />
-                <Spec icon={ShieldCheck} label="Warranty" value={display.warranty} />
+                <Spec icon={Cpu} label={t('pdp.batteryCapacity')} value={display.batteryCapacity} />
+                <Spec icon={Gauge} label={t('pdp.range')} value={`${display.range} km`} />
+                <Spec icon={Gauge} label={t('pdp.topSpeed')} value={`${display.topSpeed} km/h`} />
+                <Spec icon={Timer} label={t('pdp.charging')} value={display.chargingTime} />
+                <Spec icon={Cpu} label={t('pdp.motor')} value={display.motor} />
+                <Spec icon={Weight} label={t('pdp.weight')} value={display.weight} />
+                <Spec icon={Users} label={t('pdp.load')} value={display.loadCapacity} />
+                <Spec icon={ShieldCheck} label={t('pdp.warranty')} value={display.warranty} />
               </div>
             </div>
 
             {scooter.colors?.length > 0 && (
               <div className="mt-6">
                 <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-                  <Palette className="h-5 w-5 text-brand-500" /> Available colours
+                  <Palette className="h-5 w-5 text-brand-500" /> {t('pdp.colours')}
                 </h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {scooter.colors.map((c) => (
@@ -254,7 +256,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 className="sm:flex-1"
                 onClick={() => setTestRideOpen(true)}
               >
-                Book Test Ride
+                {t('cta.testRide')}
               </Button>
               <Button
                 href={telUrl(undefined, site)}
@@ -266,7 +268,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 className="sm:flex-1"
                 onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
               >
-                Call Showroom
+                {t('cta.callShowroom')}
               </Button>
               <Button
                 href={whatsappUrl(waMessage, site)}
@@ -277,7 +279,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                 className="!rounded-dealer sm:flex-1"
                 onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail', scooterId: scooter.id })}
               >
-                WhatsApp
+                {t('cta.whatsapp')}
               </Button>
             </div>
 
@@ -334,7 +336,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                   <BatteryCharging className="h-5 w-5" strokeWidth={2.2} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-display text-base font-bold uppercase tracking-wide text-navy sm:text-lg">Want More Range?</h3>
+                  <h3 className="font-display text-base font-bold uppercase tracking-wide text-navy sm:text-lg">{t('pdp.moreRange')}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-body">
                     Increase mileage with a higher AH battery — custom modifications tailored to your daily riding needs.
                   </p>
@@ -359,7 +361,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                     className="mt-4 !rounded-dealer"
                     onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'battery-upgrade', scooterId: scooter.id })}
                   >
-                    Contact Us to Know More
+                    {t('pdp.contactMore')}
                   </Button>
                 </div>
               </div>
@@ -372,7 +374,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
           <div className="order-2 min-w-0 lg:order-1 lg:col-span-3">
             <div>
               <h3 className="flex items-center gap-2 font-display text-lg font-bold text-heading">
-                <Sparkles className="h-5 w-5 text-brand-500" /> Features
+                <Sparkles className="h-5 w-5 text-brand-500" /> {t('pdp.features')}
               </h3>
               <ul className="mt-4 grid grid-cols-1 gap-3">
                 {scooter.features?.map((f) => (
@@ -411,9 +413,9 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         </div>
       </div>
 
-      <Modal open={testRideOpen} onClose={() => setTestRideOpen(false)} title={`Book a test ride`}>
+      <Modal open={testRideOpen} onClose={() => setTestRideOpen(false)} title={t('pdp.bookRideTitle')}>
         <p className="mb-4 text-sm text-muted">
-          Ride the <span className="font-semibold text-heading">{scooter.name}</span> at our {site.address.city} showroom.
+          {t('pdp.bookRideHint', { name: scooter.name, city: site.address.city })}
         </p>
         <TestRideForm scooter={display} onSuccess={() => setTimeout(() => setTestRideOpen(false), 2500)} />
       </Modal>
@@ -435,7 +437,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             className="min-h-11 !rounded-dealer"
             onClick={() => trackEvent(EVENT.CALL_CLICK, { from: 'scooter-detail-sticky', scooterId: scooter.id })}
           >
-            Call about {scooter.name}
+            {t('cta.call')} {scooter.name}
           </Button>
           <Button
             href={whatsappUrl(waMessage, site)}
@@ -446,7 +448,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
             className="min-h-11 !rounded-dealer"
             onClick={() => trackEvent(EVENT.WHATSAPP_CLICK, { from: 'scooter-detail-sticky', scooterId: scooter.id })}
           >
-            WhatsApp
+            {t('cta.whatsapp')}
           </Button>
         </div>
       </div>
