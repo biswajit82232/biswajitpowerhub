@@ -27,3 +27,13 @@ if (!isSupabaseConfigured && env.DEV) {
       'Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env to enable persistence.'
   );
 }
+
+/**
+ * Public form writes: demo delay is local-only. Production never pretends a lead saved.
+ */
+export function requirePersistence(action = 'This request') {
+  if (isSupabaseConfigured && supabase) return;
+  if (env.PROD) {
+    throw new Error(`${action} could not be saved. Please call or WhatsApp the showroom.`);
+  }
+}

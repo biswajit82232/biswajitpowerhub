@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, requirePersistence } from '@/lib/supabase';
 import { fetchWithCache, clearCache } from '@/lib/cache';
 import { REVIEWS } from '@/data/reviews';
 import { compressForUpload } from '@/lib/resizeImage';
@@ -120,6 +120,7 @@ export async function submitReview({ name, rating, review, scooter, photo, photo
     if (error) throw error;
     return { ok: true };
   }
+  requirePersistence('Review');
   await new Promise((r) => setTimeout(r, 600));
   return { ok: true, demo: true };
 }

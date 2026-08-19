@@ -50,6 +50,7 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 26 | `rate_limit_upsert_lead.sql` | Debounce + flood cap on public `upsert_lead` RPC |
 | 27 | `harden_public_writes_push_and_rate_limits.sql` | Rate-limit form/review/`lead_events` inserts; admin-only push subs; review-photo path prefix; never-downgrade lead classification; revoke anon analytics RPC |
 | 28 | `add_lead_attribution.sql` | UTM / gclid / channel JSON on leads + inbox rows; `upsert_lead` first-touch attribution |
+| 29 | `repair_rls_after_replay.sql` | Drop leftover `USING (true)` policies recreated by replaying 19–21 after hardening; require `visitor_id` on public form inserts |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 

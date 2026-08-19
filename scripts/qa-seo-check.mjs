@@ -61,6 +61,10 @@ for (const route of routes) {
   const html = readFileSync(p, 'utf8');
   const issues = [];
   if (!/<title>[^<]+<\/title>/i.test(html)) issues.push('no-title');
+  const titleText = (html.match(/<title>([^<]+)<\/title>/i) || [])[1] || '';
+  if (titleText && (/\uFFFD/.test(titleText) || /[\u2010-\u2015]/.test(titleText))) {
+    issues.push('title-encoding');
+  }
   if (!/name=["']description["']/i.test(html)) issues.push('no-description');
   if (
     !/rel=["']canonical["']/i.test(html) &&

@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, requirePersistence } from '@/lib/supabase';
 import { getVisitorId, getLocalLeadSummary, trackEvent, EVENT, classifyLead } from '@/lib/tracking';
 import {
   computePurchaseReadiness,
@@ -114,6 +114,7 @@ export async function submitCallback({ name, phone, interest }) {
     });
     if (error) throw error;
   } else {
+    requirePersistence('Callback');
     await new Promise((r) => setTimeout(r, 600));
   }
   await upsertLead({
@@ -142,6 +143,7 @@ export async function submitTestRide({ name, phone, date, time, scooter, scooter
     });
     if (error) throw error;
   } else {
+    requirePersistence('Test ride');
     await new Promise((r) => setTimeout(r, 600));
   }
   await upsertLead({ name: cleanName, phone: cleanPhone, source: 'test_ride', scooter });
@@ -176,6 +178,7 @@ export async function submitServiceBooking({
     });
     if (error) throw error;
   } else {
+    requirePersistence('Service booking');
     await new Promise((r) => setTimeout(r, 600));
   }
   await upsertLead({ name: cleanName, phone: cleanPhone, source: 'service', scooter });
@@ -197,6 +200,7 @@ export async function submitContact({ name, phone, email, message, from = 'conta
     });
     if (error) throw error;
   } else {
+    requirePersistence('Message');
     await new Promise((r) => setTimeout(r, 600));
   }
   await upsertLead({ name: cleanName, phone: cleanPhone, source: 'contact' });

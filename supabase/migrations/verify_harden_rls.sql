@@ -9,7 +9,11 @@ where schemaname = 'public'
     'auth all offers',
     'auth read all offers',
     'auth read vyapar_settings',
-    'auth read vyapar_items'
+    'auth read vyapar_items',
+    'auth all vyapar_settings',
+    'auth all vyapar_items',
+    'auth all service_bookings',
+    'auth manage own push subs'
   );
 
 select policyname, cmd, roles

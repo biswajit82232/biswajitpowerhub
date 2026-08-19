@@ -10,7 +10,14 @@ import { FinanceSettingsProvider } from '@/context/FinanceSettingsContext';
 import { SitePhotosProvider } from '@/context/SitePhotosContext';
 import { ToastProvider } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { reportClientError } from '@/lib/clientError';
 import './index.css';
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    reportClientError(event.reason, { source: 'unhandledrejection' });
+  });
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

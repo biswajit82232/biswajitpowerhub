@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import Button from '@/components/ui/Button';
+import { reportClientError } from '@/lib/clientError';
 
 /**
  * Catches render / lazy-import failures so the site never stays a blank white page.
@@ -16,6 +17,10 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error('[ErrorBoundary]', error, info?.componentStack);
+    reportClientError(error, {
+      source: 'error-boundary',
+      path: typeof window !== 'undefined' ? window.location.pathname : '',
+    });
   }
 
   handleReload = () => {

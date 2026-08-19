@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "dev:http": "vite --mode http",
-    "build": "node scripts/generate-sitemap.mjs && vite build && node scripts/fallback-prerender.mjs",
+    "build": "node scripts/assert-prod-env.mjs && node scripts/generate-sitemap.mjs && vite build && node scripts/fallback-prerender.mjs",
     "build:analyze": "vite build --mode analyze",
     "qa:seo": "node scripts/qa-seo-check.mjs",
     "qa:gsc": "node scripts/gsc-deep-audit.mjs",

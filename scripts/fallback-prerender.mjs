@@ -658,8 +658,16 @@ async function buildNoindexCatalogRoutes() {
   return routes;
 }
 
-function escapeHtml(s) {
+function asciiMeta(s) {
   return String(s)
+    .replace(/[\u2010-\u2015]/g, '-')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function escapeHtml(s) {
+  return asciiMeta(s)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -676,7 +684,7 @@ function breadcrumbSchema(path, title) {
   let acc = '';
   parts.forEach((p, i) => {
     acc += `/${p}`;
-    const name = i === parts.length - 1 ? title.split('—')[0].split('|')[0].trim() : p;
+    const name = i === parts.length - 1 ? title.split(/[—\-–|]/)[0].trim() : p;
     items.push({
       '@type': 'ListItem',
       position: i + 2,

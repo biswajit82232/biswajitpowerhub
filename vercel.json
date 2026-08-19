@@ -75,6 +75,10 @@
         {
           "key": "Strict-Transport-Security",
           "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "Content-Security-Policy-Report-Only",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.google.com; frame-src https://www.google.com https://maps.google.com https://www.google.com/maps https://www.facebook.com https://www.youtube.com https://www.youtube-nocookie.com; media-src 'self' https:; worker-src 'self'; base-uri 'self'; form-action 'self' https://wa.me https://api.whatsapp.com"
         }
       ]
     },
