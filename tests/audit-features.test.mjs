@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { classifyChannel, mergeFirstTouch, buildAttribution, CHANNEL } from '../src/lib/attribution.js';
 import { aggregateChannelCloseRates } from '../src/lib/channelReport.js';
 import { buildQuoteMessage, listQuoteTemplates } from '../src/lib/whatsappTemplates.js';
-import { translate } from '../src/i18n/messages.js';
+import { translate, missingBengaliKeys } from '../src/i18n/messages.js';
 
 test('gclid is classified as ads', () => {
   const ch = classifyChannel({ searchParams: 'gclid=abc123' });
@@ -122,4 +122,8 @@ test('Bengali covers shopper chrome', () => {
   assert.equal(translate('bn', 'card.viewMore'), 'আরও দেখুন');
   assert.equal(translate('bn', 'home.getDirection'), 'দিকনির্দেশ');
   assert.equal(translate('bn', 'footer.batteryScooty'), 'ব্যাটারি স্কুটি');
+});
+
+test('Bengali table covers every English key', () => {
+  assert.deepEqual(missingBengaliKeys(), []);
 });

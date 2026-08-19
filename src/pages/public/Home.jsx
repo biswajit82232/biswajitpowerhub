@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazyRetry as lazy } from '@/lib/lazyRetry';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { SEO } from '@/components/common/SEO';
 import { HeroCarousel } from '@/components/sections/HeroCarousel';
 import { ExploreRange } from '@/components/sections/ExploreRange';
@@ -19,6 +20,7 @@ import {
 import { SCOOTERS } from '@/data/scooters';
 import { buildSiteFaqs, formatCatalogFromPrice } from '@/lib/catalogCopy';
 import { SITE_FAQS } from '@/data/seoContent';
+import { SoftBoundary } from '@/components/common/ErrorBoundary';
 
 const MoreFromUs = lazy(() =>
   import('@/components/sections/MoreFromUs').then((m) => ({ default: m.MoreFromUs })),
@@ -37,6 +39,14 @@ const GoogleReviewsWidget = lazy(() =>
     default: m.GoogleReviewsWidget,
   })),
 );
+
+function HomeChunk({ children }) {
+  return (
+    <SoftBoundary>
+      <Suspense fallback={null}>{children}</Suspense>
+    </SoftBoundary>
+  );
+}
 
 /** Below-fold home blocks — deferred so first paint / TBT stay light. */
 function DeferredHomeTail({ faqs }) {
@@ -60,13 +70,23 @@ function DeferredHomeTail({ faqs }) {
   if (!ready) return null;
 
   return (
-    <Suspense fallback={null}>
-      <MoreFromUs />
-      <LocateUs />
-      <SeoAboutBlock />
-      <DealerFaq faqs={faqs} />
-      <GoogleReviewsWidget />
-    </Suspense>
+    <>
+      <HomeChunk>
+        <MoreFromUs />
+      </HomeChunk>
+      <HomeChunk>
+        <LocateUs />
+      </HomeChunk>
+      <HomeChunk>
+        <SeoAboutBlock />
+      </HomeChunk>
+      <HomeChunk>
+        <DealerFaq faqs={faqs} />
+      </HomeChunk>
+      <HomeChunk>
+        <GoogleReviewsWidget />
+      </HomeChunk>
+    </>
   );
 }
 

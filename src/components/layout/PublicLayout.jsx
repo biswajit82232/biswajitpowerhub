@@ -1,4 +1,5 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { lazyRetry as lazy } from '@/lib/lazyRetry';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
@@ -6,7 +7,7 @@ import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { FloatingDealerRail } from '@/components/common/FloatingDealerRail';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { ErrorBoundary, SoftBoundary } from '@/components/common/ErrorBoundary';
 import { RouteLoader } from '@/components/ui/Loading';
 import { usePageTracking } from '@/hooks/usePageTracking';
 
@@ -58,9 +59,11 @@ function DeferredFirstVisitPrompt() {
   }, []);
   if (!ready) return null;
   return (
-    <Suspense fallback={null}>
-      <FirstVisitNoLicencePrompt />
-    </Suspense>
+    <SoftBoundary>
+      <Suspense fallback={null}>
+        <FirstVisitNoLicencePrompt />
+      </Suspense>
+    </SoftBoundary>
   );
 }
 
@@ -90,9 +93,15 @@ export function PublicLayout() {
           </Suspense>
         </ErrorBoundary>
       </main>
-      <Footer />
-      <MobileLocalCTA />
-      <FloatingDealerRail />
+      <SoftBoundary>
+        <Footer />
+      </SoftBoundary>
+      <SoftBoundary>
+        <MobileLocalCTA />
+      </SoftBoundary>
+      <SoftBoundary>
+        <FloatingDealerRail />
+      </SoftBoundary>
       <DeferredFirstVisitPrompt />
     </div>
   );

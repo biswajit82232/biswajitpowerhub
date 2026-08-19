@@ -35,6 +35,7 @@ const LocationPage = lazy(() => import('@/pages/public/seo/locationPages'));
 const NearMeBerhampore = lazy(() => import('@/pages/public/seo/NearMeBerhampore'));
 const BatteryScootyBerhampore = lazy(() => import('@/pages/public/seo/BatteryScootyBerhampore'));
 const AreasWeServe = lazy(() => import('@/pages/public/AreasWeServe'));
+const Social = lazy(() => import('@/pages/public/Social'));
 
 // Admin (separate chunk)
 const AdminLogin = lazy(() => import('@/pages/admin/AdminLogin'));
@@ -98,6 +99,7 @@ export default function App() {
         <Route path="guides/:slug" element={<GuidePost />} />
         <Route path="terms" element={<Terms />} />
         <Route path="privacy" element={<Privacy />} />
+        <Route path="social" element={<Social />} />
         <Route path="dealership" element={<Navigate to="/contact" replace />} />
         <Route path="updates" element={<Navigate to="/offers" replace />} />
         <Route path="*" element={<NotFound />} />

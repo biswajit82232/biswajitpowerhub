@@ -61,7 +61,7 @@ function formFromSite(data) {
     tagline: data.tagline || '',
     description: data.description || '',
     shortName: data.shortName || '',
-    social: { instagram: '', facebook: '', youtube: '', ...data.social },
+    social: { instagram: '', facebook: '', youtube: '', whatsappCatalog: '', ...data.social },
     geo: {
       latitude: data.geo?.latitude || '',
       longitude: data.geo?.longitude || '',
@@ -413,8 +413,18 @@ export default function Settings() {
               <Field label="Facebook URL">
                 <Input value={form.social.facebook} onChange={(e) => setSocial('facebook', e.target.value)} />
               </Field>
-              <Field label="YouTube URL" className="sm:col-span-2">
+              <Field label="YouTube URL">
                 <Input value={form.social.youtube || ''} onChange={(e) => setSocial('youtube', e.target.value)} />
+              </Field>
+              <Field
+                label="WhatsApp catalog URL"
+                hint="Leave blank to open wa.me/c/ from your WhatsApp number"
+              >
+                <Input
+                  value={form.social.whatsappCatalog || ''}
+                  onChange={(e) => setSocial('whatsappCatalog', e.target.value)}
+                  placeholder="https://wa.me/c/919635505436"
+                />
               </Field>
               <Field label="Latitude">
                 <Input value={form.geo.latitude} onChange={(e) => setGeo('latitude', e.target.value)} />

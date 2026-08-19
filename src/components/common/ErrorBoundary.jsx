@@ -49,3 +49,8 @@ export class ErrorBoundary extends Component {
     return this.props.children;
   }
 }
+
+/** Optional widgets — hide the block if it crashes; never blank the page. */
+export function SoftBoundary({ children, fallback = null }) {
+  return <ErrorBoundary fallback={fallback}>{children}</ErrorBoundary>;
+}

@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { FloatingWhatsApp } from '@/components/common/FloatingWhatsApp';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
@@ -11,12 +11,13 @@ import { usePageTracking } from '@/hooks/usePageTracking';
 /** Minimal layout for ads landing — no header/footer nav */
 export function BareAdsLayout() {
   usePageTracking();
+  const { pathname } = useLocation();
 
   return (
     <div className="min-h-screen min-w-0 w-full overflow-x-clip">
       <GoogleAnalytics />
       <ScrollToTop />
-      <ErrorBoundary>
+      <ErrorBoundary key={pathname}>
         <Suspense fallback={<RouteLoader label="Loading" />}>
           <Outlet />
         </Suspense>

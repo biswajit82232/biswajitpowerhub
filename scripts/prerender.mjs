@@ -35,6 +35,7 @@ const ROUTES = [
   '/compare',
   '/terms',
   '/privacy',
+  '/social',
   '/accessories',
 ];
 

@@ -41,7 +41,7 @@ export default function Privacy() {
               Your privacy matters to us. This policy explains what information we collect, how we
               use it, and the safeguards we apply when you interact with {SITE.name}.
             </p>
-            <p className="mt-2 text-sm text-muted">Last updated: 13 August 2026</p>
+            <p className="mt-2 text-sm text-muted">Last updated: 19 August 2026</p>
           </Reveal>
         </div>
       </section>
@@ -120,6 +120,11 @@ export default function Privacy() {
               We use trusted services such as Supabase (database and file storage), Vercel (website
               hosting), Google Maps (location), and WhatsApp (messaging). When you use those
               services via links on our site, their respective privacy policies apply.
+            </p>
+            <p>
+              The Social page may load Meta&apos;s official Facebook Page Plugin so visitors can see
+              recent posts. That plugin is served by Facebook and may set Facebook cookies according
+              to Meta&apos;s privacy policy. It is not loaded on other pages.
             </p>
             <p>
               We also use <strong>Google Analytics 4</strong> to understand anonymised site usage

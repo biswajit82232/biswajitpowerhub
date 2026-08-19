@@ -107,19 +107,11 @@
   }
 
   /*
-   * ReplyOnTheFly seed is crawlable HTML; the live widget replaces it.
-   * Hide the seed from visitors so reviews never appear twice if replace is slow.
+   * ReplyOnTheFly seed stays visible until the live widget script loads.
+   * If the script fails, visitors still see the crawlable reviews.
    */
-  .google-reviews-embed [data-rotf-seed] {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+  .google-reviews-embed [data-rotf-seed][hidden] {
+    display: none !important;
   }
 
   .google-reviews-embed {

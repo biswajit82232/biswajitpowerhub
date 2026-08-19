@@ -62,6 +62,14 @@ export function GoogleReviewsWidget() {
     script.setAttribute('data-size', '2');
     script.setAttribute('data-autoplay', '4');
     script.setAttribute('data-max-reviews', '10');
+    script.onload = () => {
+      const seed = host.querySelector('[data-rotf-seed]');
+      if (seed) seed.setAttribute('hidden', '');
+    };
+    script.onerror = () => {
+      const seed = host.querySelector('[data-rotf-seed]');
+      if (seed) seed.removeAttribute('hidden');
+    };
     host.appendChild(script);
 
     return () => {

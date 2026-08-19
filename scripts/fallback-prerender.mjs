@@ -387,6 +387,16 @@ function buildRoutes(catalog) {
     h1: 'Privacy Policy',
     schema: 'crumbs',
   },
+  {
+    path: '/social',
+    title: 'Social | Biswajit Power Hub Berhampore',
+    description:
+      'Follow Biswajit Power Hub on Instagram, Facebook, WhatsApp, and Google. Showroom at Chunakhali Bus Stand, Berhampore.',
+    h1: 'Social',
+    schema: 'crumbs',
+    crawlText:
+      'Follow Biswajit Power Hub on Instagram @biswajitpowerhub, Facebook, WhatsApp, and Google Maps. Recent Facebook posts and photos from the showroom page. Showroom at Chunakhali Bus Stand, Nimtala, Berhampore, Murshidabad.',
+  },
   ...SERVICE_LOCATIONS.map((loc) => ({
     path: loc.path,
     title: loc.title,
@@ -780,8 +790,8 @@ function localBusinessSchema() {
       },
     ],
     sameAs: [
-      'https://www.instagram.com/biswajitpowerhub',
-      'https://www.facebook.com/BiswajitPowerHub',
+      'https://www.instagram.com/biswajitpowerhub/',
+      'https://www.facebook.com/p/Biswajit-Power-Hub-61583295660105/',
       'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
     ],
     areaServed: [
@@ -857,8 +867,8 @@ function organizationSchema() {
     url: BASE,
     logo: `${BASE}/logo-512.png`,
     sameAs: [
-      'https://www.instagram.com/biswajitpowerhub',
-      'https://www.facebook.com/BiswajitPowerHub',
+      'https://www.instagram.com/biswajitpowerhub/',
+      'https://www.facebook.com/p/Biswajit-Power-Hub-61583295660105/',
       'https://maps.app.goo.gl/2SPHtdi1dhLUHHtb7',
     ],
   };
@@ -1402,7 +1412,7 @@ ${homeLcp}
   </div>
   <p style="text-align:center;margin:2rem 0 0;color:#999;font-size:0.875rem;">© 2026 Biswajit Power Hub. Electric Scooter Dealer in Berhampore, Murshidabad.</p>
   <p style="text-align:center;margin:0.5rem 0 0;color:#ccc;font-size:0.875rem;">Best Electric Scooters in Berhampore | No Licence Required | Low Running Cost</p>
-  <p style="text-align:center;margin:0.75rem 0 0;font-size:0.875rem;"><a href="${BASE}/terms" style="color:#bbb;">Terms of Service</a> · <a href="${BASE}/privacy" style="color:#bbb;">Privacy Policy</a> · <a href="${BASE}/about" style="color:#bbb;">About</a></p>
+  <p style="text-align:center;margin:0.75rem 0 0;font-size:0.875rem;"><a href="${BASE}/terms" style="color:#bbb;">Terms of Service</a> · <a href="${BASE}/privacy" style="color:#bbb;">Privacy Policy</a> · <a href="${BASE}/about" style="color:#bbb;">About</a> · <a href="${BASE}/social" style="color:#bbb;">Social</a></p>
 </footer>
 <div role="navigation" aria-label="Call or get directions" style="position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;gap:0.5rem;padding:0.5rem;padding-bottom:calc(0.5rem + env(safe-area-inset-bottom));background:#1a1a1a;">
   <a href="tel:+919635505436" style="flex:1;display:flex;min-height:48px;align-items:center;justify-content:center;background:#2563EB;color:#fff;font-weight:700;text-decoration:none;border-radius:8px;">Call</a>

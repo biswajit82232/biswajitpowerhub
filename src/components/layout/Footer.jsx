@@ -139,6 +139,9 @@ export function Footer() {
             <Link to="/about" className="text-muted hover:text-navy hover:underline">
               {t('footer.about')}
             </Link>
+            <Link to="/social" className="text-muted hover:text-navy hover:underline">
+              {t('social.nav')}
+            </Link>
           </div>
         </div>
       </div>

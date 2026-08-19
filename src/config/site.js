@@ -143,9 +143,10 @@ export const SITE = {
   hours: toLegacyHours(CONTACT_DEFAULTS.hours),
 
   social: {
-    instagram: 'https://www.instagram.com/biswajitpowerhub',
-    facebook: 'https://www.facebook.com/BiswajitPowerHub',
+    instagram: 'https://www.instagram.com/biswajitpowerhub/',
+    facebook: 'https://www.facebook.com/p/Biswajit-Power-Hub-61583295660105/',
     youtube: '',
+    whatsappCatalog: '',
   },
 
   /** Showroom coordinates from live GBP listing (Chunakhali, Berhampore) */
@@ -365,6 +366,7 @@ export const FOOTER_MORE_LINKS = [
   { label: 'Our Community', to: '/community' },
   { label: 'Guides', to: '/guides' },
   { label: 'Accessories', to: '/accessories' },
+  { label: 'Social', to: '/social' },
 ];
 
 /** Footer Explore — hubs only; town pages live under Areas we serve */

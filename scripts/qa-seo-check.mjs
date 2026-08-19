@@ -39,6 +39,7 @@ const routes = [
   '/accessories',
   '/terms',
   '/privacy',
+  '/social',
   '/ad-landing',
 ];
 

@@ -1,5 +1,7 @@
 import { lazy } from 'react';
 
+const RELOAD_KEY = 'bph_chunk_reload';
+
 /**
  * React.lazy wrapper that retries chunk fetches (stale deploy / flaky network).
  * After retries fail, forces a one-time full reload to pick up the new index.html.
@@ -9,7 +11,13 @@ export function lazyRetry(factory, { retries = 2, delayMs = 1200 } = {}) {
     let lastError;
     for (let attempt = 0; attempt <= retries; attempt += 1) {
       try {
-        return await factory();
+        const mod = await factory();
+        try {
+          sessionStorage.removeItem(RELOAD_KEY);
+        } catch {
+          /* storage blocked */
+        }
+        return mod;
       } catch (err) {
         lastError = err;
         if (attempt < retries) {
@@ -18,16 +26,14 @@ export function lazyRetry(factory, { retries = 2, delayMs = 1200 } = {}) {
       }
     }
 
-    const key = 'bph_chunk_reload';
     try {
-      const already = sessionStorage.getItem(key);
+      const already = sessionStorage.getItem(RELOAD_KEY);
       if (!already) {
-        sessionStorage.setItem(key, '1');
+        sessionStorage.setItem(RELOAD_KEY, '1');
         window.location.reload();
-        // Keep Suspense pending until reload completes.
         return new Promise(() => {});
       }
-      sessionStorage.removeItem(key);
+      sessionStorage.removeItem(RELOAD_KEY);
     } catch {
       /* storage blocked */
     }

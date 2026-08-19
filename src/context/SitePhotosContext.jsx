@@ -24,16 +24,20 @@ export function SitePhotosProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const loaded = await loadSitePhotos();
       try {
-        const finance = await getFinanceSettings();
-        if (finance?.heroImageUrl && !loaded.hero?.url) {
-          loaded.hero = { ...loaded.hero, url: finance.heroImageUrl };
+        const loaded = await loadSitePhotos();
+        try {
+          const finance = await getFinanceSettings();
+          if (finance?.heroImageUrl && !loaded.hero?.url) {
+            loaded.hero = { ...loaded.hero, url: finance.heroImageUrl };
+          }
+        } catch {
+          /* ignore */
         }
+        if (!cancelled) setPhotos(loaded);
       } catch {
-        /* ignore */
+        /* keep cached / default photos */
       }
-      if (!cancelled) setPhotos(loaded);
     })();
     return () => {
       cancelled = true;

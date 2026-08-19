@@ -24,7 +24,7 @@ export function useAsync(asyncFn, deps = []) {
       })
       .catch((error) => {
         if (gen !== genRef.current) throw error;
-        setState({ data: null, loading: false, error });
+        setState((s) => ({ data: s.data, loading: false, error }));
         throw error;
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
