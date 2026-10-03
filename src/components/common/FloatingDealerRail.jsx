@@ -54,14 +54,14 @@ export function FloatingDealerRail() {
 
   return (
     <aside
-      className="pointer-events-none fixed right-0 top-1/2 z-[90] hidden -translate-y-1/2 lg:block"
+      className="pointer-events-none fixed right-3 top-1/2 z-[90] hidden -translate-y-1/2 lg:block"
       aria-label="Quick actions"
     >
-      <ul className="pointer-events-auto flex flex-col gap-px overflow-hidden rounded-l-dealer shadow-card">
+      <ul className="pointer-events-auto flex flex-col gap-2">
         {RAIL.map((item) => {
           const Icon = item.icon;
           const className = cn(
-            'flex w-[52px] flex-col items-center gap-1 bg-navy px-1.5 py-2.5 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-white transition hover:bg-brand-500',
+            'flex h-16 w-16 flex-col items-center justify-center gap-1 rounded-2xl bg-navy/95 px-1.5 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-white shadow-[0_10px_24px_rgba(0,18,51,0.38)] ring-1 ring-white/25 transition duration-150 hover:-translate-y-0.5 hover:bg-brand-500 hover:shadow-[0_14px_28px_rgba(185,28,28,0.35)] active:translate-y-0 active:scale-95',
           );
 
           if (item.hrefKey === 'tel') {
