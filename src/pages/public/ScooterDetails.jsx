@@ -40,7 +40,7 @@ import { buildModelSeo } from '@/lib/catalogCopy';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
 import { useSaleOffers } from '@/context/SaleOffersContext';
-import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
+import { SalePriceStack } from '@/components/common/SaleMark';
 
 function Spec({ icon: Icon, label, value }) {
   return (
@@ -146,7 +146,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   if (insights?.popularWeekIds?.has?.(scooter.id)) popularityTags.push({ label: 'Trending this week', tone: 'hot' });
   if (insights?.topIntentMonthIds?.has?.(scooter.id)) popularityTags.push({ label: 'Top pick this month', tone: 'warm' });
   const priceForMessage = priceQuote.onSale
-    ? `${formatINR(priceQuote.sale)} sale price, ${priceQuote.percent}% off`
+    ? `${formatINR(priceQuote.sale)} (was ${formatINR(priceQuote.list)})`
     : formatINR(priceQuote.sale);
   const waMessage = display.selectedVariant
     ? `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} — ${display.selectedVariant.name} (${priceForMessage}). Please share more details.`
@@ -196,7 +196,6 @@ function ScooterDetailsPage({ id, initialVariantId }) {
           <Reveal className="min-w-0">
             <div className="relative">
               <ScooterGallery scooter={scooter} />
-              {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} className="right-3 top-3" /> : null}
             </div>
           </Reveal>
 
@@ -334,7 +333,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                   Price, range &amp; showroom support in Murshidabad
                 </h2>
                 <p className="mt-3">
-                  On-road pricing for the {scooter.name} {priceQuote.onSale ? `is ${formatINR(priceQuote.sale)} on sale (${priceQuote.percent}% off ${formatINR(priceQuote.list)})` : `starts near ${formatINR(display.price)}`} depending on
+                  On-road pricing for the {scooter.name} {priceQuote.onSale ? `is ${formatINR(priceQuote.sale)} (was ${formatINR(priceQuote.list)})` : `starts near ${formatINR(display.price)}`} depending on
                   variant. Typical range is about {display.range} km per charge with a top speed of{' '}
                   {display.topSpeed} km/h — ideal for Berhampore town rides and many Murshidabad daily
                   routes. Our team explains battery pack options

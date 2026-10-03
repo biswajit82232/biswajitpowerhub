@@ -103,7 +103,7 @@ export function buildModelSeo(scooter, baseMeta = {}, offers) {
   if (!scooter) return baseMeta;
   const quote = startingQuote(scooter, offers);
   const price = formatINR(quote.sale);
-  const saleNote = quote.onSale ? ` (${quote.percent}% off, was ${formatINR(quote.list)})` : '';
+  const saleNote = quote.onSale ? ` (was ${formatINR(quote.list)})` : '';
   const range = formatRangeRange(scooter);
   const packs = getScooterVariants(scooter);
   const packNote = packs.length > 1 ? ' Battery pack options available.' : '';

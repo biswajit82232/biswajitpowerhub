@@ -1,22 +1,6 @@
 import { formatINR, cn } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
 
-/** Corner flag for a scooter that is on the current percent-off sale. */
-export function SaleRibbon({ percent, className }) {
-  const { t } = useLocale();
-  if (!percent) return null;
-  return (
-    <span className={cn('pointer-events-none absolute right-2 top-2 z-10 flex flex-col items-end gap-1', className)}>
-      <span className="bg-red-600 px-2.5 py-1 font-display text-sm font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_18px_rgba(185,28,28,0.45)] sm:px-3 sm:text-base">
-        {t('card.sale')}
-      </span>
-      <span className="bg-amber-400 px-2 py-0.5 font-display text-xs font-black text-navy shadow sm:text-sm">
-        {t('card.percentOff', { pct: percent })}
-      </span>
-    </span>
-  );
-}
-
 /**
  * List price struck through, sale price large, amount saved.
  * When the scooter is not on sale, renders the list price only.

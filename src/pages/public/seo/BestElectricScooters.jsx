@@ -91,7 +91,6 @@ export default function BestElectricScooters() {
                       {r.model}
                     </h3>
                     <p className={`shrink-0 text-right font-display text-base font-extrabold ${r.onSale ? 'text-red-600' : 'text-body'}`}>
-                      {r.onSale ? <span className="block text-[10px] font-black uppercase tracking-wide">Sale {r.salePercent}%</span> : null}
                       {r.price}
                       {r.onSale ? <span className="block text-xs font-medium text-muted line-through">{r.listPrice}</span> : null}
                     </p>

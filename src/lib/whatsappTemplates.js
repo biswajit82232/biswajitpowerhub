@@ -43,13 +43,13 @@ const TPL = {
   en: {
     greet: (n) => (n ? `Hi ${n},` : 'Hi,'),
     sign: '— Biswajit Power Hub, Chunakhali Bus Stand, Berhampore. Call 096355 05436',
-    price: ({ greet, model, price, list, onSale, percent, emi, stock }) =>
+    price: ({ greet, model, price, list, onSale, emi, stock }) =>
       onSale
-        ? `${greet} ${model} sale price is ${formatINR(price)} (${percent}% off, was ${formatINR(list)}). EMI from ${formatINR(emi)}/mo* on the sale price. ${stock}. Visit us for a free test ride.\n${TPL.en.sign}`
+        ? `${greet} ${model} is ${formatINR(price)} (was ${formatINR(list)}). EMI from ${formatINR(emi)}/mo*. ${stock}. Visit us for a free test ride.\n${TPL.en.sign}`
         : `${greet} ${model} on-road is ${formatINR(price)}. EMI from ${formatINR(emi)}/mo*. ${stock}. Visit us for a free test ride.\n${TPL.en.sign}`,
-    emi: ({ greet, model, price, list, onSale, percent, emi }) =>
+    emi: ({ greet, model, price, list, onSale, emi }) =>
       onSale
-        ? `${greet} EMI for ${model} on the sale price ${formatINR(price)} (${percent}% off, was ${formatINR(list)}) starts at about ${formatINR(emi)}/mo*. Final terms at the showroom.\n${TPL.en.sign}`
+        ? `${greet} EMI for ${model} at ${formatINR(price)} (was ${formatINR(list)}) starts at about ${formatINR(emi)}/mo*. Final terms at the showroom.\n${TPL.en.sign}`
         : `${greet} EMI for ${model} (${formatINR(price)} on-road) starts at about ${formatINR(emi)}/mo*. Final terms at the showroom.\n${TPL.en.sign}`,
     stock: ({ greet, model, stock }) =>
       `${greet} ${model} is ${stock} at our Chunakhali showroom. Come for a free test ride today — we are open all days 9 AM–8:30 PM.\n${TPL.en.sign}`,
@@ -63,13 +63,13 @@ const TPL = {
   bn: {
     greet: (n) => (n ? `নমস্কার ${n},` : 'নমস্কার,'),
     sign: '— বিশ্বজিৎ পাওয়ার হাব, চুনাখালি বাস স্ট্যান্ড, বহরমপুর। কল 096355 05436',
-    price: ({ greet, model, price, list, onSale, percent, emi, stock }) =>
+    price: ({ greet, model, price, list, onSale, emi, stock }) =>
       onSale
-        ? `${greet} ${model} সেল প্রাইস ${formatINR(price)} (${percent}% ছাড়, আগে ${formatINR(list)})। EMI ${formatINR(emi)}/মাস* সেল প্রাইসে। ${stock}। ফ্রি টেস্ট রাইডের জন্য চুনাখালি আসুন।\n${TPL.bn.sign}`
+        ? `${greet} ${model} দাম ${formatINR(price)} (আগে ${formatINR(list)})। EMI ${formatINR(emi)}/মাস*। ${stock}। ফ্রি টেস্ট রাইডের জন্য চুনাখালি আসুন।\n${TPL.bn.sign}`
         : `${greet} ${model} অন-রোড দাম ${formatINR(price)}। EMI ${formatINR(emi)}/মাস* থেকে। ${stock}। ফ্রি টেস্ট রাইডের জন্য চুনাখালি আসুন।\n${TPL.bn.sign}`,
-    emi: ({ greet, model, price, list, onSale, percent, emi }) =>
+    emi: ({ greet, model, price, list, onSale, emi }) =>
       onSale
-        ? `${greet} ${model} সেল প্রাইস ${formatINR(price)} (${percent}% ছাড়, আগে ${formatINR(list)}) EMI প্রায় ${formatINR(emi)}/মাস*। চূড়ান্ত শর্ত শোরুমে।\n${TPL.bn.sign}`
+        ? `${greet} ${model} দাম ${formatINR(price)} (আগে ${formatINR(list)}) EMI প্রায় ${formatINR(emi)}/মাস*। চূড়ান্ত শর্ত শোরুমে।\n${TPL.bn.sign}`
         : `${greet} ${model} (${formatINR(price)} অন-রোড) EMI প্রায় ${formatINR(emi)}/মাস*। চূড়ান্ত শর্ত শোরুমে।\n${TPL.bn.sign}`,
     stock: ({ greet, model, stock }) =>
       `${greet} ${model} আমাদের চুনাখালি শোরুমে ${stock}। আজই ফ্রি টেস্ট রাইডে আসুন — প্রতিদিন সকাল ৯টা–রাত ৮:৩০।\n${TPL.bn.sign}`,

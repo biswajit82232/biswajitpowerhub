@@ -160,9 +160,6 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
               ) : null}
             </span>
           </div>
-          {priced.onSale ? (
-            <p className="text-xs font-bold text-red-600">{t('card.percentOff', { pct: priced.percent })}</p>
-          ) : null}
           {showPicker && selected && (
             <p className="text-xs text-muted">
               {selected.name}

@@ -66,7 +66,7 @@ export function VariantSelector({ scooter, selectedId, onChange }) {
               </p>
               {priced.onSale ? (
                 <p className="mt-1 text-xs font-medium text-muted line-through">
-                  {formatINR(priced.list)} · {priced.percent}% off
+                  {formatINR(priced.list)}
                 </p>
               ) : null}
               {priceDelta != null ? (
