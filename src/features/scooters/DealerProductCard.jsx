@@ -5,17 +5,26 @@ import Button from '@/components/ui/Button';
 import {
   formatBatteryCapacityRange,
   formatRangeRange,
+  getStartingPrice,
 } from '@/lib/scooterVariants';
 import { STOCK_LABELS } from '@/data/scooters';
-import { cn } from '@/lib/utils';
+import { cn, formatINR } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
+import { emiFrom } from '@/lib/finance';
+import { useFinance } from '@/context/FinanceSettingsContext';
 
 /**
  * Dealer-style product card with smart discovery badges (trending / value).
  */
 export function DealerProductCard({ scooter, imageOverride, tags = [], className }) {
   const { t } = useLocale();
+  const { settings } = useFinance();
+  const { quote } = useSaleOffers();
   if (!scooter) return null;
+  const priceQuote = quote(getStartingPrice(scooter), scooter.id);
+  const emi = emiFrom({ price: priceQuote.sale, settings });
   const battery = formatBatteryCapacityRange(scooter);
   const range = formatRangeRange(scooter);
   const topSpeed = scooter.topSpeed ?? '—';
@@ -51,6 +60,7 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
             ))}
           </div>
         )}
+        {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} /> : null}
       </Link>
 
       <div className="flex flex-1 flex-col px-2 pb-5 pt-3">
@@ -78,6 +88,13 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
             <p className="mt-1 text-xs font-bold text-body sm:text-sm">{battery}</p>
           </div>
         </div>
+
+        {priceQuote.onSale ? (
+          <div className="mt-4">
+            <SalePriceStack quote={priceQuote} size="md" align="center" showListWhenRegular={false} />
+            <p className="mt-1 text-xs font-semibold text-brand-700">{t('card.emiFrom', { amount: formatINR(emi) })}</p>
+          </div>
+        ) : null}
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           <Button to="/test-ride-berhampore" variant="dealerPrimary" size="sm">

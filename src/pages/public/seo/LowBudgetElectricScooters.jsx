@@ -14,14 +14,16 @@ import {
   formatCatalogFromPrice,
 } from '@/lib/catalogCopy';
 import { formatINR } from '@/lib/utils';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 
 export default function LowBudgetElectricScooters() {
   const path = '/low-budget-electric-scooters-berhampore';
   const { data: scooters } = useAsync(() => getScooters(), []);
+  const { offers: saleOffers } = useSaleOffers();
   const list = scooters?.length ? scooters : SCOOTERS;
-  const rows = useMemo(() => buildComparisonRows(list), [list]);
-  const fromPrice = formatCatalogFromPrice(list);
-  const faqs = useMemo(() => buildSiteFaqs(SITE_FAQS, list), [list]);
+  const rows = useMemo(() => buildComparisonRows(list, saleOffers), [list, saleOffers]);
+  const fromPrice = formatCatalogFromPrice(list, saleOffers);
+  const faqs = useMemo(() => buildSiteFaqs(SITE_FAQS, list, saleOffers), [list, saleOffers]);
   const entry = rows[0];
   const under50k = rows.filter((r) => r.priceValue < 50000);
 

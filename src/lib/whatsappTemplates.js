@@ -1,6 +1,7 @@
 import { formatINR } from './utils.js';
 import { emiFrom } from './finance.js';
 import { getStartingPrice } from './scooterVariants.js';
+import { quoteScooterPrice } from './salePrice.js';
 import { STOCK_LABELS } from '../data/scooters.js';
 
 export const WA_TPL_LANG_KEY = 'bph_wa_tpl_lang';
@@ -21,22 +22,35 @@ export function findCatalogScooter(scooters, name) {
   );
 }
 
-function priceLine(scooter, settings) {
+function priceLine(scooter, settings, offers) {
   if (!scooter) return null;
-  const price = getStartingPrice(scooter);
+  const quoted = quoteScooterPrice(getStartingPrice(scooter), scooter.id, offers);
+  const price = quoted.sale;
   const emi = emiFrom({ price, settings });
   const stock = STOCK_LABELS[scooter.stock]?.label || 'in stock';
-  return { price, emi, stock, name: scooter.name };
+  return {
+    price,
+    list: quoted.list,
+    onSale: quoted.onSale,
+    percent: quoted.percent,
+    emi,
+    stock,
+    name: scooter.name,
+  };
 }
 
 const TPL = {
   en: {
     greet: (n) => (n ? `Hi ${n},` : 'Hi,'),
     sign: '— Biswajit Power Hub, Chunakhali Bus Stand, Berhampore. Call 096355 05436',
-    price: ({ greet, model, price, emi, stock }) =>
-      `${greet} ${model} on-road is ${formatINR(price)}. EMI from ${formatINR(emi)}/mo*. ${stock}. Visit us for a free test ride.\n${TPL.en.sign}`,
-    emi: ({ greet, model, price, emi }) =>
-      `${greet} EMI for ${model} (${formatINR(price)} on-road) starts at about ${formatINR(emi)}/mo*. Final terms at the showroom.\n${TPL.en.sign}`,
+    price: ({ greet, model, price, list, onSale, percent, emi, stock }) =>
+      onSale
+        ? `${greet} ${model} sale price is ${formatINR(price)} (${percent}% off, was ${formatINR(list)}). EMI from ${formatINR(emi)}/mo* on the sale price. ${stock}. Visit us for a free test ride.\n${TPL.en.sign}`
+        : `${greet} ${model} on-road is ${formatINR(price)}. EMI from ${formatINR(emi)}/mo*. ${stock}. Visit us for a free test ride.\n${TPL.en.sign}`,
+    emi: ({ greet, model, price, list, onSale, percent, emi }) =>
+      onSale
+        ? `${greet} EMI for ${model} on the sale price ${formatINR(price)} (${percent}% off, was ${formatINR(list)}) starts at about ${formatINR(emi)}/mo*. Final terms at the showroom.\n${TPL.en.sign}`
+        : `${greet} EMI for ${model} (${formatINR(price)} on-road) starts at about ${formatINR(emi)}/mo*. Final terms at the showroom.\n${TPL.en.sign}`,
     stock: ({ greet, model, stock }) =>
       `${greet} ${model} is ${stock} at our Chunakhali showroom. Come for a free test ride today — we are open all days 9 AM–8:30 PM.\n${TPL.en.sign}`,
     ride: ({ greet, model, date, time }) =>
@@ -49,10 +63,14 @@ const TPL = {
   bn: {
     greet: (n) => (n ? `নমস্কার ${n},` : 'নমস্কার,'),
     sign: '— বিশ্বজিৎ পাওয়ার হাব, চুনাখালি বাস স্ট্যান্ড, বহরমপুর। কল 096355 05436',
-    price: ({ greet, model, price, emi, stock }) =>
-      `${greet} ${model} অন-রোড দাম ${formatINR(price)}। EMI ${formatINR(emi)}/মাস* থেকে। ${stock}। ফ্রি টেস্ট রাইডের জন্য চুনাখালি আসুন।\n${TPL.bn.sign}`,
-    emi: ({ greet, model, price, emi }) =>
-      `${greet} ${model} (${formatINR(price)} অন-রোড) EMI প্রায় ${formatINR(emi)}/মাস*। চূড়ান্ত শর্ত শোরুমে।\n${TPL.bn.sign}`,
+    price: ({ greet, model, price, list, onSale, percent, emi, stock }) =>
+      onSale
+        ? `${greet} ${model} সেল প্রাইস ${formatINR(price)} (${percent}% ছাড়, আগে ${formatINR(list)})। EMI ${formatINR(emi)}/মাস* সেল প্রাইসে। ${stock}। ফ্রি টেস্ট রাইডের জন্য চুনাখালি আসুন।\n${TPL.bn.sign}`
+        : `${greet} ${model} অন-রোড দাম ${formatINR(price)}। EMI ${formatINR(emi)}/মাস* থেকে। ${stock}। ফ্রি টেস্ট রাইডের জন্য চুনাখালি আসুন।\n${TPL.bn.sign}`,
+    emi: ({ greet, model, price, list, onSale, percent, emi }) =>
+      onSale
+        ? `${greet} ${model} সেল প্রাইস ${formatINR(price)} (${percent}% ছাড়, আগে ${formatINR(list)}) EMI প্রায় ${formatINR(emi)}/মাস*। চূড়ান্ত শর্ত শোরুমে।\n${TPL.bn.sign}`
+        : `${greet} ${model} (${formatINR(price)} অন-রোড) EMI প্রায় ${formatINR(emi)}/মাস*। চূড়ান্ত শর্ত শোরুমে।\n${TPL.bn.sign}`,
     stock: ({ greet, model, stock }) =>
       `${greet} ${model} আমাদের চুনাখালি শোরুমে ${stock}। আজই ফ্রি টেস্ট রাইডে আসুন — প্রতিদিন সকাল ৯টা–রাত ৮:৩০।\n${TPL.bn.sign}`,
     ride: ({ greet, model, date, time }) =>
@@ -93,18 +111,22 @@ export function buildQuoteMessage({
   scooter,
   scooterName,
   settings,
+  offers,
   date,
   time,
   serviceKind,
 }) {
   const pack = TPL[lang] || TPL.en;
   const greet = pack.greet(firstName(name));
-  const priced = priceLine(scooter, settings);
+  const priced = priceLine(scooter, settings, offers);
   const model = priced?.name || scooterName || 'our electric scooters';
   const ctx = {
     greet,
     model,
     price: priced?.price || 0,
+    list: priced?.list || priced?.price || 0,
+    onSale: Boolean(priced?.onSale),
+    percent: priced?.percent || 0,
     emi: priced?.emi || 0,
     stock: priced?.stock || 'available',
     date,

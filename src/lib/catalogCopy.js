@@ -3,9 +3,9 @@
 import { formatINR } from '@/lib/utils';
 import {
   formatRangeRange,
-  getStartingPrice,
   getScooterVariants,
 } from '@/lib/scooterVariants';
+import { quoteStartingPrice } from '@/lib/salePrice';
 
 /** Editorial “best for” lines — not inventory fields. */
 export const BEST_FOR_BY_ID = {
@@ -17,16 +17,20 @@ export const BEST_FOR_BY_ID = {
 
 const FALLBACK_ORDER = ['activa', 'zoom', 'double-light', 'single-light'];
 
-export function catalogMinPrice(scooters = []) {
+function startingQuote(scooter, offers) {
+  return quoteStartingPrice(scooter, offers);
+}
+
+export function catalogMinPrice(scooters = [], offers) {
   const prices = (scooters || [])
-    .map((s) => getStartingPrice(s))
+    .map((s) => startingQuote(s, offers).sale)
     .filter((p) => Number.isFinite(p) && p > 0);
   if (!prices.length) return null;
   return Math.min(...prices);
 }
 
-export function formatCatalogFromPrice(scooters = []) {
-  const min = catalogMinPrice(scooters);
+export function formatCatalogFromPrice(scooters = [], offers) {
+  const min = catalogMinPrice(scooters, offers);
   return min != null ? formatINR(min) : null;
 }
 
@@ -34,11 +38,11 @@ export function formatCatalogFromPrice(scooters = []) {
  * Comparison rows for SEO / marketing tables from live scooters.
  * Sorted by starting price ascending.
  */
-export function buildComparisonRows(scooters = []) {
+export function buildComparisonRows(scooters = [], offers) {
   const list = [...(scooters || [])];
   list.sort((a, b) => {
-    const pa = getStartingPrice(a);
-    const pb = getStartingPrice(b);
+    const pa = startingQuote(a, offers).sale;
+    const pb = startingQuote(b, offers).sale;
     if (pa !== pb) return pa - pb;
     const ia = FALLBACK_ORDER.indexOf(a.id);
     const ib = FALLBACK_ORDER.indexOf(b.id);
@@ -46,13 +50,16 @@ export function buildComparisonRows(scooters = []) {
   });
 
   return list.map((s) => {
-    const starting = getStartingPrice(s);
+    const quote = startingQuote(s, offers);
     return {
       id: s.id,
       slug: s.id,
       model: s.name,
-      price: formatINR(starting),
-      priceValue: starting,
+      price: formatINR(quote.sale),
+      priceValue: quote.sale,
+      listPrice: quote.onSale ? formatINR(quote.list) : '',
+      onSale: quote.onSale,
+      salePercent: quote.onSale ? quote.percent : 0,
       range: formatRangeRange(s),
       topSpeed: s.topSpeed != null ? `${s.topSpeed} km/h` : '—',
       bestFor: BEST_FOR_BY_ID[s.id] || s.tagline || 'Daily rides',
@@ -62,8 +69,8 @@ export function buildComparisonRows(scooters = []) {
 }
 
 /** Soft price FAQ answer from live catalog. */
-export function buildPriceFaqAnswer(scooters = []) {
-  const rows = buildComparisonRows(scooters);
+export function buildPriceFaqAnswer(scooters = [], offers) {
+  const rows = buildComparisonRows(scooters, offers);
   if (!rows.length) {
     return 'At Biswajit Power Hub, electric scooter prices depend on model and battery pack. Ask for today’s starting price and EMI at our Berhampore showroom.';
   }
@@ -72,10 +79,10 @@ export function buildPriceFaqAnswer(scooters = []) {
   return `At Biswajit Power Hub, electric scooters start from ${from}. Current starting prices: ${parts}. EMI options are available — confirm today’s offer at the showroom.`;
 }
 
-export function buildSiteFaqs(baseFaqs = [], scooters = []) {
+export function buildSiteFaqs(baseFaqs = [], scooters = [], offers) {
   return (baseFaqs || []).map((faq) => {
     if (/price of electric scooters/i.test(faq.question || '')) {
-      return { ...faq, answer: buildPriceFaqAnswer(scooters) };
+      return { ...faq, answer: buildPriceFaqAnswer(scooters, offers) };
     }
     if (/range per full charge/i.test(faq.question || '')) {
       const ranges = (scooters || [])
@@ -92,9 +99,11 @@ export function buildSiteFaqs(baseFaqs = [], scooters = []) {
 }
 
 /** PDP / meta description with live starting price. */
-export function buildModelSeo(scooter, baseMeta = {}) {
+export function buildModelSeo(scooter, baseMeta = {}, offers) {
   if (!scooter) return baseMeta;
-  const price = formatINR(getStartingPrice(scooter));
+  const quote = startingQuote(scooter, offers);
+  const price = formatINR(quote.sale);
+  const saleNote = quote.onSale ? ` (${quote.percent}% off, was ${formatINR(quote.list)})` : '';
   const range = formatRangeRange(scooter);
   const packs = getScooterVariants(scooter);
   const packNote = packs.length > 1 ? ' Battery pack options available.' : '';
@@ -102,7 +111,7 @@ export function buildModelSeo(scooter, baseMeta = {}) {
     title:
       baseMeta.title ||
       `${scooter.name} Electric Scooter Berhampore — Price & Test Ride`,
-    description: `Buy ${scooter.name} at Biswajit Power Hub, Chunakhali, Berhampore.${scooter.noLicence ? ' No licence required.' : ''} From ${price}${range && range !== '—' ? ` · ${range}` : ''}.${packNote} Book test ride. Call 096355 05436.`,
+    description: `Buy ${scooter.name} at Biswajit Power Hub, Chunakhali, Berhampore.${scooter.noLicence ? ' No licence required.' : ''} From ${price}${saleNote}${range && range !== '—' ? ` · ${range}` : ''}.${packNote} Book test ride. Call 096355 05436.`,
     h1:
       baseMeta.h1 ||
       `${scooter.name} Electric Scooter in Berhampore — Price, Features & Test Ride`,

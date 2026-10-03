@@ -15,7 +15,6 @@ import { EMI_DISCLAIMER, EMI_DISCLAIMER_NOTE } from '@/config/finance';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { breadcrumbList } from '@/lib/schemaHelpers';
 import {
-  formatPriceRange,
   formatRangeRange,
   formatVariantSpec,
   getStartingPrice,
@@ -23,14 +22,16 @@ import {
 import { ShowroomCtaRow } from '@/components/seo/SeoLandingLayout';
 import { DealerPageHero } from '@/components/common/DealerPageHero';
 import { useLocale } from '@/context/LocaleContext';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { describePriceRange, quoteScooterPrice } from '@/lib/salePrice';
 
 const MAX_SLOTS = 3;
 const LABEL_W = '8.75rem';
 
-function compareRows(settings, t) {
+function compareRows(settings, t, offers) {
   return [
-    { label: t('cmp.price'), get: (s) => formatPriceRange(s, formatINR) },
-    { label: t('cmp.emi'), get: (s) => `${formatINR(emiFrom({ price: getStartingPrice(s), settings }))}/mo*` },
+    { label: t('cmp.price'), get: (s) => <ComparePrice scooter={s} offers={offers} /> },
+    { label: t('cmp.emi'), get: (s) => `${formatINR(emiFrom({ price: quoteScooterPrice(getStartingPrice(s), s.id, offers).sale, settings }))}/mo*` },
     { label: t('pdp.range'), get: (s) => formatRangeRange(s) },
     { label: t('pdp.topSpeed'), get: (s) => `${s.topSpeed} km/h` },
     { label: t('pdp.batteryCapacity'), get: (s) => formatVariantSpec(s, 'batteryCapacity') },
@@ -51,7 +52,19 @@ function stickyLabelClass(even) {
   );
 }
 
-function CompactSlot({ scooter, options, onChange, onRemove, canRemove }) {
+function ComparePrice({ scooter, offers }) {
+  const range = describePriceRange(scooter, offers);
+  if (!range.onSale) return range.sale.text;
+  return (
+    <span>
+      <span className="block font-extrabold text-red-600">{range.sale.text}</span>
+      <span className="block text-[11px] text-muted line-through">{range.list.text}</span>
+      <span className="block text-[10px] font-black uppercase tracking-wide text-red-600">{range.percent}% off</span>
+    </span>
+  );
+}
+
+function CompactSlot({ scooter, options, onChange, onRemove, canRemove, offers }) {
   return (
     <div className="relative flex min-w-[9.5rem] items-center gap-2 p-2 sm:min-w-[10.5rem] sm:p-2.5">
       <ScooterImage
@@ -75,7 +88,7 @@ function CompactSlot({ scooter, options, onChange, onRemove, canRemove }) {
           ))}
         </Select>
         <p className="mt-0.5 truncate text-[11px] font-bold text-heading sm:text-xs">
-          {formatPriceRange(scooter, formatINR)}
+          <ComparePrice scooter={scooter} offers={offers} />
         </p>
       </div>
       {canRemove && (
@@ -112,7 +125,7 @@ function CompactAddSlot({ options, onAdd, addLabel }) {
   );
 }
 
-function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, optionsFor, addLabel, modelsLabel, swipeHint }) {
+function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, optionsFor, addLabel, modelsLabel, swipeHint, offers }) {
   const showAdd = chosen.length < MAX_SLOTS && available.length > 0;
   const colCount = chosen.length + (showAdd ? 1 : 0);
   const gridCols = `${LABEL_W} repeat(${colCount}, minmax(9.5rem, 1fr))`;
@@ -152,6 +165,7 @@ function CompareGrid({ chosen, rows, available, onSwap, onRemove, onAdd, options
                 onChange={(id) => onSwap(s.id, id)}
                 onRemove={() => onRemove(s.id)}
                 canRemove={chosen.length > 1}
+                offers={offers}
               />
             </div>
           ))}
@@ -221,7 +235,8 @@ export default function Compare() {
   const { data: scooters, loading } = useAsync(() => getScooters(), []);
   const { settings } = useFinance();
   const { t } = useLocale();
-  const rows = useMemo(() => compareRows(settings, t), [settings, t]);
+  const { offers } = useSaleOffers();
+  const rows = useMemo(() => compareRows(settings, t, offers), [settings, t, offers]);
   const [selected, setSelected] = useState([]);
   const tracked = useRef(false);
 
@@ -329,6 +344,7 @@ export default function Compare() {
               addLabel={t('cmp.add')}
               modelsLabel={t('cmp.models')}
               swipeHint={t('cmp.swipe')}
+              offers={offers}
             />
             <p className="mt-4 text-xs text-muted">
               {EMI_DISCLAIMER} {EMI_DISCLAIMER_NOTE}

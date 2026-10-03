@@ -15,13 +15,16 @@ import {
   hasVariants,
 } from '@/lib/scooterVariants';
 import { useLocale } from '@/context/LocaleContext';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
 
 export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [], imageOverride }) {
   const { t } = useLocale();
   const { settings } = useFinance();
+  const { quote } = useSaleOffers();
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
-  const startingPrice = getStartingPrice(scooter);
-  const emi = emiFrom({ price: startingPrice, settings });
+  const priceQuote = quote(getStartingPrice(scooter), scooter.id);
+  const emi = emiFrom({ price: priceQuote.sale, settings });
   const packNames = hasVariants(scooter) ? formatVariantNames(scooter, ' & ') : null;
   const extraBadges = [
     ...popularityTags,
@@ -60,6 +63,7 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
             </Badge>
           ))}
         </div>
+        {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} /> : null}
       </Link>
 
       <div className="flex flex-1 flex-col border-b border-line pb-5 pt-4">
@@ -79,8 +83,8 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-5">
           <div>
-            <p className="text-xs font-medium text-muted">{t('card.starting')}</p>
-            <p className="font-display text-2xl font-extrabold text-heading">{formatINR(startingPrice)}</p>
+            <p className="text-xs font-medium text-muted">{priceQuote.onSale ? t('card.salePrice') : t('card.starting')}</p>
+            <SalePriceStack quote={priceQuote} size="md" caption={false} />
             {packNames && (
               <p className="mt-0.5 text-xs text-muted">{packNames}</p>
             )}

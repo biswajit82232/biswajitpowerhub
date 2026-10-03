@@ -21,10 +21,11 @@ export function HeroCarousel({ heroImageUrl }) {
   const { data: offers, loading: offersLoading } = useAsync(() => getActiveOffers(), []);
 
   const heroOffers = (offers || []).filter((o) => o.showOnHero !== false);
-  const promoOffers = heroOffers.filter((o) => o.kind !== 'free_with_purchase');
+  const saleOffers = heroOffers.filter((o) => o.kind === 'scooter_sale');
+  const promoOffers = heroOffers.filter((o) => o.kind === 'promo');
   const freeOffers = heroOffers.filter((o) => o.kind === 'free_with_purchase');
-  // Sticker is free-with-purchase only — never duplicate the promo bar.
-  const stickerOffer = freeOffers[0] || null;
+  // Big sticker: percent-off sale first, otherwise the free-gift badge.
+  const stickerOffer = saleOffers[0] || freeOffers[0] || null;
 
   const slides = [];
 

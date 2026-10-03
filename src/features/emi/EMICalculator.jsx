@@ -14,6 +14,7 @@ import {
   getStartingPrice,
 } from '@/lib/scooterVariants';
 import { useLocale } from '@/context/LocaleContext';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 
 function Amount({ value, className }) {
   const display = useCountUp(value, { active: true, duration: 600 });
@@ -27,6 +28,7 @@ function Amount({ value, className }) {
  */
 export function EMICalculator({ price: priceProp, settings, scooterId: scooterIdProp, scooters }) {
   const { t } = useLocale();
+  const { quote } = useSaleOffers();
   const showPicker = Array.isArray(scooters) && scooters.length > 0;
   const tenureOptions = settings?.tenureOptions || [6, 12, 18, 24, 36];
   const [downPct, setDownPct] = useState(settings?.downPaymentPct ?? 20);
@@ -70,11 +72,12 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
     [scooter, variantId]
   );
 
-  const price = showPicker
+  const listPrice = showPicker
     ? (selected?.price ?? getStartingPrice(scooter) ?? 0)
     : (priceProp ?? 0);
-
   const trackScooterId = showPicker ? scooterId : scooterIdProp;
+  const priced = quote(listPrice, trackScooterId);
+  const price = priced.sale;
 
   const downPayment = Math.round((price * downPct) / 100);
 
@@ -138,7 +141,7 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
                 >
                   {variants.map((v) => (
                     <option key={v.id} value={v.id}>
-                      {v.name} · {formatINR(v.price)}
+                      {v.name} · {formatINR(quote(v.price, scooter.id).sale)}
                     </option>
                   ))}
                 </Select>
@@ -149,9 +152,17 @@ export function EMICalculator({ price: priceProp, settings, scooterId: scooterId
 
         <div>
           <div className="mb-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-sm font-semibold text-heading">
-            <span>{t('fin.vehicle')}</span>
-            <span className="break-words text-brand-600">{formatINR(price)}</span>
+            <span>{priced.onSale ? t('card.salePrice') : t('fin.vehicle')}</span>
+            <span className={`break-words ${priced.onSale ? 'text-red-600' : 'text-brand-600'}`}>
+              {formatINR(price)}
+              {priced.onSale ? (
+                <span className="ml-2 text-xs font-medium text-muted line-through">{formatINR(priced.list)}</span>
+              ) : null}
+            </span>
           </div>
+          {priced.onSale ? (
+            <p className="text-xs font-bold text-red-600">{t('card.percentOff', { pct: priced.percent })}</p>
+          ) : null}
           {showPicker && selected && (
             <p className="text-xs text-muted">
               {selected.name}

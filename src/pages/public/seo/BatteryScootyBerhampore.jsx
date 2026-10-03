@@ -8,6 +8,7 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { SCOOTERS } from '@/data/scooters';
 import { formatCatalogFromPrice } from '@/lib/catalogCopy';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 
 const path = '/battery-scooty-berhampore';
 
@@ -47,7 +48,8 @@ const BATTERY_SCOOTY_FAQS = [
 export default function BatteryScootyBerhampore() {
   const priority = getPriorityLocations();
   const { data: scooters } = useAsync(() => getScooters(), []);
-  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS);
+  const { offers: saleOffers } = useSaleOffers();
+  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS, saleOffers);
 
   const jsonLd = useMemo(
     () => [
