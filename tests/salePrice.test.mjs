@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  bestDealScooterId,
   describePriceRange,
   isScooterSale,
   normalizeSalePercent,
@@ -8,6 +9,7 @@ import {
   quoteStartingPrice,
   roundSalePrice,
   saleForScooter,
+  smartSalePrice,
 } from '../src/lib/salePrice.js';
 
 const activa = {
@@ -47,8 +49,29 @@ test('quotes list price when the scooter is not on sale', () => {
   assert.equal(quote.saved, 0);
 });
 
+test('smart prices stay at or below the percent and land on a showroom ending', () => {
+  assert.equal(roundSalePrice(45999, 10), 41399);
+  assert.equal(smartSalePrice(45999, 10), 40999);
+  assert.equal(smartSalePrice(42999, 10), 38499);
+  assert.equal(smartSalePrice(57999, 10), 51999);
+
+  const quote = quotePrice(45999, sale({ scooterIds: ['activa'] }));
+  assert.equal(quote.sale, 40999);
+  assert.equal(quote.exact, 41399);
+  assert.equal(quote.extraSaved, 400);
+  assert.ok(quote.sale <= quote.exact);
+  assert.equal(quote.percent, 10);
+  assert.ok(quote.effectivePercent >= 10);
+});
+
+test('exact technique does not add a charm discount', () => {
+  const quote = quotePrice(45999, sale({ priceTechnique: 'exact' }));
+  assert.equal(quote.sale, 41399);
+  assert.equal(quote.extraSaved, 0);
+});
+
 test('applies the sale to the starting pack and every variant', () => {
-  const offers = [sale()];
+  const offers = [sale({ priceTechnique: 'exact' })];
   const start = quoteStartingPrice(activa, offers);
   assert.equal(start.list, 45000);
   assert.equal(start.sale, 40500);
@@ -70,9 +93,20 @@ test('highest active percent wins when two sales include the same scooter', () =
   ];
   const winner = saleForScooter('activa', offers);
   assert.equal(winner.id, 'high');
-  assert.equal(quotePrice(45000, winner).sale, 38250);
+  assert.equal(quotePrice(45000, { ...winner, priceTechnique: 'exact' }).sale, 38250);
   assert.equal(saleForScooter('zoom', offers).id, 'high');
   assert.equal(saleForScooter('single-light', offers), null);
+});
+
+test('best deal is the in-stock model that saves the most rupees', () => {
+  const offers = [sale({ scooterIds: ['activa', 'zoom'], priceTechnique: 'exact' })];
+  const scooters = [
+    { id: 'activa', stock: 'in_stock', price: 45000, variants: [] },
+    { id: 'zoom', stock: 'in_stock', price: 60000, variants: [] },
+    { id: 'gone', stock: 'out_of_stock', price: 90000, variants: [] },
+  ];
+  assert.equal(bestDealScooterId(scooters, offers), 'zoom');
+  assert.equal(bestDealScooterId(scooters.slice(0, 1), offers), null);
 });
 
 test('ignores a sale with no scooters or a bad percent', () => {

@@ -15,7 +15,7 @@ import { deleteOffer, getAllOffers, saveOffer, uploadOfferImage } from '@/featur
 import { getScooters } from '@/features/scooters/scooterService';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useSaleOffers } from '@/context/SaleOffersContext';
-import { normalizeSalePercent, roundSalePrice, SCOOTER_SALE_KIND } from '@/lib/salePrice';
+import { normalizePriceTechnique, normalizeSalePercent, quotePrice, SCOOTER_SALE_KIND, SMART_TECHNIQUE, EXACT_TECHNIQUE } from '@/lib/salePrice';
 import { getStartingPrice } from '@/lib/scooterVariants';
 import { formatINR } from '@/lib/utils';
 
@@ -29,6 +29,7 @@ const EMPTY = {
   showOnHero: true,
   discountPercent: 10,
   scooterIds: [],
+  priceTechnique: SMART_TECHNIQUE,
   active: true,
   sortOrder: 0,
 };
@@ -85,7 +86,13 @@ export default function Offers() {
       return;
     }
     const payload = isSaleDraft
-      ? { ...form, discountPercent: salePercent, discountText: `${salePercent}% OFF`, promoCode: '' }
+      ? {
+          ...form,
+          discountPercent: salePercent,
+          discountText: `${salePercent}% OFF`,
+          promoCode: '',
+          priceTechnique: normalizePriceTechnique(form.priceTechnique),
+        }
       : form;
     setSaving(true);
     try {
@@ -265,7 +272,7 @@ export default function Offers() {
                     label="Percent off"
                     htmlFor="offer-percent"
                     required
-                    hint="Applied to every battery pack of the scooters you select. 1–90."
+                    hint="Minimum off every battery pack. The website, EMI, compare, and WhatsApp update on their own."
                     className="sm:max-w-xs"
                   >
                     <Input
@@ -305,16 +312,74 @@ export default function Offers() {
                 </Field>
                 )}
                 {isSale ? (
+                  <Field label="Price technique" htmlFor="offer-technique" className="sm:col-span-2">
+                    <Select
+                      id="offer-technique"
+                      value={normalizePriceTechnique(form.priceTechnique)}
+                      onChange={(e) => set('priceTechnique', e.target.value)}
+                    >
+                      <option value={SMART_TECHNIQUE}>Smart showroom price (recommended)</option>
+                      <option value={EXACT_TECHNIQUE}>Exact percent</option>
+                    </Select>
+                    <p className="mt-1 text-xs text-muted">
+                      Smart keeps at least this percent off, then steps the price down to a …999 or …499 sticker. Exact uses the percent with no extra rounding.
+                    </p>
+                  </Field>
+                ) : null}
+                {isSale ? (
                   <div className="sm:col-span-2">
                     <p className="text-sm font-semibold text-heading">Scooters on this sale</p>
                     <p className="mt-1 text-xs text-muted">
-                      Only these models show the Sale mark and sale price. Other models stay at list price.
+                      Tick models, or apply a group. Unticked models stay at list price. The model that saves the most rupees is marked Best deal automatically.
                     </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {[
+                        ['all', 'All models'],
+                        ['stock', 'In stock'],
+                        ['budget', 'Budget'],
+                        ['premium', 'Premium'],
+                      ].map(([mode, label]) => (
+                        <button
+                          key={mode}
+                          type="button"
+                          className="rounded-full bg-surface px-3 py-1.5 text-xs font-bold text-heading ring-1 ring-line hover:bg-red-50"
+                          onClick={() => {
+                            const ids = catalog
+                              .filter((scooter) => {
+                                if (mode === 'stock') return scooter.stock !== 'out_of_stock';
+                                if (mode === 'budget') return scooter.isBudget;
+                                if (mode === 'premium') return scooter.isPremium;
+                                return true;
+                              })
+                              .map((scooter) => scooter.id);
+                            set('scooterIds', ids);
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        className="rounded-full px-3 py-1.5 text-xs font-bold text-muted hover:text-heading"
+                        onClick={() => set('scooterIds', [])}
+                      >
+                        Clear
+                      </button>
+                    </div>
                     <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                       {catalog.map((scooter) => {
                         const checked = (form.scooterIds || []).includes(scooter.id);
                         const list = getStartingPrice(scooter);
-                        const salePrice = salePercent ? roundSalePrice(list, salePercent) : list;
+                        const preview = salePercent
+                          ? quotePrice(list, {
+                              kind: SCOOTER_SALE_KIND,
+                              active: true,
+                              discountPercent: salePercent,
+                              priceTechnique: form.priceTechnique,
+                              scooterIds: [scooter.id],
+                            })
+                          : null;
+                        const salePrice = preview?.onSale ? preview.sale : list;
                         const clash = otherSales.some((offer) => (offer.scooterIds || []).includes(scooter.id));
                         return (
                           <li key={scooter.id}>
@@ -345,6 +410,11 @@ export default function Offers() {
                                 <span className="block font-display text-lg font-extrabold text-red-600">
                                   {salePercent ? formatINR(salePrice) : 'Enter a percent'}
                                 </span>
+                                {preview?.onSale && preview.extraSaved > 0 ? (
+                                  <span className="mt-0.5 block text-[11px] font-medium text-emerald-700">
+                                    Smart sticker, {formatINR(preview.extraSaved)} under the exact {salePercent}%
+                                  </span>
+                                ) : null}
                                 {clash && checked ? (
                                   <span className="mt-1 block text-[11px] font-medium text-amber-700">
                                     Also on another active sale — the bigger discount is shown.

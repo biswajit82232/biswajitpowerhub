@@ -52,6 +52,7 @@ Or run each file manually in the **Supabase SQL editor** (skip any already appli
 | 28 | `add_lead_attribution.sql` | UTM / gclid / channel JSON on leads + inbox rows; `upsert_lead` first-touch attribution |
 | 29 | `repair_rls_after_replay.sql` | Drop leftover `USING (true)` policies recreated by replaying 19–21 after hardening; require `visitor_id` on public form inserts |
 | 30 | `add_scooter_sale_offer.sql` | Percent-off sale on selected scooters (`discount_percent`, `scooter_ids`, kind `scooter_sale`) |
+| 31 | `add_sale_price_technique.sql` | Smart showroom price vs exact percent (`price_technique`) |
 
 All migrations are idempotent (`if not exists` / `on conflict`) — safe to re-run.
 

@@ -21,7 +21,7 @@ import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
 export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [], imageOverride }) {
   const { t } = useLocale();
   const { settings } = useFinance();
-  const { quote } = useSaleOffers();
+  const { quote, isBestDeal } = useSaleOffers();
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
   const priceQuote = quote(getStartingPrice(scooter), scooter.id);
   const emi = emiFrom({ price: priceQuote.sale, settings });
@@ -57,6 +57,9 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
         <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
           {scooter.noLicence && <Badge tone="success">{t('card.noLicence')}*</Badge>}
           <Badge tone={stock.tone}>{t(`stock.${scooter.stock}`)}</Badge>
+          {priceQuote.onSale && isBestDeal(scooter.id) ? (
+            <Badge tone="hot">{t('card.bestDeal')}</Badge>
+          ) : null}
           {extraBadges.slice(0, 1).map((b) => (
             <Badge key={b.label} tone={b.tone}>
               {b.label}

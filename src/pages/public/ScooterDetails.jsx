@@ -78,7 +78,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   const { data: scooter, loading } = useAsync(() => getScooterById(id), [id]);
   const { data: reviews } = useAsync(() => getApprovedReviews(), []);
   const { settings } = useFinance();
-  const { offers: saleOffers, quote } = useSaleOffers();
+  const { offers: saleOffers, quote, isBestDeal } = useSaleOffers();
   const { data: insights } = useAsync(async () => {
     const all = await getScooters();
     return getScooterInsights(all);
@@ -210,6 +210,9 @@ function ScooterDetailsPage({ id, initialVariantId }) {
               {valueBadges.map((b) => (
                 <Badge key={b.id} tone={b.tone}>{b.emoji} {b.label}</Badge>
               ))}
+              {priceQuote.onSale && isBestDeal(scooter.id) ? (
+                <Badge tone="hot">{t('card.bestDeal')}</Badge>
+              ) : null}
             </div>
             <h1 className="mt-4 break-words font-display text-display-md font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
               {detailSeo.h1 || `${scooter.name} Electric Scooter in Berhampore — Price, Features & Test Ride`}

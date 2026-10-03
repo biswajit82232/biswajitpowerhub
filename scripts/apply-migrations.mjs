@@ -48,6 +48,7 @@ const ORDER = [
   'add_lead_attribution.sql',
   'repair_rls_after_replay.sql',
   'add_scooter_sale_offer.sql',
+  'add_sale_price_technique.sql',
 ];
 
 function getDatabaseUrl(env) {

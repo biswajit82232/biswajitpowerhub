@@ -3,10 +3,10 @@ import { fetchWithCache, clearCache } from '@/lib/cache';
 import { getFinanceSettings } from '@/features/finance/financeService';
 import { compressForUpload } from '@/lib/resizeImage';
 import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
-import { normalizeSalePercent, parseScooterIds, SCOOTER_SALE_KIND } from '@/lib/salePrice';
+import { normalizePriceTechnique, normalizeSalePercent, parseScooterIds, SCOOTER_SALE_KIND } from '@/lib/salePrice';
 
-const CACHE_KEY = 'promotional_offers_v4';
-const LEGACY_CACHE_KEY = 'promotional_offers_v3';
+const CACHE_KEY = 'promotional_offers_v5';
+const LEGACY_CACHE_KEY = 'promotional_offers_v4';
 const LOCAL_KEY = 'bph_promotional_offers';
 
 function bustOfferCache() {
@@ -41,6 +41,7 @@ function mapRow(row) {
     showOnHero: (row.show_on_hero ?? row.showOnHero) !== false,
     discountPercent,
     scooterIds,
+    priceTechnique: kind === SCOOTER_SALE_KIND ? normalizePriceTechnique(row.price_technique ?? row.priceTechnique) : null,
     active: Boolean(row.active),
     sortOrder: row.sort_order ?? row.sortOrder ?? 0,
     createdAt: row.created_at || row.createdAt,
@@ -62,6 +63,7 @@ function toRow(offer) {
     show_on_hero: offer.showOnHero !== false,
     discount_percent: discountPercent,
     scooter_ids: scooterIds,
+    price_technique: kind === SCOOTER_SALE_KIND ? normalizePriceTechnique(offer.priceTechnique) : null,
     active: Boolean(offer.active),
     sort_order: Number(offer.sortOrder) || 0,
     updated_at: new Date().toISOString(),
@@ -72,12 +74,8 @@ function withoutSaleColumns(payload) {
   const next = { ...payload };
   delete next.discount_percent;
   delete next.scooter_ids;
+  delete next.price_technique;
   return next;
-}
-
-function isMissingSaleColumns(error) {
-  const msg = error?.message || '';
-  return error?.code === 'PGRST204' || error?.code === '42703' || /discount_percent|scooter_ids/i.test(msg);
 }
 
 function saleMigrationError() {
@@ -254,13 +252,24 @@ async function writeOfferRow(payload, id) {
     return withTimeout(query, MUTATION_TIMEOUT_MS, 'Offer save timed out');
   };
 
-  let { data, error } = await run(payload);
-  if (error && isMissingSaleColumns(error)) {
-    if (payload.kind === SCOOTER_SALE_KIND) throw saleMigrationError();
-    ({ data, error } = await run(withoutSaleColumns(payload)));
+  let row = { ...payload };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { data, error } = await run(row);
+    if (!error) return mapRow(data);
+    const msg = error?.message || '';
+    if (/price_technique/i.test(msg) && Object.prototype.hasOwnProperty.call(row, 'price_technique')) {
+      delete row.price_technique;
+      row = { ...row };
+      continue;
+    }
+    if (/discount_percent|scooter_ids/i.test(msg)) {
+      if (payload.kind === SCOOTER_SALE_KIND) throw saleMigrationError();
+      row = withoutSaleColumns(row);
+      continue;
+    }
+    throw error;
   }
-  if (error) throw error;
-  return mapRow(data);
+  throw new Error('Offer save failed');
 }
 
 export async function saveOffer(offer) {
