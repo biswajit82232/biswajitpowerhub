@@ -172,6 +172,81 @@ function SaleModelPrices({ offer }) {
   );
 }
 
+function OfferBanner({ offer, site, onOpen }) {
+  const { t } = useLocale();
+  const look = offerLook(offer, t);
+  const headline = offerHeadline(offer, t);
+  const support = offerSupport(offer);
+  const waMsg = offerWhatsappMessage(offer, site);
+  const img = offerImage(offer.imageUrl, 96);
+  const Icon = look.Icon;
+
+  return (
+    <div className={cn('relative flex min-h-[4.75rem] items-stretch overflow-hidden text-white sm:rounded-2xl sm:shadow-soft', look.card)}>
+      <span
+        className="pointer-events-none absolute inset-y-0 right-0 w-[4.75rem] bg-black/15 lg:hidden"
+        aria-hidden
+      />
+      <button
+        type="button"
+        onClick={() => onOpen(offer)}
+        className="flex min-w-0 flex-1 items-center gap-3 py-3 pl-4 pr-2 text-left sm:pl-5"
+        aria-label={`View details: ${headline}${support ? ` — ${support}` : ''}`}
+      >
+        {img ? (
+          <img
+            src={img}
+            alt=""
+            width={48}
+            height={48}
+            className="h-12 w-12 shrink-0 rounded-xl object-cover ring-2 ring-white/40"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/15">
+            <Icon className="h-6 w-6" aria-hidden />
+          </span>
+        )}
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-1.5">
+            <span className="truncate text-[10px] font-black uppercase tracking-[0.12em] text-white/80">
+              {look.isFree ? t('off.freeChip') : look.eyebrow}
+            </span>
+            {offer.promoCode ? (
+              <span className={cn('max-w-[7rem] shrink-0 truncate rounded-full px-2 py-0.5 text-[10px] font-black uppercase', look.chipClass)}>
+                {offer.promoCode}
+              </span>
+            ) : null}
+          </span>
+          <span className="mt-0.5 line-clamp-2 block font-display text-base font-black leading-tight sm:text-lg">
+            {headline}
+          </span>
+          {support ? (
+            <span className="mt-0.5 line-clamp-1 block text-xs font-semibold text-white/90">{support}</span>
+          ) : null}
+        </span>
+      </button>
+      <a
+        href={whatsappUrl(waMsg, site)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="my-auto mr-[4.75rem] inline-flex h-9 shrink-0 items-center gap-1 rounded-full bg-white px-3 text-[11px] font-black uppercase tracking-wide text-navy shadow-sm lg:mr-4"
+        onClick={() =>
+          trackEvent(EVENT.WHATSAPP_CLICK, {
+            from: 'promo-banner',
+            offerId: offer.id,
+            kind: offer.kind,
+          })
+        }
+      >
+        <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+        {look.isFree ? t('off.ask') : t('off.claim')}
+      </a>
+    </div>
+  );
+}
+
 function OfferStrip({ offer, site, onOpen }) {
   const { t } = useLocale();
   const [copied, setCopied] = useState(false);
@@ -333,9 +408,9 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
   if (loading) {
     if (compact) {
       return (
-        <Section id="offers" tight className="py-3 sm:py-6">
-          <div className="min-h-[9.5rem] rounded-xl bg-surface-alt/80 ring-1 ring-line sm:min-h-[10.5rem]" aria-hidden />
-        </Section>
+        <section id="offers" className="py-3" aria-hidden>
+          <div className="h-[4.75rem] bg-surface-alt sm:mx-auto sm:h-20 sm:max-w-content sm:rounded-2xl" />
+        </section>
       );
     }
     return (
@@ -361,24 +436,40 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
     );
   }
 
+  if (compact) {
+    return (
+      <section id="offers" className="scroll-mt-[var(--header-offset)] bg-white py-3 sm:py-5">
+        <div className="container-px">
+          <h2 className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-navy">
+            {t('off.active')}
+          </h2>
+        </div>
+        <div className="flex flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-content sm:gap-3 sm:px-6 lg:px-8">
+          {visibleOffers.map((offer) => (
+            <OfferBanner key={offer.id} offer={offer} site={site} onOpen={openOffer} />
+          ))}
+        </div>
+        <OfferDetailsModal
+          offer={selected}
+          site={site}
+          open={!!selected}
+          onClose={closeOffer}
+        />
+      </section>
+    );
+  }
+
   return (
-    <Section id="offers" tight={compact} className={compact ? 'scroll-mt-[var(--header-offset)] py-3 sm:py-6' : 'scroll-mt-[var(--header-offset)] py-5 sm:py-10'}>
-      <h2 className={compact
-        ? 'mb-3 text-xs font-black uppercase tracking-[0.16em] text-navy'
-        : 'dealer-section-title mb-3 !text-left text-lg sm:mb-8 sm:text-inherit'}
-      >
+    <Section id="offers" className="scroll-mt-[var(--header-offset)] py-5 sm:py-10">
+      <h2 className="dealer-section-title mb-3 !text-left text-lg sm:mb-8 sm:text-inherit">
         {t('off.active')}
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {visibleOffers.map((offer, i) =>
-          compact ? (
-            <OfferStrip key={offer.id} offer={offer} site={site} onOpen={openOffer} />
-          ) : (
-            <Reveal key={offer.id} delay={i * 0.04}>
-              <OfferStrip offer={offer} site={site} onOpen={openOffer} />
-            </Reveal>
-          ),
-        )}
+        {visibleOffers.map((offer, i) => (
+          <Reveal key={offer.id} delay={i * 0.04}>
+            <OfferStrip offer={offer} site={site} onOpen={openOffer} />
+          </Reveal>
+        ))}
       </div>
 
       <OfferDetailsModal
