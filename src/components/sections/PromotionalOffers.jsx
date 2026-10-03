@@ -1,4 +1,4 @@
-import { Gift, Tag, Copy, Check, MessageCircle, Phone } from 'lucide-react';
+import { Gift, Tag, Copy, Check, MessageCircle, Phone, Percent } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Section } from '@/components/common/Section';
@@ -9,11 +9,13 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useAsync } from '@/hooks/useAsync';
 import { getActiveOffers } from '@/features/offers/offerService';
+import { getScooters } from '@/features/scooters/scooterService';
+import { quoteStartingPrice } from '@/lib/salePrice';
 import { telUrl, whatsappUrl } from '@/config/site';
 import { useSite } from '@/context/SiteSettingsContext';
 import { trackEvent, EVENT } from '@/lib/tracking';
 import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
-import { cn } from '@/lib/utils';
+import { cn, formatINR } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
 
 function offerImage(url, size = 96) {
@@ -25,6 +27,9 @@ function offerImage(url, size = 96) {
 
 function offerWhatsappMessage(offer, site) {
   const isFree = offer.kind === 'free_with_purchase';
+  if (offer.kind === 'scooter_sale') {
+    return `Hi ${site.name}, I want the ${offer.discountPercent}% off sale (${offer.title || offer.discountText}) on the selected scooters. Please confirm today's sale price.`;
+  }
   if (isFree) {
     return `Hi ${site.name}, I'd like the free gift "${offer.title}" (${offer.discountText}) with my scooter purchase.`;
   }
@@ -40,6 +45,7 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
   if (!offer) return null;
 
   const isFree = offer.kind === 'free_with_purchase';
+  const isSale = offer.kind === 'scooter_sale';
   const img = offerImage(offer.imageUrl, 640);
   const waMsg = offerWhatsappMessage(offer, site);
 
@@ -65,6 +71,10 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
             loading="lazy"
             decoding="async"
           />
+        ) : isSale ? (
+          <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-red-600 text-white">
+            <Percent className="h-9 w-9" />
+          </span>
         ) : isFree ? (
           <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-red-600 text-white">
             <Gift className="h-9 w-9" />
@@ -72,7 +82,11 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
         ) : null}
 
         <div className="text-center">
-          {isFree ? (
+          {isSale ? (
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-red-700">
+              Sale on selected scooters
+            </p>
+          ) : isFree ? (
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-red-700">
               {t('off.freeGift')}
             </p>
@@ -91,6 +105,8 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
             <p className="mt-3 text-sm leading-relaxed text-body">{offer.description}</p>
           ) : null}
         </div>
+
+        {isSale ? <SaleModelPrices offer={offer} /> : null}
 
         {offer.promoCode ? (
           <button
@@ -136,9 +152,33 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
   );
 }
 
+function SaleModelPrices({ offer }) {
+  const { data: scooters } = useAsync(() => getScooters(), []);
+  const ids = new Set(offer.scooterIds || []);
+  const selected = (scooters || []).filter((scooter) => ids.has(String(scooter.id)));
+  if (!selected.length) return null;
+  return (
+    <ul className="space-y-2 text-left">
+      {selected.map((scooter) => {
+        const quote = quoteStartingPrice(scooter, [offer]);
+        return (
+          <li key={scooter.id} className="flex items-center justify-between gap-3 rounded-xl bg-red-50 px-3 py-2 ring-1 ring-red-100">
+            <span className="font-semibold text-heading">{scooter.name}</span>
+            <span className="text-right">
+              <span className="block text-xs text-muted line-through">{formatINR(quote.list)}</span>
+              <span className="block font-display text-lg font-extrabold text-red-600">{formatINR(quote.sale)}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 function OfferStrip({ offer, site, onOpen }) {
   const [copied, setCopied] = useState(false);
   const isFree = offer.kind === 'free_with_purchase';
+  const isSale = offer.kind === 'scooter_sale';
   const waMsg = offerWhatsappMessage(offer, site);
   const img = offerImage(offer.imageUrl, 96);
 
@@ -157,7 +197,7 @@ function OfferStrip({ offer, site, onOpen }) {
     <div
       className={cn(
         'overflow-hidden rounded-xl shadow-soft sm:rounded-2xl',
-        isFree
+        isSale || isFree
           ? 'border border-red-200 bg-red-50/70'
           : 'border border-line bg-white',
       )}
@@ -181,6 +221,11 @@ function OfferStrip({ offer, site, onOpen }) {
             loading="lazy"
             decoding="async"
           />
+        ) : isSale ? (
+          <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-red-600 text-white sm:h-14 sm:w-14">
+            <span className="font-display text-[10px] font-black uppercase tracking-widest leading-none">Sale</span>
+            <span className="font-display text-sm font-black leading-none">{offer.discountPercent}%</span>
+          </span>
         ) : isFree ? (
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white sm:h-14 sm:w-14">
             <Gift className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -195,10 +240,10 @@ function OfferStrip({ offer, site, onOpen }) {
           <span
             className={cn(
               'block text-[9px] font-black uppercase tracking-[0.14em] sm:text-[10px] sm:tracking-[0.16em]',
-              isFree ? 'text-red-700' : 'text-brand-600',
+              isSale || isFree ? 'text-red-700' : 'text-brand-600',
             )}
           >
-            {isFree ? 'Free with scooty purchase' : 'Special offer'}
+            {isSale ? 'Sale on selected scooters' : isFree ? 'Free with scooty purchase' : 'Special offer'}
           </span>
           <span className="mt-0.5 block font-display text-[15px] font-black leading-snug tracking-tight text-navy sm:text-xl">
             {offer.discountText}
@@ -219,7 +264,7 @@ function OfferStrip({ offer, site, onOpen }) {
       <div
         className={cn(
           'flex flex-wrap items-center gap-2 border-t px-3 py-2.5 sm:gap-2.5 sm:px-4',
-          isFree ? 'border-red-100 bg-red-50/80' : 'border-line bg-surface-alt/60',
+          isSale || isFree ? 'border-red-100 bg-red-50/80' : 'border-line bg-surface-alt/60',
         )}
       >
         {offer.promoCode ? (
@@ -247,7 +292,7 @@ function OfferStrip({ offer, site, onOpen }) {
 
         <Button
           href={whatsappUrl(waMsg, site)}
-          variant={isFree ? 'dealerPrimary' : 'whatsapp'}
+          variant={isFree || isSale ? 'dealerPrimary' : 'whatsapp'}
           size="sm"
           icon={MessageCircle}
           className="ml-auto h-9 !px-3 text-[11px] sm:h-10 sm:!px-3.5 sm:text-xs"
@@ -259,7 +304,7 @@ function OfferStrip({ offer, site, onOpen }) {
             })
           }
         >
-          {isFree ? 'Ask' : 'Claim'}
+          {isSale ? 'Ask price' : isFree ? 'Ask' : 'Claim'}
         </Button>
       </div>
     </div>
@@ -280,7 +325,11 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
 
   // Home already shows freebies as the hero sticky — skip the duplicate strip there.
   const visibleOffers = compact
-    ? (offers || []).filter((o) => o.kind !== 'free_with_purchase')
+    ? (offers || []).filter((o) => {
+        if (o.kind === 'free_with_purchase') return false;
+        if (o.kind === 'scooter_sale' && o.showOnHero !== false) return false;
+        return true;
+      })
     : offers || [];
 
   const openOffer = (offer) => {

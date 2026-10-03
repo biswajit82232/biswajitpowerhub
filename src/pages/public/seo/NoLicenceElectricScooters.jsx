@@ -14,7 +14,8 @@ import {
   formatCatalogFromPrice,
 } from '@/lib/catalogCopy';
 import { formatINR } from '@/lib/utils';
-import { getStartingPrice } from '@/lib/scooterVariants';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { quoteStartingPrice } from '@/lib/salePrice';
 
 export default function NoLicenceElectricScooters() {
   const path = '/no-licence-electric-scooters-west-bengal';
@@ -24,9 +25,10 @@ export default function NoLicenceElectricScooters() {
     () => list.filter((s) => s.noLicence),
     [list],
   );
+  const { offers: saleOffers } = useSaleOffers();
   const models = noLicence.length ? noLicence : list;
-  const fromPrice = formatCatalogFromPrice(models);
-  const faqs = useMemo(() => buildSiteFaqs(SITE_FAQS, list), [list]);
+  const fromPrice = formatCatalogFromPrice(models, saleOffers);
+  const faqs = useMemo(() => buildSiteFaqs(SITE_FAQS, list, saleOffers), [list, saleOffers]);
 
   const jsonLd = useMemo(
     () => [
@@ -86,7 +88,12 @@ export default function NoLicenceElectricScooters() {
             {' — '}
             {BEST_FOR_BY_ID[s.id] || s.tagline || 'Daily rides'}
             {' · from '}
-            {formatINR(getStartingPrice(s))}
+            {(() => {
+              const quote = quoteStartingPrice(s, saleOffers);
+              return quote.onSale
+                ? `${formatINR(quote.sale)} (${quote.percent}% off)`
+                : formatINR(quote.sale);
+            })()}
           </li>
         ))}
       </ul>

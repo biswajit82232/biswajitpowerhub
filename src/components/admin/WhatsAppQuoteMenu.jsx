@@ -3,6 +3,7 @@ import { ChevronDown, MessageCircle } from 'lucide-react';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { useFinance } from '@/context/FinanceSettingsContext';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 import { cn } from '@/lib/utils';
 import {
   WA_TPL_LANG_KEY,
@@ -36,6 +37,7 @@ export function WhatsAppQuoteMenu({
   onOpen,
 }) {
   const { settings } = useFinance();
+  const { offers } = useSaleOffers();
   const { data: scooters } = useAsync(() => getScooters(), []);
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState(readTplLang);
@@ -73,6 +75,7 @@ export function WhatsAppQuoteMenu({
         scooter: matched,
         scooterName: matched?.name || scooterName,
         settings,
+        offers,
         date,
         time,
         serviceKind,

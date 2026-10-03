@@ -6,6 +6,8 @@ import { getScooters } from '@/features/scooters/scooterService';
 import { SCOOTERS } from '@/data/scooters';
 import { getStartingPrice } from '@/lib/scooterVariants';
 import { formatINR } from '@/lib/utils';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { SaleRibbon } from '@/components/common/SaleMark';
 import { whatsappCatalogUrl } from '@/lib/whatsappLinks';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
@@ -24,6 +26,7 @@ export function WhatsAppCatalog() {
   const { site } = useSite();
   const { t } = useLocale();
   const { photos } = useSitePhotos();
+  const { quote } = useSaleOffers();
   const catalogUrl = whatsappCatalogUrl(site);
   const { data: remote } = useAsync(() => getScooters(), []);
   const scooters = (remote?.length ? remote : SCOOTERS).slice(0, 4);
@@ -62,7 +65,8 @@ export function WhatsAppCatalog() {
           <ul className="-mx-4 mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
             {scooters.map((scooter) => {
               const img = photos?.models?.[scooter.id]?.url || scooter.images?.[0];
-              const price = getStartingPrice(scooter);
+              const priceQuote = quote(getStartingPrice(scooter), scooter.id);
+              const price = priceQuote.sale;
               return (
                 <li
                   key={scooter.id}
@@ -73,9 +77,10 @@ export function WhatsAppCatalog() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => trackCatalog('social-catalog-item', { scooterId: scooter.id })}
-                    className="flex h-full flex-col border border-line bg-white p-2.5 shadow-soft transition hover:border-brand-500 active:scale-[0.99]"
+                    className="relative flex h-full flex-col border border-line bg-white p-2.5 shadow-soft transition hover:border-brand-500 active:scale-[0.99]"
                     aria-label={`${scooter.name}. ${t('social.catalogCta')}. ${t('social.opensNew')}`}
                   >
+                    {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} className="right-1 top-1" /> : null}
                     <ScooterImage
                       src={img}
                       alt=""
@@ -91,7 +96,12 @@ export function WhatsAppCatalog() {
                       {scooter.name}
                     </p>
                     {price ? (
-                      <p className="mt-0.5 text-sm font-semibold text-body">{formatINR(price)}</p>
+                      <p className={`mt-0.5 text-sm font-semibold ${priceQuote.onSale ? 'text-red-600' : 'text-body'}`}>
+                        {priceQuote.onSale ? (
+                          <span className="mr-1 text-xs font-medium text-muted line-through">{formatINR(priceQuote.list)}</span>
+                        ) : null}
+                        {formatINR(price)}
+                      </p>
                     ) : null}
                     <span className="mt-2 text-[11px] font-bold uppercase tracking-wide text-[#128c7e]">
                       {t('social.catalogCta')}

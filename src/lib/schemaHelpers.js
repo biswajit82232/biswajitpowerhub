@@ -1,5 +1,6 @@
 import { DAY_KEYS, DAY_LABELS, SITE, SITE_URL } from '@/config/site';
 import { getScooterVariants, getStartingPrice } from '@/lib/scooterVariants';
+import { quoteScooterPrice } from '@/lib/salePrice';
 import { SITE_FAQS, MODEL_SEO_META } from '@/data/seoContent';
 import { SEO_READY_SCOOTER_IDS } from '@/data/seoReady';
 
@@ -191,7 +192,15 @@ export function productReviewsSchema(reviews, scooterName, limit = 5) {
  * Valid Product schema for a scooter — includes required offers and optional
  * aggregateRating / review when review data is available.
  */
-export function buildScooterProductSchema(scooter, { reviews, site } = {}) {
+function payableVariantPrices(scooter, saleOffers) {
+  const variants = getScooterVariants(scooter);
+  if (!variants.length) {
+    return [quoteScooterPrice(getStartingPrice(scooter), scooter?.id, saleOffers).sale];
+  }
+  return variants.map((variant) => quoteScooterPrice(variant.price, scooter.id, saleOffers).sale);
+}
+
+export function buildScooterProductSchema(scooter, { reviews, site, offers: saleOffers } = {}) {
   if (!scooter) return null;
   const seller = localBusinessRef(site);
   const variants = getScooterVariants(scooter);
@@ -202,7 +211,7 @@ export function buildScooterProductSchema(scooter, { reviews, site } = {}) {
 
   let offers;
   if (variants.length) {
-    const prices = variants.map((v) => v.price);
+    const prices = payableVariantPrices(scooter, saleOffers);
     offers = buildAggregateProductOffer({
       url,
       lowPrice: Math.min(...prices),
@@ -214,7 +223,7 @@ export function buildScooterProductSchema(scooter, { reviews, site } = {}) {
   } else {
     offers = buildProductOffer({
       url,
-      price: scooter.price,
+      price: quoteScooterPrice(scooter.price, scooter.id, saleOffers).sale,
       stock: scooter.stock,
       seller,
     });

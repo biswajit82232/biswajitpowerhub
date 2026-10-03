@@ -1,8 +1,10 @@
 import { Check } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 import { getCheapestVariant, getScooterVariants } from '@/lib/scooterVariants';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 
 export function VariantSelector({ scooter, selectedId, onChange }) {
+  const { quote } = useSaleOffers();
   const variants = getScooterVariants(scooter);
   if (variants.length < 2) return null;
 
@@ -20,9 +22,11 @@ export function VariantSelector({ scooter, selectedId, onChange }) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {variants.map((variant) => {
           const selected = variant.id === selectedId;
+          const priced = quote(variant.price, scooter.id);
+          const cheapestQuote = minPrice != null ? quote(minPrice, scooter.id) : null;
           const priceDelta =
-            minPrice != null && variant.price != null && variant.price > minPrice
-              ? variant.price - minPrice
+            cheapestQuote && priced.sale > cheapestQuote.sale
+              ? priced.sale - cheapestQuote.sale
               : null;
           const isBestRange = maxRange != null && variant.range === maxRange;
           const isStarting = cheapest && variant.id === cheapest.id;
@@ -57,9 +61,14 @@ export function VariantSelector({ scooter, selectedId, onChange }) {
                 )}
               </div>
 
-              <p className="mt-2 font-display text-2xl font-extrabold leading-none text-heading">
-                {formatINR(variant.price)}
+              <p className={`mt-2 font-display text-2xl font-extrabold leading-none ${priced.onSale ? 'text-red-600' : 'text-heading'}`}>
+                {formatINR(priced.sale)}
               </p>
+              {priced.onSale ? (
+                <p className="mt-1 text-xs font-medium text-muted line-through">
+                  {formatINR(priced.list)} · {priced.percent}% off
+                </p>
+              ) : null}
               {priceDelta != null ? (
                 <p className="mt-1 text-xs font-semibold text-brand-700">
                   +{formatINR(priceDelta)} vs {startingName}

@@ -9,6 +9,7 @@ import { getScooters } from '@/features/scooters/scooterService';
 import { useFinance } from '@/context/FinanceSettingsContext';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 import { SITE_URL, siteSameAs } from '@/config/site';
 import { heroImageSources } from '@/lib/imageCdn';
 import {
@@ -95,11 +96,12 @@ export default function Home() {
   const { photos } = useSitePhotos();
   const { data: allScooters, loading: scootersLoading } = useAsync(() => getScooters(), []);
   const { settings: financeSettings } = useFinance();
+  const { offers: saleOffers } = useSaleOffers();
   const catalog = allScooters?.length ? allScooters : SCOOTERS;
-  const fromPrice = formatCatalogFromPrice(catalog);
+  const fromPrice = formatCatalogFromPrice(catalog, saleOffers);
   const faqs = useMemo(
-    () => buildSiteFaqs(site.faqs?.length ? site.faqs : SITE_FAQS, catalog),
-    [site.faqs, catalog],
+    () => buildSiteFaqs(site.faqs?.length ? site.faqs : SITE_FAQS, catalog, saleOffers),
+    [site.faqs, catalog, saleOffers],
   );
 
   const heroSrc = photos?.hero?.url || financeSettings?.heroImageUrl || null;

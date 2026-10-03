@@ -39,6 +39,8 @@ import {
 import { buildModelSeo } from '@/lib/catalogCopy';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { getApprovedReviews } from '@/features/reviews/reviewService';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
 
 function Spec({ icon: Icon, label, value }) {
   return (
@@ -76,6 +78,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
   const { data: scooter, loading } = useAsync(() => getScooterById(id), [id]);
   const { data: reviews } = useAsync(() => getApprovedReviews(), []);
   const { settings } = useFinance();
+  const { offers: saleOffers, quote, isBestDeal } = useSaleOffers();
   const { data: insights } = useAsync(async () => {
     const all = await getScooters();
     return getScooterInsights(all);
@@ -136,21 +139,25 @@ function ScooterDetailsPage({ id, initialVariantId }) {
     );
   }
 
+  const priceQuote = quote(display.price, scooter.id);
   const stock = STOCK_LABELS[scooter.stock] || STOCK_LABELS.in_stock;
   const valueBadges = getAllValueBadges(scooter.id, insights?.valueBadges);
   const popularityTags = [];
   if (insights?.popularWeekIds?.has?.(scooter.id)) popularityTags.push({ label: 'Trending this week', tone: 'hot' });
   if (insights?.topIntentMonthIds?.has?.(scooter.id)) popularityTags.push({ label: 'Top pick this month', tone: 'warm' });
+  const priceForMessage = priceQuote.onSale
+    ? `${formatINR(priceQuote.sale)} sale price, ${priceQuote.percent}% off`
+    : formatINR(priceQuote.sale);
   const waMessage = display.selectedVariant
-    ? `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} — ${display.selectedVariant.name} (${formatINR(display.price)}). Please share more details.`
-    : `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${formatINR(display.price)}). Please share more details.`;
+    ? `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} — ${display.selectedVariant.name} (${priceForMessage}). Please share more details.`
+    : `Hi BISWAJIT POWER HUB, I'm interested in the ${scooter.name} (${priceForMessage}). Please share more details.`;
   const batteryUpgradeWaMessage = batteryUpgradeWhatsappMessage(scooter.name);
 
-  const productSchema = buildScooterProductSchema(scooter, { reviews, site });
+  const productSchema = buildScooterProductSchema(scooter, { reviews, site, offers: saleOffers });
   const detailSeo = buildModelSeo(scooter, SCOOTER_SEO[scooter.id] || {
     title: `${scooter.name} Electric Scooter | Biswajit Power Hub, Berhampore`,
     description: scooter.description,
-  });
+  }, saleOffers);
   const detailJsonLd = [
     breadcrumbList([
       { name: 'Home', path: '/' },
@@ -187,7 +194,10 @@ function ScooterDetailsPage({ id, initialVariantId }) {
         <div className="mt-6 grid min-w-0 gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Gallery */}
           <Reveal className="min-w-0">
-            <ScooterGallery scooter={scooter} />
+            <div className="relative">
+              <ScooterGallery scooter={scooter} />
+              {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} className="right-3 top-3" /> : null}
+            </div>
           </Reveal>
 
           {/* Summary */}
@@ -200,15 +210,22 @@ function ScooterDetailsPage({ id, initialVariantId }) {
               {valueBadges.map((b) => (
                 <Badge key={b.id} tone={b.tone}>{b.emoji} {b.label}</Badge>
               ))}
+              {priceQuote.onSale && isBestDeal(scooter.id) ? (
+                <Badge tone="hot">{t('card.bestDeal')}</Badge>
+              ) : null}
             </div>
             <h1 className="mt-4 break-words font-display text-display-md font-extrabold uppercase tracking-wide text-navy sm:text-3xl">
               {detailSeo.h1 || `${scooter.name} Electric Scooter in Berhampore — Price, Features & Test Ride`}
             </h1>
             <p className="mt-1 break-words text-base text-muted">{scooter.tagline}</p>
 
-            <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
-              <span className="break-words font-display text-3xl font-extrabold text-heading sm:text-4xl">{formatINR(display.price)}</span>
-              <span className="pb-1 text-sm text-muted">{t('pdp.onRoad')}{display.selectedVariant ? ` · ${display.selectedVariant.name}` : ''}</span>
+            <div className="mt-5">
+              {priceQuote.onSale ? (
+                <SalePriceStack quote={priceQuote} size="xl" />
+              ) : (
+                <span className="break-words font-display text-3xl font-extrabold text-heading sm:text-4xl">{formatINR(display.price)}</span>
+              )}
+              <p className="mt-1 text-sm text-muted">{t('pdp.onRoad')}{display.selectedVariant ? ` · ${display.selectedVariant.name}` : ''}</p>
             </div>
 
             <VariantSelector scooter={scooter} selectedId={variantId} onChange={handleVariantChange} />
@@ -317,7 +334,7 @@ function ScooterDetailsPage({ id, initialVariantId }) {
                   Price, range &amp; showroom support in Murshidabad
                 </h2>
                 <p className="mt-3">
-                  On-road pricing for the {scooter.name} starts near {formatINR(display.price)} depending on
+                  On-road pricing for the {scooter.name} {priceQuote.onSale ? `is ${formatINR(priceQuote.sale)} on sale (${priceQuote.percent}% off ${formatINR(priceQuote.list)})` : `starts near ${formatINR(display.price)}`} depending on
                   variant. Typical range is about {display.range} km per charge with a top speed of{' '}
                   {display.topSpeed} km/h — ideal for Berhampore town rides and many Murshidabad daily
                   routes. Our team explains battery pack options

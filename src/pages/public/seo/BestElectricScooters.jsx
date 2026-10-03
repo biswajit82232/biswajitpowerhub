@@ -13,14 +13,16 @@ import {
   buildSiteFaqs,
   formatCatalogFromPrice,
 } from '@/lib/catalogCopy';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 
 export default function BestElectricScooters() {
   const path = '/best-electric-scooters-berhampore';
   const { data: scooters } = useAsync(() => getScooters(), []);
+  const { offers: saleOffers } = useSaleOffers();
   const list = scooters?.length ? scooters : SCOOTERS;
-  const rows = useMemo(() => buildComparisonRows(list), [list]);
-  const fromPrice = formatCatalogFromPrice(list);
-  const faqs = useMemo(() => buildSiteFaqs(SITE_FAQS, list), [list]);
+  const rows = useMemo(() => buildComparisonRows(list, saleOffers), [list, saleOffers]);
+  const fromPrice = formatCatalogFromPrice(list, saleOffers);
+  const faqs = useMemo(() => buildSiteFaqs(SITE_FAQS, list, saleOffers), [list, saleOffers]);
   const cheapestName = rows[0]?.model;
 
   const jsonLd = useMemo(
@@ -88,7 +90,11 @@ export default function BestElectricScooters() {
                     <h3 className="font-display text-base font-bold uppercase tracking-wide text-navy">
                       {r.model}
                     </h3>
-                    <p className="shrink-0 font-display text-base font-extrabold text-body">{r.price}</p>
+                    <p className={`shrink-0 text-right font-display text-base font-extrabold ${r.onSale ? 'text-red-600' : 'text-body'}`}>
+                      {r.onSale ? <span className="block text-[10px] font-black uppercase tracking-wide">Sale {r.salePercent}%</span> : null}
+                      {r.price}
+                      {r.onSale ? <span className="block text-xs font-medium text-muted line-through">{r.listPrice}</span> : null}
+                    </p>
                   </div>
                   <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
                     <div>
@@ -130,7 +136,10 @@ export default function BestElectricScooters() {
                   {rows.map((r) => (
                     <tr key={r.slug} className="border-t border-line">
                       <td className="px-3 py-3 font-semibold text-navy">{r.model}</td>
-                      <td className="px-3 py-3 whitespace-nowrap">{r.price}</td>
+                      <td className={`px-3 py-3 whitespace-nowrap ${r.onSale ? 'font-bold text-red-600' : ''}`}>
+                        {r.price}
+                        {r.onSale ? <span className="block text-xs font-medium text-muted line-through">{r.listPrice}</span> : null}
+                      </td>
                       <td className="px-3 py-3 whitespace-nowrap">{r.range}</td>
                       <td className="px-3 py-3 whitespace-nowrap">{r.topSpeed}</td>
                       <td className="px-3 py-3">{r.bestFor}</td>

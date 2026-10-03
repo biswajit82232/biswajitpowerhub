@@ -10,6 +10,7 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { SCOOTERS } from '@/data/scooters';
 import { formatCatalogFromPrice } from '@/lib/catalogCopy';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 
 /**
  * Bare Google Ads landing — noindex, no main nav, conversion-first.
@@ -21,7 +22,8 @@ export default function AdLanding() {
   const maps = site.maps.link;
   const perks = (site.perks || []).slice(0, 3);
   const { data: scooters } = useAsync(() => getScooters(), []);
-  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS);
+  const { offers: saleOffers } = useSaleOffers();
+  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS, saleOffers);
 
   return (
     <div className="relative min-h-screen bg-white text-body">

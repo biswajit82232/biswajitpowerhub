@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Gift, ImagePlus, Loader2, Plus, Tag, Save, X } from 'lucide-react';
+import { Gift, ImagePlus, Loader2, Percent, Plus, Tag, Save, X } from 'lucide-react';
 import { AdminSEO } from '@/components/admin/AdminSEO';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { InventoryRowActions } from '@/components/admin/InventoryRowActions';
@@ -12,7 +12,12 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
 import { useAsync } from '@/hooks/useAsync';
 import { deleteOffer, getAllOffers, saveOffer, uploadOfferImage } from '@/features/offers/offerService';
+import { getScooters } from '@/features/scooters/scooterService';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { normalizePriceTechnique, normalizeSalePercent, quotePrice, SCOOTER_SALE_KIND, SMART_TECHNIQUE, EXACT_TECHNIQUE } from '@/lib/salePrice';
+import { getStartingPrice } from '@/lib/scooterVariants';
+import { formatINR } from '@/lib/utils';
 
 const EMPTY = {
   title: '',
@@ -22,14 +27,19 @@ const EMPTY = {
   kind: 'promo',
   imageUrl: '',
   showOnHero: true,
+  discountPercent: 10,
+  scooterIds: [],
+  priceTechnique: SMART_TECHNIQUE,
   active: true,
   sortOrder: 0,
 };
 
 export default function Offers() {
   const { toast } = useToast();
+  const { refresh: refreshPublicSales } = useSaleOffers();
   const fileRef = useRef(null);
   const { data, loading, refetch } = useAsync(() => getAllOffers(), []);
+  const { data: scooters } = useAsync(() => getScooters(), []);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
@@ -61,13 +71,33 @@ export default function Offers() {
 
   const onSave = async (e) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.discountText.trim()) {
+    const isSaleDraft = form.kind === SCOOTER_SALE_KIND;
+    const salePercent = normalizeSalePercent(form.discountPercent);
+    if (!form.title.trim() || (!isSaleDraft && !form.discountText.trim())) {
       toast('Title and discount / freebie text are required.', 'error');
       return;
     }
+    if (isSaleDraft && !salePercent) {
+      toast('Enter a sale percent from 1 to 90.', 'error');
+      return;
+    }
+    if (isSaleDraft && !form.scooterIds?.length) {
+      toast('Select at least one scooty for this sale.', 'error');
+      return;
+    }
+    const payload = isSaleDraft
+      ? {
+          ...form,
+          discountPercent: salePercent,
+          discountText: `${salePercent}% OFF`,
+          promoCode: '',
+          priceTechnique: normalizePriceTechnique(form.priceTechnique),
+        }
+      : form;
     setSaving(true);
     try {
-      await saveOffer(form);
+      await saveOffer(payload);
+      await refreshPublicSales();
       toast('Offer saved.', 'success');
       setEditing(null);
       refetch();
@@ -86,19 +116,26 @@ export default function Offers() {
       if (editing?.id === id) setEditing(null);
       setConfirmDelete(null);
       refetch();
+      refreshPublicSales();
     } catch (err) {
       toast(err.message || 'Delete failed.', 'error');
     }
   };
 
   const isFree = form.kind === 'free_with_purchase';
+  const isSale = form.kind === SCOOTER_SALE_KIND;
+  const salePercent = normalizeSalePercent(form.discountPercent) || 0;
+  const catalog = scooters || [];
+  const otherSales = (data || []).filter(
+    (offer) => offer.kind === SCOOTER_SALE_KIND && offer.active && offer.id !== editing?.id,
+  );
 
   return (
     <>
       <AdminSEO title="Promotional Offers" />
       <AdminHeader
         title="Offers & Freebies"
-        subtitle="Discount promos and free-with-purchase gifts (sticky red badge on the homepage hero)."
+        subtitle="Promos, free gifts, and a percent-off sale on the scooters you pick."
         action={
           <Button variant="primary" icon={Plus} onClick={() => setEditing('new')} className="w-full sm:w-auto">
             New Offer
@@ -120,7 +157,7 @@ export default function Offers() {
             <EmptyState
               icon={Tag}
               title="No offers yet"
-              description="Add a discount promo or a free gift with scooty purchase."
+              description="Add a promo, a free gift, or a percent-off sale on selected scooters."
               action={<Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>Add Offer</Button>}
             />
           ) : (
@@ -138,6 +175,11 @@ export default function Offers() {
                           alt=""
                           className="h-12 w-12 shrink-0 rounded-lg object-cover ring-1 ring-line"
                         />
+                      ) : offer.kind === 'scooter_sale' ? (
+                        <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-red-600 text-white">
+                          <Percent className="h-4 w-4" />
+                          <span className="text-[10px] font-black leading-none">{offer.discountPercent}%</span>
+                        </span>
                       ) : offer.kind === 'free_with_purchase' ? (
                         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
                           <Gift className="h-5 w-5" />
@@ -149,7 +191,11 @@ export default function Offers() {
                           <Badge tone={offer.active ? 'success' : 'neutral'}>
                             {offer.active ? 'Active' : 'Inactive'}
                           </Badge>
-                          {offer.kind === 'free_with_purchase' ? (
+                          {offer.kind === 'scooter_sale' ? (
+                            <Badge tone="hot">
+                              Sale {offer.discountPercent}% · {offer.scooterIds?.length || 0} scooters
+                            </Badge>
+                          ) : offer.kind === 'free_with_purchase' ? (
                             <Badge tone="hot">Free w/ scooty</Badge>
                           ) : null}
                         </div>
@@ -193,27 +239,63 @@ export default function Offers() {
                     value={form.kind}
                     onChange={(e) => {
                       const kind = e.target.value;
-                      setForm((f) => ({
-                        ...f,
-                        kind,
-                        promoCode: kind === 'free_with_purchase' ? '' : f.promoCode,
-                        imageUrl: kind === 'promo' ? '' : f.imageUrl,
-                      }));
+                      setForm((f) => {
+                        const percent = normalizeSalePercent(f.discountPercent) || 10;
+                        return {
+                          ...f,
+                          kind,
+                          promoCode: kind === 'promo' ? f.promoCode : '',
+                          imageUrl: kind === 'free_with_purchase' ? f.imageUrl : '',
+                          discountPercent: percent,
+                          discountText: kind === SCOOTER_SALE_KIND ? `${percent}% OFF` : f.discountText,
+                          scooterIds: Array.isArray(f.scooterIds) ? f.scooterIds : [],
+                        };
+                      });
                     }}
                   >
                     <option value="promo">Discount / promo strip</option>
                     <option value="free_with_purchase">Free with scooty purchase (hero sticky)</option>
+                    <option value={SCOOTER_SALE_KIND}>Sale — % off selected scooters</option>
                   </Select>
                 </Field>
                 <Field label="Offer title" htmlFor="offer-title" required className="sm:col-span-2">
                   <Input
                     id="offer-title"
-                    placeholder={isFree ? 'e.g. Free Helmet' : 'e.g. Festive Sale'}
+                    placeholder={isSale ? 'e.g. Showroom Sale' : isFree ? 'e.g. Free Helmet' : 'e.g. Festive Sale'}
                     value={form.title}
                     onChange={(e) => set('title', e.target.value)}
                     required
                   />
                 </Field>
+                {isSale ? (
+                  <Field
+                    label="Percent off"
+                    htmlFor="offer-percent"
+                    required
+                    hint="Minimum off every battery pack. The website, EMI, compare, and WhatsApp update on their own."
+                    className="sm:max-w-xs"
+                  >
+                    <Input
+                      id="offer-percent"
+                      type="number"
+                      min={1}
+                      max={90}
+                      step={1}
+                      inputMode="numeric"
+                      value={form.discountPercent}
+                      onChange={(e) => {
+                        const next = e.target.value;
+                        const percent = normalizeSalePercent(next);
+                        setForm((f) => ({
+                          ...f,
+                          discountPercent: next,
+                          discountText: percent ? `${percent}% OFF` : f.discountText,
+                        }));
+                      }}
+                      required
+                    />
+                  </Field>
+                ) : (
                 <Field
                   label={isFree ? 'Freebie label (big display)' : 'Discount text (big display)'}
                   htmlFor="offer-discount"
@@ -228,7 +310,127 @@ export default function Offers() {
                     required
                   />
                 </Field>
-                {!isFree ? (
+                )}
+                {isSale ? (
+                  <Field label="Price technique" htmlFor="offer-technique" className="sm:col-span-2">
+                    <Select
+                      id="offer-technique"
+                      value={normalizePriceTechnique(form.priceTechnique)}
+                      onChange={(e) => set('priceTechnique', e.target.value)}
+                    >
+                      <option value={SMART_TECHNIQUE}>Smart showroom price (recommended)</option>
+                      <option value={EXACT_TECHNIQUE}>Exact percent</option>
+                    </Select>
+                    <p className="mt-1 text-xs text-muted">
+                      Smart keeps at least this percent off, then steps the price down to a …999 or …499 sticker. Exact uses the percent with no extra rounding.
+                    </p>
+                  </Field>
+                ) : null}
+                {isSale ? (
+                  <div className="sm:col-span-2">
+                    <p className="text-sm font-semibold text-heading">Scooters on this sale</p>
+                    <p className="mt-1 text-xs text-muted">
+                      Tick models, or apply a group. Unticked models stay at list price. The model that saves the most rupees is marked Best deal automatically.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {[
+                        ['all', 'All models'],
+                        ['stock', 'In stock'],
+                        ['budget', 'Budget'],
+                        ['premium', 'Premium'],
+                      ].map(([mode, label]) => (
+                        <button
+                          key={mode}
+                          type="button"
+                          className="rounded-full bg-surface px-3 py-1.5 text-xs font-bold text-heading ring-1 ring-line hover:bg-red-50"
+                          onClick={() => {
+                            const ids = catalog
+                              .filter((scooter) => {
+                                if (mode === 'stock') return scooter.stock !== 'out_of_stock';
+                                if (mode === 'budget') return scooter.isBudget;
+                                if (mode === 'premium') return scooter.isPremium;
+                                return true;
+                              })
+                              .map((scooter) => scooter.id);
+                            set('scooterIds', ids);
+                          }}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        className="rounded-full px-3 py-1.5 text-xs font-bold text-muted hover:text-heading"
+                        onClick={() => set('scooterIds', [])}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {catalog.map((scooter) => {
+                        const checked = (form.scooterIds || []).includes(scooter.id);
+                        const list = getStartingPrice(scooter);
+                        const preview = salePercent
+                          ? quotePrice(list, {
+                              kind: SCOOTER_SALE_KIND,
+                              active: true,
+                              discountPercent: salePercent,
+                              priceTechnique: form.priceTechnique,
+                              scooterIds: [scooter.id],
+                            })
+                          : null;
+                        const salePrice = preview?.onSale ? preview.sale : list;
+                        const clash = otherSales.some((offer) => (offer.scooterIds || []).includes(scooter.id));
+                        return (
+                          <li key={scooter.id}>
+                            <label className={`flex cursor-pointer items-start gap-3 rounded-xl px-3 py-3 ring-1 ${checked ? 'bg-red-50 ring-red-200' : 'bg-surface ring-line'}`}>
+                              <input
+                                type="checkbox"
+                                className="mt-1 h-5 w-5 rounded accent-red-600"
+                                checked={checked}
+                                onChange={() => {
+                                  setForm((f) => {
+                                    const ids = f.scooterIds || [];
+                                    return {
+                                      ...f,
+                                      scooterIds: ids.includes(scooter.id)
+                                        ? ids.filter((id) => id !== scooter.id)
+                                        : [...ids, scooter.id],
+                                    };
+                                  });
+                                }}
+                              />
+                              <span className="min-w-0">
+                                <span className="block font-semibold text-heading">{scooter.name}</span>
+                                {salePercent ? (
+                                  <span className="mt-0.5 block text-xs text-muted line-through">{formatINR(list)}</span>
+                                ) : (
+                                  <span className="mt-0.5 block text-xs text-muted">{formatINR(list)}</span>
+                                )}
+                                <span className="block font-display text-lg font-extrabold text-red-600">
+                                  {salePercent ? formatINR(salePrice) : 'Enter a percent'}
+                                </span>
+                                {preview?.onSale && preview.extraSaved > 0 ? (
+                                  <span className="mt-0.5 block text-[11px] font-medium text-emerald-700">
+                                    Smart sticker, {formatINR(preview.extraSaved)} under the exact {salePercent}%
+                                  </span>
+                                ) : null}
+                                {clash && checked ? (
+                                  <span className="mt-1 block text-[11px] font-medium text-amber-700">
+                                    Also on another active sale — the bigger discount is shown.
+                                  </span>
+                                ) : null}
+                              </span>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {!catalog.length ? (
+                      <p className="mt-2 text-sm text-muted">No scooters in the catalog yet.</p>
+                    ) : null}
+                  </div>
+                ) : !isFree ? (
                   <Field label="Promo code" htmlFor="offer-code" hint="Optional — e.g. BIDGDG">
                     <Input
                       id="offer-code"
@@ -292,7 +494,7 @@ export default function Offers() {
                   <Textarea
                     id="offer-desc"
                     rows={3}
-                    placeholder={isFree ? 'e.g. Free branded helmet with every scooter purchase this month.' : 'Short line shown under the offer on the website.'}
+                    placeholder={isSale ? 'e.g. 10% off selected models this week. Confirm the sale price at the showroom.' : isFree ? 'e.g. Free branded helmet with every scooter purchase this month.' : 'Short line shown under the offer on the website.'}
                     value={form.description}
                     onChange={(e) => set('description', e.target.value)}
                   />
@@ -306,7 +508,7 @@ export default function Offers() {
                   onChange={(e) => set('showOnHero', e.target.checked)}
                   className="h-5 w-5 rounded accent-brand-500"
                 />
-                Show on homepage hero
+                Show on homepage hero{isSale ? ' as a big Sale badge' : ''}
               </label>
 
               <label className="mt-3 flex items-center gap-2 text-sm font-medium text-body">
@@ -330,7 +532,7 @@ export default function Offers() {
             </form>
           ) : (
             <div className="hidden min-h-[12rem] items-center justify-center rounded-xl border border-dashed border-line bg-surface-alt/50 p-6 text-center text-sm text-muted lg:flex">
-              Select an offer to edit, or create a new one. Use “Free with scooty purchase” for the sticky red hero badge with photo.
+              Select an offer to edit, or create a new one. Use “Sale — % off selected scooters” to mark models and show their sale price.
             </div>
           )}
         </div>

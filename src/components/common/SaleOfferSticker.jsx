@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ChevronRight, Gift } from 'lucide-react';
+import { ChevronRight, Gift, Percent } from 'lucide-react';
 import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
 
@@ -11,6 +11,7 @@ export function SaleOfferSticker({ offer, to, className }) {
   if (!offer) return null;
 
   const isFree = offer.kind === 'free_with_purchase';
+  const isSale = offer.kind === 'scooter_sale';
   const thumb = offer.imageUrl
     ? isSupabaseStorageUrl(offer.imageUrl)
       ? optimizedImageUrl(offer.imageUrl, 200, 82, { height: 200, resize: 'cover' })
@@ -22,7 +23,7 @@ export function SaleOfferSticker({ offer, to, className }) {
     offer.title && offer.discountText && offer.title !== offer.discountText
       ? offer.title.trim()
       : '';
-  const eyebrow = isFree ? 'Free gift' : 'Hot deal';
+  const eyebrow = isSale ? 'Sale' : isFree ? 'Free gift' : 'Hot deal';
   const href = to || `/offers?offer=${encodeURIComponent(offer.id)}`;
 
   return (
@@ -49,7 +50,7 @@ export function SaleOfferSticker({ offer, to, className }) {
             {eyebrow}
           </span>
           <span className="rounded-full bg-navy-900 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-wide text-amber-300 sm:text-[9px]">
-            {isFree ? 'With scooty' : 'Limited'}
+            {isSale ? `${offer.discountPercent || ''}% off` : isFree ? 'With scooty' : 'Limited'}
           </span>
         </span>
 
@@ -66,8 +67,12 @@ export function SaleOfferSticker({ offer, to, className }) {
                 decoding="async"
               />
             ) : (
-              <span className="flex h-full w-full items-center justify-center bg-brand-600">
-                <Gift className="h-4 w-4 text-white sm:h-7 sm:w-7" strokeWidth={2.2} aria-hidden />
+              <span className={`flex h-full w-full items-center justify-center ${isSale ? 'bg-red-600' : 'bg-brand-600'}`}>
+                {isSale ? (
+                  <Percent className="h-4 w-4 text-white sm:h-7 sm:w-7" strokeWidth={2.4} aria-hidden />
+                ) : (
+                  <Gift className="h-4 w-4 text-white sm:h-7 sm:w-7" strokeWidth={2.2} aria-hidden />
+                )}
               </span>
             )}
           </span>

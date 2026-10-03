@@ -8,6 +8,7 @@ import { LocaleProvider } from '@/context/LocaleContext';
 import { SiteSettingsProvider } from '@/context/SiteSettingsContext';
 import { FinanceSettingsProvider } from '@/context/FinanceSettingsContext';
 import { SitePhotosProvider } from '@/context/SitePhotosContext';
+import { SaleOffersProvider } from '@/context/SaleOffersContext';
 import { ToastProvider } from '@/components/ui/Toast';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { reportClientError } from '@/lib/clientError';
@@ -29,9 +30,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               <SiteSettingsProvider>
                 <FinanceSettingsProvider>
                   <SitePhotosProvider>
-                    <ToastProvider>
-                      <App />
-                    </ToastProvider>
+                    <SaleOffersProvider>
+                      <ToastProvider>
+                        <App />
+                      </ToastProvider>
+                    </SaleOffersProvider>
                   </SitePhotosProvider>
                 </FinanceSettingsProvider>
               </SiteSettingsProvider>

@@ -5,17 +5,26 @@ import Button from '@/components/ui/Button';
 import {
   formatBatteryCapacityRange,
   formatRangeRange,
+  getStartingPrice,
 } from '@/lib/scooterVariants';
 import { STOCK_LABELS } from '@/data/scooters';
-import { cn } from '@/lib/utils';
+import { cn, formatINR } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
+import { useSaleOffers } from '@/context/SaleOffersContext';
+import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
+import { emiFrom } from '@/lib/finance';
+import { useFinance } from '@/context/FinanceSettingsContext';
 
 /**
  * Dealer-style product card with smart discovery badges (trending / value).
  */
 export function DealerProductCard({ scooter, imageOverride, tags = [], className }) {
   const { t } = useLocale();
+  const { settings } = useFinance();
+  const { quote, isBestDeal } = useSaleOffers();
   if (!scooter) return null;
+  const priceQuote = quote(getStartingPrice(scooter), scooter.id);
+  const emi = emiFrom({ price: priceQuote.sale, settings });
   const battery = formatBatteryCapacityRange(scooter);
   const range = formatRangeRange(scooter);
   const topSpeed = scooter.topSpeed ?? '—';
@@ -38,12 +47,15 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
           className="mx-auto aspect-[4/3] w-full max-w-full bg-surface-alt"
           fit="cover"
         />
-        {(tags.length > 0 || scooter.noLicence || scooter.stock === 'out_of_stock' || scooter.stock === 'low_stock') && (
+        {(tags.length > 0 || scooter.noLicence || scooter.stock === 'out_of_stock' || scooter.stock === 'low_stock' || (priceQuote.onSale && isBestDeal(scooter.id))) && (
           <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-start gap-1.5">
             {scooter.noLicence && <Badge tone="success">{t('card.noLicence')}</Badge>}
             {(scooter.stock === 'out_of_stock' || scooter.stock === 'low_stock') && (
               <Badge tone={stock.tone}>{t(`stock.${scooter.stock}`)}</Badge>
             )}
+            {priceQuote.onSale && isBestDeal(scooter.id) ? (
+              <Badge tone="hot">{t('card.bestDeal')}</Badge>
+            ) : null}
             {tags.map((tag) => (
               <Badge key={tag.id || tag.label} tone={tag.tone || 'brand'}>
                 {tag.id === 'trending' || tag.id === 'hot' ? t(`tag.${tag.id}`) : tag.label}
@@ -51,6 +63,7 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
             ))}
           </div>
         )}
+        {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} /> : null}
       </Link>
 
       <div className="flex flex-1 flex-col px-2 pb-5 pt-3">
@@ -78,6 +91,13 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
             <p className="mt-1 text-xs font-bold text-body sm:text-sm">{battery}</p>
           </div>
         </div>
+
+        {priceQuote.onSale ? (
+          <div className="mt-4">
+            <SalePriceStack quote={priceQuote} size="md" align="center" showListWhenRegular={false} />
+            <p className="mt-1 text-xs font-semibold text-brand-700">{t('card.emiFrom', { amount: formatINR(emi) })}</p>
+          </div>
+        ) : null}
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           <Button to="/test-ride-berhampore" variant="dealerPrimary" size="sm">

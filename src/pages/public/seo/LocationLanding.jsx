@@ -8,6 +8,7 @@ import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { SCOOTERS } from '@/data/scooters';
 import { formatCatalogFromPrice } from '@/lib/catalogCopy';
+import { useSaleOffers } from '@/context/SaleOffersContext';
 
 /**
  * Shared local service-area page — one town, one job: bring riders to Berhampore showroom.
@@ -17,7 +18,8 @@ export default function LocationLanding({ location }) {
   const faqs = useMemo(() => location.faqs || [], [location]);
   const nearbyTowns = getNearbyLocations(location, 5);
   const { data: scooters } = useAsync(() => getScooters(), []);
-  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS);
+  const { offers: saleOffers } = useSaleOffers();
+  const fromPrice = formatCatalogFromPrice(scooters?.length ? scooters : SCOOTERS, saleOffers);
   const seoDescription = fromPrice
     ? `${location.description.replace(/\.\s*$/, '')}. Starting from ${fromPrice}.`
     : location.description;

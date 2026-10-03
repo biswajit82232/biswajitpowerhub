@@ -3,9 +3,10 @@ import { fetchWithCache, clearCache } from '@/lib/cache';
 import { getFinanceSettings } from '@/features/finance/financeService';
 import { compressForUpload } from '@/lib/resizeImage';
 import { withTimeout, FETCH_TIMEOUT_MS, MUTATION_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from '@/lib/utils';
+import { normalizePriceTechnique, normalizeSalePercent, parseScooterIds, SCOOTER_SALE_KIND } from '@/lib/salePrice';
 
-const CACHE_KEY = 'promotional_offers_v3';
-const LEGACY_CACHE_KEY = 'promotional_offers_v2';
+const CACHE_KEY = 'promotional_offers_v5';
+const LEGACY_CACHE_KEY = 'promotional_offers_v4';
 const LOCAL_KEY = 'bph_promotional_offers';
 
 function bustOfferCache() {
@@ -17,36 +18,68 @@ function bustOfferCache() {
   clearCache('promotional_offers_active');
 }
 
+function normalizeKind(kind) {
+  if (kind === 'free_with_purchase' || kind === SCOOTER_SALE_KIND) return kind;
+  return 'promo';
+}
+
 function mapRow(row) {
+  const kind = normalizeKind(row.kind);
+  const discountPercent = kind === SCOOTER_SALE_KIND ? normalizeSalePercent(row.discount_percent ?? row.discountPercent) : null;
+  const scooterIds = kind === SCOOTER_SALE_KIND ? parseScooterIds(row.scooter_ids ?? row.scooterIds) : [];
+  const discountText = kind === SCOOTER_SALE_KIND && discountPercent
+    ? `${discountPercent}% OFF`
+    : (row.discount_text || row.discountText || '');
   return {
     id: row.id,
     title: row.title || '',
-    discountText: row.discount_text || '',
-    promoCode: row.promo_code || '',
+    discountText,
+    promoCode: kind === SCOOTER_SALE_KIND ? '' : (row.promo_code || row.promoCode || ''),
     description: row.description || '',
-    kind: row.kind === 'free_with_purchase' ? 'free_with_purchase' : 'promo',
-    imageUrl: row.image_url || '',
-    showOnHero: row.show_on_hero !== false,
+    kind,
+    imageUrl: row.image_url || row.imageUrl || '',
+    showOnHero: (row.show_on_hero ?? row.showOnHero) !== false,
+    discountPercent,
+    scooterIds,
+    priceTechnique: kind === SCOOTER_SALE_KIND ? normalizePriceTechnique(row.price_technique ?? row.priceTechnique) : null,
     active: Boolean(row.active),
-    sortOrder: row.sort_order ?? 0,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    sortOrder: row.sort_order ?? row.sortOrder ?? 0,
+    createdAt: row.created_at || row.createdAt,
+    updatedAt: row.updated_at || row.updatedAt,
   };
 }
 
 function toRow(offer) {
+  const kind = normalizeKind(offer.kind);
+  const discountPercent = kind === SCOOTER_SALE_KIND ? normalizeSalePercent(offer.discountPercent) : null;
+  const scooterIds = kind === SCOOTER_SALE_KIND ? parseScooterIds(offer.scooterIds) : [];
   return {
     title: offer.title?.trim() || '',
-    discount_text: offer.discountText?.trim() || '',
-    promo_code: offer.promoCode?.trim() || '',
+    discount_text: discountPercent ? `${discountPercent}% OFF` : (offer.discountText?.trim() || ''),
+    promo_code: kind === 'promo' ? (offer.promoCode?.trim() || '') : '',
     description: offer.description?.trim() || '',
-    kind: offer.kind === 'free_with_purchase' ? 'free_with_purchase' : 'promo',
-    image_url: offer.imageUrl?.trim() || '',
+    kind,
+    image_url: kind === 'free_with_purchase' ? (offer.imageUrl?.trim() || '') : '',
     show_on_hero: offer.showOnHero !== false,
+    discount_percent: discountPercent,
+    scooter_ids: scooterIds,
+    price_technique: kind === SCOOTER_SALE_KIND ? normalizePriceTechnique(offer.priceTechnique) : null,
     active: Boolean(offer.active),
     sort_order: Number(offer.sortOrder) || 0,
     updated_at: new Date().toISOString(),
   };
+}
+
+function withoutSaleColumns(payload) {
+  const next = { ...payload };
+  delete next.discount_percent;
+  delete next.scooter_ids;
+  delete next.price_technique;
+  return next;
+}
+
+function saleMigrationError() {
+  return new Error('Scooter sale needs a database update. Run npm run db:migrate, then save again.');
 }
 
 function readLocal() {
@@ -90,6 +123,8 @@ async function legacyOffersFromFinance() {
         kind: 'promo',
         imageUrl: '',
         showOnHero: true,
+        discountPercent: null,
+        scooterIds: [],
         active: true,
         sortOrder: 0,
       }];
@@ -209,69 +244,60 @@ export async function uploadOfferImage(file) {
   });
 }
 
+async function writeOfferRow(payload, id) {
+  const run = (row) => {
+    const query = id
+      ? supabase.from('promotional_offers').update(row).eq('id', id).select().single()
+      : supabase.from('promotional_offers').insert(row).select().single();
+    return withTimeout(query, MUTATION_TIMEOUT_MS, 'Offer save timed out');
+  };
+
+  let row = { ...payload };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { data, error } = await run(row);
+    if (!error) return mapRow(data);
+    const msg = error?.message || '';
+    if (/price_technique/i.test(msg) && Object.prototype.hasOwnProperty.call(row, 'price_technique')) {
+      delete row.price_technique;
+      row = { ...row };
+      continue;
+    }
+    if (/discount_percent|scooter_ids/i.test(msg)) {
+      if (payload.kind === SCOOTER_SALE_KIND) throw saleMigrationError();
+      row = withoutSaleColumns(row);
+      continue;
+    }
+    throw error;
+  }
+  throw new Error('Offer save failed');
+}
+
 export async function saveOffer(offer) {
   const payload = toRow(offer);
 
   if (isSupabaseConfigured && supabase) {
     bustOfferCache();
-
-    if (offer.id && !String(offer.id).startsWith('legacy')) {
-      const { data, error } = await withTimeout(
-        supabase.from('promotional_offers').update(payload).eq('id', offer.id).select().single(),
-        MUTATION_TIMEOUT_MS,
-        'Offer save timed out',
-      );
-      if (error) throw error;
-      return mapRow(data);
-    }
-
-    const { data, error } = await withTimeout(
-      supabase.from('promotional_offers').insert(payload).select().single(),
-      MUTATION_TIMEOUT_MS,
-      'Offer save timed out',
-    );
-    if (error) throw error;
-    return mapRow(data);
+    const id = offer.id && !String(offer.id).startsWith('legacy') ? offer.id : null;
+    return writeOfferRow(payload, id);
   }
 
   const list = readLocal();
+  const stored = mapRow({
+    ...payload,
+    id: offer.id || crypto.randomUUID(),
+    created_at: offer.createdAt || new Date().toISOString(),
+  });
+
   if (offer.id) {
-    const next = list.map((o) =>
-      o.id === offer.id
-        ? {
-            ...o,
-            ...offer,
-            discountText: payload.discount_text,
-            promoCode: payload.promo_code,
-            sortOrder: payload.sort_order,
-            kind: payload.kind,
-            imageUrl: payload.image_url,
-            showOnHero: payload.show_on_hero,
-            active: payload.active,
-          }
-        : o,
-    );
+    const next = list.map((item) => (item.id === offer.id ? { ...item, ...stored } : item));
     writeLocal(next);
     bustOfferCache();
-    return next.find((o) => o.id === offer.id);
+    return next.find((item) => item.id === offer.id);
   }
 
-  const created = {
-    id: crypto.randomUUID(),
-    title: payload.title,
-    discountText: payload.discount_text,
-    promoCode: payload.promo_code,
-    description: payload.description,
-    kind: payload.kind,
-    imageUrl: payload.image_url,
-    showOnHero: payload.show_on_hero,
-    sortOrder: payload.sort_order,
-    active: payload.active,
-    createdAt: new Date().toISOString(),
-  };
-  writeLocal([...list, created]);
+  writeLocal([...list, stored]);
   bustOfferCache();
-  return created;
+  return stored;
 }
 
 export async function deleteOffer(id) {
