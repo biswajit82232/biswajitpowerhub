@@ -1,29 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import { SiteImage } from '@/components/common/SiteImage';
-import { SaleOfferSticker } from '@/components/common/SaleOfferSticker';
-import { OfferSpotlight } from '@/components/offers/OfferSpotlight';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { useSite } from '@/context/SiteSettingsContext';
-import { useAsync } from '@/hooks/useAsync';
-import { getActiveOffers } from '@/features/offers/offerService';
 import { HERO_IMAGE } from '@/lib/imageCdn';
 import { cn } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
 
 /**
- * Full-bleed dealer hero — showroom slide + promo bar and/or sticky sale sticker.
+ * Full-bleed dealer hero. Offers are listed once, under the hero.
  */
 export function HeroCarousel({ heroImageUrl }) {
   const { site } = useSite();
   const { t } = useLocale();
   const { photos } = useSitePhotos();
-  const { data: offers, loading: offersLoading } = useAsync(() => getActiveOffers(), []);
-
-  const heroOffers = (offers || []).filter((o) => o.showOnHero !== false);
-  const saleOffers = heroOffers.filter((o) => o.kind === 'scooter_sale');
-  const freeOffers = heroOffers.filter((o) => o.kind === 'free_with_purchase');
-  // Big sticker: percent-off sale first, otherwise the free-gift badge.
-  const stickerOffer = saleOffers[0] || freeOffers[0] || null;
 
   const slides = [];
 
@@ -149,24 +138,6 @@ export function HeroCarousel({ heroImageUrl }) {
           </div>
         )}
       </div>
-
-      {/* Sale sticker sits above the clipped media so the burst is never cut off */}
-      {heroOffers.length < 2 && stickerOffer ? (
-        <SaleOfferSticker
-          offer={stickerOffer}
-          to={`/offers?offer=${encodeURIComponent(stickerOffer.id)}`}
-          className="right-2 top-2 z-30 sm:right-4 sm:top-3 lg:right-6 lg:top-4"
-        />
-      ) : null}
-
-      {/* Every hero offer at once — a rotator was hiding the rest. */}
-      {offersLoading ? (
-        <div className="min-h-[8.75rem] border-t border-line bg-surface-alt" aria-hidden />
-      ) : heroOffers.length ? (
-        <div className="border-t border-line bg-surface-alt px-3 py-3 sm:px-4 sm:py-4">
-          <OfferSpotlight offers={heroOffers} />
-        </div>
-      ) : null}
 
       <span className="sr-only">
         Slide {index + 1} of {count}: {slide.alt}

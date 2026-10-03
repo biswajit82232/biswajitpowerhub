@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useLocale } from '@/context/LocaleContext';
 import { useSaleOffers } from '@/context/SaleOffersContext';
-import { offerLook, presentOffers } from '@/components/offers/offerLook';
+import { offerHeadline, offerLook, offerSupport, presentOffers } from '@/components/offers/offerLook';
 import { cn } from '@/lib/utils';
 
 /** Every active offer, side by side. Nothing is hidden behind a rotator. */
@@ -22,8 +22,8 @@ export function OfferSpotlight({ offers, layout = 'row' }) {
       {list.map((offer) => {
         const look = offerLook(offer, t);
         const Icon = look.Icon;
-        const headline = offer.discountText || offer.title;
-        const title = offer.title && offer.title !== offer.discountText ? offer.title : '';
+        const headline = offerHeadline(offer, t);
+        const title = offerSupport(offer);
         return (
           <li
             key={offer.id}
@@ -42,9 +42,11 @@ export function OfferSpotlight({ offers, layout = 'row' }) {
                 <span className="text-[10px] font-black uppercase tracking-[0.14em] text-white/80">
                   {look.eyebrow}
                 </span>
-                <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide', look.chipClass)}>
-                  {look.chip}
-                </span>
+                {look.chip ? (
+                  <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide', look.chipClass)}>
+                    {look.chip}
+                  </span>
+                ) : null}
               </span>
               <span className="mt-3 flex items-end gap-2">
                 <Icon className="mb-0.5 h-5 w-5 shrink-0" aria-hidden />
@@ -68,7 +70,7 @@ export function SiteOfferRail() {
   const { pathname } = useLocation();
   const { offers, loading } = useSaleOffers();
   const { t } = useLocale();
-  if (pathname === '/' || loading || !offers?.length) return null;
+  if (pathname === '/' || pathname === '/offers' || loading || !offers?.length) return null;
 
   return (
     <section className="border-b border-line bg-white" aria-labelledby="site-offers-heading">

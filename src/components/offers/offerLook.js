@@ -1,4 +1,4 @@
-import { Gift, Percent, Tag } from 'lucide-react';
+import { Gift, Star, Tag } from 'lucide-react';
 
 const KIND_RANK = { scooter_sale: 0, free_with_purchase: 1, promo: 2 };
 
@@ -11,6 +11,31 @@ export function presentOffers(offers) {
   });
 }
 
+const PERCENT_COPY = /^\s*\d+\s*%/i;
+
+export function isPercentCopy(text) {
+  return PERCENT_COPY.test(String(text || ''));
+}
+
+/** Sale cards use the offer name. The percent stays on the scooter price, not in the offer line. */
+export function offerHeadline(offer, t) {
+  if (offer?.kind === 'scooter_sale') {
+    const title = String(offer.title || '').trim();
+    if (title && !isPercentCopy(title)) return title;
+    return t('off.saleTitle');
+  }
+  return String(offer?.discountText || offer?.title || '').trim();
+}
+
+/** Second line for promos and free gifts. Empty for a sale, so the percent is not repeated. */
+export function offerSupport(offer) {
+  if (offer?.kind === 'scooter_sale') return '';
+  const title = String(offer?.title || '').trim();
+  const headline = String(offer?.discountText || '').trim();
+  if (title && title !== headline && !isPercentCopy(title)) return title;
+  return '';
+}
+
 export function offerLook(offer, t) {
   const isSale = offer?.kind === 'scooter_sale';
   const isFree = offer?.kind === 'free_with_purchase';
@@ -19,10 +44,10 @@ export function offerLook(offer, t) {
       isSale: true,
       isFree: false,
       eyebrow: t('off.saleOn'),
-      chip: offer.discountPercent ? t('card.percentOff', { pct: offer.discountPercent }) : t('card.sale'),
+      chip: null,
       card: 'bg-gradient-to-br from-red-600 via-red-700 to-red-900 text-white ring-red-900/30',
       chipClass: 'bg-amber-300 text-red-900',
-      Icon: Percent,
+      Icon: Star,
     };
   }
   if (isFree) {

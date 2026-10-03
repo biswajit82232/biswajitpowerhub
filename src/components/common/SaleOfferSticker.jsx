@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight, Gift, Percent } from 'lucide-react';
 import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
+import { offerHeadline, offerSupport } from '@/components/offers/offerLook';
+import { useLocale } from '@/context/LocaleContext';
 import { cn } from '@/lib/utils';
 
 /**
@@ -8,6 +10,7 @@ import { cn } from '@/lib/utils';
  * Designed to read clearly over busy showroom photos.
  */
 export function SaleOfferSticker({ offer, to, className }) {
+  const { t } = useLocale();
   if (!offer) return null;
 
   const isFree = offer.kind === 'free_with_purchase';
@@ -18,11 +21,8 @@ export function SaleOfferSticker({ offer, to, className }) {
       : offer.imageUrl
     : null;
 
-  const headline = (offer.discountText || offer.title || 'Special offer').trim();
-  const title =
-    offer.title && offer.discountText && offer.title !== offer.discountText
-      ? offer.title.trim()
-      : '';
+  const headline = offerHeadline(offer, t) || 'Special offer';
+  const title = offerSupport(offer);
   const eyebrow = isSale ? 'Sale' : isFree ? 'Free gift' : 'Hot deal';
   const href = to || `/offers?offer=${encodeURIComponent(offer.id)}`;
 
@@ -50,7 +50,7 @@ export function SaleOfferSticker({ offer, to, className }) {
             {eyebrow}
           </span>
           <span className="rounded-full bg-navy-900 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-wide text-amber-300 sm:text-[9px]">
-            {isSale ? `${offer.discountPercent || ''}% off` : isFree ? 'With scooty' : 'Limited'}
+            {isSale ? 'Sale' : isFree ? 'With scooty' : 'Limited'}
           </span>
         </span>
 
