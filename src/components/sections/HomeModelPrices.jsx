@@ -49,14 +49,14 @@ export function HomeModelPrices({ scooters = [] }) {
           </p>
         ) : null}
 
-        <ul className="mt-5 flex gap-3 overflow-x-auto pb-2 pr-14 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] lg:pr-16 [&::-webkit-scrollbar]:hidden">
+        <ul className="mt-5 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {board.map((scooter) => {
             const priceQuote = quote(getStartingPrice(scooter), scooter.id);
             const emi = emiFrom({ price: priceQuote.sale, settings });
             const role = roleById.get(String(scooter.id));
             const imgSrc = photos?.models?.[scooter.id]?.url || scooter.images?.[0];
             return (
-              <li key={scooter.id} className="w-[11.5rem] shrink-0 snap-start">
+              <li key={scooter.id} className="w-[calc(100%-1.25rem)] shrink-0 snap-start sm:w-[11.5rem]">
                 <Link
                   to={`/scooters/${scooter.id}`}
                   className="flex h-full flex-col rounded-2xl bg-white p-3 shadow-soft ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-navy/30"
@@ -72,7 +72,7 @@ export function HomeModelPrices({ scooters = [] }) {
                     src={imgSrc}
                     alt=""
                     hue={scooter.hue}
-                    name={scooter.name}
+                    name=""
                     width={240}
                     height={160}
                     loading="lazy"

@@ -19,11 +19,11 @@ export function MobileSideShortcuts() {
 
   return (
     <nav
-      className="fixed right-0 z-[80] lg:hidden"
-      style={{ top: 'calc(var(--header-offset) + 0.75rem)', bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
+      className="pointer-events-none fixed right-0 z-[80] flex items-center lg:hidden"
+      style={{ top: 'calc(var(--header-offset) + 0.5rem)', bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
       aria-label={t('short.label')}
     >
-      <ul className="flex h-full flex-col justify-center overflow-hidden rounded-l-dealer shadow-card">
+      <ul className="pointer-events-auto flex flex-col overflow-hidden rounded-l-dealer shadow-card">
         {SHORTCUTS.map((item) => {
           const Icon = item.icon;
           return (
