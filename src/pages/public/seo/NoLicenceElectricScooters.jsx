@@ -90,9 +90,7 @@ export default function NoLicenceElectricScooters() {
             {' · from '}
             {(() => {
               const quote = quoteStartingPrice(s, saleOffers);
-              return quote.onSale
-                ? `${formatINR(quote.sale)} (${quote.percent}% off)`
-                : formatINR(quote.sale);
+              return formatINR(quote.sale);
             })()}
           </li>
         ))}

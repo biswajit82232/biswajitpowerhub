@@ -32,8 +32,6 @@ export function HomeModelPrices({ scooters = [] }) {
   const guides = buildShowroomGuides(scooters, offers);
   const roleById = new Map(guides.map((guide) => [guide.id, guide.role]));
   const board = sortByShowroomPrice(scooters, offers);
-  const anySale = board.some((scooter) => quote(getStartingPrice(scooter), scooter.id).onSale);
-
   return (
     <section className="border-b border-line bg-surface-alt py-6 sm:py-8" aria-labelledby="prices-heading">
       <div className="container-px">
@@ -43,12 +41,6 @@ export function HomeModelPrices({ scooters = [] }) {
         <p className="mx-auto mt-2 max-w-lg text-center text-xs text-muted sm:text-sm">
           {t('home.pricesHint')}
         </p>
-        {anySale ? (
-          <p className="mx-auto mt-3 max-w-lg rounded-full bg-red-600 px-4 py-1.5 text-center text-xs font-bold text-white">
-            {t('home.saleLive')}
-          </p>
-        ) : null}
-
         <ul className="mt-5 flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {board.map((scooter) => {
             const priceQuote = quote(getStartingPrice(scooter), scooter.id);

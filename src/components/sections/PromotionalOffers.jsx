@@ -1,4 +1,4 @@
-import { Gift, Tag, Copy, Check, MessageCircle, Phone, Percent } from 'lucide-react';
+import { Gift, Tag, Copy, Check, MessageCircle, Phone, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Section } from '@/components/common/Section';
@@ -74,7 +74,7 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
           />
         ) : isSale ? (
           <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-red-600 text-white">
-            <Percent className="h-9 w-9" />
+            <Star className="h-9 w-9" />
           </span>
         ) : isFree ? (
           <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-red-600 text-white">
@@ -83,11 +83,7 @@ function OfferDetailsModal({ offer, site, open, onClose }) {
         ) : null}
 
         <div className="text-center">
-          {isSale ? (
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-red-700">
-              Sale on selected scooters
-            </p>
-          ) : isFree ? (
+          {isSale ? null : isFree ? (
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-red-700">
               {t('off.freeGift')}
             </p>

@@ -59,7 +59,6 @@ function ComparePrice({ scooter, offers }) {
     <span>
       <span className="block font-extrabold text-red-600">{range.sale.text}</span>
       <span className="block text-[11px] text-muted line-through">{range.list.text}</span>
-      <span className="block text-[10px] font-black uppercase tracking-wide text-red-600">{range.percent}% off</span>
     </span>
   );
 }

@@ -11,7 +11,7 @@ import { STOCK_LABELS } from '@/data/scooters';
 import { cn, formatINR } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
 import { useSaleOffers } from '@/context/SaleOffersContext';
-import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
+import { SalePriceStack } from '@/components/common/SaleMark';
 import { emiFrom } from '@/lib/finance';
 import { useFinance } from '@/context/FinanceSettingsContext';
 
@@ -63,7 +63,6 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
             ))}
           </div>
         )}
-        {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} /> : null}
       </Link>
 
       <div className="flex flex-1 flex-col px-2 pb-5 pt-3">

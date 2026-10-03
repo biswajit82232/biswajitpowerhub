@@ -16,7 +16,7 @@ import {
 } from '@/lib/scooterVariants';
 import { useLocale } from '@/context/LocaleContext';
 import { useSaleOffers } from '@/context/SaleOffersContext';
-import { SalePriceStack, SaleRibbon } from '@/components/common/SaleMark';
+import { SalePriceStack } from '@/components/common/SaleMark';
 
 export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTags = [], imageOverride }) {
   const { t } = useLocale();
@@ -66,7 +66,6 @@ export function ScooterCard({ scooter, index = 0, valueBadges = [], popularityTa
             </Badge>
           ))}
         </div>
-        {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} /> : null}
       </Link>
 
       <div className="flex flex-1 flex-col border-b border-line pb-5 pt-4">

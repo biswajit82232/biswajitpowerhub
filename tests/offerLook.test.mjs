@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isPercentCopy, offerHeadline, offerLook, offerSupport } from '../src/components/offers/offerLook.js';
+import { isPercentCopy, offerHeadline, offerLook, offerSupport, presentOffers } from '../src/components/offers/offerLook.js';
 
 const t = (key, vars) => (vars?.pct != null ? `${key}:${vars.pct}` : key);
 
@@ -15,6 +15,7 @@ test('a sale offer is named, not written as a percent', () => {
   assert.equal(offerHeadline(offer, t), 'Showroom Sale');
   assert.equal(offerSupport(offer), '');
   assert.equal(offerLook(offer, t).chip, null);
+  assert.equal(presentOffers([offer, { id: 'gift', kind: 'free_with_purchase', sortOrder: 1 }]).map((row) => row.kind).join(','), 'free_with_purchase');
 });
 
 test('a promo keeps its offer line and code', () => {

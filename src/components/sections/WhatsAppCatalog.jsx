@@ -7,7 +7,6 @@ import { SCOOTERS } from '@/data/scooters';
 import { getStartingPrice } from '@/lib/scooterVariants';
 import { formatINR } from '@/lib/utils';
 import { useSaleOffers } from '@/context/SaleOffersContext';
-import { SaleRibbon } from '@/components/common/SaleMark';
 import { whatsappCatalogUrl } from '@/lib/whatsappLinks';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useSitePhotos } from '@/context/SitePhotosContext';
@@ -80,7 +79,6 @@ export function WhatsAppCatalog() {
                     className="relative flex h-full flex-col border border-line bg-white p-2.5 shadow-soft transition hover:border-brand-500 active:scale-[0.99]"
                     aria-label={`${scooter.name}. ${t('social.catalogCta')}. ${t('social.opensNew')}`}
                   >
-                    {priceQuote.onSale ? <SaleRibbon percent={priceQuote.percent} className="right-1 top-1" /> : null}
                     <ScooterImage
                       src={img}
                       alt=""

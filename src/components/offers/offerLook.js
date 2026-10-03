@@ -4,7 +4,9 @@ const KIND_RANK = { scooter_sale: 0, free_with_purchase: 1, promo: 2 };
 
 /** Sales first, then free gifts, then promos. Sort order breaks ties. */
 export function presentOffers(offers) {
-  return [...(offers || [])].sort((a, b) => {
+  return [...(offers || [])]
+    .filter((offer) => offer?.kind !== 'scooter_sale')
+    .sort((a, b) => {
     const byKind = (KIND_RANK[a.kind] ?? 9) - (KIND_RANK[b.kind] ?? 9);
     if (byKind) return byKind;
     return (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0);
@@ -43,7 +45,7 @@ export function offerLook(offer, t) {
     return {
       isSale: true,
       isFree: false,
-      eyebrow: t('off.saleOn'),
+      eyebrow: '',
       chip: null,
       card: 'bg-gradient-to-br from-red-600 via-red-700 to-red-900 text-white ring-red-900/30',
       chipClass: 'bg-amber-300 text-red-900',
