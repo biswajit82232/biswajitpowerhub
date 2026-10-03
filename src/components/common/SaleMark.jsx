@@ -29,7 +29,9 @@ export function SalePriceStack({ quote, size = 'lg', align = 'start', className,
     ? 'text-3xl sm:text-4xl'
     : size === 'md'
       ? 'text-2xl'
-      : 'text-lg';
+      : size === 'sm'
+        ? 'text-lg'
+        : 'text-lg';
 
   if (!quote.onSale) {
     if (!showListWhenRegular) return null;

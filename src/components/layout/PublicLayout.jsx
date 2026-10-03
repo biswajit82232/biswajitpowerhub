@@ -6,6 +6,7 @@ import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { FloatingDealerRail } from '@/components/common/FloatingDealerRail';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
+import { MobileSideShortcuts } from '@/components/common/MobileSideShortcuts';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { ErrorBoundary, SoftBoundary } from '@/components/common/ErrorBoundary';
 import { RouteLoader } from '@/components/ui/Loading';
@@ -98,6 +99,9 @@ export function PublicLayout() {
       </SoftBoundary>
       <SoftBoundary>
         <MobileLocalCTA />
+      </SoftBoundary>
+      <SoftBoundary>
+        <MobileSideShortcuts />
       </SoftBoundary>
       <SoftBoundary>
         <FloatingDealerRail />

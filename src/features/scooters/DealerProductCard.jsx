@@ -33,7 +33,7 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
 
   return (
     <article
-      className={cn('flex h-full flex-col bg-white text-center [content-visibility:auto] [contain-intrinsic-size:auto_28rem]', className)}
+      className={cn('flex h-full flex-col bg-white text-center [content-visibility:auto] [contain-intrinsic-size:auto_36rem]', className)}
     >
       <Link to={`/scooters/${scooter.id}`} className="relative block bg-white px-2 pt-2">
         <ScooterImage
@@ -92,12 +92,13 @@ export function DealerProductCard({ scooter, imageOverride, tags = [], className
           </div>
         </div>
 
-        {priceQuote.onSale ? (
-          <div className="mt-4">
-            <SalePriceStack quote={priceQuote} size="md" align="center" showListWhenRegular={false} />
-            <p className="mt-1 text-xs font-semibold text-brand-700">{t('card.emiFrom', { amount: formatINR(emi) })}</p>
-          </div>
-        ) : null}
+        <div className="mt-4">
+          {priceQuote.onSale ? null : (
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted">{t('card.starting')}</p>
+          )}
+          <SalePriceStack quote={priceQuote} size="md" align="center" />
+          <p className="mt-1 text-xs font-semibold text-brand-700">{t('card.emiFrom', { amount: formatINR(emi) })}</p>
+        </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
           <Button to="/test-ride-berhampore" variant="dealerPrimary" size="sm">
