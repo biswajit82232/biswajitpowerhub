@@ -4,6 +4,7 @@ import { SEO } from '@/components/common/SEO';
 import { HeroCarousel } from '@/components/sections/HeroCarousel';
 import { ExploreRange } from '@/components/sections/ExploreRange';
 import { PromotionalOffers } from '@/components/sections/PromotionalOffers';
+import { HomeModelPrices } from '@/components/sections/HomeModelPrices';
 import { useAsync } from '@/hooks/useAsync';
 import { getScooters } from '@/features/scooters/scooterService';
 import { useFinance } from '@/context/FinanceSettingsContext';
@@ -194,6 +195,7 @@ export default function Home() {
 
       <HeroCarousel heroImageUrl={financeSettings?.heroImageUrl} />
       <PromotionalOffers compact />
+      <HomeModelPrices scooters={modelGrid} />
       <ExploreRange scooters={modelGrid} loading={showModelSkeletons} />
       <DeferredHomeTail faqs={faqs} />
     </>
