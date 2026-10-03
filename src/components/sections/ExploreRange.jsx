@@ -66,7 +66,7 @@ export function ExploreRange({ scooters = [], loading = false, title }) {
   );
 
   return (
-    <section id="models" className="bg-white py-10 sm:py-14" aria-labelledby="explore-heading">
+    <section id="models" className="scroll-mt-[var(--header-offset)] bg-white py-10 sm:py-14" aria-labelledby="explore-heading">
       <div className="container-px">
         <h2 id="explore-heading" className="dealer-section-title text-center">
           {heading}

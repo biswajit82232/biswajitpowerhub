@@ -17,6 +17,7 @@ import { trackEvent, EVENT } from '@/lib/tracking';
 import { optimizedImageUrl, isSupabaseStorageUrl } from '@/lib/imageCdn';
 import { cn, formatINR } from '@/lib/utils';
 import { useLocale } from '@/context/LocaleContext';
+import { offerLook, presentOffers } from '@/components/offers/offerLook';
 
 function offerImage(url, size = 96) {
   if (!url) return null;
@@ -176,9 +177,10 @@ function SaleModelPrices({ offer }) {
 }
 
 function OfferStrip({ offer, site, onOpen }) {
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
-  const isFree = offer.kind === 'free_with_purchase';
-  const isSale = offer.kind === 'scooter_sale';
+  const look = offerLook(offer, t);
+  const { isFree, isSale } = look;
   const waMsg = offerWhatsappMessage(offer, site);
   const img = offerImage(offer.imageUrl, 96);
 
@@ -193,72 +195,50 @@ function OfferStrip({ offer, site, onOpen }) {
     }
   };
 
+  const Icon = look.Icon;
+
   return (
-    <div
-      className={cn(
-        'overflow-hidden rounded-xl shadow-soft sm:rounded-2xl',
-        isSale || isFree
-          ? 'border border-red-200 bg-red-50/70'
-          : 'border border-line bg-white',
-      )}
-    >
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-soft ring-1 ring-black/5">
       <button
         type="button"
         onClick={() => onOpen(offer)}
-        className="flex w-full items-start gap-3 p-3 text-left transition hover:opacity-95 sm:gap-4 sm:p-4"
+        className={cn('flex w-full flex-1 flex-col p-4 text-left text-white', look.card)}
         aria-label={`View details: ${offer.discountText}${offer.title ? ` — ${offer.title}` : ''}`}
       >
-        {img ? (
-          <img
-            src={img}
-            alt=""
-            width={56}
-            height={56}
-            className={cn(
-              'h-12 w-12 shrink-0 rounded-xl object-cover sm:h-14 sm:w-14',
-              isFree ? 'ring-2 ring-red-300' : 'ring-1 ring-line',
-            )}
-            loading="lazy"
-            decoding="async"
-          />
-        ) : isSale ? (
-          <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-red-600 text-white sm:h-14 sm:w-14">
-            <span className="font-display text-[10px] font-black uppercase tracking-widest leading-none">Sale</span>
-            <span className="font-display text-sm font-black leading-none">{offer.discountPercent}%</span>
+        <span className="flex items-start justify-between gap-2">
+          <span className="text-[10px] font-black uppercase tracking-[0.14em] text-white/80">
+            {look.eyebrow}
           </span>
-        ) : isFree ? (
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white sm:h-14 sm:w-14">
-            <Gift className="h-5 w-5 sm:h-6 sm:w-6" />
+          <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase', look.chipClass)}>
+            {look.chip}
           </span>
-        ) : (
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100 sm:h-14 sm:w-14">
-            <Tag className="h-5 w-5 sm:h-6 sm:w-6" />
-          </span>
-        )}
-
-        <span className="min-w-0 flex-1">
-          <span
-            className={cn(
-              'block text-[9px] font-black uppercase tracking-[0.14em] sm:text-[10px] sm:tracking-[0.16em]',
-              isSale || isFree ? 'text-red-700' : 'text-brand-600',
-            )}
-          >
-            {isSale ? 'Sale on selected scooters' : isFree ? 'Free with scooty purchase' : 'Special offer'}
-          </span>
-          <span className="mt-0.5 block font-display text-[15px] font-black leading-snug tracking-tight text-navy sm:text-xl">
-            {offer.discountText}
-          </span>
-          {offer.title && offer.title !== offer.discountText ? (
-            <span className="mt-0.5 block text-sm font-semibold leading-snug text-heading sm:text-base">
-              {offer.title}
-            </span>
-          ) : null}
-          {offer.description ? (
-            <span className="mt-1 block text-[12px] leading-snug text-muted sm:line-clamp-2 sm:text-sm">
-              {offer.description}
-            </span>
-          ) : null}
         </span>
+        <span className="mt-3 flex items-start gap-3">
+          {img ? (
+            <img
+              src={img}
+              alt=""
+              width={56}
+              height={56}
+              className="h-14 w-14 shrink-0 rounded-xl object-cover ring-2 ring-white/40"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/15">
+              <Icon className="h-6 w-6" aria-hidden />
+            </span>
+          )}
+          <span className="min-w-0">
+            <span className="block font-display text-xl font-black leading-tight">{offer.discountText}</span>
+            {offer.title && offer.title !== offer.discountText ? (
+              <span className="mt-1 block text-sm font-semibold text-white/90">{offer.title}</span>
+            ) : null}
+          </span>
+        </span>
+        {offer.description ? (
+          <span className="mt-3 line-clamp-3 text-sm leading-snug text-white/85">{offer.description}</span>
+        ) : null}
       </button>
 
       <div
@@ -287,7 +267,7 @@ function OfferStrip({ offer, site, onOpen }) {
           className="h-9 !px-3 text-[11px] sm:h-10 sm:!px-3.5 sm:text-xs"
           onClick={() => onOpen(offer)}
         >
-          Details
+          {t('home.details')}
         </Button>
 
         <Button
@@ -304,7 +284,7 @@ function OfferStrip({ offer, site, onOpen }) {
             })
           }
         >
-          {isSale ? 'Ask price' : isFree ? 'Ask' : 'Claim'}
+          {isSale ? t('off.askPrice') : isFree ? t('off.ask') : t('off.claim')}
         </Button>
       </div>
     </div>
@@ -323,14 +303,7 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
   const { data: offers, loading } = useAsync(() => getActiveOffers(), []);
   const [selected, setSelected] = useState(null);
 
-  // Home already shows freebies as the hero sticky — skip the duplicate strip there.
-  const visibleOffers = compact
-    ? (offers || []).filter((o) => {
-        if (o.kind === 'free_with_purchase') return false;
-        if (o.kind === 'scooter_sale' && o.showOnHero !== false) return false;
-        return true;
-      })
-    : offers || [];
+  const visibleOffers = presentOffers(offers);
 
   const openOffer = (offer) => {
     if (!offer) return;
@@ -395,7 +368,7 @@ export function PromotionalOffers({ compact = false, showEmpty = false }) {
           {t('off.active')}
         </h2>
       ) : null}
-      <div className="space-y-2 sm:space-y-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {visibleOffers.map((offer, i) =>
           compact ? (
             <OfferStrip key={offer.id} offer={offer} site={site} onOpen={openOffer} />

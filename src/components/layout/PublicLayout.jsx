@@ -6,6 +6,8 @@ import { Footer } from './Footer';
 import { ScrollToTop } from '@/components/common/ScrollToTop';
 import { FloatingDealerRail } from '@/components/common/FloatingDealerRail';
 import { MobileLocalCTA } from '@/components/common/MobileLocalCTA';
+import { MobileSideShortcuts } from '@/components/common/MobileSideShortcuts';
+import { SiteOfferRail } from '@/components/offers/OfferSpotlight';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { ErrorBoundary, SoftBoundary } from '@/components/common/ErrorBoundary';
 import { RouteLoader } from '@/components/ui/Loading';
@@ -85,8 +87,11 @@ export function PublicLayout() {
       <main
         id="main-content"
         tabIndex={-1}
-        className="min-w-0 flex-1 overflow-x-clip pt-[var(--header-offset)] pb-[calc(4.5rem+env(safe-area-inset-bottom))] outline-none lg:pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+        className="min-w-0 flex-1 overflow-x-clip pt-[var(--header-offset)] pb-[calc(4.5rem+env(safe-area-inset-bottom))] pr-[52px] outline-none lg:pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:pr-0"
       >
+        <SoftBoundary>
+          <SiteOfferRail />
+        </SoftBoundary>
         <ErrorBoundary key={pathname}>
           <Suspense fallback={<RouteLoader label="Loading page" />}>
             <FadeOutlet />
@@ -98,6 +103,9 @@ export function PublicLayout() {
       </SoftBoundary>
       <SoftBoundary>
         <MobileLocalCTA />
+      </SoftBoundary>
+      <SoftBoundary>
+        <MobileSideShortcuts />
       </SoftBoundary>
       <SoftBoundary>
         <FloatingDealerRail />

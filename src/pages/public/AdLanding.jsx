@@ -11,6 +11,7 @@ import { getScooters } from '@/features/scooters/scooterService';
 import { SCOOTERS } from '@/data/scooters';
 import { formatCatalogFromPrice } from '@/lib/catalogCopy';
 import { useSaleOffers } from '@/context/SaleOffersContext';
+import { OfferSpotlight } from '@/components/offers/OfferSpotlight';
 
 /**
  * Bare Google Ads landing — noindex, no main nav, conversion-first.
@@ -53,6 +54,12 @@ export default function AdLanding() {
             city: site.address.city,
           })}
         </p>
+
+        {saleOffers?.length ? (
+          <div className="mt-6">
+            <OfferSpotlight offers={saleOffers} layout="grid" />
+          </div>
+        ) : null}
 
         <div className="mt-8 flex flex-col gap-3">
           <Button

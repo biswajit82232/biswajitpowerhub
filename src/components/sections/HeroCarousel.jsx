@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Tag } from 'lucide-react';
 import { SiteImage } from '@/components/common/SiteImage';
 import { SaleOfferSticker } from '@/components/common/SaleOfferSticker';
+import { OfferSpotlight } from '@/components/offers/OfferSpotlight';
 import { useSitePhotos } from '@/context/SitePhotosContext';
 import { useSite } from '@/context/SiteSettingsContext';
 import { useAsync } from '@/hooks/useAsync';
@@ -22,7 +21,6 @@ export function HeroCarousel({ heroImageUrl }) {
 
   const heroOffers = (offers || []).filter((o) => o.showOnHero !== false);
   const saleOffers = heroOffers.filter((o) => o.kind === 'scooter_sale');
-  const promoOffers = heroOffers.filter((o) => o.kind === 'promo');
   const freeOffers = heroOffers.filter((o) => o.kind === 'free_with_purchase');
   // Big sticker: percent-off sale first, otherwise the free-gift badge.
   const stickerOffer = saleOffers[0] || freeOffers[0] || null;
@@ -47,11 +45,9 @@ export function HeroCarousel({ heroImageUrl }) {
   }
 
   const [index, setIndex] = useState(0);
-  const [offerIndex, setOfferIndex] = useState(0);
   // Defer mounting the next slide so LCP isn't competing for bandwidth.
   const [mountNear, setMountNear] = useState(false);
   const count = slides.length;
-  const offerCount = promoOffers.length;
 
   const next = useCallback(() => {
     setIndex((i) => (i + 1) % count);
@@ -79,20 +75,7 @@ export function HeroCarousel({ heroImageUrl }) {
     return () => clearInterval(id);
   }, [count, next, mountNear]);
 
-  useEffect(() => {
-    if (offerCount < 2) return undefined;
-    const id = setInterval(() => {
-      setOfferIndex((i) => (i + 1) % offerCount);
-    }, 4500);
-    return () => clearInterval(id);
-  }, [offerCount]);
-
-  useEffect(() => {
-    setOfferIndex(0);
-  }, [offerCount]);
-
   const slide = slides[index];
-  const offer = promoOffers[offerIndex] || promoOffers[0];
 
   return (
     <section className="relative isolate w-full bg-surface-alt" aria-label="Hero">
@@ -168,7 +151,7 @@ export function HeroCarousel({ heroImageUrl }) {
       </div>
 
       {/* Sale sticker sits above the clipped media so the burst is never cut off */}
-      {stickerOffer ? (
+      {heroOffers.length < 2 && stickerOffer ? (
         <SaleOfferSticker
           offer={stickerOffer}
           to={`/offers?offer=${encodeURIComponent(stickerOffer.id)}`}
@@ -176,40 +159,13 @@ export function HeroCarousel({ heroImageUrl }) {
         />
       ) : null}
 
-      {/* Reserve promo-bar height while loading to avoid pushing #models (CLS). */}
+      {/* Every hero offer at once — a rotator was hiding the rest. */}
       {offersLoading ? (
-        <div className="min-h-[4.75rem] border-t border-brand-600 bg-brand-500 sm:min-h-[5.5rem]" aria-hidden />
-      ) : offer ? (
-        <Link
-          to={`/offers?offer=${encodeURIComponent(offer.id)}`}
-          className="block min-h-[4.75rem] border-t border-brand-600 bg-brand-500 text-white transition hover:bg-brand-600 sm:min-h-[5.5rem]"
-          aria-label={`View offer: ${offer.discountText}${offer.title ? ` — ${offer.title}` : ''}`}
-        >
-          <div className="container-px flex items-center justify-between gap-3 py-2.5 sm:gap-6 sm:py-3.5">
-            <div className="min-w-0 flex-1 text-left">
-              <p className="text-[9px] font-black uppercase tracking-[0.16em] text-white/85 sm:text-[10px] sm:tracking-[0.18em]">
-                {t('home.offer')}{offerCount > 1 ? ` · ${offerIndex + 1}/${offerCount}` : ''}
-              </p>
-              <p className="mt-0.5 font-display text-[13px] font-black leading-snug tracking-tight text-white sm:text-lg">
-                {offer.discountText}
-              </p>
-              {offer.title && offer.title !== offer.discountText ? (
-                <p className="mt-0.5 text-[11px] font-semibold leading-snug text-white/90 sm:text-sm">
-                  {offer.title}
-                </p>
-              ) : null}
-              {offer.promoCode ? (
-                <p className="mt-1.5 inline-flex items-center gap-1.5 rounded-md bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-brand-600 sm:text-xs">
-                  <Tag className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
-                  {t('home.code')} {offer.promoCode}
-                </p>
-              ) : null}
-            </div>
-            <span className="inline-flex h-9 shrink-0 items-center justify-center rounded-dealer border border-white bg-white px-3 text-[10px] font-black uppercase tracking-wide text-brand-600 sm:h-11 sm:px-5 sm:text-xs">
-              {t('home.details')}
-            </span>
-          </div>
-        </Link>
+        <div className="min-h-[8.75rem] border-t border-line bg-surface-alt" aria-hidden />
+      ) : heroOffers.length ? (
+        <div className="border-t border-line bg-surface-alt px-3 py-3 sm:px-4 sm:py-4">
+          <OfferSpotlight offers={heroOffers} />
+        </div>
       ) : null}
 
       <span className="sr-only">
